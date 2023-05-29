@@ -12,3 +12,7 @@
 Use `app-config.yaml` to configure the application.
 
 #todo add ability to override config for local usage.
+
+## Contributing
+
+You can find documentation for developers and contributors in the [DEVELOPMENT.md](./DEVELOPMENT.md) file.

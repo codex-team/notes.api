@@ -14,14 +14,30 @@ const MetricsConfig = z.object({
 });
 
 /**
+ * Available logging levels configuration
+ */
+const LoggingLevel = z.union([
+  z.boolean(), // disabled if false, 'info' if true
+  z.literal('fatal'),
+  z.literal('error'),
+  z.literal('warn'),
+  z.literal('info'),
+  z.literal('debug'),
+  z.literal('trace'),
+  z.literal('silent'),
+]);
+
+/**
  * Logging configuration
  */
-const LoggingConfig = z.object({ // todo use this config to setup logging later
-  global: z.string(), // todo use special type for log level
-  metricsServer: z.string(),
-  appServer: z.string(),
-  database: z.string(),
+export const LoggingConfig = z.object({
+  global: LoggingLevel,
+  metricsServer: LoggingLevel,
+  appServer: LoggingLevel,
+  database: LoggingLevel,
 });
+
+export type LoggingConfig = z.infer<typeof LoggingConfig>;
 
 /**
  * Http API configuration
