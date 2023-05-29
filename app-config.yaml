@@ -9,6 +9,6 @@ metrics:
 
 logging:
   global: info
-  metricsServer: error
-  appServer: error
+  metricsServer: info
+  appServer: info
   database: info

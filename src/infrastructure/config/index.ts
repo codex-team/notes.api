@@ -47,6 +47,8 @@ const HttpApiConfig = z.object({
   port: z.number(),
 });
 
+export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
+
 /**
  * Application configuration
  */
