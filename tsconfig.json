@@ -12,6 +12,7 @@
     "paths": {
       "@infrastructure/*": ["infrastructure/*"],
       "@presentation/*": ["presentation/*"],
+      "@lib/*": ["lib/*"],
     }
   },
   "ts-node": {
