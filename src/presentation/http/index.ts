@@ -9,6 +9,9 @@ const appServerLogger = getLogger('appServer');
  * Http server implementation
  */
 export default class HttpServer implements Server {
+  /**
+   * Fastify server instance
+   */
   private server = fastify({
     logger: appServerLogger,
   });
