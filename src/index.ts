@@ -1,6 +1,6 @@
-import config from './infrastructure/config';
-import logger from './infrastructure/logging';
-import HttpServer from './presentation/http';
+import config from './infrastructure/config/index.js';
+import logger from './infrastructure/logging/index.js';
+import HttpServer from './presentation/http/index.js';
 
 
 const httpServer = new HttpServer(config.httpApi);
