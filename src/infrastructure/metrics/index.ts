@@ -2,7 +2,7 @@ import fastify from 'fastify';
 import promClient from 'prom-client';
 import { getLogger } from '@infrastructure/logging/index.js';
 import config from '@infrastructure/config/index.js';
-import HttpStatusCode from '@lib/http-status-codes.js';
+import { StatusCodes } from 'http-status-codes';
 
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
 const Registry = promClient.Registry;
@@ -32,13 +32,13 @@ export default async function runMetricsServer(): Promise<void> {
 
   metricsServer.get('/', (_request, reply) => {
     reply
-      .code(HttpStatusCode.SuccessOK)
+      .code(StatusCodes.OK)
       .type('text/html')
       .send(homePage);
   });
 
   metricsServer.get('/metrics', async (_request, reply) => {
-    reply.code(HttpStatusCode.SuccessOK).send(await register.metrics());
+    reply.code(StatusCodes.OK).send(await register.metrics());
   });
 
   metricsServer.get('/health', async (_request, reply) => {
@@ -48,7 +48,7 @@ export default async function runMetricsServer(): Promise<void> {
       date: new Date(),
     };
 
-    reply.status(HttpStatusCode.SuccessOK).send(data);
+    reply.status(StatusCodes.OK).send(data);
   });
 
   await metricsServer.listen({
