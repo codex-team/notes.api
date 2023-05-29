@@ -1,23 +1,16 @@
-import fastify from 'fastify';
 import config from './infrastructure/config';
-import logger, { getLogger } from './infrastructure/logging';
+import logger from './infrastructure/logging';
+import HttpServer from './presentation/http';
 
-const appServerLogger = getLogger('appServer');
 
-const server = fastify({
-  logger: appServerLogger,
-});
-
-server.get('/', async () => {
-  return { hello: 'world' };
-});
+const httpServer = new HttpServer(config.httpApi);
 
 const start = async (): Promise<void> => {
   try {
-    await server.listen({ port: config.httpApi.port }); // todo move it to src/presentation as we agreed
-    logger.info(`🚀 Server ready at http://${config.httpApi.host}:${config.httpApi.port}`);
+    await httpServer.run();
+    logger.info('Application launched successfully');
   } catch (err) {
-    logger.fatal('Failed to start server', err);
+    logger.fatal('Failed to start application', err);
     process.exit(1);
   }
 };
