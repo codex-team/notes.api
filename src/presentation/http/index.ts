@@ -1,7 +1,7 @@
-import { getLogger } from '../../infrastructure/logging/index.js';
+import { getLogger } from '@infrastructure/logging/index.js';
+import { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
 import { Server } from '../index.js';
-import { HttpApiConfig } from '../../infrastructure/config/index.js';
 
 const appServerLogger = getLogger('appServer');
 
