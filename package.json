@@ -19,6 +19,10 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "fastify": "^4.17.0"
+    "@codex-team/config-loader": "^0.1.0-rc1",
+    "arg": "^5.0.2",
+    "fastify": "^4.17.0",
+    "pino": "^8.14.1",
+    "zod": "^3.21.4"
   }
 }

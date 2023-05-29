@@ -1,0 +1,14 @@
+httpApi:
+  host: 0.0.0.0
+  port: 3000
+
+metrics:
+  enabled: true
+  host: 0.0.0.0
+  port: 9090
+
+logging:
+  global: info
+  metricsServer: error
+  appServer: error
+  database: info
