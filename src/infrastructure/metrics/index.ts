@@ -55,5 +55,4 @@ export default async function runMetricsServer(): Promise<void> {
     port: config.metrics.port,
     host: config.metrics.host,
   });
-  metricsServerLogger.info(`Metrics server ready at http://${config.metrics.host}:${config.metrics.port}`);
 }
