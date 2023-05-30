@@ -18,7 +18,7 @@ export enum Actions {
 /**
  * Type for route tuple (Method, path, handler)
  */
-export type Route = [Actions, string, Handler];
+export type Route = ['post' | 'get' | 'delete' | 'put',`/${string}`, Handler];
 
 /**
  * Interface representing router
