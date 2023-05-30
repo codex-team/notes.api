@@ -13,7 +13,7 @@ export default class NoteRouter implements Router {
   /**
    * Routes for note
    */
-  public routes: Array<Route> = [];
+  public routes: Route[] = [];
 
   /**
    * Creates note router instance

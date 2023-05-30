@@ -14,7 +14,7 @@ export default class RootRouter implements Router {
   /**
    * Routes (Action, path, handler)
    */
-  public routes: Array<Route> = [];
+  public routes: Route[] = [];
 
   /**
    * Note router
