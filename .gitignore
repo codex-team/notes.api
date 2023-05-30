@@ -1,3 +1,5 @@
+app-config.local.yaml
+
 # Logs
 logs
 *.log
