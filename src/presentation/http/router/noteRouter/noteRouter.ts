@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import Router, { Actions, Route } from '@presentation/http/router/index.js';
+import Router, { Route } from '@presentation/http/router/index.js';
 
 /**
  * Class representing note router
@@ -23,7 +23,7 @@ export default class NoteRouter implements Router {
   constructor(prefix: string) {
     this.prefix = prefix;
     this.routes = [
-      ['post', '/add', this.addNote]
+      ['post', '/add', this.addNote],
     ];
   }
 
@@ -47,7 +47,7 @@ export default class NoteRouter implements Router {
       /**
        * Create fastify server routes
        */
-      server[route[0]](route[1], route[2]);
+      server[route[0]](this.prefix + route[1], route[2]);
     }
   }
 }
