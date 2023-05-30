@@ -1,14 +1,13 @@
 import config from '@infrastructure/config/index.js';
 import logger from '@infrastructure/logging/index.js';
-import HttpServer from '@presentation/http/http-server.js';
+import API from '@presentation/index.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
 
-
-const httpServer = new HttpServer(config.httpApi);
+const ApiInstance = new API(config.httpApi);
 
 const start = async (): Promise<void> => {
   try {
-    await httpServer.run();
+    await ApiInstance.run();
 
     if (config.metrics.enabled) {
       await runMetricsServer();
