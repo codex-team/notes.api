@@ -1,7 +1,7 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
-import type API from '../api.interface.js';
+import type API from '@presentation/api.interface.js';
 import NoteRouter from '@presentation/http/router/note.js';
 
 const appServerLogger = getLogger('appServer');
