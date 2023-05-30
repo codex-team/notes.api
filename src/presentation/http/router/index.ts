@@ -27,7 +27,7 @@ export default interface Router {
     /**
      * Routes
      */
-    routes: Array<Route>;
+    routes: Route[];
 
     /**
      * Router prefix
