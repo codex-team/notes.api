@@ -6,7 +6,7 @@ import Router, { Actions, Route } from '@presentation/http/router/index.js';
  */
 export default class NoteRouter implements Router {
   /**
-   * Router prefix
+   * Prefix that will be added to each route
    */
   public prefix: string;
 
