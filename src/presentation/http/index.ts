@@ -18,9 +18,9 @@ export default class HttpServer implements Server {
   });
 
   /**
-   * Router with all modules 
+   * Router with all modules
    */
-  private router = new Router(this.server);
+  private router = new Router('/');
 
   /**
    * Http server config
@@ -35,7 +35,7 @@ export default class HttpServer implements Server {
   constructor(config: HttpApiConfig) {
     this.config = config;
 
-    this.router.register();
+    this.router.register(this.server);
   }
 
 

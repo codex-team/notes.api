@@ -1,5 +1,5 @@
-import { FastifyInstance } from 'fastify';
-import Router from '@presentation/http/router/index.js';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import Router, { Actions, Route } from '@presentation/http/router/index.js';
 
 /**
  * Class representing note router
@@ -11,36 +11,41 @@ export default class NoteRouter implements Router {
   public prefix: string;
 
   /**
-   * Server instance
+   * Routes for note
    */
-  public server: FastifyInstance;
+  public routes: Array<Route> = [];
 
   /**
    * Creates note router instance
    *
-   * @param server - server instance
    * @param prefix - router prefix
    */
-  constructor(server: FastifyInstance, prefix: string) {
+  constructor(prefix: string) {
     this.prefix = prefix;
-    this.server = server;
+    this.routes.push([Actions.POST, this.prefix + '/add', this.addNote]);
   }
 
   /**
    * Function to add note
    *
-   * @param path - path to add note
+   * @param request - request object
+   * @param reply - reply object
    */
-  public addNote(path: string): void  {
-    this.server.post(path, async (request, reply) => {
-      reply.send( { data: request.query });
-    });
+  public async addNote(request: FastifyRequest, reply: FastifyReply): Promise<void>  {
+    reply.send( { data: request.query });
   }
 
   /**
    * Registers routes
+   *
+   * @param server - fastify server instance
    */
-  public register(): void {
-    this.addNote(this.prefix + '/add');
+  public register(server: FastifyInstance): void {
+    for (const route of this.routes) {
+      /**
+       * Create fastify server routes
+       */
+      server[route[0]](route[1], route[2]);
+    }
   }
 }

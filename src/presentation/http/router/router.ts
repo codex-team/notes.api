@@ -1,6 +1,6 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import NoteRouter from '@presentation/http/router/noteRouter/noteRouter.js';
-import Router from '@presentation/http/router/index.js';
+import Router, { Actions, Route } from '@presentation/http/router/index.js';
 
 /**
  * Class representing router
@@ -9,7 +9,12 @@ export default class RootRouter implements Router {
   /**
    * Router prefix
    */
-  public prefix = '/';
+  public prefix: string;
+
+  /**
+   * Routes (Action, path, handler)
+   */
+  public routes: Array<Route> = [];
 
   /**
    * Note router
@@ -17,36 +22,39 @@ export default class RootRouter implements Router {
   public noteRouter: NoteRouter;
 
   /**
-   * Server instance
-   */
-  public server: FastifyInstance;
-
-  /**
    * Creates router instance
    *
-   * @param server - server instance
+   * @param prefix - router prefix
    */
-  constructor(server: FastifyInstance) {
-    this.server = server;
-    this.noteRouter = new NoteRouter(this.server, '/note');
+  constructor(prefix: string) {
+    this.prefix = prefix;
+    this.routes.push([Actions.GET, this.prefix, this.index]);
+    this.noteRouter = new NoteRouter('/note');
   }
 
   /**
    * Root route
    *
-   * @param path - path to index
+   * @param request - request object
+   * @param reply - reply object
    */
-  public index(path: string): void {
-    this.server.get(path, async () => {
-      return { hello: 'world' };
-    });
+  public async index(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+    reply.send({ hello: 'world' });
   }
 
   /**
    * Registers routes
+   *
+   * @param server - fastify server instance
    */
-  public register(): void {
-    this.index(this.prefix);
-    this.noteRouter.register();
+  public register(server: FastifyInstance): void {
+    for (const route of this.routes) {
+      server[route[0]](route[1], route[2]);
+    }
+
+    /**
+     * Register note router
+     */
+    this.noteRouter.register(server);
   }
 }
