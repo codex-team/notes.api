@@ -2,6 +2,7 @@ import { getLogger } from '@infrastructure/logging/index.js';
 import { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
 import { Server } from '../index.js';
+import Router from '@presentation/http/router/router.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -17,6 +18,11 @@ export default class HttpServer implements Server {
   });
 
   /**
+   * Note route
+   */
+  private router = new Router(this.server);
+
+  /**
    * Http server config
    */
   private readonly config: HttpApiConfig;
@@ -29,10 +35,9 @@ export default class HttpServer implements Server {
   constructor(config: HttpApiConfig) {
     this.config = config;
 
-    this.server.get('/', async () => { // todo move to http/router folder
-      return { hello: 'world' };
-    });
+    this.router.register();
   }
+
 
   /**
    * Runs http server
