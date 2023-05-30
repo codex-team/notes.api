@@ -3,11 +3,11 @@ import logger from '@infrastructure/logging/index.js';
 import API from '@presentation/index.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
 
-const apiInstance = new API(config.httpApi);
+const api = new API(config.httpApi);
 
 const start = async (): Promise<void> => {
   try {
-    await apiInstance.run();
+    await api.run();
 
     if (config.metrics.enabled) {
       await runMetricsServer();
