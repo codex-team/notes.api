@@ -22,7 +22,9 @@ export default class NoteRouter implements Router {
    */
   constructor(prefix: string) {
     this.prefix = prefix;
-    this.routes.push([Actions.POST, this.prefix + '/add', this.addNote]);
+    this.routes = [
+      ['post', '/add', this.addNote]
+    ];
   }
 
   /**
