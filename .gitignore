@@ -1,4 +1,6 @@
 app-config.local.yaml
+docker-compose.yml
+.idea
 
 # Logs
 logs
