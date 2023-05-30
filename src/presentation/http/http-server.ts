@@ -1,8 +1,8 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
-import { Server } from '../index.js';
-import Router from '@presentation/http/router/router.js';
+import { Server } from '../server.js';
+import NoteRouter from '@presentation/http/router/note.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -18,11 +18,6 @@ export default class HttpServer implements Server {
   });
 
   /**
-   * Router with all modules
-   */
-  private router = new Router('/');
-
-  /**
    * Http server config
    */
   private readonly config: HttpApiConfig;
@@ -35,7 +30,10 @@ export default class HttpServer implements Server {
   constructor(config: HttpApiConfig) {
     this.config = config;
 
-    this.router.register(this.server);
+    /**
+     * Register all routers
+     */
+    this.server.register(NoteRouter, { prefix: '/note' });
   }
 
 
