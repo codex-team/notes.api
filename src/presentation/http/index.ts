@@ -18,7 +18,7 @@ export default class HttpServer implements Server {
   });
 
   /**
-   * Note route
+   * Router with all modules 
    */
   private router = new Router(this.server);
 
