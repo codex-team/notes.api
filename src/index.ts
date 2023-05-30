@@ -1,6 +1,6 @@
-import config from './infrastructure/config/index.js';
-import logger from './infrastructure/logging/index.js';
-import HttpServer from './presentation/http/index.js';
+import config from '@infrastructure/config/index.js';
+import logger from '@infrastructure/logging/index.js';
+import HttpServer from '@presentation/http/http-server.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
 
 
