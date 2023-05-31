@@ -1,4 +1,5 @@
 import { FastifyPluginCallback } from 'fastify';
+import NoteService, { AddNoteOptions } from '@domain/service/note.js';
 
 /**
  * Note router plugin
@@ -18,8 +19,16 @@ const NoteRouter: FastifyPluginCallback = (fastify, _, done) => {
   /**
    * Add new note
    */
-  fastify.post('/add', async (request, reply) => {
-    reply.send(request.query);
+  fastify.post('/', async (request, reply) => {
+    /**
+     * TODO: Validate request query
+     */
+    const options = request.query as AddNoteOptions;
+
+    reply.send(NoteService.addNote({
+      title: options.title,
+      content: options.content,
+    }));
   });
 
   done();
