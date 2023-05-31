@@ -11,7 +11,7 @@ const start = async (): Promise<void> => {
     /**
      * TODO - Add database connection and creating storage instance
      */
-    const domainServices = initDomains();
+    const domainServices = initDomain();
 
     await api.run(domainServices);
 
