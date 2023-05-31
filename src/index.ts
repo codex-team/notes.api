@@ -12,7 +12,15 @@ const start = async (): Promise<void> => {
     /**
      * TODO - Add database connection and creating storage instance
      */
+
+    /**
+     * Initiate repositories
+     */
     const noteRepository = new NoteRepository({});
+
+    /**
+     * Initiate services
+     */
     const noteService = new NoteService(noteRepository);
 
     await api.run(noteService);
