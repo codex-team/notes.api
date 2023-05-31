@@ -2,7 +2,7 @@ import config from '@infrastructure/config/index.js';
 import logger from '@infrastructure/logging/index.js';
 import API from '@presentation/index.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
-import { init as initDomains } from '@domain/index.js';
+import { init as initDomain } from '@domain/index.js';
 
 const api = new API(config.httpApi);
 
