@@ -1,7 +1,7 @@
 import Note from '@domain/entities/note.js';
 
 /**
- * Note repository
+ * Repository allows accessing data from business-logic (domain) level
  */
 export default class NoteRepository {
   /**
