@@ -2,13 +2,28 @@ import { FastifyPluginCallback } from 'fastify';
 import NoteService, { AddNoteOptions } from '@domain/service/note.js';
 
 /**
+ * Interface for the note router.
+ */
+interface NoteRouterOptions {
+  /**
+   * Note service instance
+   */
+  noteService: NoteService,
+}
+
+/**
  * Note router plugin
  *
  * @param fastify - fastify instance
- * @param _ - empty options
+ * @param opts - empty options
  * @param done - callback
  */
-const NoteRouter: FastifyPluginCallback = (fastify, _, done) => {
+const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, done) => {
+  /**
+   * Get note service from options
+   */
+  const noteService = opts.noteService;
+
   /**
    * Get notes
    */
@@ -25,7 +40,7 @@ const NoteRouter: FastifyPluginCallback = (fastify, _, done) => {
      */
     const options = request.query as AddNoteOptions;
 
-    reply.send(NoteService.addNote({
+    reply.send(noteService.addNote({
       title: options.title,
       content: options.content,
     }));

@@ -1,4 +1,5 @@
 import Note from '@domain/entities/note.js';
+import NoteRepository from '@repository/note.js';
 
 /**
  * Interface for the adding note options.
@@ -40,22 +41,34 @@ interface AddedNoteObject {
  */
 export default class NoteService {
   /**
+   * Note repository
+   */
+  public repository: NoteRepository;
+
+  /**
+   * Note service constructor
+   *
+   * @param repository - note repository
+   */
+  constructor(repository: NoteRepository) {
+    this.repository = repository;
+  }
+
+  /**
    * Adds note
    *
    * @param options - add note options
    * @returns { AddedNoteObject } added note object
    */
-  public static addNote({ title, content }: AddNoteOptions): AddedNoteObject {
+  public addNote({ title, content }: AddNoteOptions): AddedNoteObject {
     const note = new Note(title, content);
 
-    /**
-     * TODO: Add note to database
-     */
+    const addedNote = this.repository.addNote(note);
 
     return {
-      id: note.id,
-      title: note.title,
-      content: note.content,
+      id: addedNote.id,
+      title: addedNote.title,
+      content: addedNote.content,
     };
   }
 }
