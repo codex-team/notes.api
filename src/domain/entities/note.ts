@@ -1,11 +1,11 @@
 /**
  * Note entity
  */
-export default class NoteEntity {
+export default class Note {
   /**
    * Note id
    */
-  public id?: string;
+  public id: string;
 
   /**
    * Note title
@@ -16,13 +16,15 @@ export default class NoteEntity {
    * Note content
    */
   public content: string;
+
   /**
+   * Note entity constructor
    *
    * @param title - note title
    * @param content - note content
    * @param id - note id
    */
-  constructor(title: string, content: string, id?: string) {
+  constructor(title: string, content: string, id = '') {
     this.title = title;
     this.content = content;
     this.id = id;

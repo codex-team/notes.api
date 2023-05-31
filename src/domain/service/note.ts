@@ -1,14 +1,29 @@
-import NoteEntity from '@domain/entities/note.js';
+import Note from '@domain/entities/note.js';
 
 /**
- * Interface for the add note query.
+ * Interface for the add note options.
  */
-interface AddNoteQuery {
+export interface AddNoteOptions {
   /**
    * Note title
    */
   title: string;
 
+  /**
+   * Note content
+   */
+  content: string;
+}
+
+interface AddedNoteObject {
+  /**
+   * Note id
+   */
+  id: string;
+  /**
+   * Note title
+   */
+  title: string;
   /**
    * Note content
    */
@@ -22,16 +37,11 @@ export default class NoteService {
   /**
    * Adds note
    *
-   * @param query - add note query
+   * @param options - add note options
    * @returns {unknown} - added note object
    */
-  public static addNote(query: unknown): unknown {
-    /**
-     * TODO: Validate query
-     */
-    const { title, content } = query as AddNoteQuery;
-
-    const note = new NoteEntity(title, content);
+  public static addNote({ title, content }: AddNoteOptions): AddedNoteObject {
+    const note = new Note(title, content);
 
     /**
      * TODO: Add note to database
