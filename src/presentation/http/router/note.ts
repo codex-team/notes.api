@@ -1,5 +1,5 @@
 import { FastifyPluginCallback } from 'fastify';
-import NoteService from '@domain/service/note.service.js';
+import NoteService from '@domain/service/note.js';
 
 /**
  * Note router plugin

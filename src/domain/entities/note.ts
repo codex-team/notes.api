@@ -1,7 +1,7 @@
 /**
  * Note entity
  */
-export default class NoteEntity {
+export default class Note {
   /**
    * Note id
    */

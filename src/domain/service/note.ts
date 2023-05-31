@@ -1,4 +1,4 @@
-import NoteEntity from '@domain/entities/note.entity.js';
+import NoteEntity from '@domain/entities/note.js';
 
 /**
  * Interface for the add note query.
@@ -18,7 +18,7 @@ interface AddNoteQuery {
 /**
  * Note service
  */
-export default class NoteService {
+export default class Note {
   /**
    * Adds note
    *
