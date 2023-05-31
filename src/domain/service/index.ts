@@ -15,6 +15,9 @@ export interface DomainServices {
  * Initiate services
  */
 export function init(): DomainServices {
+  /**
+   * TODO - Pass existing storage instance
+   */
   const noteRepository = new NoteRepository({});
   const noteService = new NoteService(noteRepository);
 
