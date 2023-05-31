@@ -3,7 +3,7 @@ import { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
 import type API from '@presentation/api.interface.js';
 import NoteRouter from '@presentation/http/router/note.js';
-import { DomainServices } from '@domain/service/index.js';
+import { DomainServices } from '@domain/index.js';
 
 const appServerLogger = getLogger('appServer');
 
