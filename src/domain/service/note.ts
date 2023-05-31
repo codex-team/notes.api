@@ -38,7 +38,7 @@ export default class NoteService {
    * Adds note
    *
    * @param options - add note options
-   * @returns {unknown} - added note object
+   * @returns added note object
    */
   public static addNote({ title, content }: AddNoteOptions): AddedNoteObject {
     const note = new Note(title, content);
