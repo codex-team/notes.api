@@ -1,4 +1,5 @@
 import { FastifyPluginCallback } from 'fastify';
+import NoteService from '@domain/service/note.service.js';
 
 /**
  * Note router plugin
@@ -19,7 +20,7 @@ const NoteRouter: FastifyPluginCallback = (fastify, _, done) => {
    * Add new note
    */
   fastify.post('/add', async (request, reply) => {
-    reply.send(request.query);
+    reply.send(NoteService.addNote(request.query));
   });
 
   done();
