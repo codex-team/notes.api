@@ -25,8 +25,8 @@ const NoteRouter: FastifyPluginCallback = (fastify, _, done) => {
      */
     const options = request.query as AddNoteOptions;
 
-    reply.send(NoteService.addNote({ 
-      title: options.title, 
+    reply.send(NoteService.addNote({
+      title: options.title,
       content: options.content,
     }));
   });

@@ -1,7 +1,7 @@
 import Note from '@domain/entities/note.js';
 
 /**
- * Interface for the add note options.
+ * Interface for the adding note options.
  */
 export interface AddNoteOptions {
   /**
@@ -15,15 +15,20 @@ export interface AddNoteOptions {
   content: string;
 }
 
+/**
+ * Interface for the added note object.
+ */
 interface AddedNoteObject {
   /**
    * Note id
    */
   id: string;
+
   /**
    * Note title
    */
   title: string;
+
   /**
    * Note content
    */
@@ -38,7 +43,7 @@ export default class NoteService {
    * Adds note
    *
    * @param options - add note options
-   * @returns added note object
+   * @returns { AddedNoteObject } added note object
    */
   public static addNote({ title, content }: AddNoteOptions): AddedNoteObject {
     const note = new Note(title, content);
