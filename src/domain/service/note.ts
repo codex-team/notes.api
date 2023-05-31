@@ -1,5 +1,5 @@
 import Note from '@domain/entities/note.js';
-import { NoteRepository } from '@repository/index.js';
+import NoteRepository from '@repository/note.js';
 
 /**
  * Interface for the adding note options.
