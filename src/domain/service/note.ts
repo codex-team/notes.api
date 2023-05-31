@@ -18,7 +18,7 @@ interface AddNoteQuery {
 /**
  * Note service
  */
-export default class NoteSevice {
+export default class NoteService {
   /**
    * Adds note
    *
