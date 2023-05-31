@@ -14,10 +14,6 @@ jobs:
   eslint:
     name: Run eslint check
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
