@@ -14,6 +14,15 @@ const MetricsConfig = z.object({
 });
 
 /**
+ * Database configuration
+ */
+const DatabaseConfig = z.object({
+  url: z.string(), // todo url or params
+});
+
+export type DatabaseConfig = z.infer<typeof DatabaseConfig>;
+
+/**
  * Available logging levels configuration
  */
 const LoggingLevel = z.union([
@@ -56,6 +65,7 @@ const AppConfig = z.object({
   httpApi: HttpApiConfig,
   metrics: MetricsConfig,
   logging: LoggingConfig,
+  database: DatabaseConfig,
 });
 
 export type AppConfig = z.infer<typeof AppConfig>;
@@ -75,6 +85,9 @@ const defaultConfig: AppConfig = {
     metricsServer: 'info',
     appServer: 'info',
     database: 'info',
+  },
+  database: {
+    url: 'postgres://user:pass@postgres/codex-notes',
   },
 };
 

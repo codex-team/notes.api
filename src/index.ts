@@ -3,15 +3,15 @@ import logger from '@infrastructure/logging/index.js';
 import API from '@presentation/index.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
 import { init as initDomain } from '@domain/index.js';
+import { initRepositories } from '@repository/index.js';
 
 const api = new API(config.httpApi);
 
 const start = async (): Promise<void> => {
   try {
-    /**
-     * TODO - Add database connection and creating storage instance
-     */
-    const domainServices = initDomain();
+    const repositories = await initRepositories(config.database);
+
+    const domainServices = initDomain(repositories);
 
     await api.run(domainServices);
 
