@@ -1,14 +1,13 @@
 import { DatabaseConfig } from '@infrastructure/config/index.js';
 import { Sequelize } from 'sequelize';
 import { getLogger } from '@infrastructure/logging/index.js';
-import Storage from '@repository/storage.interface.js';
 
 const databaseLogger = getLogger('database');
 
 /**
  * Class for creating database connection
  */
-export default class Database implements Storage {
+export default class DatabaseSequelize {
   /**
    * Database configuration
    */

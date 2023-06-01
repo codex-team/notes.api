@@ -1,5 +1,5 @@
 import Note from '@domain/entities/note.js';
-import NoteStorage from '@repository/postgres/orm/note.js';
+import NoteStorage from '@repository/storage/postgres/orm/note.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
