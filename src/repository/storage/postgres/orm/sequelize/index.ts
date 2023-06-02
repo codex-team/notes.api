@@ -13,7 +13,10 @@ export default class SequelizeOrm {
    */
   private config: DatabaseConfig;
 
-  private conn: Sequelize;
+  /**
+   * Database instance
+   */
+  private readonly conn: Sequelize;
 
   /**
    * Constructor for class
@@ -25,13 +28,14 @@ export default class SequelizeOrm {
 
     this.conn = new Sequelize(this.config.url, {
       logging: databaseLogger.info.bind(databaseLogger),
+      sync: {
+        force: true,
+      },
     });
   }
 
   /**
    * Test the connection by trying to authenticate
-   *
-   * @returns { Sequelize } - database instance
    */
   public async authenticate(): Promise<void> {
     /**
@@ -46,7 +50,7 @@ export default class SequelizeOrm {
   }
 
   /**
-   *
+   * Get database connection
    */
   public get connection(): Sequelize  {
     return this.conn;

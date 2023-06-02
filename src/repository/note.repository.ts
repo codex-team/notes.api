@@ -23,8 +23,11 @@ export default class NoteRepository {
    * Add note
    *
    * @param note - note to add
+   * @returns { Promise<Note> } added note
    */
-  public addNote(note: Note): void {
-    this.storage.insertNote(note);
+  public async addNote({ title, content }: Note): Promise<Note> {
+    const insertedNote = await this.storage.insertNote(title, content);
+
+    return new Note(insertedNote.title, insertedNote.content, insertedNote.id);
   }
 }

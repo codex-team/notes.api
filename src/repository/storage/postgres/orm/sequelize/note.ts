@@ -1,13 +1,44 @@
 import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
-import Note from '@domain/entities/note.js';
-import Orm from './index.js';
-import NoteStorageInterface from '@repository/note.storage.interface.js';
+import Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 
 /**
- *
+ * Interface for inserted note
+ */
+interface InsertedNote {
+  /**
+   * Note id
+   */
+  id: number;
+
+  /**
+   * Note title
+   */
+  title: string;
+
+  /**
+   * Note content
+   */
+  content: string;
+}
+
+/**
+ * Class representing a note model in database
  */
 class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAttributes<NoteModel>> {
+  /**
+   * Note id
+   */
   public declare id: CreationOptional<number>;
+
+  /**
+   * Note title
+   */
+  public declare title: string;
+
+  /**
+   * Note content
+   */
+  public declare content: string;
 }
 
 
@@ -19,22 +50,38 @@ export default class NoteSequelizeStorage {
    * Database instance
    */
   private readonly database: Sequelize;
+
+  /**
+   * Note model in database
+   */
   private model: typeof NoteModel;
+
+  /**
+   * Table name
+   */
+  private readonly tableName = 'notes';
 
   /**
    * Constructor for note storage
    *
-   * @param ormInstance
+   * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
     this.database = connection;
 
+    /**
+     * Initiate note model
+     */
     this.model = NoteModel.init({
-      id: DataTypes.STRING,
-      // title: DataTypes.STRING,
-      // content: DataTypes.STRING,
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      title: DataTypes.STRING,
+      content: DataTypes.STRING,
     }, {
-      tableName: 'notes',
+      tableName: this.tableName,
       sequelize: this.database,
     });
   }
@@ -42,16 +89,20 @@ export default class NoteSequelizeStorage {
   /**
    * Insert note to database
    *
-   * @param note - note to insert
-   * @returns { Note } - inserted note
+   * @param title - note title
+   * @param content - note content
+   * @returns { InsertedNote } - inserted note
    */
-  public insertNote(note: Pick<Note, 'title' | 'content'>): Note {
-    /**
-     * TODO - add note to database
-     */
-    note.id = '42';
+  public async insertNote(title: string, content: string): Promise<InsertedNote> {
+    const insertedNote = await this.model.create({
+      title,
+      content,
+    });
 
-
-    return note;
+    return {
+      id: insertedNote.id,
+      title: insertedNote.title,
+      content: insertedNote.content,
+    };
   }
 }

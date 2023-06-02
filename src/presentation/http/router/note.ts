@@ -1,5 +1,6 @@
 import { FastifyPluginCallback } from 'fastify';
 import NoteService, { AddNoteOptions } from '@domain/service/note.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the note router.
@@ -40,12 +41,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const options = request.query as AddNoteOptions;
 
-    reply.send(noteService.addNote({
-      title: options.title,
-      content: options.content,
-    }));
-  });
+    const addedNote = await noteService.addNote(options);
 
+    return reply.code(StatusCodes.CREATED).send(addedNote);
+  });
   done();
 };
 

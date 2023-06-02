@@ -21,6 +21,9 @@ export interface Repositories {
 export async function init(databaseConfig: DatabaseConfig): Promise<Repositories> {
   const orm = new Orm(databaseConfig);
 
+  /**
+   * Test the connection by trying to authenticate
+   */
   await orm.authenticate();
 
   /**

@@ -5,7 +5,7 @@ export default class Note {
   /**
    * Note id
    */
-  public id: string;
+  public id: number;
 
   /**
    * Note title
@@ -24,7 +24,7 @@ export default class Note {
    * @param content - note content
    * @param id - note id
    */
-  constructor(title: string, content: string, id = '') {
+  constructor(title: string, content: string, id = 0) {
     this.title = title;
     this.content = content;
     this.id = id;

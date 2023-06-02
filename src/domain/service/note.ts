@@ -23,7 +23,7 @@ interface AddedNoteObject {
   /**
    * Note id
    */
-  id: string;
+  id: number;
 
   /**
    * Note title
@@ -60,12 +60,10 @@ export default class NoteService {
    * @param options - add note options
    * @returns { AddedNoteObject } added note object
    */
-  public addNote({ title, content }: AddNoteOptions): AddedNoteObject {
+  public async addNote({ title, content }: AddNoteOptions): Promise<AddedNoteObject> {
     const note = new Note(title, content);
 
-    const addedNote = this.repository.addNote(note);
-
-    // this.userRepository.updateLastActiveDate();
+    const addedNote = await this.repository.addNote(note);
 
     return {
       id: addedNote.id,
