@@ -1,5 +1,5 @@
 import NoteService from '@domain/service/note.js';
-import { Repositories } from '@repository/index';
+import { Repositories } from '@repository/index.js';
 
 /**
  * Interface for initiated services
