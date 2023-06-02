@@ -28,9 +28,6 @@ export default class SequelizeOrm {
 
     this.conn = new Sequelize(this.config.url, {
       logging: databaseLogger.info.bind(databaseLogger),
-      sync: {
-        force: true,
-      },
     });
   }
 
