@@ -7,11 +7,13 @@ const databaseLogger = getLogger('database');
 /**
  * Class for creating database connection
  */
-export default class DatabaseSequelize {
+export default class SequelizeOrm {
   /**
    * Database configuration
    */
   private config: DatabaseConfig;
+
+  private conn: Sequelize;
 
   /**
    * Constructor for class
@@ -20,28 +22,33 @@ export default class DatabaseSequelize {
    */
   constructor(databaseConfig: DatabaseConfig) {
     this.config = databaseConfig;
+
+    this.conn = new Sequelize(this.config.url, {
+      logging: databaseLogger.info.bind(databaseLogger),
+    });
   }
 
   /**
-   * Connect to database
+   * Test the connection by trying to authenticate
    *
    * @returns { Sequelize } - database instance
    */
-  public async connect(): Promise<Sequelize> {
-    const seq = new Sequelize(this.config.url, {
-      logging: databaseLogger.info.bind(databaseLogger),
-    });
-
+  public async authenticate(): Promise<void> {
     /**
      * Make sure that database is connected
      */
     try {
-      await seq.authenticate();
-      databaseLogger.info(`Database connected to ${seq.config.host}:${seq.config.port}`);
+      await this.conn.authenticate();
+      databaseLogger.info(`Database connected to ${this.conn.config.host}:${this.conn.config.port}`);
     } catch (error) {
       databaseLogger.error('Unable to connect to the database:', error);
     }
+  }
 
-    return seq;
+  /**
+   *
+   */
+  public get connection(): Sequelize  {
+    return this.conn;
   }
 }

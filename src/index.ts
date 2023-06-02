@@ -2,16 +2,17 @@ import config from '@infrastructure/config/index.js';
 import logger from '@infrastructure/logging/index.js';
 import API from '@presentation/index.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
-import { init as initDomain } from '@domain/index.js';
-import { initRepositories } from '@repository/index.js';
+import { init as initDomainServices } from '@domain/index.js';
+import { init as initRepositories } from '@repository/index.js';
 
-const api = new API(config.httpApi);
-
+/**
+ * Application entry point
+ */
 const start = async (): Promise<void> => {
   try {
+    const api = new API(config.httpApi);
     const repositories = await initRepositories(config.database);
-
-    const domainServices = initDomain(repositories);
+    const domainServices = initDomainServices(repositories);
 
     await api.run(domainServices);
 

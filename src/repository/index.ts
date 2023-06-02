@@ -1,7 +1,7 @@
 import { DatabaseConfig } from '@infrastructure/config/index.js';
-import DatabaseSequelize from '@repository/storage/postgres/database.sequlieze.js';
-import NoteStorage from '@repository/storage/postgres/orm/note.js';
-import NoteRepository from '@repository/note.js';
+import NoteStorage from './storage/note.storage.js';
+import NoteRepository from './note.repository.js';
+import Orm from './storage/postgres/orm/index.js';
 
 /**
  * Interface for initiated repositories
@@ -18,15 +18,15 @@ export interface Repositories {
  *
  * @param databaseConfig - database config
  */
-export async function initRepositories(databaseConfig: DatabaseConfig): Promise<Repositories> {
-  const database = new DatabaseSequelize(databaseConfig);
+export async function init(databaseConfig: DatabaseConfig): Promise<Repositories> {
+  const orm = new Orm(databaseConfig);
 
-  const conn = await database.connect();
+  await orm.authenticate();
 
   /**
    * Create storage instances
    */
-  const noteStorage = new NoteStorage(conn);
+  const noteStorage = new NoteStorage(orm);
 
   /**
    * Create repositories

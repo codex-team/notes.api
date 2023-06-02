@@ -1,5 +1,5 @@
 import Note from '@domain/entities/note.js';
-import NoteRepository from '@repository/note.js';
+import NoteRepository from '@repository/note.repository.js';
 
 /**
  * Interface for the adding note options.
@@ -64,6 +64,8 @@ export default class NoteService {
     const note = new Note(title, content);
 
     const addedNote = this.repository.addNote(note);
+
+    // this.userRepository.updateLastActiveDate();
 
     return {
       id: addedNote.id,

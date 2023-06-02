@@ -1,5 +1,5 @@
 import Note from '@domain/entities/note.js';
-import NoteStorage from '@repository/storage/postgres/orm/note.js';
+import NoteStorage from './storage/note.storage.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -24,7 +24,7 @@ export default class NoteRepository {
    *
    * @param note - note to add
    */
-  public addNote(note: Note): Note {
-    return this.storage.insertNote(note);
+  public addNote(note: Note): void {
+    this.storage.insertNote(note);
   }
 }
