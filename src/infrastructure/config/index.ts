@@ -17,7 +17,7 @@ const MetricsConfig = z.object({
  * Database configuration
  */
 const DatabaseConfig = z.object({
-  url: z.string(), // todo url or params
+  dsn: z.string(), // todo url or params
 });
 
 export type DatabaseConfig = z.infer<typeof DatabaseConfig>;
@@ -87,7 +87,7 @@ const defaultConfig: AppConfig = {
     database: 'info',
   },
   database: {
-    url: 'postgres://user:pass@postgres/codex-notes',
+    dsn: 'postgres://user:pass@postgres/codex-notes',
   },
 };
 

@@ -14,4 +14,4 @@ logging:
   database: info
 
 database:
-  url: 'postgres://postgres:pass@localhost:5432/codex-notes'
+  dsn: 'postgres://postgres:pass@localhost:5432/codex-notes'

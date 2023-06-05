@@ -26,7 +26,7 @@ export default class SequelizeOrm {
   constructor(databaseConfig: DatabaseConfig) {
     this.config = databaseConfig;
 
-    this.conn = new Sequelize(this.config.url, {
+    this.conn = new Sequelize(this.config.dsn, {
       logging: databaseLogger.info.bind(databaseLogger),
     });
   }
