@@ -12,3 +12,6 @@ logging:
   metricsServer: info
   appServer: info
   database: info
+
+database:
+  dsn: 'postgres://postgres:pass@localhost:5432/codex-notes'

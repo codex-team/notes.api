@@ -1,5 +1,5 @@
-import NoteRepository from '@repository/note.js';
 import NoteService from '@domain/service/note.js';
+import { Repositories } from '@repository/index.js';
 
 /**
  * Interface for initiated services
@@ -13,13 +13,11 @@ export interface DomainServices {
 
 /**
  * Initiate services
+ *
+ * @param repositories - repositories
  */
-export function init(): DomainServices {
-  /**
-   * TODO - Pass existing storage instance
-   */
-  const noteRepository = new NoteRepository({});
-  const noteService = new NoteService(noteRepository);
+export function init(repositories: Repositories): DomainServices {
+  const noteService = new NoteService(repositories.noteRepository);
 
   return {
     noteService,
