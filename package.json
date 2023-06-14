@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.2.3",
     "eslint": "^8.41.0",
     "eslint-config-codex": "^1.7.2",
@@ -26,7 +27,6 @@
   },
   "dependencies": {
     "@codex-team/config-loader": "^1.0.0",
-    "@types/jsonwebtoken": "^9.0.2",
     "arg": "^5.0.2",
     "fastify": "^4.17.0",
     "http-status-codes": "^2.2.0",
