@@ -36,7 +36,7 @@ export default class HttpServer implements API {
    */
   constructor(config: HttpApiConfig) {
     this.config = config;
-    this.jwtService = new JwtService(this.config.secret);
+    this.jwtService = new JwtService(this.config.accessTokenSecret, this.config.refreshTokenSecret);
   }
 
 

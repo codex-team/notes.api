@@ -54,7 +54,8 @@ export type LoggingConfig = z.infer<typeof LoggingConfig>;
 const HttpApiConfig = z.object({
   host: z.string(),
   port: z.number(),
-  secret: z.string(),
+  refreshTokenSecret: z.string(),
+  accessTokenSecret: z.string(),
 });
 
 export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
@@ -75,7 +76,8 @@ const defaultConfig: AppConfig = {
   httpApi: {
     host: '0.0.0.0',
     port: 3000,
-    secret: 'supersecret',
+    refreshTokenSecret: 'refreshTokenSecret',
+    accessTokenSecret: 'accessTokenSecret',
   },
   metrics: {
     enabled: true,
