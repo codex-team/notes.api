@@ -5,7 +5,7 @@ import Orm from './storage/postgres/orm/index.js';
 import UserRepository from '@repository/user.repository.js';
 import UserStorage from '@repository/storage/user.storage.js';
 import GoogleApi from '@repository/api/google.api.js';
-import OauthRepository from '@repository/oauth.repository';
+import OauthRepository from '@repository/oauth.repository.js';
 
 /**
  * Interface for initiated repositories
@@ -31,8 +31,10 @@ export interface Repositories {
  * Initiate repositories
  *
  * @param databaseConfig - database config
+ * @param googleApiUrl - google api url
+ * @returns { Promise<Repositories> } initiated repositories
  */
-export async function init(databaseConfig: DatabaseConfig): Promise<Repositories> {
+export async function init(databaseConfig: DatabaseConfig, googleApiUrl: string): Promise<Repositories> {
   const orm = new Orm(databaseConfig);
 
   /**
@@ -49,7 +51,7 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
   /**
    * Create api instances
    */
-  const googleApi = new GoogleApi('https://www.googleapis.com/oauth2/v2');
+  const googleApi = new GoogleApi(googleApiUrl);
 
   /**
    * Create repositories
