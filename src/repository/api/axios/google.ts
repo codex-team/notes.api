@@ -26,7 +26,7 @@ export default class GoogleAxios {
    * Gets user info
    *
    * @param accessToken - google api access token
-   * @returns user info
+   * @returns { Promise<UserInfo> } user info
    */
   public async getUserInfo(accessToken: string): Promise<UserInfo> {
     const userInfoEndpoint = `${this.url}/userinfo`;

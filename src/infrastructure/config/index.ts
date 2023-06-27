@@ -105,7 +105,7 @@ const defaultConfig: AppConfig = {
   },
   google: {
     apiUrl: 'https://www.googleapis.com/oauth2/v2',
-  }
+  },
 };
 
 const args = arg({ /* eslint-disable @typescript-eslint/naming-convention */
