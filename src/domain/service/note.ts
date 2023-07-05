@@ -17,23 +17,13 @@ export interface AddNoteOptions {
 }
 
 /**
- * Interface for the added note object.
+ * Interface for the getting note by id options.
  */
-interface AddedNoteObject {
+export interface GetNoteByIdOptions {
   /**
    * Note id
    */
   id: number;
-
-  /**
-   * Note title
-   */
-  title: string;
-
-  /**
-   * Note content
-   */
-  content: string;
 }
 
 /**
@@ -58,9 +48,9 @@ export default class NoteService {
    * Adds note
    *
    * @param options - add note options
-   * @returns { AddedNoteObject } added note object
+   * @returns { Note } added note object
    */
-  public async addNote({ title, content }: AddNoteOptions): Promise<AddedNoteObject> {
+  public async addNote({ title, content }: AddNoteOptions): Promise<Note> {
     const note = new Note(title, content);
 
     const addedNote = await this.repository.addNote(note);
@@ -70,5 +60,14 @@ export default class NoteService {
       title: addedNote.title,
       content: addedNote.content,
     };
+  }
+
+  /**
+   * Gets note by id
+   *
+   * @param options - get note by id options
+   */
+  public async getNoteById({ id }: GetNoteByIdOptions): Promise<Note | null> {
+    return await this.repository.getNoteById(id);
   }
 }

@@ -1,5 +1,5 @@
 import { FastifyPluginCallback } from 'fastify';
-import NoteService, { AddNoteOptions } from '@domain/service/note.js';
+import NoteService, { AddNoteOptions, GetNoteByIdOptions } from '@domain/service/note.js';
 import { StatusCodes } from 'http-status-codes';
 
 /**
@@ -26,10 +26,25 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const noteService = opts.noteService;
 
   /**
-   * Get notes
+   * Get note by id
    */
-  fastify.get('/', async () => {
-    return { hello: 'world' };
+  fastify.get<{ Params: GetNoteByIdOptions }>('/:id', async (request, reply) => {
+    const params = request.params;
+
+    const note = await noteService.getNoteById(params);
+
+    /**
+     * Check if note does not exist
+     */
+    if (!note) {
+      const payload = {
+        message: 'Note not found',
+      };
+
+      return reply.code(StatusCodes.NOT_FOUND).send(payload);
+    }
+
+    return reply.code(StatusCodes.OK).send(note);
   });
 
   /**

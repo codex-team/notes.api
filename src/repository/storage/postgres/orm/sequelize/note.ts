@@ -105,4 +105,31 @@ export default class NoteSequelizeStorage {
       content: insertedNote.content,
     };
   }
+
+  /**
+   * Gets note by id
+   *
+   * @param id - note id
+   * @returns { Promise<InsertedNote | null> } found note
+   */
+  public async getNoteById(id: number): Promise<InsertedNote | null> {
+    const note = await this.model.findOne({
+      where: {
+        id,
+      },
+    });
+
+    /**
+     * If note not found, return null
+     */
+    if (!note) {
+      return null;
+    }
+
+    return {
+      id: note.id,
+      title: note.title,
+      content: note.content,
+    };
+  }
 }
