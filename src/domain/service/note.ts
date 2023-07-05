@@ -66,6 +66,7 @@ export default class NoteService {
    * Gets note by id
    *
    * @param options - get note by id options
+   * @returns { Promise<Note | null> } note
    */
   public async getNoteById({ id }: GetNoteByIdOptions): Promise<Note | null> {
     return await this.repository.getNoteById(id);
