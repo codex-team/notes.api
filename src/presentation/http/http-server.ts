@@ -52,10 +52,16 @@ export default class HttpServer implements API {
      */
     this.server.register(NoteRouter, { prefix: '/note',
       noteService: domainServices.noteService });
+
     /**
-     * Register cors
+     * Check if environment is development
      */
-    this.server.register(cors, { origin: '*' });
+    if (this.config.environment === 'development') {
+      /**
+       * Allow all origins
+       */
+      this.server.register(cors, { origin: '*' });
+    }
 
     await this.server.listen({
       host: this.config.host,

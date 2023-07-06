@@ -56,6 +56,7 @@ const HttpApiConfig = z.object({
   port: z.number(),
   refreshTokenSecret: z.string(),
   accessTokenSecret: z.string(),
+  environment: z.enum(['development', 'production']),
 });
 
 export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
@@ -78,6 +79,7 @@ const defaultConfig: AppConfig = {
     port: 3000,
     refreshTokenSecret: 'refreshTokenSecret',
     accessTokenSecret: 'accessTokenSecret',
+    environment: 'development',
   },
   metrics: {
     enabled: true,

@@ -4,6 +4,7 @@ httpApi:
   # Secret keys for JWT
   refreshTokenSecret: 'refreshTokenSecret'
   accessTokenSecret: 'accessTokenSecret'
+  environment: 'development'
 
 metrics:
   enabled: true

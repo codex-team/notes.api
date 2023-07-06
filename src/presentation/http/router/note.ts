@@ -1,6 +1,33 @@
 import { FastifyPluginCallback } from 'fastify';
-import NoteService, { AddNoteOptions, GetNoteByIdOptions } from '@domain/service/note.js';
+import NoteService from '@domain/service/note.js';
 import { StatusCodes } from 'http-status-codes';
+import { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse';
+import Note from '@domain/entities/note';
+
+/**
+ * Get note by id options
+ */
+interface GetNoteByIdOptions {
+  /**
+   * Note id
+   */
+  id: number;
+}
+
+/**
+ * Add note options
+ */
+interface AddNoteOptions {
+  /**
+   * Note title
+   */
+  title: string;
+
+  /**
+   * Note content
+   */
+  content: string;
+}
 
 /**
  * Interface for the note router.
@@ -31,20 +58,33 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.get<{ Params: GetNoteByIdOptions }>('/:id', async (request, reply) => {
     const params = request.params;
 
-    const note = await noteService.getNoteById(params);
+    /**
+     * TODO: Validate request params
+     */
+    const { id } = params;
+
+    const note = await noteService.getNoteById(id);
 
     /**
      * Check if note does not exist
      */
     if (!note) {
-      const payload = {
+      const response: ErrorResponse = {
+        code: StatusCodes.NOT_FOUND,
         message: 'Note not found',
       };
 
-      return reply.code(StatusCodes.NOT_FOUND).send(payload);
+      return reply.send(response);
     }
 
-    return reply.code(StatusCodes.OK).send(note);
+    /**
+     * Create success response
+     */
+    const response: SuccessResponse<Note> = {
+      data: note,
+    };
+
+    return reply.send(response);
   });
 
   /**
@@ -54,11 +94,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * TODO: Validate request query
      */
-    const options = request.query as AddNoteOptions;
+    const { title, content } = request.query as AddNoteOptions;
 
-    const addedNote = await noteService.addNote(options);
+    const addedNote = await noteService.addNote(title, content);
 
-    return reply.code(StatusCodes.CREATED).send(addedNote);
+    return reply.send(addedNote);
   });
   done();
 };

@@ -2,31 +2,6 @@ import Note from '@domain/entities/note.js';
 import NoteRepository from '@repository/note.repository.js';
 
 /**
- * Interface for the adding note options.
- */
-export interface AddNoteOptions {
-  /**
-   * Note title
-   */
-  title: string;
-
-  /**
-   * Note content
-   */
-  content: string;
-}
-
-/**
- * Interface for the getting note by id options.
- */
-export interface GetNoteByIdOptions {
-  /**
-   * Note id
-   */
-  id: number;
-}
-
-/**
  * Note service
  */
 export default class NoteService {
@@ -47,10 +22,11 @@ export default class NoteService {
   /**
    * Adds note
    *
-   * @param options - add note options
+   * @param title - note title
+   * @param content - note content
    * @returns { Note } added note object
    */
-  public async addNote({ title, content }: AddNoteOptions): Promise<Note> {
+  public async addNote(title: string, content: string): Promise<Note> {
     const note = new Note(title, content);
 
     const addedNote = await this.repository.addNote(note);
@@ -65,10 +41,10 @@ export default class NoteService {
   /**
    * Gets note by id
    *
-   * @param options - get note by id options
+   * @param id - note id
    * @returns { Promise<Note | null> } note
    */
-  public async getNoteById({ id }: GetNoteByIdOptions): Promise<Note | null> {
+  public async getNoteById(id: number): Promise<Note | null> {
     return await this.repository.getNoteById(id);
   }
 }
