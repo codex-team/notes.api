@@ -10,8 +10,7 @@ import { init as initRepositories } from '@repository/index.js';
  */
 const start = async (): Promise<void> => {
   try {
-    const environment = config.environment;
-    const api = new API(config.httpApi, environment);
+    const api = new API(config.httpApi);
     const repositories = await initRepositories(config.database);
     const domainServices = initDomainServices(repositories);
 

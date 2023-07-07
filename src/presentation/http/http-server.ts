@@ -1,5 +1,5 @@
 import { getLogger } from '@infrastructure/logging/index.js';
-import { HttpApiConfig, EnvironmentConfig } from '@infrastructure/config/index.js';
+import config, { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
 import type API from '@presentation/api.interface.js';
 import NoteRouter from '@presentation/http/router/note.js';
@@ -31,18 +31,11 @@ export default class HttpServer implements API {
   private readonly jwtService: JwtService;
 
   /**
-   * Environment
-   */
-  private readonly environment: EnvironmentConfig;
-
-  /**
    * Creates http server instance
    *
    * @param config - http server config
-   * @param environment - environment
    */
-  constructor(config: HttpApiConfig, environment: EnvironmentConfig) {
-    this.environment = environment;
+  constructor(config: HttpApiConfig) {
     this.config = config;
     this.jwtService = new JwtService(this.config.accessTokenSecret, this.config.refreshTokenSecret);
   }
@@ -61,14 +54,9 @@ export default class HttpServer implements API {
       noteService: domainServices.noteService });
 
     /**
-     * Check if environment is development
+     * Allow cors for allowed origins from config
      */
-    if (this.environment === 'development') {
-      /**
-       * Allow all origins
-       */
-      this.server.register(cors, { origin: '*' });
-    }
+    this.server.register(cors, { origin: this.config.allowedOrigins });
 
     await this.server.listen({
       host: this.config.host,

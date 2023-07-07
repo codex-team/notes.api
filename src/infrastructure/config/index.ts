@@ -56,16 +56,10 @@ const HttpApiConfig = z.object({
   port: z.number(),
   refreshTokenSecret: z.string(),
   accessTokenSecret: z.string(),
+  allowedOrigins: z.union([z.array(z.string()), z.literal('*')]),
 });
 
 export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
-
-/**
- * Environment configuration
- */
-const Environment = z.enum(['development', 'production']);
-
-export type EnvironmentConfig = z.infer<typeof Environment>;
 
 /**
  * Application configuration
@@ -75,7 +69,6 @@ const AppConfig = z.object({
   metrics: MetricsConfig,
   logging: LoggingConfig,
   database: DatabaseConfig,
-  environment: Environment,
 });
 
 export type AppConfig = z.infer<typeof AppConfig>;
@@ -86,6 +79,7 @@ const defaultConfig: AppConfig = {
     port: 3000,
     refreshTokenSecret: 'refreshTokenSecret',
     accessTokenSecret: 'accessTokenSecret',
+    allowedOrigins: [],
   },
   metrics: {
     enabled: true,
@@ -101,7 +95,6 @@ const defaultConfig: AppConfig = {
   database: {
     dsn: 'postgres://user:pass@postgres/codex-notes',
   },
-  environment: 'development',
 };
 
 const args = arg({ /* eslint-disable @typescript-eslint/naming-convention */
