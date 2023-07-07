@@ -10,9 +10,9 @@ interface SuccessResponse<Payload> {
  */
 interface ErrorResponse {
   /**
-   * Error code
+   * Status code
    */
-  code: number;
+  status: number;
 
   /**
    * Error message code

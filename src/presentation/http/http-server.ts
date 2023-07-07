@@ -1,5 +1,5 @@
 import { getLogger } from '@infrastructure/logging/index.js';
-import { HttpApiConfig } from '@infrastructure/config/index.js';
+import { HttpApiConfig, EnvironmentConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
 import type API from '@presentation/api.interface.js';
 import NoteRouter from '@presentation/http/router/note.js';
@@ -31,11 +31,18 @@ export default class HttpServer implements API {
   private readonly jwtService: JwtService;
 
   /**
+   * Environment
+   */
+  private readonly environment: EnvironmentConfig;
+
+  /**
    * Creates http server instance
    *
    * @param config - http server config
+   * @param environment - environment
    */
-  constructor(config: HttpApiConfig) {
+  constructor(config: HttpApiConfig, environment: EnvironmentConfig) {
+    this.environment = environment;
     this.config = config;
     this.jwtService = new JwtService(this.config.accessTokenSecret, this.config.refreshTokenSecret);
   }
@@ -56,7 +63,7 @@ export default class HttpServer implements API {
     /**
      * Check if environment is development
      */
-    if (this.config.environment === 'development') {
+    if (this.environment === 'development') {
       /**
        * Allow all origins
        */

@@ -70,7 +70,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     if (!note) {
       const response: ErrorResponse = {
-        code: StatusCodes.NOT_FOUND,
+        status: StatusCodes.NOT_FOUND,
         message: 'Note not found',
       };
 

@@ -4,7 +4,6 @@ httpApi:
   # Secret keys for JWT
   refreshTokenSecret: 'refreshTokenSecret'
   accessTokenSecret: 'accessTokenSecret'
-  environment: 'development'
 
 metrics:
   enabled: true
@@ -19,3 +18,5 @@ logging:
 
 database:
   dsn: 'postgres://postgres:pass@localhost:5432/codex-notes'
+
+environment: 'development'
