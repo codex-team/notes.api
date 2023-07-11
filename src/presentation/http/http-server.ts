@@ -1,5 +1,5 @@
 import { getLogger } from '@infrastructure/logging/index.js';
-import config, { HttpApiConfig } from '@infrastructure/config/index.js';
+import { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
 import type API from '@presentation/api.interface.js';
 import NoteRouter from '@presentation/http/router/note.js';
