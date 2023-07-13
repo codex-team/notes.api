@@ -26,18 +26,16 @@ export default class UserRepository {
    * @returns { Promise<User> } added user
    */
   public async addUser({ email }: User): Promise<User> {
-    const insertedUser = await this.storage.insertUser(email);
-
-    return new User(insertedUser.email, insertedUser.id);
+    return await this.storage.insertUser(email);
   }
 
   /**
    * Get user
    *
    * @param user - user to get
-   * @returns { Promise<User | undefined> } found user
+   * @returns { Promise<User | null> } found user
    */
-  public async getUser({ id, email }: User): Promise<User | undefined> {
+  public async getUser({ id, email }: User): Promise<User | null> {
     let foundUser;
 
     /**
@@ -49,13 +47,6 @@ export default class UserRepository {
       foundUser = await this.storage.getUserByEmail(email);
     }
 
-    /**
-     * Check if user was found
-     */
-    if (!foundUser) {
-      return;
-    }
-
-    return new User(foundUser.email, foundUser.id);
+    return foundUser;
   }
 }

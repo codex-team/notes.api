@@ -1,20 +1,6 @@
 import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-
-/**
- * Interface for inserted user
- */
-interface InsertedUser {
-  /**
-   * User id
-   */
-  id: number;
-
-  /**
-   * User email address
-   */
-  email: string;
-}
+import User from '@domain/entities/user';
 
 /**
  * Class representing a user model in database
@@ -82,9 +68,9 @@ export default class UserSequelizeStorage {
    * Insert user to database
    *
    * @param email - user email address
-   * @returns { InsertedUser } - inserted user
+   * @returns { User } - inserted user
    */
-  public async insertUser(email: string): Promise<InsertedUser> {
+  public async insertUser(email: string): Promise<User> {
     const insertedNote = await this.model.create({
       email,
     });
@@ -99,9 +85,9 @@ export default class UserSequelizeStorage {
    * Get user by email
    *
    * @param email - user email address
-   * @returns { InsertedUser } - user
+   * @returns { User } - user
    */
-  public async getUserByEmail(email: string): Promise<InsertedUser | undefined> {
+  public async getUserByEmail(email: string): Promise<User | null> {
     const user = await this.model.findOne({
       where: {
         email,
@@ -109,7 +95,7 @@ export default class UserSequelizeStorage {
     });
 
     if (!user) {
-      return;
+      return null;
     }
 
     return {
@@ -122,9 +108,9 @@ export default class UserSequelizeStorage {
    * Get user by id
    *
    * @param id - user id
-   * @returns { InsertedUser } - user
+   * @returns { User } - user
    */
-  public async getUserById(id: number): Promise<InsertedUser | undefined> {
+  public async getUserById(id: number): Promise<User | null> {
     const user = await this.model.findOne({
       where: {
         id,
@@ -132,7 +118,7 @@ export default class UserSequelizeStorage {
     });
 
     if (!user) {
-      return;
+      return null;
     }
 
     return {
