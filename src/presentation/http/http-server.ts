@@ -4,7 +4,8 @@ import fastify from 'fastify';
 import type API from '@presentation/api.interface.js';
 import NoteRouter from '@presentation/http/router/note.js';
 import { DomainServices } from '@domain/index.js';
-import JwtService from '@infrastructure/jwt';
+import JwtService from '@infrastructure/jwt/index.js';
+import cors from '@fastify/cors';
 
 const appServerLogger = getLogger('appServer');
 
@@ -51,6 +52,12 @@ export default class HttpServer implements API {
      */
     this.server.register(NoteRouter, { prefix: '/note',
       noteService: domainServices.noteService });
+
+    /**
+     * Allow cors for allowed origins from config
+     */
+    this.server.register(cors, { origin: this.config.allowedOrigins });
+
     await this.server.listen({
       host: this.config.host,
       port: this.config.port,

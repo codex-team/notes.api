@@ -30,4 +30,24 @@ export default class NoteRepository {
 
     return new Note(insertedNote.title, insertedNote.content, insertedNote.id);
   }
+
+  /**
+   * Gets note by id
+   *
+   * @param id - note id
+   * @returns { Promise<Note | null> } found note
+   */
+  public async getNoteById(id: number): Promise<Note | null> {
+    const noteData = await this.storage.getNoteById(id);
+
+    if (!noteData) {
+      return null;
+    }
+
+    return new Note(
+      noteData.title,
+      noteData.content,
+      noteData.id
+    );
+  }
 }
