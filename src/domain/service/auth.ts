@@ -1,9 +1,19 @@
 import jwt from 'jsonwebtoken';
 
 /**
+ * Payload interface
+ */
+export interface AuthPayload {
+  /**
+   * User id
+   */
+  id: number;
+}
+
+/**
  * Jwt service
  */
-export default class JwtService {
+export default class AuthService {
   /**
    * Access token secret key
    */
@@ -51,9 +61,9 @@ export default class JwtService {
    * Generates access token
    *
    * @param payload - payload to sign
-   * @returns {string} access token
+   * @returns {AuthPayload} access token
    */
-  public signAccessToken(payload: unknown): string {
+  public signAccessToken(payload: AuthPayload): string {
     const strPayload = JSON.stringify(payload);
 
     return jwt.sign(strPayload, this.accessSecret, {
@@ -65,10 +75,10 @@ export default class JwtService {
    * Verifies access token
    *
    * @param token - access token
-   * @returns {string | object} payload
+   * @returns {AuthPayload} payload
    */
-  public verifyAccessToken(token: string): string | object {
-    return jwt.verify(token, this.accessSecret);
+  public verifyAccessToken(token: string): AuthPayload {
+    return jwt.verify(token, this.accessSecret, { complete: false }) as AuthPayload;
   }
 
   /**
@@ -77,7 +87,7 @@ export default class JwtService {
    * @param payload - payload to sign
    * @returns {string} refresh token
    */
-  public signRefreshToken(payload: unknown): string {
+  public signRefreshToken(payload: AuthPayload): string {
     const strPayload = JSON.stringify(payload);
 
     return jwt.sign(strPayload, this.refreshSecret, {
@@ -91,7 +101,7 @@ export default class JwtService {
    * @param token - refresh token
    * @returns {string | object} payload
    */
-  public verifyRefreshToken(token: string): string | object {
-    return jwt.verify(token, this.refreshSecret);
+  public verifyRefreshToken(token: string): AuthPayload {
+    return jwt.verify(token, this.refreshSecret, { complete: false }) as AuthPayload;
   }
 }
