@@ -11,7 +11,7 @@ import { init as initRepositories } from '@repository/index.js';
 const start = async (): Promise<void> => {
   try {
     const api = new API(config.httpApi);
-    const repositories = await initRepositories(config.database, config.google.apiUrl);
+    const repositories = await initRepositories(config.database);
     const domainServices = initDomainServices(repositories);
 
     await api.run(domainServices);

@@ -14,15 +14,6 @@ const MetricsConfig = z.object({
 });
 
 /**
- * Google configuration
- */
-const GoogleConfig = z.object({
-  apiUrl: z.string(),
-});
-
-export type GoogleConfig = z.infer<typeof GoogleConfig>;
-
-/**
  * Database configuration
  */
 const DatabaseConfig = z.object({
@@ -78,7 +69,6 @@ const AppConfig = z.object({
   metrics: MetricsConfig,
   logging: LoggingConfig,
   database: DatabaseConfig,
-  google: GoogleConfig,
 });
 
 export type AppConfig = z.infer<typeof AppConfig>;
@@ -104,9 +94,6 @@ const defaultConfig: AppConfig = {
   },
   database: {
     dsn: 'postgres://user:pass@postgres/codex-notes',
-  },
-  google: {
-    apiUrl: 'https://www.googleapis.com/oauth2/v2',
   },
 };
 

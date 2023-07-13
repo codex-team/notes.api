@@ -4,8 +4,6 @@ import NoteRepository from './note.repository.js';
 import Orm from './storage/postgres/orm/index.js';
 import UserRepository from '@repository/user.repository.js';
 import UserStorage from '@repository/storage/user.storage.js';
-import GoogleApi from '@repository/api/google.api.js';
-import OauthRepository from '@repository/oauth.repository.js';
 
 /**
  * Interface for initiated repositories
@@ -20,21 +18,15 @@ export interface Repositories {
    * User repository instance
    */
   userRepository: UserRepository,
-
-  /**
-   * Google repository instance
-   */
-  oauthRepository: OauthRepository,
 }
 
 /**
  * Initiate repositories
  *
  * @param databaseConfig - database config
- * @param googleApiUrl - google api url
  * @returns { Promise<Repositories> } initiated repositories
  */
-export async function init(databaseConfig: DatabaseConfig, googleApiUrl: string): Promise<Repositories> {
+export async function init(databaseConfig: DatabaseConfig): Promise<Repositories> {
   const orm = new Orm(databaseConfig);
 
   /**
@@ -49,20 +41,13 @@ export async function init(databaseConfig: DatabaseConfig, googleApiUrl: string)
   const userStorage = new UserStorage(orm);
 
   /**
-   * Create api instances
-   */
-  const googleApi = new GoogleApi(googleApiUrl);
-
-  /**
    * Create repositories
    */
   const noteRepository = new NoteRepository(noteStorage);
   const userRepository = new UserRepository(userStorage);
-  const oauthRepository = new OauthRepository(googleApi);
 
   return {
     noteRepository,
     userRepository,
-    oauthRepository,
   };
 }

@@ -19,6 +19,3 @@ logging:
 
 database:
   dsn: 'postgres://postgres:pass@localhost:5432/codex-notes'
-
-google:
-  apiUrl: 'https://www.googleapis.com/oauth2/v2'
