@@ -1,8 +1,8 @@
 import { preHandlerHookHandler } from 'fastify';
-import AuthService, { AuthPayload } from '@domain/service/auth';
+import AuthService, { AuthPayload } from '@domain/service/auth.js';
 import { StatusCodes } from 'http-status-codes';
-import { ErrorResponse } from '@presentation/http/types/HttpResponse';
-import { HttpRequestParams } from '@presentation/http/types/HttpRequest';
+import { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
+import { HttpRequestParams } from '@presentation/http/types/HttpRequest.js';
 
 /**
  * Auth middleware

@@ -6,6 +6,11 @@ httpApi:
   accessTokenSecret: 'accessTokenSecret'
   allowedOrigins: '*'
 
+auth:
+  refreshTokenSecret: 'refreshTokenSecret'
+  accessTokenSecret: 'accessTokenSecret'
+
+
 metrics:
   enabled: true
   host: 0.0.0.0
