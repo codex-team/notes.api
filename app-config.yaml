@@ -6,6 +6,11 @@ httpApi:
   accessTokenSecret: 'accessTokenSecret'
   allowedOrigins: '*'
 
+auth:
+  refreshTokenSecret: 'refreshTokenSecret'
+  accessTokenSecret: 'accessTokenSecret'
+
+
 metrics:
   enabled: true
   host: 0.0.0.0
@@ -19,4 +24,3 @@ logging:
 
 database:
   dsn: 'postgres://postgres:pass@localhost:5432/codex-notes'
-

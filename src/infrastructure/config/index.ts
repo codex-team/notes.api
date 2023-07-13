@@ -54,12 +54,20 @@ export type LoggingConfig = z.infer<typeof LoggingConfig>;
 const HttpApiConfig = z.object({
   host: z.string(),
   port: z.number(),
-  refreshTokenSecret: z.string(),
-  accessTokenSecret: z.string(),
   allowedOrigins: z.union([z.array(z.string()), z.literal('*')]),
 });
 
 export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
+
+/**
+ * Auth configuration
+ */
+const AuthConfig = z.object({
+  refreshTokenSecret: z.string(),
+  accessTokenSecret: z.string(),
+});
+
+export type AuthConfig = z.infer<typeof AuthConfig>;
 
 /**
  * Application configuration
@@ -67,6 +75,7 @@ export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
 const AppConfig = z.object({
   httpApi: HttpApiConfig,
   metrics: MetricsConfig,
+  auth: AuthConfig,
   logging: LoggingConfig,
   database: DatabaseConfig,
 });
@@ -77,9 +86,11 @@ const defaultConfig: AppConfig = {
   httpApi: {
     host: '0.0.0.0',
     port: 3000,
-    refreshTokenSecret: 'refreshTokenSecret',
-    accessTokenSecret: 'accessTokenSecret',
     allowedOrigins: [],
+  },
+  auth: {
+    accessTokenSecret: 'secret',
+    refreshTokenSecret: 'secret',
   },
   metrics: {
     enabled: true,
