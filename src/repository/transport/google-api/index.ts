@@ -2,11 +2,11 @@ import Transport from '@repository/transport/index.js';
 import ApiResponse from '@repository/transport/google-api/types/ApiResponse.js';
 
 /**
- * Notes api transport
+ * Google api transport
  */
 export default class GoogleApiTransport extends Transport {
   /**
-   * Constructor for notes api transport
+   * Constructor for Google api transport
    *
    * @param baseUrl - Base URL
    */
