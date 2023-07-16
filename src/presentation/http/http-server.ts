@@ -6,6 +6,7 @@ import NoteRouter from '@presentation/http/router/note.js';
 import { DomainServices } from '@domain/index.js';
 import JwtService from '@infrastructure/jwt/index.js';
 import cors from '@fastify/cors';
+import initMiddlewares from '@presentation/http/middlewares/index.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -47,11 +48,14 @@ export default class HttpServer implements API {
    * @param domainServices - instances of domain services
    */
   public async run(domainServices: DomainServices): Promise<void> {
+    const middlewares = initMiddlewares();
+
     /**
      * Register all routers
      */
     this.server.register(NoteRouter, { prefix: '/note',
-      noteService: domainServices.noteService });
+      noteService: domainServices.noteService,
+      authMiddleware: middlewares.authMiddleware });
 
     /**
      * Allow cors for allowed origins from config
