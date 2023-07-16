@@ -6,6 +6,8 @@ import NoteRouter from '@presentation/http/router/note.js';
 import { DomainServices } from '@domain/index.js';
 import JwtService from '@infrastructure/jwt/index.js';
 import cors from '@fastify/cors';
+import fastifyOauth2 from '@fastify/oauth2';
+import OauthRouter from '@presentation/http/router/oauth.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -52,6 +54,24 @@ export default class HttpServer implements API {
      */
     this.server.register(NoteRouter, { prefix: '/note',
       noteService: domainServices.noteService });
+    this.server.register(OauthRouter, { prefix: '/oauth' });
+
+    /**
+     * Register oauth2 plugin
+     */
+    this.server.register(fastifyOauth2, {
+      name: 'googleOAuth2',
+      scope: [ 'profile' ],
+      credentials: {
+        client: {
+          id: this.config.oauth2.google.clientId,
+          secret: this.config.oauth2.google.clientSecret,
+        },
+        auth: fastifyOauth2.GOOGLE_CONFIGURATION,
+      },
+      startRedirectPath: this.config.oauth2.google.redirectUrl,
+      callbackUri: this.config.oauth2.google.callbackUrl,
+    });
 
     /**
      * Allow cors for allowed origins from config

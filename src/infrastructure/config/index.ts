@@ -13,6 +13,21 @@ const MetricsConfig = z.object({
   port: z.number(),
 });
 
+const GoogleOAuth2Config = z.object({
+  clientId: z.string(),
+  clientSecret: z.string(),
+  redirectUrl: z.string(),
+  callbackUrl: z.string(),
+});
+
+export type GoogleOAuth2Config = z.infer<typeof GoogleOAuth2Config>;
+
+const OAuth2Config = z.object({
+  google: GoogleOAuth2Config,
+});
+
+export type OAuth2Config = z.infer<typeof OAuth2Config>;
+
 /**
  * Database configuration
  */
@@ -57,6 +72,7 @@ const HttpApiConfig = z.object({
   refreshTokenSecret: z.string(),
   accessTokenSecret: z.string(),
   allowedOrigins: z.union([z.array(z.string()), z.literal('*')]),
+  oauth2: OAuth2Config,
 });
 
 export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
@@ -80,6 +96,14 @@ const defaultConfig: AppConfig = {
     refreshTokenSecret: 'refreshTokenSecret',
     accessTokenSecret: 'accessTokenSecret',
     allowedOrigins: [],
+    oauth2: {
+      google: {
+        clientId: '',
+        clientSecret: '',
+        redirectUrl: '/oauth/google/login',
+        callbackUrl: '/oauth/google/callback',
+      },
+    },
   },
   metrics: {
     enabled: true,
