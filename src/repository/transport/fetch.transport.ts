@@ -17,11 +17,23 @@ export default class FetchTransport {
    *
    * @template Response - Response data type
    * @param endpoint - API endpoint
+   * @param accessToken - Access token
    * @returns { Promise<Response> } - Response data
    */
-  public async get<Response>(endpoint: string): Promise<Response> {
+  public async get<Response>(endpoint: string, accessToken: string): Promise<Response> {
+    let headers;
+
+    /**
+     * If access token is provided, add it to headers
+     */
+    if (accessToken) {
+      headers = {
+        'Authorization': `Bearer ${accessToken}`,
+      };
+    }
     const response = await fetch(this.baseUrl + endpoint, {
       method: 'GET',
+      headers,
     });
 
     return await response.json() as Response;
