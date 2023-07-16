@@ -75,7 +75,7 @@ export default class UserSequelizeStorage {
       },
       created_at: {
         type: DataTypes.DATE,
-        defaultValue: Date.now(),
+        allowNull: false,
       },
     }, {
       tableName: this.tableName,
