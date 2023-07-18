@@ -11,7 +11,7 @@ export class OAuthProvidersModel extends Model<InferAttributes<OAuthProvidersMod
   public declare id: CreationOptional<number>;
 
   /**
-   * Provider name
+   * OAuth provider name
    */
   public declare name: string;
 }
@@ -61,7 +61,6 @@ export default class OAuthProvidersSequelizeStorage {
     }, {
       tableName: this.tableName,
       sequelize: this.database,
-      timestamps: false,
     });
   }
 }

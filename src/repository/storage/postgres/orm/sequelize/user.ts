@@ -23,7 +23,7 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
   public declare name: string;
 
   /**
-   * User creation date
+   * User created at
    */
   public declare created_at: Date;
 }
@@ -80,7 +80,7 @@ export default class UserSequelizeStorage {
     }, {
       tableName: this.tableName,
       sequelize: this.database,
-      timestamps: false,
+      timestamps: true,
     });
   }
 }
