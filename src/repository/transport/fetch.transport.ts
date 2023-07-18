@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 /**
  * Fetch transport to make HTTP requests
  */
@@ -31,6 +29,7 @@ export default class FetchTransport {
         'Authorization': `Bearer ${accessToken}`,
       };
     }
+    // eslint-disable-next-line no-undef
     const response = await fetch(this.baseUrl + endpoint, {
       method: 'GET',
       headers,
