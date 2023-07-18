@@ -1,9 +1,4 @@
 /**
- * Request headers type
- */
-export type Headers = Record<string, string>;
-
-/**
  * Fetch transport to make HTTP requests
  */
 export default class FetchTransport {
@@ -23,7 +18,7 @@ export default class FetchTransport {
    * @param headers - Request headers
    * @returns { Promise<Response> } - Response data
    */
-  public async get<Response>(endpoint: string, headers: Headers): Promise<Response> {
+  public async get<Response>(endpoint: string, headers: Record<string, string>): Promise<Response> {
     // eslint-disable-next-line no-undef
     const response = await fetch(this.baseUrl + endpoint, {
       method: 'GET',

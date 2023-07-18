@@ -1,5 +1,4 @@
 import Transport from '@repository/transport/index.js';
-import type { Headers } from '@repository/transport/index.js';
 
 /**
  * Google api transport
@@ -22,7 +21,7 @@ export default class GoogleApiTransport extends Transport {
    * @param headers - Request headers
    * @returns { Promise<Payload> } - response payload
    */
-  public async get<Payload>(endpoint: string, headers: Headers): Promise<Payload> {
+  public async get<Payload>(endpoint: string, headers: Record<string, string>): Promise<Payload> {
     return await super.get<Payload>(endpoint, headers);
   }
 }
