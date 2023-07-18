@@ -80,7 +80,7 @@ export default class UserSequelizeStorage {
     }, {
       tableName: this.tableName,
       sequelize: this.database,
-      timestamps: true,
+      timestamps: false,
     });
   }
 }
