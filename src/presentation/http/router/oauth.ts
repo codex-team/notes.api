@@ -14,6 +14,9 @@ const OauthRouter: FastifyPluginCallback = (fastify, opts, done) => {
   fastify.get('/google/callback', async (request, reply) => {
     const { token } = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
 
+    /**
+     * TODO: Make request to API using token
+     */
     reply.send(token.access_token);
   });
   done();
