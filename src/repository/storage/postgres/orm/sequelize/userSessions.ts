@@ -1,7 +1,6 @@
 import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
-import { OAuthProvidersModel } from '@repository/storage/postgres/orm/sequelize/oauthProviders.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -18,11 +17,6 @@ class UserSessionModel extends Model<InferAttributes<UserSessionModel>, InferCre
    * User id
    */
   public declare user_id: number;
-
-  /**
-   * Oauth provider
-   */
-  public declare provider_id: number;
 
   /**
    * Refresh token
@@ -77,14 +71,6 @@ export default class UserSessionSequelizeStorage {
         allowNull: false,
         references: {
           model: UserModel,
-          key: 'id',
-        },
-      },
-      provider_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: OAuthProvidersModel,
           key: 'id',
         },
       },
