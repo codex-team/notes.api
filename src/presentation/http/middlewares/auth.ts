@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 
 /**
- * Auth middleware
+ * Auth middleware verifies request authorization header
  *
  * @returns { preHandlerHookHandler } - auth middleware
  */
@@ -31,6 +31,10 @@ export default (): preHandlerHookHandler => {
 
       return;
     }
+
+    /**
+     * TODO: verify token by specific service and pass payload to request
+     */
 
     done();
   };

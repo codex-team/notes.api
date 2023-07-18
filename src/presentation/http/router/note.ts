@@ -1,8 +1,9 @@
-import { FastifyPluginCallback, preHandlerHookHandler } from 'fastify';
+import { FastifyPluginCallback } from 'fastify';
 import NoteService from '@domain/service/note.js';
 import { StatusCodes } from 'http-status-codes';
 import { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
 import Note from '@domain/entities/note.js';
+import { Middlewares } from '@presentation/http/middlewares/index.js';
 
 /**
  * Get note by id options
@@ -39,9 +40,9 @@ interface NoteRouterOptions {
   noteService: NoteService,
 
   /**
-   * Auth middleware
+   * Middlewares
    */
-  authMiddleware: preHandlerHookHandler;
+  middlewares: Middlewares,
 }
 
 /**
@@ -60,7 +61,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Get note by id
    */
-  fastify.get<{ Params: GetNoteByIdOptions }>('/:id', { preHandler: opts.authMiddleware }, async (request, reply) => {
+  fastify.get<{ Params: GetNoteByIdOptions }>('/:id', async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
@@ -94,7 +95,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Add new note
    */
-  fastify.post('/', { preHandler: opts.authMiddleware }, async (request, reply) => {
+  fastify.post('/', { preHandler: opts.middlewares.authMiddleware }, async (request, reply) => {
     /**
      * TODO: Validate request query
      */

@@ -53,9 +53,11 @@ export default class HttpServer implements API {
     /**
      * Register all routers
      */
-    this.server.register(NoteRouter, { prefix: '/note',
+    this.server.register(NoteRouter, {
+      prefix: '/note',
       noteService: domainServices.noteService,
-      authMiddleware: middlewares.authMiddleware });
+      middlewares: middlewares,
+    });
 
     /**
      * Allow cors for allowed origins from config

@@ -4,7 +4,7 @@ import { preHandlerHookHandler } from 'fastify';
 /**
  * Middlewares interface
  */
-interface Middlewares {
+export interface Middlewares {
   /**
    * Auth middleware
    */
