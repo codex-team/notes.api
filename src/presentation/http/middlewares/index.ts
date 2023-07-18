@@ -8,7 +8,7 @@ export interface Middlewares {
   /**
    * Auth middleware
    */
-  authMiddleware: preHandlerHookHandler;
+  auth: preHandlerHookHandler;
 }
 
 /**
