@@ -1,4 +1,9 @@
 /**
+ * Request headers type
+ */
+export type Headers = Record<string, string>;
+
+/**
  * Fetch transport to make HTTP requests
  */
 export default class FetchTransport {
@@ -15,20 +20,10 @@ export default class FetchTransport {
    *
    * @template Response - Response data type
    * @param endpoint - API endpoint
-   * @param accessToken - Access token
+   * @param headers - Request headers
    * @returns { Promise<Response> } - Response data
    */
-  public async get<Response>(endpoint: string, accessToken: string): Promise<Response> {
-    let headers;
-
-    /**
-     * If access token is provided, add it to headers
-     */
-    if (accessToken) {
-      headers = {
-        'Authorization': `Bearer ${accessToken}`,
-      };
-    }
+  public async get<Response>(endpoint: string, headers: Headers): Promise<Response> {
     // eslint-disable-next-line no-undef
     const response = await fetch(this.baseUrl + endpoint, {
       method: 'GET',
