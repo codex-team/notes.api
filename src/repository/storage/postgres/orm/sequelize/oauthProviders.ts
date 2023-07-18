@@ -5,14 +5,7 @@ import Orm from '@repository/storage/postgres/orm/sequelize/index.js';
  * Class representing oauth providers model in database
  */
 export class OAuthProvidersModel extends Model<InferAttributes<OAuthProvidersModel>, InferCreationAttributes<OAuthProvidersModel>> {
-  /**
-   * Provider id
-   */
   public declare id: CreationOptional<number>;
-
-  /**
-   * OAuth provider name
-   */
   public declare name: string;
 }
 
