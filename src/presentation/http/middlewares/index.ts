@@ -1,4 +1,4 @@
-import auth from '@presentation/http/middlewares/auth.js';
+import initAuth from '@presentation/http/middlewares/auth.js';
 import { preHandlerHookHandler } from 'fastify';
 
 /**
@@ -19,9 +19,9 @@ export default (): Middlewares => {
   /**
    * Init middlewares
    */
-  const authMiddleware = auth();
+  const auth = initAuth();
 
   return {
-    authMiddleware,
+    auth,
   };
 };
