@@ -8,6 +8,7 @@ import JwtService from '@infrastructure/jwt/index.js';
 import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import OauthRouter from '@presentation/http/router/oauth.js';
+import initMiddlewares from '@presentation/http/middlewares/index.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -49,11 +50,16 @@ export default class HttpServer implements API {
    * @param domainServices - instances of domain services
    */
   public async run(domainServices: DomainServices): Promise<void> {
+    const middlewares = initMiddlewares();
+
     /**
      * Register all routers
      */
-    this.server.register(NoteRouter, { prefix: '/note',
-      noteService: domainServices.noteService });
+    this.server.register(NoteRouter, {
+      prefix: '/note',
+      noteService: domainServices.noteService,
+      middlewares: middlewares,
+    });
     this.server.register(OauthRouter, { prefix: '/oauth' });
 
     /**
@@ -71,7 +77,6 @@ export default class HttpServer implements API {
       },
       startRedirectPath: this.config.oauth2.google.redirectUrl,
       callbackUri: this.config.oauth2.google.callbackUrl,
-    });
 
     /**
      * Allow cors for allowed origins from config
