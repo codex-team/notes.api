@@ -40,8 +40,6 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
   const noteStorage = new NoteStorage(orm);
   const userStorage = new UserStorage(orm);
 
-  await userStorage.model.sync();
-
   /**
    * Create transport instances
    */
