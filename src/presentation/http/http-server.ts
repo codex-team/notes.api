@@ -77,6 +77,7 @@ export default class HttpServer implements API {
       },
       startRedirectPath: this.config.oauth2.google.redirectUrl,
       callbackUri: this.config.oauth2.google.callbackUrl,
+    });
 
     /**
      * Allow cors for allowed origins from config
