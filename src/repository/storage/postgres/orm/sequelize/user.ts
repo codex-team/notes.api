@@ -1,5 +1,21 @@
 import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import Orm from '@repository/storage/postgres/orm/sequelize/index.js';
+import User from '@domain/entities/user';
+
+/**
+ * Query options for getting user
+ */
+interface GetUserQueryOptions {
+  /**
+   * User id
+   */
+  id?: number;
+
+  /**
+   * User email
+   */
+  email?: string;
+}
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -82,5 +98,79 @@ export default class UserSequelizeStorage {
       sequelize: this.database,
       timestamps: false,
     });
+  }
+
+  /**
+   * Insert user
+   *
+   * @param email - user email
+   * @param name - user name
+   * @returns { Promise<User> } inserted user
+   */
+  public async insertUser(email: string, name: string): Promise<User> {
+    const user = await this.model.create({
+      email,
+      name,
+      created_at: new Date(),
+    });
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      createdAt: user.created_at,
+    };
+  }
+
+  /**
+   * Get user by id or email
+   *
+   * @param options - query options
+   * @returns { Promise<User | null> } found user
+   */
+  public async getUserByIdOrEmail({
+    id,
+    email,
+  }: GetUserQueryOptions): Promise<User | null> {
+    let user: UserModel | null;
+
+    /**
+     * Check if id or email is provided
+     */
+    if (id) {
+      /**
+       * Find user by id
+       */
+      user = await this.model.findOne({
+        where: {
+          id,
+        },
+      });
+    } else if (email) {
+      /**
+       * Find user by email
+       */
+      user = await this.model.findOne({
+        where: {
+          email,
+        },
+      });
+    } else {
+      /**
+       * No id or email provided
+       */
+      return null;
+    }
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      createdAt: user.created_at,
+    };
   }
 }
