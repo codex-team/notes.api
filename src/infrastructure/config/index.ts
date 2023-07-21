@@ -13,6 +13,18 @@ const MetricsConfig = z.object({
   port: z.number(),
 });
 
+/**
+ * Authentication configuration
+ */
+const AuthConfig = z.object({
+  accessSecret: z.string(),
+  refreshSecret: z.string(),
+  accessExpiresIn: z.string(),
+  refreshExpiresIn: z.string(),
+});
+
+export type AuthConfig = z.infer<typeof AuthConfig>;
+
 const GoogleOAuth2Config = z.object({
   clientId: z.string(),
   clientSecret: z.string(),
@@ -85,6 +97,7 @@ const AppConfig = z.object({
   metrics: MetricsConfig,
   logging: LoggingConfig,
   database: DatabaseConfig,
+  auth: AuthConfig,
 });
 
 export type AppConfig = z.infer<typeof AppConfig>;
@@ -104,6 +117,12 @@ const defaultConfig: AppConfig = {
         callbackUrl: '/oauth/google/callback',
       },
     },
+  },
+  auth: {
+    accessSecret: 'accessSecret',
+    refreshSecret: 'refreshSecret',
+    accessExpiresIn: '24h',
+    refreshExpiresIn: '7d',
   },
   metrics: {
     enabled: true,

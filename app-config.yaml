@@ -1,9 +1,6 @@
 httpApi:
   host: 0.0.0.0
   port: 3000
-  # Secret keys for JWT
-  refreshTokenSecret: 'refreshTokenSecret'
-  accessTokenSecret: 'accessTokenSecret'
   allowedOrigins: '*'
   oauth2:
     google:
@@ -12,6 +9,11 @@ httpApi:
       redirectUrl: '/oauth/google/login'
       callbackUrl: 'http://localhost:1337/oauth/google/callback'
 
+auth:
+  accessSecret: 'secret'
+  refreshSecret: 'secret'
+  accessExpiresIn: '24h'
+  refreshExpiresIn: '7d'
 
 metrics:
   enabled: true

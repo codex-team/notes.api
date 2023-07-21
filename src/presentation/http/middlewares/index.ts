@@ -1,5 +1,6 @@
 import initAuth from '@presentation/http/middlewares/auth.js';
 import { preHandlerHookHandler } from 'fastify';
+import AuthService from '@domain/service/auth.js';
 
 /**
  * Middlewares interface
@@ -14,12 +15,14 @@ export interface Middlewares {
 /**
  * Init middlewares
  *
+ * @param authService - auth service instance
+ * @returns { Middlewares } - middlewares
  */
-export default (): Middlewares => {
+export default (authService: AuthService): Middlewares => {
   /**
    * Init middlewares
    */
-  const auth = initAuth();
+  const auth = initAuth(authService);
 
   return {
     auth,

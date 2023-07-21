@@ -1,13 +1,16 @@
 import { preHandlerHookHandler } from 'fastify';
+import AuthService, { AuthPayload } from '@domain/service/auth.js';
 import { StatusCodes } from 'http-status-codes';
 import { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
+import { HttpRequestParams } from '@presentation/http/types/HttpRequest.js';
 
 /**
- * Auth middleware verifies request authorization header
+ * Auth middleware
  *
+ * @param authService - auth service instance
  * @returns { preHandlerHookHandler } - auth middleware
  */
-export default (): preHandlerHookHandler => {
+export default (authService: AuthService): preHandlerHookHandler => {
   /**
    * Middleware function
    *
@@ -33,9 +36,33 @@ export default (): preHandlerHookHandler => {
     }
 
     /**
-     * TODO: verify token by specific service and pass payload to request
+     * Extract token from authorization header
      */
+    const token = authorizationHeader.replace('Bearer ', '');
 
-    done();
+    try {
+      const tokenPayload = await authService.verifyAccessToken(token);
+
+      /**
+       * Cast token payload to HttpRequest<Payload>
+       */
+      const params = request.params as HttpRequestParams<AuthPayload>;
+
+      /**
+       * Merge token payload with request params
+       */
+      request.params = {
+        ...params,
+        auth: tokenPayload,
+      };
+      done();
+    } catch (error) {
+      const response: ErrorResponse = {
+        status: StatusCodes.UNAUTHORIZED,
+        message: 'Invalid access token',
+      };
+
+      reply.send(response);
+    }
   };
 };

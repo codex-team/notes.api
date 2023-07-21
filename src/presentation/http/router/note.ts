@@ -4,6 +4,8 @@ import { StatusCodes } from 'http-status-codes';
 import { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
 import Note from '@domain/entities/note.js';
 import { Middlewares } from '@presentation/http/middlewares/index.js';
+import { HttpRequestParams } from '@presentation/http/types/HttpRequest';
+import { AuthPayload } from '@domain/service/auth.js';
 
 /**
  * Get note by id options
@@ -95,7 +97,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Add new note
    */
-  fastify.post('/', { preHandler: opts.middlewares.auth }, async (request, reply) => {
+  fastify.post<{
+    Params: HttpRequestParams<AuthPayload>
+  }>('/', { preHandler: opts.middlewares.auth }, async (request, reply) => {
     /**
      * TODO: Validate request query
      */

@@ -1,9 +1,19 @@
 import jwt from 'jsonwebtoken';
 
 /**
- * Jwt service
+ * Payload interface
  */
-export default class JwtService {
+export interface AuthPayload {
+  /**
+   * User id
+   */
+  id: number;
+}
+
+/**
+ * Auth service
+ */
+export default class AuthService {
   /**
    * Access token secret key
    */
@@ -53,10 +63,8 @@ export default class JwtService {
    * @param payload - payload to sign
    * @returns {string} access token
    */
-  public signAccessToken(payload: unknown): string {
-    const strPayload = JSON.stringify(payload);
-
-    return jwt.sign(strPayload, this.accessSecret, {
+  public signAccessToken(payload: AuthPayload): string {
+    return jwt.sign(payload, this.accessSecret, {
       expiresIn: this.accessExpiresIn,
     });
   }
@@ -65,10 +73,10 @@ export default class JwtService {
    * Verifies access token
    *
    * @param token - access token
-   * @returns {string | object} payload
+   * @returns {AuthPayload} payload
    */
-  public verifyAccessToken(token: string): string | object {
-    return jwt.verify(token, this.accessSecret);
+  public verifyAccessToken(token: string): AuthPayload {
+    return jwt.verify(token, this.accessSecret, { complete: false }) as AuthPayload;
   }
 
   /**
@@ -77,10 +85,8 @@ export default class JwtService {
    * @param payload - payload to sign
    * @returns {string} refresh token
    */
-  public signRefreshToken(payload: unknown): string {
-    const strPayload = JSON.stringify(payload);
-
-    return jwt.sign(strPayload, this.refreshSecret, {
+  public signRefreshToken(payload: AuthPayload): string {
+    return jwt.sign(payload, this.refreshSecret, {
       expiresIn: this.refreshExpiresIn,
     });
   }
@@ -89,9 +95,9 @@ export default class JwtService {
    * Verifies refresh token
    *
    * @param token - refresh token
-   * @returns {string | object} payload
+   * @returns {AuthPayload} payload
    */
-  public verifyRefreshToken(token: string): string | object {
-    return jwt.verify(token, this.refreshSecret);
+  public verifyRefreshToken(token: string): AuthPayload {
+    return jwt.verify(token, this.refreshSecret, { complete: false }) as AuthPayload;
   }
 }
