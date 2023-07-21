@@ -1,7 +1,7 @@
 /**
- * Represents the HTTP request params with data, passed to the route handler from middlewares
+ * Represents the HTTP request config with data, passed to the route handler from middlewares
  */
-export interface HttpRequestParams<AuthPayload> {
+export interface HttpRequestConfig<AuthPayload> {
   /**
    * Auth payload
    */

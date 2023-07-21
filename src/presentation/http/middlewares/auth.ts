@@ -2,7 +2,7 @@ import { preHandlerHookHandler } from 'fastify';
 import AuthService, { AuthPayload } from '@domain/service/auth.js';
 import { StatusCodes } from 'http-status-codes';
 import { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
-import { HttpRequestParams } from '@presentation/http/types/HttpRequest.js';
+import { HttpRequestConfig } from '@presentation/http/types/HttpRequest.js';
 
 /**
  * Auth middleware
@@ -44,17 +44,12 @@ export default (authService: AuthService): preHandlerHookHandler => {
       const tokenPayload = await authService.verifyAccessToken(token);
 
       /**
-       * Cast token payload to HttpRequest<Payload>
+       * Add route config with auth payload to request object
        */
-      const params = request.params as HttpRequestParams<AuthPayload>;
-
-      /**
-       * Merge token payload with request params
-       */
-      request.params = {
-        ...params,
+      request.routeConfig = {
         auth: tokenPayload,
-      };
+      } as HttpRequestConfig<AuthPayload>;
+
       done();
     } catch (error) {
       const response: ErrorResponse = {
