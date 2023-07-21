@@ -27,12 +27,12 @@ export default class AuthService {
   /**
    * Access token expiration time
    */
-  private readonly accessExpiresIn: string = '24h';
+  private readonly accessExpiresIn: string | number;
 
   /**
    * Refresh token expiration time
    */
-  private readonly refreshExpiresIn: string = '7d';
+  private readonly refreshExpiresIn: string | number;
 
   /**
    * Creates jwt service instance
@@ -42,19 +42,11 @@ export default class AuthService {
    * @param accessTokenExpiresIn - access token expiration time
    * @param refreshTokenExpiresIn - refresh token expiration time
    */
-  constructor(accessSecret: string, refreshSecret: string, accessTokenExpiresIn?: string, refreshTokenExpiresIn?: string) {
+  constructor(accessSecret: string, refreshSecret: string, accessTokenExpiresIn: string | number, refreshTokenExpiresIn: string | number) {
     this.accessSecret = accessSecret;
     this.refreshSecret = refreshSecret;
-
-    /**
-     * If expiration time is provided, use it
-     */
-    if (accessTokenExpiresIn) {
-      this.accessExpiresIn = accessTokenExpiresIn;
-    }
-    if (refreshTokenExpiresIn) {
-      this.refreshExpiresIn = refreshTokenExpiresIn;
-    }
+    this.accessExpiresIn = accessTokenExpiresIn;
+    this.refreshExpiresIn = refreshTokenExpiresIn;
   }
 
   /**

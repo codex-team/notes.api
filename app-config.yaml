@@ -12,7 +12,7 @@ httpApi:
 auth:
   accessSecret: 'secret'
   refreshSecret: 'secret'
-  accessExpiresIn: '24h'
+  accessExpiresIn: '6h'
   refreshExpiresIn: '7d'
 
 metrics:
