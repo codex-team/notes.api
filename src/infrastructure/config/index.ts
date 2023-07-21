@@ -122,7 +122,7 @@ const defaultConfig: AppConfig = {
     accessSecret: 'accessSecret',
     refreshSecret: 'refreshSecret',
     accessExpiresIn: '15m',
-    refreshExpiresIn: '12h',
+    refreshExpiresIn: '30d',
   },
   metrics: {
     enabled: true,

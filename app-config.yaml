@@ -13,7 +13,7 @@ auth:
   accessSecret: 'secret'
   refreshSecret: 'secret'
   accessExpiresIn: '15m'
-  refreshExpiresIn: '12h'
+  refreshExpiresIn: '30d'
 
 metrics:
   enabled: true
