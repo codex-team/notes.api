@@ -1,7 +1,7 @@
 import NoteService from '@domain/service/note.js';
 import { Repositories } from '@repository/index.js';
 import AuthService from '@domain/service/auth.js';
-import { AuthConfig } from '@infrastructure/config/index.js';
+import { AppConfig, AuthConfig } from '@infrastructure/config/index.js';
 
 /**
  * Interface for initiated services
@@ -22,11 +22,15 @@ export interface DomainServices {
  * Initiate services
  *
  * @param repositories - repositories
- * @param authConfig - auth config
+ * @param appConfig - app config
  */
-export function init(repositories: Repositories, authConfig: AuthConfig): DomainServices {
+export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
   const noteService = new NoteService(repositories.noteRepository);
-  const authService = new AuthService(authConfig.accessSecret, authConfig.refreshSecret, authConfig.accessExpiresIn, authConfig.refreshExpiresIn);
+  const authService = new AuthService(
+    appConfig.auth.accessSecret,
+    appConfig.auth.refreshSecret,
+    appConfig.auth.accessExpiresIn,
+    appConfig.auth.refreshExpiresIn);
 
   return {
     noteService,
