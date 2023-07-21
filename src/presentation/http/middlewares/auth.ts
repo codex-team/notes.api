@@ -1,8 +1,7 @@
 import { preHandlerHookHandler } from 'fastify';
-import AuthService, { AuthPayload } from '@domain/service/auth.js';
+import AuthService from '@domain/service/auth.js';
 import { StatusCodes } from 'http-status-codes';
 import { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
-import { HttpRequestConfig } from '@presentation/http/types/HttpRequest.js';
 
 /**
  * Auth middleware
@@ -46,12 +45,13 @@ export default (authService: AuthService): preHandlerHookHandler => {
       /**
        * Add route config with auth payload to request object
        */
-      request.routeConfig = {
+      request.ctx = {
         auth: tokenPayload,
-      } as HttpRequestConfig<AuthPayload>;
+      };
 
       done();
     } catch (error) {
+      console.error(error);
       const response: ErrorResponse = {
         status: StatusCodes.UNAUTHORIZED,
         message: 'Invalid access token',
