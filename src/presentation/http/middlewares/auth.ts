@@ -51,7 +51,6 @@ export default (authService: AuthService): preHandlerHookHandler => {
 
       done();
     } catch (error) {
-      console.error(error);
       const response: ErrorResponse = {
         status: StatusCodes.UNAUTHORIZED,
         message: 'Invalid access token',
