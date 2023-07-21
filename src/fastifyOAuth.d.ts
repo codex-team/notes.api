@@ -1,5 +1,5 @@
 import { OAuth2Namespace } from '@fastify/oauth2';
-import { HttpRequestConfigContext } from '@presentation/http/types/HttpRequestContext.js';
+import { HttpRequestContext } from '@presentation/http/types/HttpRequestContext.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
