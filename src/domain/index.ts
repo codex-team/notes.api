@@ -1,7 +1,7 @@
 import NoteService from '@domain/service/note.js';
 import { Repositories } from '@repository/index.js';
 import AuthService from '@domain/service/auth.js';
-import { AppConfig, AuthConfig } from '@infrastructure/config/index.js';
+import { AppConfig } from '@infrastructure/config/index.js';
 
 /**
  * Interface for initiated services
@@ -30,7 +30,8 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     appConfig.auth.accessSecret,
     appConfig.auth.refreshSecret,
     appConfig.auth.accessExpiresIn,
-    appConfig.auth.refreshExpiresIn);
+    appConfig.auth.refreshExpiresIn
+  );
 
   return {
     noteService,

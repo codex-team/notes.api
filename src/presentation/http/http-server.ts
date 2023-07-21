@@ -43,7 +43,7 @@ export default class HttpServer implements API {
    * @param domainServices - instances of domain services
    */
   public async run(domainServices: DomainServices): Promise<void> {
-    const middlewares = initMiddlewares(domainServices.authService);
+    const middlewares = initMiddlewares(domainServices);
 
     /**
      * Register all routers
