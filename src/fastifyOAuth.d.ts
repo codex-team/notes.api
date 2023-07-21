@@ -1,12 +1,15 @@
 import { OAuth2Namespace } from '@fastify/oauth2';
-import { HttpRequestConfigContext } from '@presentation/http/types/HttpRequest.js';
-import { AuthPayload } from '@domain/service/auth.js';
+import { HttpRequestConfigContext } from '@presentation/http/types/HttpRequestContext.js';
+import AuthPayload from '@domain/entities/authPayload.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
     googleOAuth2: OAuth2Namespace;
   }
   interface FastifyRequest {
+    /**
+     * Request context, passed from middlewares
+     */
     ctx: HttpRequestConfigContext<AuthPayload>
   }
 }

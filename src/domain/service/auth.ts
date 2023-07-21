@@ -1,14 +1,5 @@
 import jwt from 'jsonwebtoken';
-
-/**
- * Payload interface
- */
-export interface AuthPayload {
-  /**
-   * User id
-   */
-  id: number;
-}
+import AuthPayload from '@domain/entities/authPayload.js';
 
 /**
  * Auth service
