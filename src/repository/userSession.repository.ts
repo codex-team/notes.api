@@ -1,5 +1,5 @@
-import UserSessionsStorage from '@repository/storage/userSession.storage.js';
-import UserSession from '@domain/entities/userSession.js';
+import type UserSessionsStorage from '@repository/storage/userSession.storage.js';
+import type UserSession from '@domain/entities/userSession.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level

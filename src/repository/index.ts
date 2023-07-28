@@ -1,4 +1,4 @@
-import { DatabaseConfig } from '@infrastructure/config/index.js';
+import type { DatabaseConfig } from '@infrastructure/config/index.js';
 import NoteStorage from './storage/note.storage.js';
 import NoteRepository from './note.repository.js';
 import Orm from './storage/postgres/orm/index.js';

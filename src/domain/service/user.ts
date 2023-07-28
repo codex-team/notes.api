@@ -1,5 +1,6 @@
-import UserRepository, { Provider } from '@repository/user.repository.js';
-import User from '@domain/entities/user.js';
+import type UserRepository from '@repository/user.repository.js';
+import { Provider } from '@repository/user.repository.js';
+import type User from '@domain/entities/user.js';
 
 export {
   Provider

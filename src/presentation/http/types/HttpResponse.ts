@@ -20,7 +20,7 @@ interface ErrorResponse {
   message: string;
 }
 
-export {
+export type {
   SuccessResponse,
   ErrorResponse
 };

@@ -1,9 +1,9 @@
 import { getLogger } from '@infrastructure/logging/index.js';
-import { HttpApiConfig } from '@infrastructure/config/index.js';
+import type { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
 import type API from '@presentation/api.interface.js';
 import NoteRouter from '@presentation/http/router/note.js';
-import { DomainServices } from '@domain/index.js';
+import type { DomainServices } from '@domain/index.js';
 import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import OauthRouter from '@presentation/http/router/oauth.js';

@@ -1,6 +1,6 @@
 import initAuth from '@presentation/http/middlewares/auth.js';
-import { preHandlerHookHandler } from 'fastify';
-import { DomainServices } from '@domain/index.js';
+import type { preHandlerHookHandler } from 'fastify';
+import type { DomainServices } from '@domain/index.js';
 
 /**
  * Middlewares interface

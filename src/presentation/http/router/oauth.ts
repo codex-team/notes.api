@@ -1,5 +1,6 @@
-import { FastifyPluginCallback } from 'fastify';
-import UserService, { Provider } from '@domain/service/user.js';
+import type { FastifyPluginCallback } from 'fastify';
+import type UserService from '@domain/service/user.js';
+import { Provider } from '@domain/service/user.js';
 
 /**
  * Interface for the oauth router.

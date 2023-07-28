@@ -1,7 +1,7 @@
 import NoteService from '@domain/service/note.js';
-import { Repositories } from '@repository/index.js';
+import type { Repositories } from '@repository/index.js';
 import AuthService from '@domain/service/auth.js';
-import { AppConfig } from '@infrastructure/config/index.js';
+import type { AppConfig } from '@infrastructure/config/index.js';
 import UserService from '@domain/service/user.js';
 
 /**
@@ -38,7 +38,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     appConfig.auth.accessExpiresIn,
     appConfig.auth.refreshExpiresIn
   );
-  
+
   const userService = new UserService(repositories.userRepository);
 
   return {

@@ -1,5 +1,6 @@
-import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
-import Orm from '@repository/storage/postgres/orm/sequelize/index.js';
+import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 
 /**
  * Interface for inserted note
