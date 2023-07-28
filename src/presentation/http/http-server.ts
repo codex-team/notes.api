@@ -53,14 +53,17 @@ export default class HttpServer implements API {
       noteService: domainServices.noteService,
       middlewares: middlewares,
     });
-    this.server.register(OauthRouter, { prefix: '/oauth' });
+    this.server.register(OauthRouter, {
+      prefix: '/oauth',
+      userService: domainServices.userService,
+    });
 
     /**
      * Register oauth2 plugin
      */
     this.server.register(fastifyOauth2, {
       name: 'googleOAuth2',
-      scope: [ 'profile' ],
+      scope: ['profile', 'email'],
       credentials: {
         client: {
           id: this.config.oauth2.google.clientId,

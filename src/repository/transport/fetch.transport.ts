@@ -18,7 +18,7 @@ export default class FetchTransport {
    * @param headers - Request headers
    * @returns { Promise<Response> } - Response data
    */
-  public async get<Response>(endpoint: string, headers: Record<string, string>): Promise<Response> {
+  public async get<Response>(endpoint: string, headers?: Record<string, string>): Promise<Response> {
     // eslint-disable-next-line no-undef
     const response = await fetch(this.baseUrl + endpoint, {
       method: 'GET',
