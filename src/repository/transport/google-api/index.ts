@@ -19,11 +19,33 @@ export default class GoogleApiTransport extends Transport {
    *
    * @template Payload - response payload type
    * @param endpoint - API endpoint
+   * @returns { Promise<Payload> } - response payload
+   */
+  public async get<Payload>(endpoint: string): Promise<Payload> {
+    const res = await super.get<ApiResponse>(endpoint);
+
+    if ('error' in res) {
+      /**
+       * TODO: handle error, throw error
+       */
+    }
+
+    return res as Payload;
+  }
+
+  /**
+   * Make GET request with authorization to Google API
+   *
+   * @param endpoint - API endpoint
    * @param accessToken - access token for authorization to Google API
    * @returns { Promise<Payload> } - response payload
    */
-  public async get<Payload>(endpoint: string, accessToken: string): Promise<Payload> {
-    const res = await super.get<ApiResponse>(endpoint, accessToken);
+  public async getWithAccessToken<Payload>(endpoint: string, accessToken: string): Promise<Payload> {
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    const res = await super.get<ApiResponse>(endpoint, headers);
 
     if ('error' in res) {
       /**

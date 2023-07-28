@@ -15,17 +15,10 @@ export default class FetchTransport {
    *
    * @template Response - Response data type
    * @param endpoint - API endpoint
-   * @param accessToken - Access token for authorization
+   * @param headers - Request headers
    * @returns { Promise<Response> } - Response data
    */
-  public async get<Response>(endpoint: string, accessToken: string): Promise<Response> {
-    /**
-     * Init request headers
-     */
-    const headers = {
-      Authorization: `Bearer ${accessToken}`,
-    };
-
+  public async get<Response>(endpoint: string, headers?: Record<string, string>): Promise<Response> {
     // eslint-disable-next-line no-undef
     const response = await fetch(this.baseUrl + endpoint, {
       method: 'GET',

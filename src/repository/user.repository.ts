@@ -56,7 +56,7 @@ export default class UserRepository {
         /**
          * Get user info from Google api
          */
-        res = await this.googleApiTransport.get<GetUserInfoResponsePayload>('/userinfo', accessToken);
+        res = await this.googleApiTransport.getWithAccessToken<GetUserInfoResponsePayload>('/userinfo', accessToken);
         break;
       default:
         /**
