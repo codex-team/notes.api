@@ -17,6 +17,23 @@ interface GetUserQueryOptions {
   email?: string;
 }
 
+interface InsertUserOptions {
+  /**
+   * User email
+   */
+  email: string;
+
+  /**
+   * User name
+   */
+  name: string;
+
+  /**
+   * User photo
+   */
+  photo?: string;
+}
+
 /* eslint-disable @typescript-eslint/naming-convention */
 
 /**
@@ -42,6 +59,11 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
    * User created at
    */
   public declare created_at: Date;
+
+  /**
+   * User photo
+   */
+  public declare photo: CreationOptional<string>;
 }
 
 /**
@@ -93,6 +115,9 @@ export default class UserSequelizeStorage {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      photo: {
+        type: DataTypes.STRING,
+      },
     }, {
       tableName: this.tableName,
       sequelize: this.database,
@@ -103,15 +128,19 @@ export default class UserSequelizeStorage {
   /**
    * Insert user
    *
-   * @param email - user email
-   * @param name - user name
+   * @param options - options to insert user
    * @returns { Promise<User> } inserted user
    */
-  public async insertUser(email: string, name: string): Promise<User> {
+  public async insertUser({
+    email,
+    name,
+    photo,
+  }: InsertUserOptions): Promise<User> {
     const user = await this.model.create({
       email,
       name,
       created_at: new Date(),
+      photo,
     });
 
     return {

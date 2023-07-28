@@ -21,4 +21,9 @@ export default interface User {
    * User created at
    */
   createdAt?: Date;
+
+  /**
+   * User photo
+   */
+  photo?: string;
 }

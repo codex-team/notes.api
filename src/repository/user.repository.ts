@@ -96,6 +96,10 @@ export default class UserRepository {
       return user;
     }
 
-    return await this.storage.insertUser(res.email, res.name);
+    return await this.storage.insertUser({
+      email: res.email,
+      photo: res.picture,
+      name: res.name,
+    });
   }
 }
