@@ -4,7 +4,6 @@ import fastify from 'fastify';
 import type API from '@presentation/api.interface.js';
 import NoteRouter from '@presentation/http/router/note.js';
 import { DomainServices } from '@domain/index.js';
-import JwtService from '@infrastructure/jwt/index.js';
 import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import OauthRouter from '@presentation/http/router/oauth.js';
@@ -29,18 +28,12 @@ export default class HttpServer implements API {
   private readonly config: HttpApiConfig;
 
   /**
-   * Jwt service instance
-   */
-  private readonly jwtService: JwtService;
-
-  /**
    * Creates http server instance
    *
    * @param config - http server config
    */
   constructor(config: HttpApiConfig) {
     this.config = config;
-    this.jwtService = new JwtService(this.config.accessTokenSecret, this.config.refreshTokenSecret);
   }
 
 
@@ -50,7 +43,7 @@ export default class HttpServer implements API {
    * @param domainServices - instances of domain services
    */
   public async run(domainServices: DomainServices): Promise<void> {
-    const middlewares = initMiddlewares();
+    const middlewares = initMiddlewares(domainServices);
 
     /**
      * Register all routers

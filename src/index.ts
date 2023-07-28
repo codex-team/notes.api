@@ -12,7 +12,7 @@ const start = async (): Promise<void> => {
   try {
     const api = new API(config.httpApi);
     const repositories = await initRepositories(config.database);
-    const domainServices = initDomainServices(repositories);
+    const domainServices = initDomainServices(repositories, config);
 
     await api.run(domainServices);
 
