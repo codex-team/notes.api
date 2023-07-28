@@ -15,25 +15,6 @@ export default class GoogleApiTransport extends Transport {
   }
 
   /**
-   * Make GET request
-   *
-   * @template Payload - response payload type
-   * @param endpoint - API endpoint
-   * @returns { Promise<Payload> } - response payload
-   */
-  public async get<Payload>(endpoint: string): Promise<Payload> {
-    const res = await super.get<ApiResponse>(endpoint);
-
-    if ('error' in res) {
-      /**
-       * TODO: handle error, throw error
-       */
-    }
-
-    return res as Payload;
-  }
-
-  /**
    * Make GET request with authorization to Google API
    *
    * @param endpoint - API endpoint
