@@ -21,7 +21,7 @@ export default class GoogleApiTransport extends Transport {
    * @param accessToken - access token for authorization to Google API
    * @returns { Promise<Payload> } - response payload
    */
-  public async getWithAccessToken<Payload>(endpoint: string, accessToken: string): Promise<Payload> {
+  public async getWithAccessToken<Payload>(endpoint: string, accessToken: string): Promise<Payload | null> {
     const headers = {
       Authorization: `Bearer ${accessToken}`,
     };
@@ -32,6 +32,7 @@ export default class GoogleApiTransport extends Transport {
       /**
        * TODO: handle error, throw error
        */
+      return null;
     }
 
     return res as Payload;

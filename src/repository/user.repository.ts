@@ -46,7 +46,7 @@ export default class UserRepository {
    * @returns { Promise<User | null> } found user
    */
   public async getOrCreateUserByProvider(accessToken: string, provider: Provider): Promise<User | null> {
-    let res: GetUserInfoResponsePayload;
+    let res: GetUserInfoResponsePayload | null;
 
     /**
      * Get user info from provider
@@ -65,12 +65,9 @@ export default class UserRepository {
         return null;
     }
 
-    /**
-     * Check if error in response
-     */
-    if ('error' in res) {
+    if (!res) {
       /**
-       * TODO: handle error
+       * User not found in provider
        */
       return null;
     }
