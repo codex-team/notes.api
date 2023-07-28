@@ -19,8 +19,8 @@ const MetricsConfig = z.object({
 const AuthConfig = z.object({
   accessSecret: z.string(),
   refreshSecret: z.string(),
-  accessExpiresIn: z.string(),
-  refreshExpiresIn: z.string(),
+  accessExpiresIn: z.number(),
+  refreshExpiresIn: z.number(),
 });
 
 export type AuthConfig = z.infer<typeof AuthConfig>;
@@ -119,8 +119,8 @@ const defaultConfig: AppConfig = {
   auth: {
     accessSecret: 'accessSecret',
     refreshSecret: 'refreshSecret',
-    accessExpiresIn: '15m',
-    refreshExpiresIn: '30d',
+    accessExpiresIn: 900000,
+    refreshExpiresIn: 2592000000,
   },
   metrics: {
     enabled: true,

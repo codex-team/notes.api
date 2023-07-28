@@ -11,8 +11,8 @@ httpApi:
 
 auth:
   accessSecret: 'secret'
-  accessExpiresIn: '15m'
-  refreshExpiresIn: '30d'
+  accessExpiresIn: 900000
+  refreshExpiresIn: 2592000000
 
 metrics:
   enabled: true
