@@ -26,7 +26,7 @@ export default class NoteService {
    * @param content - note content
    * @returns { Note } added note object
    */
-  public async addNote(title: string, content: string): Promise<Note> {
+  public async addNote(title: string, content: JSON): Promise<Note> {
     const note = new Note(title, content);
 
     const addedNote = await this.repository.addNote(note);

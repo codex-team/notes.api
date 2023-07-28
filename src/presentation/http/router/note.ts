@@ -27,7 +27,7 @@ interface AddNoteOptions {
   /**
    * Note content
    */
-  content: string;
+  content: JSON;
 }
 
 /**
