@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import AuthPayload from '@domain/entities/authPayload.js';
+import { nanoid } from 'nanoid';
 
 /**
  * Auth service
@@ -9,11 +10,6 @@ export default class AuthService {
    * Access token secret key
    */
   private readonly accessSecret: string;
-
-  /**
-   * Refresh token secret key
-   */
-  private readonly refreshSecret: string;
 
   /**
    * Access token expiration time
@@ -29,13 +25,11 @@ export default class AuthService {
    * Creates jwt service instance
    *
    * @param accessSecret - access token secret key
-   * @param refreshSecret - refresh token secret key
    * @param accessTokenExpiresIn - access token expiration time
    * @param refreshTokenExpiresIn - refresh token expiration time
    */
-  constructor(accessSecret: string, refreshSecret: string, accessTokenExpiresIn: string | number, refreshTokenExpiresIn: string | number) {
+  constructor(accessSecret: string, accessTokenExpiresIn: string | number, refreshTokenExpiresIn: string | number) {
     this.accessSecret = accessSecret;
-    this.refreshSecret = refreshSecret;
     this.accessExpiresIn = accessTokenExpiresIn;
     this.refreshExpiresIn = refreshTokenExpiresIn;
   }
@@ -65,22 +59,11 @@ export default class AuthService {
   /**
    * Generates refresh token
    *
-   * @param payload - payload to sign
    * @returns {string} refresh token
    */
-  public signRefreshToken(payload: AuthPayload): string {
-    return jwt.sign(payload, this.refreshSecret, {
-      expiresIn: this.refreshExpiresIn,
-    });
-  }
+  public signRefreshToken(): string {
+    const tokenSize = 10;
 
-  /**
-   * Verifies refresh token
-   *
-   * @param token - refresh token
-   * @returns {AuthPayload} payload
-   */
-  public verifyRefreshToken(token: string): AuthPayload {
-    return jwt.verify(token, this.refreshSecret, { complete: false }) as AuthPayload;
+    return nanoid(tokenSize);
   }
 }
