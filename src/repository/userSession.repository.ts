@@ -41,7 +41,6 @@ export default class UserSessionRepository {
    * @returns { Promise<UserSession | null> } found user session
    */
   public async getUserSessionRefreshToken(token: string): Promise<UserSession | null> {
-
     return await this.storage.findByToken(token);
   }
 
