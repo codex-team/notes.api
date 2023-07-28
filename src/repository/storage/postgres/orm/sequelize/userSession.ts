@@ -78,6 +78,7 @@ export default class UserSessionSequelizeStorage {
       refresh_token: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
       refresh_token_expires_at: {
         type: DataTypes.DATE,
@@ -114,14 +115,14 @@ export default class UserSessionSequelizeStorage {
   }
 
   /**
-   * Finds user session by session id
+   * Finds user session by refresh token
    *
-   * @param sessionId - session id
+   * @param token - refresh token
    * @returns { UserSession | null } found user session
    */
-  public async findById(sessionId: number): Promise<UserSession | null> {
+  public async findByToken(token: string): Promise<UserSession | null> {
     const session = await this.model.findOne({
-      where: { id: sessionId },
+      where: { refresh_token: token },
     });
 
     if (!session) {

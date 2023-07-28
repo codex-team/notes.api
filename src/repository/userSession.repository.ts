@@ -35,16 +35,14 @@ export default class UserSessionRepository {
   }
 
   /**
-   * Gets user session by session id
+   * Gets user session by refresh token
    *
-   * @param sessionId - session id
+   * @param token - refresh token
    * @returns { Promise<UserSession | null> } found user session
    */
-  public async getUserSessionBySessionId(sessionId: number): Promise<UserSession | null> {
-    /**
-     * TODO: Decrypt refresh token
-     */
-    return await this.storage.findById(sessionId);
+  public async getUserSessionRefreshToken(token: string): Promise<UserSession | null> {
+
+    return await this.storage.findByToken(token);
   }
 
   /**
