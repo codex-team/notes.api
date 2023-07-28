@@ -1,7 +1,7 @@
 import User from '@domain/entities/user.js';
 import UserStorage from './storage/user.storage.js';
 import GoogleApiTransport from '@repository/transport/google-api/index.js';
-import { GetUserInfoResponsePayload } from '@repository/transport/google-api/types/GetUserInfoResponsePayload';
+import GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
 
 /**
  * OAuth provider
@@ -39,21 +39,14 @@ export default class UserRepository {
   }
 
   /**
-   * Get user by provider
+   * Get user data from oauth provider, create user if not exists
    *
    * @param accessToken - provider access token
    * @param provider - provider
    * @returns { Promise<User | null> } found user
    */
-  public async getUserByProvider(accessToken: string, provider: Provider): Promise<User | null> {
+  public async getOrCreateUserByProvider(accessToken: string, provider: Provider): Promise<User | null> {
     let res: GetUserInfoResponsePayload;
-
-    /**
-     * Set request headers
-     */
-    const headers = {
-      Authorization: `Bearer ${accessToken}`,
-    };
 
     /**
      * Get user info from provider
@@ -63,7 +56,7 @@ export default class UserRepository {
         /**
          * Get user info from Google api
          */
-        res = await this.googleApiTransport.get<GetUserInfoResponsePayload>('/userinfo', headers);
+        res = await this.googleApiTransport.get<GetUserInfoResponsePayload>('/userinfo', accessToken);
         break;
       default:
         /**

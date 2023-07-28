@@ -20,7 +20,7 @@ interface OauthRouterOptions {
  */
 const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, done) => {
   /**
-   * Callback for Google oauth2
+   * Callback for Google oauth2. Google redirects to this endpoint after user authentication.
    */
   fastify.get('/google/callback', async (request, reply) => {
     const { token } = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);

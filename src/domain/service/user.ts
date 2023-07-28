@@ -31,6 +31,6 @@ export default class UserService {
    * @returns { Promise<User | null> } found user
    */
   public async getUserByProvider(accessToken: string, provider: Provider): Promise<User | null> {
-    return await this.repository.getUserByProvider(accessToken, provider);
+    return await this.repository.getOrCreateUserByProvider(accessToken, provider);
   }
 }
