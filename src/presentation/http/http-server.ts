@@ -8,6 +8,7 @@ import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import OauthRouter from '@presentation/http/router/oauth.js';
 import initMiddlewares from '@presentation/http/middlewares/index.js';
+import AuthRouter from '@presentation/http/router/auth.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -56,6 +57,11 @@ export default class HttpServer implements API {
     this.server.register(OauthRouter, {
       prefix: '/oauth',
       userService: domainServices.userService,
+      authService: domainServices.authService,
+    });
+    this.server.register(AuthRouter, {
+      prefix: '/auth',
+      authService: domainServices.authService,
     });
 
     /**

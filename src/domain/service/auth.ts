@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import AuthPayload from '@domain/entities/authPayload.js';
 import { nanoid } from 'nanoid';
 import UserSessionRepository from '@repository/userSession.repository.js';
-import UserSession from '@domain/entities/userSession';
+import UserSession from '@domain/entities/userSession.js';
 
 /**
  * Auth service
@@ -110,5 +110,14 @@ export default class AuthService {
     }
 
     return session;
+  }
+
+  /**
+   * Removes session by refresh token
+   *
+   * @param token - refresh token
+   */
+  public async removeSessionByRefreshToken(token: string): Promise<void> {
+    await this.userSessionRepository.removeUserSessionByRefreshToken(token);
   }
 }

@@ -47,14 +47,14 @@ class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAttribute
  */
 export default class NoteSequelizeStorage {
   /**
+   * Note model in database
+   */
+  public model: typeof NoteModel;
+
+  /**
    * Database instance
    */
   private readonly database: Sequelize;
-
-  /**
-   * Note model in database
-   */
-  private model: typeof NoteModel;
 
   /**
    * Table name
