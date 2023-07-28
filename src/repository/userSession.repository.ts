@@ -46,12 +46,12 @@ export default class UserSessionRepository {
   }
 
   /**
-   * Removes user session by session id
+   * Removes user session by refresh token
    *
-   * @param sessionId - session id
+   * @param refreshToken - refresh token
    * @returns { Promise<void> }
    */
-  public async removeUserSessionBySessionId(sessionId: number): Promise<void> {
-    await this.storage.removeById(sessionId);
+  public async removeUserSessionByRefreshToken(refreshToken: string): Promise<void> {
+    await this.storage.removeByRefreshToken(refreshToken);
   }
 }

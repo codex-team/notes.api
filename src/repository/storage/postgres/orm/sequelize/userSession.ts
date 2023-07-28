@@ -138,14 +138,14 @@ export default class UserSessionSequelizeStorage {
   }
 
   /**
-   * Removes user session by session id
+   * Removes user session by refresh token
    *
-   * @param sessionId - session id
+   * @param refreshToken - refresh token
    * @returns { void }
    */
-  public async removeById(sessionId: number): Promise<void> {
+  public async removeByRefreshToken(refreshToken: string): Promise<void> {
     await this.model.destroy({
-      where: { id: sessionId },
+      where: { refresh_token: refreshToken },
     });
   }
 }
