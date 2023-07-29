@@ -4,10 +4,10 @@ import type EditorTool from '@domain/entities/editorTools.js';
  * Tools that user uses in the editor while changing notes
  */
 export interface UserEditorTool {
-    /**
-     * Unique tool identifier
-     */
-    id: EditorTool['id'];
+  /**
+   * Unique tool identifier
+   */
+  id: EditorTool['id'];
 }
 
 /**
@@ -15,5 +15,5 @@ export interface UserEditorTool {
  * of the editor
  */
 export default interface UserExtensions {
-    editorTools?: UserEditorTool[];
+  editorTools?: UserEditorTool[];
 }

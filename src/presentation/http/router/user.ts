@@ -41,6 +41,17 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     return reply.send(user);
   });
 
+  /**
+   * Get user extensions
+   */
+  fastify.get('/editor-tools', { preHandler: opts.middlewares.auth }, async (request, reply) => {
+    const userId = request.ctx.auth.id;
+
+    const editorTools = await userService.getUserEditorTools(userId) ?? [];
+
+    return reply.send(editorTools);
+  });
+
   done();
 };
 

@@ -40,14 +40,14 @@ interface InsertUserOptions {
 /**
  * Options for linking a tool to a user
  */
-interface AddUserToolOptions {
+export interface AddUserToolOptions {
   /**
    * User identifier
    */
   userId: User['id'];
 
   /**
-   * Editor tool identifier
+   * Editor tool data
    */
   editorTool: UserEditorTool;
 }
@@ -62,9 +62,9 @@ interface RemoveUserEditorTool {
   userId: User['id'];
 
   /**
-   * Tool identifier
+   * Editor tool
    */
-  editorToolId: UserEditorTool['id'];
+  editorTool: UserEditorTool;
 }
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -192,20 +192,8 @@ export default class UserSequelizeStorage {
    */
   public async removeUserEditorTool({
     userId,
-    editorToolId,
+    editorTool,
   }: RemoveUserEditorTool): Promise<void> {
-    const user = await this.getUserByIdOrEmail({ id: userId });
-
-    if (!user) {
-      throw new Error('There is no user with such userId');
-    }
-
-    const editorTool = user.extensions?.editorTools?.find(tool => tool.id === editorToolId);
-
-    if (!editorTool) {
-      throw new Error('User has no tool with such editorToolId');
-    }
-
     await this.model.update({
       extensions: fn('array_remove', col('editorTools'), editorTool),
     }, {
