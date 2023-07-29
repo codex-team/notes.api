@@ -2,7 +2,7 @@ import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptio
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
-import type UserSession from '@domain/entities/userSession';
+import type UserSession from '@domain/entities/userSession.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
