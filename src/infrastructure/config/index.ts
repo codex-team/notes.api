@@ -81,6 +81,8 @@ export type LoggingConfig = z.infer<typeof LoggingConfig>;
 const HttpApiConfig = z.object({
   host: z.string(),
   port: z.number(),
+  cookieSecret: z.string(),
+  cookieDomain: z.string(),
   accessTokenSecret: z.string(),
   allowedOrigins: z.union([z.array(z.string()), z.literal('*')]),
   oauth2: OAuth2Config,
@@ -105,6 +107,8 @@ const defaultConfig: AppConfig = {
   httpApi: {
     host: '0.0.0.0',
     port: 3000,
+    cookieSecret: 'cookieSecret',
+    cookieDomain: 'localhost',
     accessTokenSecret: 'accessTokenSecret',
     allowedOrigins: [],
     oauth2: {
