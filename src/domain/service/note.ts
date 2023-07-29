@@ -1,5 +1,5 @@
 import Note from '@domain/entities/note.js';
-import NotesSettings from '@domain/entities/notesSettings';
+import type NotesSettings from '@domain/entities/notesSettings';
 import type NoteRepository from '@repository/note.repository.js';
 
 /**

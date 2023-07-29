@@ -2,7 +2,7 @@ import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptio
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
-import NotesSettings from '@domain/entities/notesSettings.js'
+import type NotesSettings from '@domain/entities/notesSettings.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 

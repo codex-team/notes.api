@@ -1,5 +1,5 @@
 import Note from '@domain/entities/note.js';
-import NotesSettings from '@domain/entities/notesSettings.js';
+import type NotesSettings from '@domain/entities/notesSettings.js';
 import type NoteStorage from './storage/note.storage.js';
 
 /**
@@ -56,7 +56,7 @@ export default class NoteRepository {
    * Gets note settings by id
    *
    * @param id - note id
-   * @returns { Promise<NoteSettings | null> } found note
+   * @returns { Promise<NotesSettings | null> } - found note
    */
   public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
     return await this.storage.getNoteSettingsById(id);

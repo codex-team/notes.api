@@ -19,7 +19,7 @@ export default class OpenAIApi extends Transport {
    * Make GET request with authorization to OpenAI API
    *
    * @param endpoint - api endpoint
-   * @param data
+   * @param data - unknown data
    */
   public async postWithToken<ResponsePayload>(endpoint: string, data: unknown): Promise<ResponsePayload | null> {
     const headers = {
