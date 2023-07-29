@@ -4,7 +4,7 @@ import { Provider } from '@domain/service/user.js';
 import type AuthService from '@domain/service/auth.js';
 import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
 import { StatusCodes } from 'http-status-codes';
-import type Auth from '@domain/entities/auth';
+import type AuthSession from '@domain/entities/authSession.js';
 
 /**
  * Interface for the oauth router.
@@ -57,7 +57,7 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
     const accessToken = opts.authService.signAccessToken({ id: user.id });
     const refreshToken = await opts.authService.signRefreshToken(user.id);
 
-    const response: SuccessResponse<Auth> = {
+    const response: SuccessResponse<AuthSession> = {
       data: {
         accessToken,
         refreshToken,

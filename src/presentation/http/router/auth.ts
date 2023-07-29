@@ -2,7 +2,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
 import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
 import { StatusCodes } from 'http-status-codes';
-import type Auth from '@domain/entities/auth.js';
+import type AuthSession from '@domain/entities/authSession.js';
 
 /**
  * Interface for regenerate token request options.
@@ -62,7 +62,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     await opts.authService.removeSessionByRefreshToken(token);
     const refreshToken = await opts.authService.signRefreshToken(userSession.userId);
 
-    const response: SuccessResponse<Auth> = {
+    const response: SuccessResponse<AuthSession> = {
       data: {
         accessToken,
         refreshToken,
