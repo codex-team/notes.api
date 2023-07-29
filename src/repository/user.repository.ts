@@ -1,5 +1,5 @@
 import type User from '@domain/entities/user.js';
-import type UserStorage from './storage/user.storage.js';
+import type UserStorage from '@repository/storage/user.storage.js';
 import type GoogleApiTransport from '@repository/transport/google-api/index.js';
 import type GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
 
@@ -36,6 +36,18 @@ export default class UserRepository {
   constructor(storage: UserStorage, googleApiTransport: GoogleApiTransport) {
     this.googleApiTransport = googleApiTransport;
     this.storage = storage;
+  }
+
+  /**
+   * Get all user information by it's identifier
+   *
+   * @param userId - unique user numeric identifier
+   * @returns { Promise<User | null> } found user
+   */
+  public async getUserById(userId: User['id']): Promise<User | null> {
+    return this.storage.getUserByIdOrEmail({
+      id: userId,
+    });
   }
 
   /**

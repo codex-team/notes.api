@@ -12,6 +12,7 @@ import OauthRouter from '@presentation/http/router/oauth.js';
 import initMiddlewares from '@presentation/http/middlewares/index.js';
 import AuthRouter from '@presentation/http/router/auth.js';
 import cookie from '@fastify/cookie';
+import UserRouter from '@presentation/http/router/user.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -98,6 +99,11 @@ export default class HttpServer implements API {
     this.server.register(AuthRouter, {
       prefix: '/auth',
       authService: domainServices.authService,
+    });
+    this.server.register(UserRouter, {
+      prefix: '/user',
+      userService: domainServices.userService,
+      middlewares: middlewares,
     });
 
     /**

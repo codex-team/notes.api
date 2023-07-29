@@ -25,6 +25,16 @@ export default class UserService {
   }
 
   /**
+   * Get user by it's identifier
+   *
+   * @param userId - unique user identifier
+   * @returns { Promise<User | null> } found user
+   */
+  public async getUserById(userId: User['id']): Promise<User | null> {
+    return await this.repository.getUserById(userId);
+  }
+
+  /**
    * Get user by provider
    *
    * @param accessToken - provider access token
