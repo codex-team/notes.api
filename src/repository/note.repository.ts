@@ -1,5 +1,5 @@
 import Note from '@domain/entities/note.js';
-import NoteStorage from './storage/note.storage.js';
+import type NoteStorage from './storage/note.storage.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level

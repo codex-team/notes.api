@@ -1,9 +1,9 @@
-import { FastifyPluginCallback } from 'fastify';
-import NoteService from '@domain/service/note.js';
+import type { FastifyPluginCallback } from 'fastify';
+import type NoteService from '@domain/service/note.js';
 import { StatusCodes } from 'http-status-codes';
-import { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
-import Note from '@domain/entities/note.js';
-import { Middlewares } from '@presentation/http/middlewares/index.js';
+import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
+import type Note from '@domain/entities/note.js';
+import type { Middlewares } from '@presentation/http/middlewares/index.js';
 
 /**
  * Get note by id options

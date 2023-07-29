@@ -1,7 +1,7 @@
 /**
  * Interface for the response payload of the Google API's get user info.
  */
-interface GetUserInfoSuccessfulResponsePayload {
+export default interface GetUserInfoResponsePayload {
   /**
    * User email
    */
@@ -24,19 +24,3 @@ interface GetUserInfoSuccessfulResponsePayload {
   picture: string;
 }
 
-/**
- * Interface for the error response payload of the Google API's get user info.
- */
-interface GetUserInfoErrorResponsePayload {
-  /**
-   * Error
-   */
-  error: {
-    /**
-     * Error message
-     */
-    message: string;
-  }
-}
-
-export type GetUserInfoResponsePayload = GetUserInfoSuccessfulResponsePayload | GetUserInfoErrorResponsePayload;

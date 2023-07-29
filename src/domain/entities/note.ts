@@ -1,5 +1,6 @@
 /**
  * Note entity
+ * TODO change to interface
  */
 export default class Note {
   /**

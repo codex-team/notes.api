@@ -13,6 +13,18 @@ const MetricsConfig = z.object({
   port: z.number(),
 });
 
+/**
+ * Authentication configuration
+ */
+const AuthConfig = z.object({
+  accessSecret: z.string(),
+  refreshSecret: z.string(),
+  accessExpiresIn: z.string(),
+  refreshExpiresIn: z.string(),
+});
+
+export type AuthConfig = z.infer<typeof AuthConfig>;
+
 const GoogleOAuth2Config = z.object({
   clientId: z.string(),
   clientSecret: z.string(),
@@ -69,7 +81,6 @@ export type LoggingConfig = z.infer<typeof LoggingConfig>;
 const HttpApiConfig = z.object({
   host: z.string(),
   port: z.number(),
-  refreshTokenSecret: z.string(),
   accessTokenSecret: z.string(),
   allowedOrigins: z.union([z.array(z.string()), z.literal('*')]),
   oauth2: OAuth2Config,
@@ -85,6 +96,7 @@ const AppConfig = z.object({
   metrics: MetricsConfig,
   logging: LoggingConfig,
   database: DatabaseConfig,
+  auth: AuthConfig,
 });
 
 export type AppConfig = z.infer<typeof AppConfig>;
@@ -93,7 +105,6 @@ const defaultConfig: AppConfig = {
   httpApi: {
     host: '0.0.0.0',
     port: 3000,
-    refreshTokenSecret: 'refreshTokenSecret',
     accessTokenSecret: 'accessTokenSecret',
     allowedOrigins: [],
     oauth2: {
@@ -104,6 +115,12 @@ const defaultConfig: AppConfig = {
         callbackUrl: '/oauth/google/callback',
       },
     },
+  },
+  auth: {
+    accessSecret: 'accessSecret',
+    refreshSecret: 'refreshSecret',
+    accessExpiresIn: '15m',
+    refreshExpiresIn: '30d',
   },
   metrics: {
     enabled: true,
