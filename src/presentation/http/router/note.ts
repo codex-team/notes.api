@@ -116,10 +116,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Get note by custom hostname
    */
-  fastify.post<{ Body: ResolveHostnameOptions }>('/resolve-hostname', async (request, reply) => {
-    const { hostname } = request.body;
+  fastify.get<{ Params: ResolveHostnameOptions }>('/resolve-hostname/:hostname', async (request, reply) => {
+    const params = request.params;
 
-    const note = await noteService.getNoteByHostname(hostname);
+    const note = await noteService.getNoteByHostname(params.hostname);
 
     /**
      * Check if note does not exist
