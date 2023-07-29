@@ -30,3 +30,6 @@ logging:
 database:
   dsn: 'postgres://postgres:pass@localhost:5432/codex-notes'
 
+openai:
+  token: 'token'
+

@@ -7,6 +7,8 @@ import UserSessionStorage from '@repository/storage/userSession.storage.js';
 import UserStorage from '@repository/storage/user.storage.js';
 import GoogleApiTransport from '@repository/transport/google-api/index.js';
 import UserRepository from '@repository/user.repository.js';
+import AIRepository from './ai.repository.js';
+import OpenAIApi from './transport/openai-api/index.js';
 
 /**
  * Interface for initiated repositories
@@ -26,6 +28,11 @@ export interface Repositories {
    * User repository instance
    */
   userRepository: UserRepository,
+
+  /**
+   * AI repository instance
+   */
+  aiRepository: AIRepository
 }
 
 /**
@@ -52,16 +59,20 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
    * Create transport instances
    */
   const googleApiTransport = new GoogleApiTransport();
+  const openaiApiTransport = new OpenAIApi();
+
   /**
    * Create repositories
    */
   const noteRepository = new NoteRepository(noteStorage);
   const userSessionRepository = new UserSessionRepository(userSessionStorage);
   const userRepository = new UserRepository(userStorage, googleApiTransport);
+  const aiRepository = new AIRepository(openaiApiTransport);
 
   return {
     noteRepository,
     userSessionRepository,
     userRepository,
+    aiRepository,
   };
 }
