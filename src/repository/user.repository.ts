@@ -1,7 +1,9 @@
 import type User from '@domain/entities/user.js';
+import type { UserEditorTool } from '@domain/entities/userExtensions.js';
 import type UserStorage from '@repository/storage/user.storage.js';
 import type GoogleApiTransport from '@repository/transport/google-api/index.js';
 import type GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
+import type { AddUserToolOptions } from '@repository/storage/postgres/orm/sequelize/user';
 
 /**
  * OAuth provider
@@ -11,6 +13,21 @@ export enum Provider {
    * Google provider
    */
   GOOGLE = 'google',
+}
+
+/**
+ * Remove link to a tool from a user
+ */
+interface RemoveUserEditorToolOptions {
+  /**
+   * User identifier
+   */
+  userId: User['id'];
+
+  /**
+   * Editor tool identifier
+   */
+  editorToolId: UserEditorTool['id'];
 }
 
 /**
@@ -103,5 +120,37 @@ export default class UserRepository {
       photo: res.picture,
       name: res.name,
     });
+  }
+
+  /**
+   * Adding link between user and tool
+   *
+   * @param options - identifiers of user and tool
+   */
+  public async addUserEditorTool({ userId, editorTool }: AddUserToolOptions): Promise<void> {
+    await this.storage.addUserEditorTool({ userId,
+      editorTool });
+  }
+
+  /**
+   * Removing link between user and tool
+   *
+   * @param options - identifiers of user and tool
+   */
+  public async removeUserEditorTool({ userId, editorToolId }: RemoveUserEditorToolOptions): Promise<void> {
+    const user = await this.getUserById(userId);
+
+    if (!user) {
+      throw new Error('There is no user with such userId');
+    }
+
+    const editorTool = user.extensions?.editorTools?.find(tool => tool.id === editorToolId);
+
+    if (!editorTool) {
+      throw new Error('User has no tool with such editorToolId');
+    }
+
+    await this.storage.removeUserEditorTool({ userId,
+      editorTool });
   }
 }

@@ -13,6 +13,8 @@ import initMiddlewares from '@presentation/http/middlewares/index.js';
 import AuthRouter from '@presentation/http/router/auth.js';
 import cookie from '@fastify/cookie';
 import UserRouter from '@presentation/http/router/user.js';
+import AIRouter from './router/ai.js';
+import EditorToolsRouter from './router/editorTools.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -105,6 +107,15 @@ export default class HttpServer implements API {
       userService: domainServices.userService,
       middlewares: middlewares,
     });
+    this.server.register(AIRouter, {
+      prefix: '/ai',
+      aiService: domainServices.aiService,
+    });
+    this.server.register(EditorToolsRouter, {
+      prefix: '/editor-tools',
+      editorToolsService: domainServices.editorToolsService,
+    });
+
 
     /**
      * Register oauth2 plugin

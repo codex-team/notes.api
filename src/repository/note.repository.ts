@@ -1,6 +1,6 @@
 import Note from '@domain/entities/note.js';
-import type NoteStorage from './storage/note.storage.js';
-import type NotesSettings from '@domain/entities/notesSettings';
+import type NotesSettings from '@domain/entities/notesSettings.js';
+import type NoteStorage from '@repository/storage/note.storage.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -27,7 +27,7 @@ export default class NoteRepository {
    * @returns { Promise<Note> } added note
    */
   public async addNote({ title, content }: Note): Promise<Note> {
-    const insertedNote = await this.storage.insertNote(title, content);
+    const insertedNote = await this.storage.createNote(title, content);
 
     return new Note(insertedNote.title, insertedNote.content, insertedNote.id);
   }

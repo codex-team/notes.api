@@ -47,6 +47,13 @@ const DatabaseConfig = z.object({
   dsn: z.string(), // todo url or params
 });
 
+/**
+ * OpenAI access config
+ */
+const OpenAIConfig = z.object({
+  token: z.string(),
+});
+
 export type DatabaseConfig = z.infer<typeof DatabaseConfig>;
 
 /**
@@ -99,6 +106,7 @@ const AppConfig = z.object({
   logging: LoggingConfig,
   database: DatabaseConfig,
   auth: AuthConfig,
+  openai: OpenAIConfig,
 });
 
 export type AppConfig = z.infer<typeof AppConfig>;
@@ -139,6 +147,9 @@ const defaultConfig: AppConfig = {
   },
   database: {
     dsn: 'postgres://user:pass@postgres/codex-notes',
+  },
+  openai: {
+    token: '',
   },
 };
 

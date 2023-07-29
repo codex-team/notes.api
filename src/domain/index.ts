@@ -3,6 +3,8 @@ import type { Repositories } from '@repository/index.js';
 import AuthService from '@domain/service/auth.js';
 import type { AppConfig } from '@infrastructure/config/index.js';
 import UserService from '@domain/service/user.js';
+import AIService from './service/ai.js';
+import EditorToolsService from '@domain/service/editorTools.js';
 
 /**
  * Interface for initiated services
@@ -22,6 +24,12 @@ export interface DomainServices {
    * User service instance
    */
   userService: UserService,
+
+  /**
+   * AI service instance
+   */
+  aiService: AIService
+  editorToolsService: EditorToolsService,
 }
 
 /**
@@ -42,9 +50,14 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
 
   const userService = new UserService(repositories.userRepository);
 
+  const aiService = new AIService(repositories.aiRepository);
+  const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
+
   return {
     noteService,
     userService,
     authService,
+    aiService,
+    editorToolsService,
   };
 }

@@ -121,7 +121,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * TODO: Validate request query
      */
-    const { title, content } = request.query as AddNoteOptions;
+    const { title, content } = request.query;
 
     const addedNote = await noteService.addNote(title, content);
 

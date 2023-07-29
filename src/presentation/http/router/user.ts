@@ -1,6 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
-import type UserService from '@domain/service/user';
+import type UserService from '@domain/service/user.js';
 
 /**
  * Interface for the user router
@@ -38,7 +38,22 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
 
     const user = await userService.getUserById(userId);
 
-    return reply.send(user);
+    return reply.send({
+      data: user,
+    });
+  });
+
+  /**
+   * Get user extensions
+   */
+  fastify.get('/editor-tools', { preHandler: opts.middlewares.auth }, async (request, reply) => {
+    const userId = request.ctx.auth.id;
+
+    const editorTools = await userService.getUserEditorTools(userId) ?? [];
+
+    return reply.send({
+      data: editorTools,
+    });
   });
 
   done();

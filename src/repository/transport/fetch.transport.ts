@@ -27,4 +27,22 @@ export default class FetchTransport {
 
     return await response.json() as Response;
   }
+
+  /**
+   * Make POST request
+   *
+   * @param endpoint - API endpoint
+   * @param headers - request headers
+   * @param data - request body data
+   */
+  public async post<Response>(endpoint: string, headers?: Record<string, string>, data?: FormData | string): Promise<Response> {
+    // eslint-disable-next-line no-undef
+    const response = await fetch(this.baseUrl + endpoint, {
+      method: 'POST',
+      headers,
+      body: data,
+    });
+
+    return await response.json() as Response;
+  }
 }
