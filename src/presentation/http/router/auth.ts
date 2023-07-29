@@ -1,16 +1,23 @@
-import { FastifyPluginCallback } from 'fastify';
-import AuthService from '@domain/service/auth.js';
-import { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
+import type { FastifyPluginCallback } from 'fastify';
+import type AuthService from '@domain/service/auth.js';
+import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
 import { StatusCodes } from 'http-status-codes';
+import type Auth from '@domain/entities/auth.js';
 
+/**
+ * Interface for regenerate token request options.
+ */
 interface RegenerateTokenOptions {
+  /**
+   * Refresh token
+   */
   token: string;
 }
 
 /**
- * Interface for the oauth router.
+ * Interface for the Auth router.
  */
-interface OauthRouterOptions {
+interface AuthRouterOptions {
 
   /**
    * Auth service instance
@@ -19,44 +26,52 @@ interface OauthRouterOptions {
 }
 
 /**
- * OAuth router plugin
+ * Auth router plugin
  *
  * @param fastify - fastify instance
  * @param opts - router options
  * @param done - callback
  */
-const AuthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, done) => {
+const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, done) => {
   /**
-   * Callback for Google oauth2. Google redirects to this endpoint after user authentication.
+   * Regenerate access end refresh tokens by refresh token
    */
-  fastify.get<{
-    Params: RegenerateTokenOptions;
-  }>('/regenerate', async (request, reply) => {
-    const { token } = request.params;
+  fastify.post<{
+    Querystring: RegenerateTokenOptions;
+  }>('/', async (request, reply) => {
+    const { token } = request.query;
 
-    const user = await opts.authService.verifyRefreshToken(token);
+    const userSession = await opts.authService.verifyRefreshToken(token);
 
-    if (!user) {
+    /**
+     * Check if session is valid
+     */
+    if (!userSession) {
       const response: ErrorResponse = {
         status: StatusCodes.UNAUTHORIZED,
         message: 'Session is not valid',
       };
 
-      reply.status(StatusCodes.NOT_FOUND)
-        .send(response);
+      reply.send(response);
+
       return;
     }
 
-    const accessToken = opts.authService.signAccessToken({ id: user.id });
-    await opts.authService.removeSessionByRefreshToken(token);
-    const refreshToken = await opts.authService.signRefreshToken(user.id);
+    const accessToken = opts.authService.signAccessToken({ id: userSession.userId });
 
-    reply.send({
-      accessToken,
-      refreshToken,
-    });
-    done();
+    await opts.authService.removeSessionByRefreshToken(token);
+    const refreshToken = await opts.authService.signRefreshToken(userSession.userId);
+
+    const response: SuccessResponse<Auth> = {
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    };
+
+    reply.send(response);
   });
+  done();
 };
 
 export default AuthRouter;

@@ -4,8 +4,8 @@ httpApi:
   allowedOrigins: '*'
   oauth2:
     google:
-      clientId: ''
-      clientSecret: ''
+      clientId: 'client-id'
+      clientSecret: 'client-secret'
       redirectUrl: '/oauth/google/login'
       callbackUrl: 'http://localhost:1337/oauth/google/callback'
 

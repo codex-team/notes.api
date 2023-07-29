@@ -149,6 +149,7 @@ export default class UserSequelizeStorage {
       email: user.email,
       name: user.name,
       createdAt: user.created_at,
+      photo: user.photo,
     };
   }
 
@@ -201,6 +202,7 @@ export default class UserSequelizeStorage {
       email: user.email,
       name: user.name,
       createdAt: user.created_at,
+      photo: user.photo,
     };
   }
 }

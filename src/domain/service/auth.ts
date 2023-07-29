@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import type AuthPayload from '@domain/entities/authPayload.js';
 import { nanoid } from 'nanoid';
-import UserSessionRepository from '@repository/userSession.repository.js';
-import UserSession from '@domain/entities/userSession.js';
+import type UserSessionRepository from '@repository/userSession.repository.js';
+import type UserSession from '@domain/entities/userSession.js';
 
 /**
  * Auth service
@@ -79,9 +79,9 @@ export default class AuthService {
      */
     const token = nanoid(tokenSize);
 
-    await this.userSessionRepository.addUserSession(userId, token, new Date(Date.now() + this.refreshExpiresIn));
+    const userSession = await this.userSessionRepository.addUserSession(userId, token, new Date(Date.now() + this.refreshExpiresIn));
 
-    return token;
+    return userSession.refreshToken;
   }
 
   /**
