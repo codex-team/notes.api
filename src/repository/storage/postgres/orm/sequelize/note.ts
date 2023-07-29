@@ -3,6 +3,8 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
 
+/* eslint-disable @typescript-eslint/naming-convention */
+
 /**
  * Interface for inserted note
  */
@@ -124,7 +126,8 @@ export default class NoteSequelizeStorage {
     });
 
     /** NoteModel and NotesSettingsModel are connected as ONE-TO-ONE */
-    this.model.hasOne(this.settingsModel, {foreignKey: 'note_id', as: this.settingsModel.tableName});
+    this.model.hasOne(this.settingsModel, { foreignKey: 'note_id',
+      as: this.settingsModel.tableName });
   }
 
   /**
@@ -181,19 +184,18 @@ export default class NoteSequelizeStorage {
    * @returns { Promise<InsertedNote | null> } found note
    */
   public async getNoteByHostname(hostname: string): Promise<InsertedNote | null> {
-
     /**
      * select note which has hostname in its settings
      */
     const note = await this.model.findOne({
       where: {
-        '$notes_settings.custom_hostname$': hostname
+        '$notes_settings.custom_hostname$': hostname,
       },
       include: {
         model: this.settingsModel,
         as: this.settingsModel.tableName,
-        required: true
-      }
+        required: true,
+      },
     });
 
     /**

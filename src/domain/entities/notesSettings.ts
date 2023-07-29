@@ -3,12 +3,12 @@
  */
 export default interface NotesSettings {
   /**
-   * User session id
+   * Just unique property identifier
    */
   id: number;
 
   /**
-   * Note id
+   * Related note id
    */
   noteId: number;
 

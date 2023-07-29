@@ -1,6 +1,8 @@
 import type { InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Model } from 'sequelize';
 
+/* eslint-disable @typescript-eslint/naming-convention */
+
 /**
  * Class representing a notes settings model in database
  */
