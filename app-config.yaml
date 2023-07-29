@@ -1,18 +1,18 @@
 httpApi:
   host: 0.0.0.0
-  port: 3000
+  port: 1337
   allowedOrigins: '*'
   oauth2:
     google:
-      clientId: 'client_id'
-      clientSecret: 'client_secret'
+      clientId: 'client-id'
+      clientSecret: 'client-secret'
       redirectUrl: '/oauth/google/login'
       callbackUrl: 'http://localhost:1337/oauth/google/callback'
 
 auth:
   accessSecret: 'secret'
-  accessExpiresIn: '15m'
-  refreshExpiresIn: '30d'
+  accessExpiresIn: 900000
+  refreshExpiresIn: 2592000000
 
 metrics:
   enabled: true

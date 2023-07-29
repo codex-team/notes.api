@@ -52,7 +52,6 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
    * Create transport instances
    */
   const googleApiTransport = new GoogleApiTransport();
-
   /**
    * Create repositories
    */

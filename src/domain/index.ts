@@ -36,7 +36,8 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   const authService = new AuthService(
     appConfig.auth.accessSecret,
     appConfig.auth.accessExpiresIn,
-    appConfig.auth.refreshExpiresIn
+    appConfig.auth.refreshExpiresIn,
+    repositories.userSessionRepository
   );
 
   const userService = new UserService(repositories.userRepository);

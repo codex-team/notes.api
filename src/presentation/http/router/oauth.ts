@@ -1,6 +1,10 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type UserService from '@domain/service/user.js';
 import { Provider } from '@domain/service/user.js';
+import type AuthService from '@domain/service/auth.js';
+import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
+import { StatusCodes } from 'http-status-codes';
+import type AuthSession from '@domain/entities/authSession.js';
 
 /**
  * Interface for the oauth router.
@@ -10,6 +14,11 @@ interface OauthRouterOptions {
    * User service instance
    */
   userService: UserService,
+
+  /**
+   * Auth service instance
+   */
+  authService: AuthService,
 }
 
 /**
@@ -29,9 +38,33 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
     const user = await opts.userService.getUserByProvider(token.access_token, Provider.GOOGLE);
 
     /**
-     * TODO: generate jwt token, add session, set cookie and redirect to frontend
+     * Check if user exists
      */
-    reply.send(user);
+    if (!user) {
+      const response: ErrorResponse = {
+        status: StatusCodes.NOT_FOUND,
+        message: 'User not found',
+      };
+
+      reply.send(response);
+
+      return;
+    }
+
+    /**
+     * Generate tokens
+     */
+    const accessToken = opts.authService.signAccessToken({ id: user.id });
+    const refreshToken = await opts.authService.signRefreshToken(user.id);
+
+    const response: SuccessResponse<AuthSession> = {
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    };
+
+    reply.send(response);
   });
   done();
 };
