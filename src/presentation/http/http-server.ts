@@ -6,6 +6,8 @@ import NoteRouter from '@presentation/http/router/note.js';
 import type { DomainServices } from '@domain/index.js';
 import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUI from '@fastify/swagger-ui';
 import OauthRouter from '@presentation/http/router/oauth.js';
 import initMiddlewares from '@presentation/http/middlewares/index.js';
 
@@ -44,6 +46,34 @@ export default class HttpServer implements API {
    */
   public async run(domainServices: DomainServices): Promise<void> {
     const middlewares = initMiddlewares(domainServices);
+
+    /**
+     * Register openapi documentation
+     */
+    this.server.register(fastifySwagger, {
+      openapi: {
+        info: {
+          title: 'NoteX openapi',
+          description: 'Fastify REST API',
+          version: '0.1.0',
+        },
+        servers: [ {
+          url: 'http://localhost',
+        } ],
+      },
+    });
+
+    /**
+     * Serve openapi UI and JSON scheme
+     */
+    this.server.register(fastifySwaggerUI, {
+      routePrefix: '/openapi',
+      uiConfig: {
+        docExpansion: 'list',
+        deepLinking: false,
+      },
+      transformSpecificationClone: true,
+    });
 
     /**
      * Register all routers

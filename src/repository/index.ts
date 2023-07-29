@@ -45,8 +45,8 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
    * Create storage instances
    */
   const noteStorage = new NoteStorage(orm);
-  const userSessionStorage = new UserSessionStorage(orm);
   const userStorage = new UserStorage(orm);
+  const userSessionStorage = new UserSessionStorage(orm);
 
   /**
    * Create transport instances
