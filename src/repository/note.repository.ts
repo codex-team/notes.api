@@ -59,17 +59,7 @@ export default class NoteRepository {
    * @returns { Promise<NoteSettings | null> } found note
    */
   public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
-    const noteData = await this.storage.getNoteSettingsById(id);
-
-    if (!noteData) {
-      return null;
-    }
-
-    return new NotesSettings(
-      noteData.custom_hostname,
-      noteData.note_id,
-      noteData.id,
-    );
+    return await this.storage.getNoteSettingsById(id);
   }
 
   /**

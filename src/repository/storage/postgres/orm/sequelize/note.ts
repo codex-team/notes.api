@@ -2,6 +2,7 @@ import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptio
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
+import NotesSettings from '@domain/entities/notesSettings.js'
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -23,26 +24,6 @@ interface InsertedNote {
    * Note content
    */
   content: JSON;
-}
-
-/**
- * Interface for note settings
- */
-interface NoteSettings {
-  /**
-   * NoteSettings id
-   */
-  id: number;
-
-  /**
-   * Note id
-   */
-  note_id: number;
-
-  /**
-   * Custom hostname
-   */
-  custom_hostname: string;
 }
 
 /**
@@ -203,7 +184,7 @@ export default class NoteSequelizeStorage {
    * @param id - note id
    * @returns { Promise<InsertedNote | null> } found note
    */
-  public async getNoteSettingsById(id: number): Promise<NoteSettings | null> {
+  public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
     const noteSettings = await this.settingsModel.findOne({
       where: {
         id,
@@ -219,8 +200,8 @@ export default class NoteSequelizeStorage {
 
     return {
       id: noteSettings.id,
-      note_id: noteSettings.note_id,
-      custom_hostname: noteSettings.custom_hostname,
+      noteId: noteSettings.note_id,
+      customHostname: noteSettings.custom_hostname,
     };
   }
 
