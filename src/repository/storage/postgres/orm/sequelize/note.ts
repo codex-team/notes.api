@@ -1,29 +1,10 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
+import type Note from '@domain/entities/note.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
-
-/**
- * Interface for inserted note
- */
-interface InsertedNote {
-  /**
-   * Note id
-   */
-  id: number;
-
-  /**
-   * Note title
-   */
-  title: string;
-
-  /**
-   * Note content
-   */
-  content: JSON;
-}
 
 /**
  * Class representing a note model in database
@@ -32,17 +13,17 @@ export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAt
   /**
    * Note id
    */
-  public declare id: CreationOptional<number>;
+  public declare id: CreationOptional<Note['id']>;
 
   /**
    * Note title
    */
-  public declare title: string;
+  public declare title: Note['title'];
 
   /**
    * Note content
    */
-  public declare content: JSON;
+  public declare content: Note['content'];
 }
 
 
@@ -135,18 +116,18 @@ export default class NoteSequelizeStorage {
    *
    * @param title - note title
    * @param content - note content
-   * @returns { InsertedNote } - inserted note
+   * @returns { Note } - created note
    */
-  public async insertNote(title: string, content: JSON): Promise<InsertedNote> {
-    const insertedNote = await this.model.create({
+  public async createNote(title: string, content: JSON): Promise<Note> {
+    const createdNote = await this.model.create({
       title,
       content,
     });
 
     return {
-      id: insertedNote.id,
-      title: insertedNote.title,
-      content: insertedNote.content,
+      id: createdNote.id,
+      title: createdNote.title,
+      content: createdNote.content,
     };
   }
 
@@ -154,9 +135,9 @@ export default class NoteSequelizeStorage {
    * Gets note by id
    *
    * @param id - note id
-   * @returns { Promise<InsertedNote | null> } found note
+   * @returns { Promise<Note | null> } found note
    */
-  public async getNoteById(id: number): Promise<InsertedNote | null> {
+  public async getNoteById(id: number): Promise<Note | null> {
     const note = await this.model.findOne({
       where: {
         id,
@@ -181,9 +162,9 @@ export default class NoteSequelizeStorage {
    * Gets note by id
    *
    * @param hostname - custom hostname
-   * @returns { Promise<InsertedNote | null> } found note
+   * @returns { Promise<Note | null> } found note
    */
-  public async getNoteByHostname(hostname: string): Promise<InsertedNote | null> {
+  public async getNoteByHostname(hostname: string): Promise<Note | null> {
     /**
      * select note which has hostname in its settings
      */

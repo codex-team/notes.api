@@ -1,7 +1,9 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import { fn, col } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type User from '@domain/entities/user.js';
+import type { UserEditorTool } from '@domain/entities/userExtensions.js';
 
 /**
  * Query options for getting user
@@ -35,6 +37,36 @@ interface InsertUserOptions {
   photo?: string;
 }
 
+/**
+ * Options for linking a tool to a user
+ */
+export interface AddUserToolOptions {
+  /**
+   * User identifier
+   */
+  userId: User['id'];
+
+  /**
+   * Editor tool data
+   */
+  editorTool: UserEditorTool;
+}
+
+/**
+ * Remove link to a tool from a user
+ */
+interface RemoveUserEditorTool {
+  /**
+   * User identifier
+   */
+  userId: User['id'];
+
+  /**
+   * Editor tool
+   */
+  editorTool: UserEditorTool;
+}
+
 /* eslint-disable @typescript-eslint/naming-convention */
 
 /**
@@ -65,6 +97,11 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
    * User photo
    */
   public declare photo: CreationOptional<string>;
+
+  /**
+   *
+   */
+  public declare extensions: CreationOptional<User['extensions']>;
 }
 
 /**
@@ -119,10 +156,50 @@ export default class UserSequelizeStorage {
       photo: {
         type: DataTypes.STRING,
       },
+      extensions: {
+        type: DataTypes.JSON,
+      },
     }, {
       tableName: this.tableName,
       sequelize: this.database,
       timestamps: false,
+    });
+  }
+
+  /**
+   * Link tool with user to use it in the editor
+   *
+   * @param options - userId & editor credentials to link it to user
+   */
+  public async addUserEditorTool({
+    userId,
+    editorTool,
+  }: AddUserToolOptions): Promise<void> {
+    await this.model.update({
+      extensions: fn('array_append', col('editorTools'), editorTool),
+    }, {
+      where: {
+        id: userId,
+        // TODO: Add check to unique editorTool id
+      },
+    });
+  }
+
+  /**
+   * Remove tool from the list of tools of the current user
+   *
+   * @param options - identifiers to remove a link between a user and a tool
+   */
+  public async removeUserEditorTool({
+    userId,
+    editorTool,
+  }: RemoveUserEditorTool): Promise<void> {
+    await this.model.update({
+      extensions: fn('array_remove', col('editorTools'), editorTool),
+    }, {
+      where: {
+        id: userId,
+      },
     });
   }
 
