@@ -5,9 +5,9 @@ import { StatusCodes } from 'http-status-codes';
 import type AuthSession from '@domain/entities/authSession.js';
 
 /**
- * Interface for regenerate token request options.
+ * Interface for auth request options. Uses for regenerate tokens and logout.
  */
-interface RegenerateTokenOptions {
+interface AuthOptions {
   /**
    * Refresh token
    */
@@ -37,7 +37,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
    * Regenerate access end refresh tokens by refresh token
    */
   fastify.post<{
-    Querystring: RegenerateTokenOptions;
+    Querystring: AuthOptions;
   }>('/', async (request, reply) => {
     const { token } = request.query;
 
@@ -70,6 +70,21 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     };
 
     reply.send(response);
+  });
+
+  /**
+   * Route for logout, removes session from database by refresh token
+   */
+  fastify.post<{
+    Querystring: AuthOptions;
+  }>('/logout', async (request, reply) => {
+    await opts.authService.removeSessionByRefreshToken(request.query.token);
+
+    const response: SuccessResponse<string> = {
+      data: 'OK',
+    };
+
+    reply.status(StatusCodes.OK).send(response);
   });
   done();
 };
