@@ -1,3 +1,5 @@
+import type UserExtensions from '@domain/entities/userExtensions.js';
+
 /**
  * User entity
  */
@@ -26,4 +28,10 @@ export default interface User {
    * User photo
    */
   photo?: string;
+
+  /**
+   * Custom plugins from the marketplace that improve
+   * editor or notes environment
+   */
+  userExtensions?: UserExtensions;
 }

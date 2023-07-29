@@ -1,7 +1,9 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import { fn, col } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type User from '@domain/entities/user.js';
+import type { UserEditorTool } from '@domain/entities/userExtensions.js';
 
 /**
  * Query options for getting user
@@ -35,6 +37,18 @@ interface InsertUserOptions {
   photo?: string;
 }
 
+interface AddUserEditorTool {
+  userId: User['id'];
+
+  editorTool: UserEditorTool;
+}
+
+interface RemoveUserEditorTool {
+  userId: User['id'];
+
+  editorToolId: UserEditorTool['id'];
+}
+
 /* eslint-disable @typescript-eslint/naming-convention */
 
 /**
@@ -65,6 +79,11 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
    * User photo
    */
   public declare photo: CreationOptional<string>;
+
+  /**
+   *
+   */
+  public declare userExtensions: CreationOptional<User['userExtensions']>;
 }
 
 /**
@@ -119,10 +138,62 @@ export default class UserSequelizeStorage {
       photo: {
         type: DataTypes.STRING,
       },
+      userExtensions: {
+        type: DataTypes.JSON,
+      },
     }, {
       tableName: this.tableName,
       sequelize: this.database,
       timestamps: false,
+    });
+  }
+
+  /**
+   * Link tool with user to use it in the editor
+   *
+   * @param options - userId & editor credentials to link it to user
+   */
+  public async addUserEditorTool({
+    userId,
+    editorTool,
+  }: AddUserEditorTool): Promise<void> {
+    await this.model.update({
+      userExtensions: fn('array_append', col('editorTools'), editorTool),
+    }, {
+      where: {
+        id: userId,
+        // TODO: Add check to unique editorTool id
+      },
+    });
+  }
+
+  /**
+   * Remove tool from the list of tools of the current user
+   *
+   * @param options - identifiers to remove a link between a user and a tool
+   */
+  public async removeUserEditorTool({
+    userId,
+    editorToolId,
+  }: RemoveUserEditorTool): Promise<void> {
+    const user = await this.getUserByIdOrEmail({ id: userId });
+
+    if (!user) {
+      throw new Error('There is no user with such userId');
+    }
+
+    const editorTool = user.userExtensions?.editorTools?.find(tool => tool.id === editorToolId);
+
+    if (!editorTool) {
+      throw new Error('User has no tool with such editorToolId');
+    }
+
+    await this.model.update({
+      userExtensions: fn('array_remove', col('editorTools'), editorTool),
+    }, {
+      where: {
+        id: userId,
+      },
     });
   }
 

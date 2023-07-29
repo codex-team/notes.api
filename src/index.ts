@@ -22,6 +22,7 @@ const start = async (): Promise<void> => {
 
     logger.info('Application launched successfully');
   } catch (err) {
+    console.log('Error', err);
     logger.fatal('Failed to start application', err);
     process.exit(1);
   }

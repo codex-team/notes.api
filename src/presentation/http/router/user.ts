@@ -1,6 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
-import type UserService from '@domain/service/user';
+import type UserService from '@domain/service/user.js';
 
 /**
  * Interface for the user router
