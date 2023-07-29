@@ -40,14 +40,7 @@ export default (authService: AuthService): preHandlerHookHandler => {
     const token = authorizationHeader.replace('Bearer ', '');
 
     try {
-      const tokenPayload = await authService.verifyAccessToken(token);
-
-      /**
-       * Add route config with auth payload to request object
-       */
-      request.ctx = {
-        auth: tokenPayload,
-      };
+      await authService.verifyAccessToken(token);
 
       done();
     } catch (error) {
