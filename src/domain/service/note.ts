@@ -1,4 +1,5 @@
 import Note from '@domain/entities/note.js';
+import NotesSettings from '@domain/entities/notesSettings';
 import type NoteRepository from '@repository/note.repository.js';
 
 /**
@@ -46,6 +47,16 @@ export default class NoteService {
    */
   public async getNoteById(id: number): Promise<Note | null> {
     return await this.repository.getNoteById(id);
+  }
+
+  /**
+   * Gets note settings by id
+   *
+   * @param id - note id
+   * @returns { Promise<NotesSettings | null> } note
+   */
+  public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
+    return await this.repository.getNoteSettingsById(id);
   }
 
   /**

@@ -26,6 +26,26 @@ interface InsertedNote {
 }
 
 /**
+ * Interface for note settings
+ */
+interface NoteSettings {
+  /**
+   * NoteSettings id
+   */
+  id: number;
+
+  /**
+   * Note id
+   */
+  note_id: number;
+
+  /**
+   * Custom hostname
+   */
+  custom_hostname: string;
+}
+
+/**
  * Class representing a note model in database
  */
 export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAttributes<NoteModel>> {
@@ -174,6 +194,33 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
+    };
+  }
+
+  /**
+   * Gets note settings by id
+   *
+   * @param id - note id
+   * @returns { Promise<InsertedNote | null> } found note
+   */
+  public async getNoteSettingsById(id: number): Promise<NoteSettings | null> {
+    const noteSettings = await this.settingsModel.findOne({
+      where: {
+        id,
+      },
+    });
+
+    /**
+     * If note settings not found, return null
+     */
+    if (!noteSettings) {
+      return null;
+    }
+
+    return {
+      id: noteSettings.id,
+      note_id: noteSettings.note_id,
+      custom_hostname: noteSettings.custom_hostname,
     };
   }
 
