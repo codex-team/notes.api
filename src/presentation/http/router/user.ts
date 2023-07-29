@@ -3,7 +3,7 @@ import type { Middlewares } from '@presentation/http/middlewares/index.js';
 import type UserService from '@domain/service/user';
 
 /**
- * Interface for the note router.
+ * Interface for the user router
  */
 interface UserRouterOptions {
   /**
