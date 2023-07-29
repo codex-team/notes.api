@@ -12,7 +12,7 @@ interface GetNoteByIdOptions {
   /**
    * Note id
    */
-  id: number;
+  id: string;
 }
 
 /**
@@ -68,7 +68,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Get note by id
    */
-  fastify.get<{ Params: GetNoteByIdOptions }>('/:id', async (request, reply) => {
+  fastify.get<{ Params: GetNoteByIdOptions }>('/:id', { preHandler: opts.middlewares.withUser }, async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
@@ -89,20 +89,35 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return reply.send(response);
     }
 
+    const noteSettings = await noteService.getNoteSettingsByNoteId(note.id);
+
+    if (noteSettings.enabled) {
+      /**
+       * Create success response
+       */
+      const response: SuccessResponse<Note> = {
+        data: note,
+      };
+
+      return reply.send(response);
+    }
+
     /**
-     * Create success response
+     * TODO: add check for collaborators by request context from auth middleware
      */
-    const response: SuccessResponse<Note> = {
-      data: note,
+
+    const response: ErrorResponse = {
+      status: StatusCodes.UNAUTHORIZED,
+      message: 'Permission denied',
     };
 
-    return reply.send(response);
+    reply.send(response);
   });
 
   /**
    * Add new note
    */
-  fastify.post<{ Querystring: AddNoteOptions }>('/', { preHandler: opts.middlewares.auth }, async (request, reply) => {
+  fastify.post('/', { preHandler: opts.middlewares.authRequired }, async (request, reply) => {
     /**
      * TODO: Validate request query
      */

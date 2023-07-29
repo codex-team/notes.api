@@ -68,17 +68,16 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
     /**
      * Set tokens to cookies and redirect to referer
      */
-    reply.cookie('refreshToken', refreshToken, {
+    reply.setCookie('refreshToken', refreshToken, {
       httpOnly: true,
       path: '/',
       domain: opts.cookieDomain,
-    });
-
-    reply.cookie('accessToken', accessToken, {
+    }).setCookie('accessToken', accessToken, {
       httpOnly: true,
       path: '/',
       domain: opts.cookieDomain,
-    });
+    })
+      .redirect(referer);
 
     reply.redirect(referer);
   });

@@ -1,3 +1,5 @@
+import type { PublicId } from '@domain/entities/publicId.js';
+
 /**
  * Notes settings entity
  */
@@ -16,4 +18,14 @@ export default interface NotesSettings {
    * Custom hostname
    */
   customHostname: string;
+
+  /**
+   * Public id to get note via link, not by integer identifier, but by string hash
+   */
+  publicId: PublicId;
+
+  /**
+   * Is note public for everyone or only for collaborators
+   */
+  enabled: boolean;
 }
