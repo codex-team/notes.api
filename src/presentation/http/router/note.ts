@@ -91,7 +91,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const noteSettings = await noteService.getNoteSettingsByNoteId(note.id);
 
-    if (!noteSettings || noteSettings.enabled) {
+    if (noteSettings.enabled) {
       /**
        * Create success response
        */

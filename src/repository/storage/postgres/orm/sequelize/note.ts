@@ -257,7 +257,7 @@ export default class NoteSequelizeStorage {
    * @param noteId - note id
    * @returns { Promise<NotesSettings | null> } - note settings
    */
-  public async findSettingsById(noteId: number): Promise<NotesSettings | null> {
+  public async findSettingsById(noteId: number): Promise<NotesSettings> {
     const settings = await this.settingsModel.findOne({
       where: {
         note_id: noteId,
@@ -265,7 +265,10 @@ export default class NoteSequelizeStorage {
     });
 
     if (!settings) {
-      return null;
+      /**
+       * TODO: improve exceptions
+       */
+      throw new Error('Note settings not found');
     }
 
     return {
