@@ -45,6 +45,13 @@ interface NoteRouterOptions {
   middlewares: Middlewares,
 }
 
+interface ResolveHostnameOptions {
+  /**
+   * Custom Hostname
+   */
+  hostname: string;
+}
+
 /**
  * Note router plugin
  *
@@ -105,6 +112,37 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     return reply.send(addedNote);
   });
+
+  /**
+   * Get note by custom hostname
+   */
+  fastify.get<{ Params: ResolveHostnameOptions }>('/resolve-hostname/:hostname', async (request, reply) => {
+    const params = request.params;
+
+    const note = await noteService.getNoteByHostname(params.hostname);
+
+    /**
+     * Check if note does not exist
+     */
+    if (!note) {
+      const response: ErrorResponse = {
+        status: StatusCodes.NOT_FOUND,
+        message: 'Note not found',
+      };
+
+      return reply.send(response);
+    }
+
+    /**
+     * Create success response
+     */
+    const response: SuccessResponse<Note> = {
+      data: note,
+    };
+
+    return reply.send(response);
+  });
+
   done();
 };
 

@@ -1,6 +1,9 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
+import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
+
+/* eslint-disable @typescript-eslint/naming-convention */
 
 /**
  * Interface for inserted note
@@ -25,7 +28,7 @@ interface InsertedNote {
 /**
  * Class representing a note model in database
  */
-class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAttributes<NoteModel>> {
+export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAttributes<NoteModel>> {
   /**
    * Note id
    */
@@ -53,6 +56,11 @@ export default class NoteSequelizeStorage {
   public model: typeof NoteModel;
 
   /**
+   * Notes settings model in database
+   */
+  public settingsModel: typeof NotesSettingsModel;
+
+  /**
    * Database instance
    */
   private readonly database: Sequelize;
@@ -61,6 +69,11 @@ export default class NoteSequelizeStorage {
    * Table name
    */
   private readonly tableName = 'notes';
+
+  /**
+   * Settings table name
+   */
+  private readonly settingsTableName = 'notes_settings';
 
   /**
    * Constructor for note storage
@@ -85,6 +98,36 @@ export default class NoteSequelizeStorage {
       tableName: this.tableName,
       sequelize: this.database,
     });
+
+    /**
+     * Initiate note settings model
+     */
+    this.settingsModel = NotesSettingsModel.init({
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      note_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: NoteModel,
+          key: 'id',
+        },
+      },
+      custom_hostname: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+    }, {
+      tableName: this.settingsTableName,
+      sequelize: this.database,
+    });
+
+    /** NoteModel and NotesSettingsModel are connected as ONE-TO-ONE */
+    this.model.hasOne(this.settingsModel, { foreignKey: 'note_id',
+      as: this.settingsModel.tableName });
   }
 
   /**
@@ -117,6 +160,41 @@ export default class NoteSequelizeStorage {
     const note = await this.model.findOne({
       where: {
         id,
+      },
+    });
+
+    /**
+     * If note not found, return null
+     */
+    if (!note) {
+      return null;
+    }
+
+    return {
+      id: note.id,
+      title: note.title,
+      content: note.content,
+    };
+  }
+
+  /**
+   * Gets note by id
+   *
+   * @param hostname - custom hostname
+   * @returns { Promise<InsertedNote | null> } found note
+   */
+  public async getNoteByHostname(hostname: string): Promise<InsertedNote | null> {
+    /**
+     * select note which has hostname in its settings
+     */
+    const note = await this.model.findOne({
+      where: {
+        '$notes_settings.custom_hostname$': hostname,
+      },
+      include: {
+        model: this.settingsModel,
+        as: this.settingsModel.tableName,
+        required: true,
       },
     });
 

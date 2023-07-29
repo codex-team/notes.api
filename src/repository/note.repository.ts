@@ -50,4 +50,24 @@ export default class NoteRepository {
       noteData.id
     );
   }
+
+  /**
+   * Gets note by hostname
+   *
+   * @param hostname - custom hostname
+   * @returns { Promise<Note | null> } found note
+   */
+  public async getNoteByHostname(hostname: string): Promise<Note | null> {
+    const noteData = await this.storage.getNoteByHostname(hostname);
+
+    if (!noteData) {
+      return null;
+    }
+
+    return new Note(
+      noteData.title,
+      noteData.content,
+      noteData.id
+    );
+  }
 }

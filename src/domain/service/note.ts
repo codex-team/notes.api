@@ -47,4 +47,14 @@ export default class NoteService {
   public async getNoteById(id: number): Promise<Note | null> {
     return await this.repository.getNoteById(id);
   }
+
+  /**
+   * Gets note by custom hostname
+   *
+   * @param hostname - hostname
+   * @returns { Promise<Note | null> } note
+   */
+  public async getNoteByHostname(hostname: string): Promise<Note | null> {
+    return await this.repository.getNoteByHostname(hostname);
+  }
 }
