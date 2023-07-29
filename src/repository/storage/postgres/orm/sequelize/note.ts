@@ -4,6 +4,8 @@ import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type Note from '@domain/entities/note.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
 
+/* eslint-disable @typescript-eslint/naming-convention */
+
 /**
  * Class representing a note model in database
  */
