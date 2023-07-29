@@ -16,4 +16,14 @@ export default interface NotesSettings {
    * Custom hostname
    */
   customHostname: string;
+
+  /**
+   * Public id
+   */
+  publicId: string;
+
+  /**
+   * Is note public
+   */
+  enabled: boolean;
 }

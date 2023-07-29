@@ -1,7 +1,5 @@
 import type { preHandlerHookHandler } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
-import { StatusCodes } from 'http-status-codes';
-import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 
 /**
  * Auth middleware
@@ -21,15 +19,10 @@ export default (authService: AuthService): preHandlerHookHandler => {
     const authorizationHeader = request.headers.authorization;
 
     /**
-     * If authorization header is not present, return unauthorized response
+     * If authorization header is not present, skip auth middleware
      */
     if (!authorizationHeader) {
-      const response: ErrorResponse = {
-        status: StatusCodes.UNAUTHORIZED,
-        message: 'Missing authorization header',
-      };
-
-      reply.send(response);
+      done();
 
       return;
     }
@@ -43,20 +36,16 @@ export default (authService: AuthService): preHandlerHookHandler => {
       const tokenPayload = await authService.verifyAccessToken(token);
 
       /**
-       * Add route config with auth payload to request object
+       * Add route config with auth payload to request context
        */
       request.ctx = {
         auth: tokenPayload,
       };
-
+    } finally {
+      /**
+       * Continue request lifecycle
+       */
       done();
-    } catch (error) {
-      const response: ErrorResponse = {
-        status: StatusCodes.UNAUTHORIZED,
-        message: 'Invalid access token',
-      };
-
-      reply.send(response);
     }
   };
 };

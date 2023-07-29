@@ -7,8 +7,8 @@ declare module 'fastify' {
   }
   interface FastifyRequest {
     /**
-     * Request context, passed from middlewares
+     * Request context, passed from middlewares, when request is authorized
      */
-    ctx: HttpRequestContext;
+    ctx?: HttpRequestContext;
   }
 }
