@@ -1,10 +1,5 @@
 import type EditorToolsRepository from '@repository/editorTools.repository.js';
-import { Provider } from '@repository/user.repository.js';
 import type EditorTool from '@domain/entities/editorTools.js';
-
-export {
-  Provider
-};
 
 /**
  * Editor tools service
