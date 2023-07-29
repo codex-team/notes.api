@@ -9,6 +9,6 @@ declare module 'fastify' {
     /**
      * Request context, passed from middlewares, when request is authorized
      */
-    ctx?: HttpRequestContext;
+    ctx: HttpRequestContext;
   }
 }

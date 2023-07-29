@@ -68,7 +68,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Get note by id
    */
-  fastify.get<{ Params: GetNoteByIdOptions }>('/:id', { preHandler: opts.middlewares.auth }, async (request, reply) => {
+  fastify.get<{ Params: GetNoteByIdOptions }>('/:id', { preHandler: opts.middlewares.withUser }, async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
@@ -117,7 +117,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Add new note
    */
-  fastify.post('/', { preHandler: opts.middlewares.auth }, async (request, reply) => {
+  fastify.post('/', { preHandler: opts.middlewares.authRequired }, async (request, reply) => {
     /**
      * TODO: Validate request query
      */

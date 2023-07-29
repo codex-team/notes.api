@@ -1,4 +1,4 @@
-import initAuth from '@presentation/http/middlewares/auth.js';
+import initAuth from '@presentation/http/middlewares/authRequired.js';
 import type { preHandlerHookHandler } from 'fastify';
 import type { DomainServices } from '@domain/index.js';
 
@@ -7,9 +7,14 @@ import type { DomainServices } from '@domain/index.js';
  */
 export interface Middlewares {
   /**
-   * Auth middleware
+   * Middleware for private routes
    */
-  auth: preHandlerHookHandler;
+  authRequired: preHandlerHookHandler;
+
+  /**
+   * Middleware for routes that should have user data
+   */
+  withUser: preHandlerHookHandler;
 }
 
 /**
@@ -22,9 +27,11 @@ export default (services: DomainServices): Middlewares => {
   /**
    * Init middlewares
    */
-  const auth = initAuth(services.authService);
+  const authRequired = initAuth(services.authService);
+  const withUser = initAuth(services.authService);
 
   return {
-    auth,
+    authRequired,
+    withUser,
   };
 };

@@ -33,7 +33,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   /**
    * Get user by session
    */
-  fastify.get('/myself', { preHandler: opts.middlewares.auth }, async (request, reply) => {
+  fastify.get('/myself', { preHandler: opts.middlewares.authRequired }, async (request, reply) => {
     const userId = request.ctx.auth.id;
 
     const user = await userService.getUserById(userId);

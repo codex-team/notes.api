@@ -2,7 +2,7 @@ import type { preHandlerHookHandler } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
 
 /**
- * Auth middleware
+ * Middleware for routes, which should have user data
  *
  * @param authService - auth service instance
  * @returns { preHandlerHookHandler } - auth middleware
@@ -19,7 +19,7 @@ export default (authService: AuthService): preHandlerHookHandler => {
     const authorizationHeader = request.headers.authorization;
 
     /**
-     * If authorization header is not present, skip auth middleware
+     * If authorization header is not present, return unauthorized response
      */
     if (!authorizationHeader) {
       done();
@@ -36,15 +36,12 @@ export default (authService: AuthService): preHandlerHookHandler => {
       const tokenPayload = await authService.verifyAccessToken(token);
 
       /**
-       * Add route config with auth payload to request context
+       * Add route config with auth payload to request object
        */
       request.ctx = {
         auth: tokenPayload,
       };
     } finally {
-      /**
-       * Continue request lifecycle
-       */
       done();
     }
   };
