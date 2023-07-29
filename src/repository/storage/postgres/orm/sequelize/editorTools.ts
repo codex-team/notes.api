@@ -1,10 +1,10 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type EditorTool from '@domain/entities/editorTool.js';
+import type EditorTool from '@domain/entities/editorTools.js';
 
 
-interface AddEditorToolOptions {
+interface AddToolOptions {
     id: EditorTool['id'];
     name: EditorTool['name'];
     class: EditorTool['class'];
@@ -94,12 +94,12 @@ export default class UserSequelizeStorage {
   /**
    * @param options - tool data to identify and connect to the editor
    */
-  public async addEditorTool({
+  public async addTool({
     id,
     name,
     class: editorToolClass,
     source,
-  }: AddEditorToolOptions): Promise<EditorTool> {
+  }: AddToolOptions): Promise<EditorTool> {
     const editorTool = await this.model.create({
       id,
       name,
@@ -111,9 +111,9 @@ export default class UserSequelizeStorage {
   }
 
   /**
-   *
+   * Get all available editor tools
    */
-  public async getEditorTools(): Promise<EditorTool[]> {
+  public async getTools(): Promise<EditorTool[]> {
     const editorTools = await EditorToolModel.findAll();
 
     return editorTools;

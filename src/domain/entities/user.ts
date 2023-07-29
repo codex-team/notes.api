@@ -33,5 +33,5 @@ export default interface User {
    * Custom plugins from the marketplace that improve
    * editor or notes environment
    */
-  userExtensions?: UserExtensions;
+  extensions?: UserExtensions;
 }

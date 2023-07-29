@@ -29,7 +29,7 @@ export interface DomainServices {
    * AI service instance
    */
   aiService: AIService
-  editoToolsService: EditorToolsService,
+  editorToolsService: EditorToolsService,
 }
 
 /**
@@ -51,13 +51,13 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   const userService = new UserService(repositories.userRepository);
 
   const aiService = new AIService(repositories.aiRepository);
-  const editoToolsService = new EditorToolsService(repositories.editorToolsRepository);
+  const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
 
   return {
     noteService,
     userService,
     authService,
     aiService,
-    editoToolsService,
+    editorToolsService,
   };
 }

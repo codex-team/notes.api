@@ -37,15 +37,33 @@ interface InsertUserOptions {
   photo?: string;
 }
 
-interface AddUserEditorTool {
+/**
+ * Options for linking a tool to a user
+ */
+interface AddUserToolOptions {
+  /**
+   * User identifier
+   */
   userId: User['id'];
 
+  /**
+   * Editor tool identifier
+   */
   editorTool: UserEditorTool;
 }
 
+/**
+ * Remove link to a tool from a user
+ */
 interface RemoveUserEditorTool {
+  /**
+   * User identifier
+   */
   userId: User['id'];
 
+  /**
+   * Tool identifier
+   */
   editorToolId: UserEditorTool['id'];
 }
 
@@ -83,7 +101,7 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
   /**
    *
    */
-  public declare userExtensions: CreationOptional<User['userExtensions']>;
+  public declare extensions: CreationOptional<User['extensions']>;
 }
 
 /**
@@ -138,7 +156,7 @@ export default class UserSequelizeStorage {
       photo: {
         type: DataTypes.STRING,
       },
-      userExtensions: {
+      extensions: {
         type: DataTypes.JSON,
       },
     }, {
@@ -156,9 +174,9 @@ export default class UserSequelizeStorage {
   public async addUserEditorTool({
     userId,
     editorTool,
-  }: AddUserEditorTool): Promise<void> {
+  }: AddUserToolOptions): Promise<void> {
     await this.model.update({
-      userExtensions: fn('array_append', col('editorTools'), editorTool),
+      extensions: fn('array_append', col('editorTools'), editorTool),
     }, {
       where: {
         id: userId,
@@ -182,14 +200,14 @@ export default class UserSequelizeStorage {
       throw new Error('There is no user with such userId');
     }
 
-    const editorTool = user.userExtensions?.editorTools?.find(tool => tool.id === editorToolId);
+    const editorTool = user.extensions?.editorTools?.find(tool => tool.id === editorToolId);
 
     if (!editorTool) {
       throw new Error('User has no tool with such editorToolId');
     }
 
     await this.model.update({
-      userExtensions: fn('array_remove', col('editorTools'), editorTool),
+      extensions: fn('array_remove', col('editorTools'), editorTool),
     }, {
       where: {
         id: userId,

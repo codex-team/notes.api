@@ -1,4 +1,4 @@
-import EditorToolsSequelizeStorage from '@repository/storage/postgres/orm/sequelize/editorTool.js';
+import EditorToolsSequelizeStorage from '@repository/storage/postgres/orm/sequelize/editorTools.js';
 
 /**
  * Editor tools storage

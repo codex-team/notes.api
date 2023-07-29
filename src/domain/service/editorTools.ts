@@ -1,13 +1,13 @@
 import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import { Provider } from '@repository/user.repository.js';
-import type EditorTool from '@domain/entities/editorTool.js';
+import type EditorTool from '@domain/entities/editorTools.js';
 
 export {
   Provider
 };
 
 /**
- * User service
+ * Editor tools service
  */
 export default class EditorToolsService {
   /**
@@ -16,7 +16,7 @@ export default class EditorToolsService {
   private readonly repository: EditorToolsRepository;
 
   /**
-   * User service constructor
+   * Editor tools service constructor
    *
    * @param repository - user repository instance
    */
@@ -27,17 +27,17 @@ export default class EditorToolsService {
   /**
    * @returns {Promise<EditorTool[] | null>} all available editor tools
    */
-  public async getEditorTools(): Promise<EditorTool[] | null> {
-    return await this.repository.getEditorTools();
+  public async getTools(): Promise<EditorTool[] | null> {
+    return await this.repository.getTools();
   }
 
   /**
    * Adding custom editor tool
    *
-   * @param editorTool - all data about the editor plugin
+   * @param tool - all data about the editor plugin
    * @returns {Promise<EditorTool | null>} editor tool data
    */
-  public async addEditorTool(editorTool: EditorTool): Promise<EditorTool | null> {
-    return await this.repository.addEditorTool(editorTool);
+  public async addTool(tool: EditorTool): Promise<EditorTool | null> {
+    return await this.repository.addTools(tool);
   }
 }

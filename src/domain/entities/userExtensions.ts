@@ -1,4 +1,4 @@
-import type EditorTool from '@domain/entities/editorTool.js';
+import type EditorTool from '@domain/entities/editorTools.js';
 
 /**
  * Tools that user uses in the editor while changing notes

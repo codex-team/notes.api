@@ -1,5 +1,5 @@
 import type EditorToolsStorage from '@repository/storage/editorTools.storage.js';
-import type EditorTool from '@domain/entities/editorTool.js';
+import type EditorTool from '@domain/entities/editorTools.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -17,8 +17,8 @@ export default class EditorToolsRepository {
   /**
    * @param editorTool - all editor tool data
    */
-  public async addEditorTool(editorTool: EditorTool): Promise<EditorTool> {
-    const createdEditorTool = await this.storage.addEditorTool(editorTool);
+  public async addTools(editorTool: EditorTool): Promise<EditorTool> {
+    const createdEditorTool = await this.storage.addTool(editorTool);
 
     return createdEditorTool;
   }
@@ -26,8 +26,8 @@ export default class EditorToolsRepository {
   /**
    * Get all editor tools
    */
-  public async getEditorTools(): Promise<EditorTool[]> {
-    const editorTools = await this.storage.getEditorTools();
+  public async getTools(): Promise<EditorTool[]> {
+    const editorTools = await this.storage.getTools();
 
     return editorTools;
   }
