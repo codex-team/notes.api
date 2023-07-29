@@ -2,9 +2,8 @@ import type { FastifyPluginCallback } from 'fastify';
 import type UserService from '@domain/service/user.js';
 import { Provider } from '@domain/service/user.js';
 import type AuthService from '@domain/service/auth.js';
-import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
+import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import { StatusCodes } from 'http-status-codes';
-import type AuthSession from '@domain/entities/authSession.js';
 
 /**
  * Interface for the oauth router.
@@ -19,6 +18,11 @@ interface OauthRouterOptions {
    * Auth service instance
    */
   authService: AuthService,
+
+  /**
+   * Cookie domain for refresh and access tokens
+   */
+  cookieDomain: string,
 }
 
 /**
@@ -33,6 +37,10 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
    * Callback for Google oauth2. Google redirects to this endpoint after user authentication.
    */
   fastify.get('/google/callback', async (request, reply) => {
+    /**
+     * Get referer from request headers
+     */
+    const referer = request.headers.referer as string;
     const { token } = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
 
     const user = await opts.userService.getUserByProvider(token.access_token, Provider.GOOGLE);
@@ -57,14 +65,22 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
     const accessToken = opts.authService.signAccessToken({ id: user.id });
     const refreshToken = await opts.authService.signRefreshToken(user.id);
 
-    const response: SuccessResponse<AuthSession> = {
-      data: {
-        accessToken,
-        refreshToken,
-      },
-    };
+    /**
+     * Set tokens to cookies and redirect to referer
+     */
+    reply.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      path: '/',
+      domain: opts.cookieDomain,
+    });
 
-    reply.send(response);
+    reply.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      path: '/',
+      domain: opts.cookieDomain,
+    });
+
+    reply.redirect(referer);
   });
   done();
 };

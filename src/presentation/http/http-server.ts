@@ -11,6 +11,7 @@ import fastifySwaggerUI from '@fastify/swagger-ui';
 import OauthRouter from '@presentation/http/router/oauth.js';
 import initMiddlewares from '@presentation/http/middlewares/index.js';
 import AuthRouter from '@presentation/http/router/auth.js';
+import cookie from '@fastify/cookie';
 
 const appServerLogger = getLogger('appServer');
 
@@ -64,6 +65,10 @@ export default class HttpServer implements API {
       },
     });
 
+    this.server.register(cookie, {
+      secret: this.config.cookieSecret,
+    });
+
     /**
      * Serve openapi UI and JSON scheme
      */
@@ -88,6 +93,7 @@ export default class HttpServer implements API {
       prefix: '/oauth',
       userService: domainServices.userService,
       authService: domainServices.authService,
+      cookieDomain: this.config.cookieDomain,
     });
     this.server.register(AuthRouter, {
       prefix: '/auth',
