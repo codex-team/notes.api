@@ -16,7 +16,7 @@ export default class Note {
   /**
    * Note content
    */
-  public content: string;
+  public content: JSON;
 
   /**
    * Note entity constructor
@@ -25,7 +25,7 @@ export default class Note {
    * @param content - note content
    * @param id - note id
    */
-  constructor(title: string, content: string, id = 0) {
+  constructor(title: string, content: JSON, id = 0) {
     this.title = title;
     this.content = content;
     this.id = id;

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import AuthPayload from '@domain/entities/authPayload.js';
+import type AuthPayload from '@domain/entities/authPayload.js';
 import { nanoid } from 'nanoid';
 import UserSessionRepository from '@repository/userSession.repository.js';
 import UserSession from '@domain/entities/userSession.js';

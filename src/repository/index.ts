@@ -1,4 +1,4 @@
-import { DatabaseConfig } from '@infrastructure/config/index.js';
+import type { DatabaseConfig } from '@infrastructure/config/index.js';
 import NoteStorage from './storage/note.storage.js';
 import NoteRepository from './note.repository.js';
 import Orm from './storage/postgres/orm/index.js';
@@ -45,8 +45,8 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
    * Create storage instances
    */
   const noteStorage = new NoteStorage(orm);
-  const userSessionStorage = new UserSessionStorage(orm);
   const userStorage = new UserStorage(orm);
+  const userSessionStorage = new UserSessionStorage(orm);
 
   await noteStorage.model.sync();
 

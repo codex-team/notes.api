@@ -1,5 +1,5 @@
 import Transport from '@repository/transport/index.js';
-import { ApiResponse } from '@repository/transport/google-api/types/ApiResponse.js';
+import type { ApiResponse } from '@repository/transport/google-api/types/ApiResponse.js';
 
 /**
  * Google api transport
@@ -19,7 +19,6 @@ export default class GoogleApiTransport extends Transport {
    *
    * @param endpoint - API endpoint
    * @param accessToken - access token for authorization to Google API
-   * @returns { Promise<Payload | null> } - Response data
    */
   public async getWithAccessToken<Payload>(endpoint: string, accessToken: string): Promise<Payload | null> {
     const headers = {

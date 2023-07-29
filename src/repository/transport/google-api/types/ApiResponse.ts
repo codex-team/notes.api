@@ -1,4 +1,4 @@
-import GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
+import type GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
 
 /**
  * Response payload, which is returned by Google API

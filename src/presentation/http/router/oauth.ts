@@ -1,7 +1,8 @@
-import { FastifyPluginCallback } from 'fastify';
-import UserService, { Provider } from '@domain/service/user.js';
-import AuthService from '@domain/service/auth.js';
-import { ErrorResponse } from '@presentation/http/types/HttpResponse';
+import type { FastifyPluginCallback } from 'fastify';
+import type UserService from '@domain/service/user.js';
+import { Provider } from '@domain/service/user.js';
+import type AuthService from '@domain/service/auth.js';
+import type { ErrorResponse } from '@presentation/http/types/HttpResponse';
 import { StatusCodes } from 'http-status-codes';
 
 /**

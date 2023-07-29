@@ -1,4 +1,4 @@
-import { DomainServices } from '@domain/index.js';
+import type { DomainServices } from '@domain/index.js';
 
 /**
  * API interface

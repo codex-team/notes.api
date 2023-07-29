@@ -1,7 +1,7 @@
-import User from '@domain/entities/user.js';
-import UserStorage from './storage/user.storage.js';
-import GoogleApiTransport from '@repository/transport/google-api/index.js';
-import GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
+import type User from '@domain/entities/user.js';
+import type UserStorage from './storage/user.storage.js';
+import type GoogleApiTransport from '@repository/transport/google-api/index.js';
+import type GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
 
 /**
  * OAuth provider

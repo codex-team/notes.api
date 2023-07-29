@@ -1,4 +1,4 @@
-import { DatabaseConfig } from '@infrastructure/config/index.js';
+import type { DatabaseConfig } from '@infrastructure/config/index.js';
 import { Sequelize } from 'sequelize';
 import { getLogger } from '@infrastructure/logging/index.js';
 

@@ -1,5 +1,6 @@
-import { Model, DataTypes, Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
-import Orm from '@repository/storage/postgres/orm/sequelize/index.js';
+import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
+import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 
 /**
  * Interface for inserted note
@@ -18,7 +19,7 @@ interface InsertedNote {
   /**
    * Note content
    */
-  content: string;
+  content: JSON;
 }
 
 /**
@@ -38,7 +39,7 @@ class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAttribute
   /**
    * Note content
    */
-  public declare content: string;
+  public declare content: JSON;
 }
 
 
@@ -79,7 +80,7 @@ export default class NoteSequelizeStorage {
         primaryKey: true,
       },
       title: DataTypes.STRING,
-      content: DataTypes.STRING,
+      content: DataTypes.JSON,
     }, {
       tableName: this.tableName,
       sequelize: this.database,
@@ -93,7 +94,7 @@ export default class NoteSequelizeStorage {
    * @param content - note content
    * @returns { InsertedNote } - inserted note
    */
-  public async insertNote(title: string, content: string): Promise<InsertedNote> {
+  public async insertNote(title: string, content: JSON): Promise<InsertedNote> {
     const insertedNote = await this.model.create({
       title,
       content,
