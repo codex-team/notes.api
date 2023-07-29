@@ -32,7 +32,9 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   fastify.get('/all', async (_, reply) => {
     const tools = await editorToolsService.getTools();
 
-    return reply.send(tools);
+    return reply.send({
+      data: tools,
+    });
   });
 
   /**
@@ -41,9 +43,11 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   fastify.post<{ Body: EditorTool }>('/add-tool', async (request, reply) => {
     const editorTool = request.body;
 
-    const tools = await editorToolsService.addTool(editorTool);
+    const tool = await editorToolsService.addTool(editorTool);
 
-    return reply.send(tools);
+    return reply.send({
+      data: tool,
+    });
   });
 
   done();

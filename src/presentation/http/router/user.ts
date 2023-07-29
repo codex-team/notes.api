@@ -38,7 +38,9 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
 
     const user = await userService.getUserById(userId);
 
-    return reply.send(user);
+    return reply.send({
+      data: user,
+    });
   });
 
   /**
@@ -49,7 +51,9 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
 
     const editorTools = await userService.getUserEditorTools(userId) ?? [];
 
-    return reply.send(editorTools);
+    return reply.send({
+      data: editorTools,
+    });
   });
 
   done();
