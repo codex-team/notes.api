@@ -38,7 +38,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
    */
   fastify.post<{
     Body: AuthOptions;
-  }>('/refresh', async (request, reply) => {
+  }>('/', async (request, reply) => {
     const { token } = request.body;
 
     const userSession = await opts.authService.verifyRefreshToken(token);
@@ -75,9 +75,9 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
   /**
    * Route for logout, removes session from database by refresh token
    */
-  fastify.post<{
+  fastify.delete<{
     Body: AuthOptions;
-  }>('/logout', async (request, reply) => {
+  }>('/', async (request, reply) => {
     await opts.authService.removeSessionByRefreshToken(request.body.token);
 
     const response: SuccessResponse<string> = {
