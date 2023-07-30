@@ -50,6 +50,8 @@ export default (authService: AuthService): preHandlerHookHandler => {
       };
 
       reply.send(response);
+
+      return;
     }
   };
 };

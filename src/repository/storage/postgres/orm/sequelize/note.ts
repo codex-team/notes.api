@@ -368,4 +368,36 @@ export default class NoteSequelizeStorage {
       enabled: settings.enabled,
     };
   }
+
+  /**
+   * Update note settings
+   *
+   * @param data - note settings new data
+   * @param id - note settings id
+   */
+  public async patchNoteSettings(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
+    const settingsToUpdate = await this.settingsModel.findByPk(id);
+
+    /**
+     * Check if note settings exists in database
+     */
+    if (!settingsToUpdate) {
+      return null;
+    }
+
+    const values = {
+      enabled: data.enabled,
+      custom_hostname: data.customHostname,
+    };
+
+    const updatedSettings = await settingsToUpdate.update(values);
+
+    return {
+      id: updatedSettings.id,
+      noteId: updatedSettings.note_id,
+      customHostname: updatedSettings.custom_hostname,
+      publicId: updatedSettings.public_id,
+      enabled: updatedSettings.enabled,
+    };
+  }
 }

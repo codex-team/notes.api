@@ -13,7 +13,7 @@ interface GetNoteByIdOptions {
   /**
    * Note id
    */
-  id: string;
+  id: NotesSettings['publicId'];
 }
 
 /**
@@ -149,6 +149,37 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const response: SuccessResponse<NotesSettings> = {
       data: noteSettings,
+    };
+
+    return reply.send(response);
+  });
+
+  /**
+   * Patch noteSettings by note public id
+   */
+  fastify.patch<{
+    Body: Partial<NotesSettings>,
+    Params: GetNoteByIdOptions
+  }>('/:id/settings', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
+    const noteId = request.params.id;
+
+    /**
+     * TODO: check is user collaborator
+     */
+
+    const updatedNoteSettings = await noteService.patchNoteSettings(request.body, noteId);
+
+    if (!updatedNoteSettings) {
+      const response: ErrorResponse = {
+        status: StatusCodes.NOT_FOUND,
+        message: 'Note setting not found',
+      };
+
+      return reply.send(response);
+    }
+
+    const response: SuccessResponse<NotesSettings> = {
+      data: updatedNoteSettings,
     };
 
     return reply.send(response);
