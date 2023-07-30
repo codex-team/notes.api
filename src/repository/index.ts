@@ -59,8 +59,6 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
   const userSessionStorage = new UserSessionStorage(orm);
   const editorToolsStorage = new EditorToolsStorage(orm);
 
-  console.log('Database structure prepared');
-
   /**
    * Prepare db structure
    */
