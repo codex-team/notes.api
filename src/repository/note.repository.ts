@@ -38,7 +38,7 @@ export default class NoteRepository {
    * @param id - note id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteById(id: number): Promise<Note | null> {
+  public async getNoteById(id: Note['id']): Promise<Note | null> {
     return await this.storage.getNoteById(id);
   }
 
@@ -48,7 +48,7 @@ export default class NoteRepository {
    * @param id - note id
    * @returns { Promise<NotesSettings | null> } - found note
    */
-  public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
+  public async getNoteSettingsById(id: NotesSettings['id']): Promise<NotesSettings | null> {
     return await this.storage.getNoteSettingsById(id);
   }
 
@@ -68,7 +68,7 @@ export default class NoteRepository {
    * @param publicId - public id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteByPublicId(publicId: string): Promise<Note | null> {
+  public async getNoteByPublicId(publicId: NotesSettings['publicId']): Promise<Note | null> {
     return await this.storage.getNoteByPublicId(publicId);
   }
 
@@ -78,7 +78,7 @@ export default class NoteRepository {
    * @param id - note public id
    * @returns { Promise<NotesSettings | null> } found note settings
    */
-  public async getNoteSettingsByPublicId(id: string): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(id: NotesSettings['publicId']): Promise<NotesSettings> {
     return await this.storage.getNoteSettingsByPublicId(id);
   }
 
@@ -88,7 +88,7 @@ export default class NoteRepository {
    * @param id - note id
    * @returns { Promise<NotesSettings | null> } found note settings
    */
-  public async getNoteSettingsByNoteId(id: number): Promise<NotesSettings> {
+  public async getNoteSettingsByNoteId(id: Note['id']): Promise<NotesSettings> {
     return await this.storage.getNoteSettingsByNoteId(id);
   }
 

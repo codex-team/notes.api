@@ -26,14 +26,14 @@ export default class NoteService {
    *
    * @param title - note title
    * @param content - note content
-   * @param creator - note creator
+   * @param creatorId - note creator
    * @returns { Note } added note object
    */
-  public async addNote(title: string, content: JSON, creator: number): Promise<Note> {
+  public async addNote(title: string, content: JSON, creatorId: Note['creatorId']): Promise<Note> {
     return await this.repository.addNote({
       title,
       content,
-      creator,
+      creatorId,
     });
   }
 
@@ -43,7 +43,7 @@ export default class NoteService {
    * @param id - note id
    * @returns { Promise<Note | null> } note
    */
-  public async getNoteById(id: string): Promise<Note | null> {
+  public async getNoteById(id: NotesSettings['publicId']): Promise<Note | null> {
     return await this.repository.getNoteByPublicId(id);
   }
 
@@ -53,7 +53,7 @@ export default class NoteService {
    * @param id - note public id
    * @returns { Promise<NotesSettings | null> } note settings
    */
-  public async getNoteSettingsByPublicId(id: string): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(id: NotesSettings['publicId']): Promise<NotesSettings> {
     return await this.repository.getNoteSettingsByPublicId(id);
   }
 
@@ -63,7 +63,7 @@ export default class NoteService {
    * @param id - note id
    * @returns { Promise<NotesSettings | null> } note
    */
-  public async getNoteSettingsByNoteId(id: number): Promise<NotesSettings | null> {
+  public async getNoteSettingsByNoteId(id: Note['id']): Promise<NotesSettings | null> {
     return await this.repository.getNoteSettingsByNoteId(id);
   }
 
@@ -84,7 +84,7 @@ export default class NoteService {
    * @param enabled - is note enabled
    * @returns { Promise<NotesSettings> } note settings
    */
-  public async addNoteSettings(noteId: number, enabled: boolean = true): Promise<NotesSettings> {
+  public async addNoteSettings(noteId: Note['id'], enabled: boolean = true): Promise<NotesSettings> {
     const publicIdLength = 10;
 
     const publicId = nanoid(publicIdLength);

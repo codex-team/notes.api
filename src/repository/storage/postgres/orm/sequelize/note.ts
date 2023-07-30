@@ -32,7 +32,7 @@ export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAt
   /**
    * Note creator, user identifier, who created this note
    */
-  public declare creator_id: Note['creator'];
+  public declare creator_id: Note['creatorId'];
 }
 
 
@@ -148,14 +148,14 @@ export default class NoteSequelizeStorage {
     const createdNote = await this.model.create({
       title: options.title,
       content: options.content,
-      creator_id: options.creator,
+      creator_id: options.creatorId,
     });
 
     return {
       id: createdNote.id,
       title: createdNote.title,
       content: createdNote.content,
-      creator: createdNote.creator_id,
+      creatorId: createdNote.creator_id,
     };
   }
 
@@ -165,7 +165,7 @@ export default class NoteSequelizeStorage {
    * @param id - note id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteById(id: number): Promise<Note | null> {
+  public async getNoteById(id: Note['id']): Promise<Note | null> {
     const note = await this.model.findOne({
       where: {
         id,
@@ -183,7 +183,7 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
-      creator: note.creator_id,
+      creatorId: note.creator_id,
     };
   }
 
@@ -193,7 +193,7 @@ export default class NoteSequelizeStorage {
    * @param id - note id
    * @returns { Promise<NotesSettings | null> } found note
    */
-  public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
+  public async getNoteSettingsById(id: NotesSettings['id']): Promise<NotesSettings | null> {
     const noteSettings = await this.settingsModel.findOne({
       where: {
         id,
@@ -248,7 +248,7 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
-      creator: note.creator_id,
+      creatorId: note.creator_id,
     };
   }
 
@@ -258,7 +258,7 @@ export default class NoteSequelizeStorage {
    * @param publicId - note public id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteByPublicId(publicId: string): Promise<Note | null> {
+  public async getNoteByPublicId(publicId: NotesSettings['publicId']): Promise<Note | null> {
     const note = await this.model.findOne({
       where: {
         '$notes_settings.public_id$': publicId,
@@ -278,20 +278,20 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
-      creator: note.creator_id,
+      creatorId: note.creator_id,
     };
   };
 
   /**
    * Get note settings
    *
-   * @param noteId - note public id
+   * @param publicId - note public id
    * @returns { Promise<NotesSettings | null> } - note settings
    */
-  public async getNoteSettingsByPublicId(noteId: string): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(publicId: NotesSettings['publicId']): Promise<NotesSettings> {
     const settings = await this.settingsModel.findOne({
       where: {
-        public_id: noteId,
+        public_id: publicId,
       },
     });
 
@@ -317,7 +317,7 @@ export default class NoteSequelizeStorage {
    * @param noteId - note id
    * @returns { Promise<NotesSettings | null> } - note settings
    */
-  public async getNoteSettingsByNoteId(noteId: number): Promise<NotesSettings> {
+  public async getNoteSettingsByNoteId(noteId: NotesSettings['noteId']): Promise<NotesSettings> {
     const settings = await this.settingsModel.findOne({
       where: {
         note_id: noteId,
