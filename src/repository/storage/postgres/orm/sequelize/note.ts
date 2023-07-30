@@ -2,9 +2,11 @@ import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptio
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type Note from '@domain/entities/note.js';
+import type { NoteCreationAttributes } from '@domain/entities/note.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
+import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -26,6 +28,11 @@ export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAt
    * Note content
    */
   public declare content: Note['content'];
+
+  /**
+   * Note creator, user identifier, who created this note
+   */
+  public declare creator_id: Note['creatorId'];
 }
 
 
@@ -77,6 +84,14 @@ export default class NoteSequelizeStorage {
       },
       title: DataTypes.STRING,
       content: DataTypes.JSON,
+      creator_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: UserModel,
+          key: 'id',
+        },
+      },
     }, {
       tableName: this.tableName,
       sequelize: this.database,
@@ -126,20 +141,21 @@ export default class NoteSequelizeStorage {
   /**
    * Insert note to database
    *
-   * @param title - note title
-   * @param content - note content
+   * @param options - note creation options
    * @returns { Note } - created note
    */
-  public async createNote(title: string, content: JSON): Promise<Note> {
+  public async createNote(options: NoteCreationAttributes): Promise<Note> {
     const createdNote = await this.model.create({
-      title,
-      content,
+      title: options.title,
+      content: options.content,
+      creator_id: options.creatorId,
     });
 
     return {
       id: createdNote.id,
       title: createdNote.title,
       content: createdNote.content,
+      creatorId: createdNote.creator_id,
     };
   }
 
@@ -149,7 +165,7 @@ export default class NoteSequelizeStorage {
    * @param id - note id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteById(id: number): Promise<Note | null> {
+  public async getNoteById(id: Note['id']): Promise<Note | null> {
     const note = await this.model.findOne({
       where: {
         id,
@@ -167,6 +183,7 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
+      creatorId: note.creator_id,
     };
   }
 
@@ -176,7 +193,7 @@ export default class NoteSequelizeStorage {
    * @param id - note id
    * @returns { Promise<NotesSettings | null> } found note
    */
-  public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
+  public async getNoteSettingsById(id: NotesSettings['id']): Promise<NotesSettings | null> {
     const noteSettings = await this.settingsModel.findOne({
       where: {
         id,
@@ -231,6 +248,7 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
+      creatorId: note.creator_id,
     };
   }
 
@@ -240,7 +258,7 @@ export default class NoteSequelizeStorage {
    * @param publicId - note public id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteByPublicId(publicId: string): Promise<Note | null> {
+  public async getNoteByPublicId(publicId: NotesSettings['publicId']): Promise<Note | null> {
     const note = await this.model.findOne({
       where: {
         '$notes_settings.public_id$': publicId,
@@ -260,19 +278,20 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
+      creatorId: note.creator_id,
     };
   };
 
   /**
    * Get note settings
    *
-   * @param noteId - note public id
+   * @param publicId - note public id
    * @returns { Promise<NotesSettings | null> } - note settings
    */
-  public async getNoteSettingsByPublicId(noteId: string): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(publicId: NotesSettings['publicId']): Promise<NotesSettings> {
     const settings = await this.settingsModel.findOne({
       where: {
-        public_id: noteId,
+        public_id: publicId,
       },
     });
 
@@ -298,7 +317,7 @@ export default class NoteSequelizeStorage {
    * @param noteId - note id
    * @returns { Promise<NotesSettings | null> } - note settings
    */
-  public async getNoteSettingsByNoteId(noteId: number): Promise<NotesSettings> {
+  public async getNoteSettingsByNoteId(noteId: NotesSettings['noteId']): Promise<NotesSettings> {
     const settings = await this.settingsModel.findOne({
       where: {
         note_id: noteId,

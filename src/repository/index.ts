@@ -62,9 +62,9 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
   /**
    * Prepare db structure
    */
+  await userStorage.model.sync();
   await noteStorage.model.sync();
   await noteStorage.settingsModel.sync();
-  await userStorage.model.sync();
   await userSessionStorage.model.sync();
   await editorToolsStorage.model.sync();
 

@@ -1,4 +1,5 @@
 import initAuth from '@presentation/http/middlewares/authRequired.js';
+import initWithUser from '@presentation/http/middlewares/withUser.js';
 import type { preHandlerHookHandler } from 'fastify';
 import type { DomainServices } from '@domain/index.js';
 
@@ -28,7 +29,7 @@ export default (services: DomainServices): Middlewares => {
    * Init middlewares
    */
   const authRequired = initAuth(services.authService);
-  const withUser = initAuth(services.authService);
+  const withUser = initWithUser(services.authService);
 
   return {
     authRequired,

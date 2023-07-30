@@ -157,13 +157,18 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Add new note
    */
-  fastify.post<{ Body: AddNoteOptions }>('/', { preHandler: opts.middlewares.authRequired }, async (request, reply) => {
+  fastify.post<{ Body: AddNoteOptions }>('/', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
     /**
      * TODO: Validate request query
      */
     const { title, content, enabled } = request.body;
 
-    const addedNote = await noteService.addNote(title, content);
+    /**
+     * Get user id from request context, because we have auth middleware
+     */
+    const user = request.ctx.auth.id;
+
+    const addedNote = await noteService.addNote(title, content, user);
 
     const noteSettings = await noteService.addNoteSettings(addedNote.id, enabled);
 
