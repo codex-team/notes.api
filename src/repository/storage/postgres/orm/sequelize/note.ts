@@ -392,8 +392,6 @@ export default class NoteSequelizeStorage {
 
     const updatedSettings = await settingsToUpdate.update(values);
 
-    console.log(updatedSettings);
-
     return {
       id: updatedSettings.id,
       noteId: updatedSettings.note_id,
