@@ -3,7 +3,7 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type Note from '@domain/entities/note.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
-import type NotesSettings from '@domain/entities/notesSettings.js';
+import type NotesSettings from '@domain/entities/notesSettings';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -236,7 +236,7 @@ export default class NoteSequelizeStorage {
    * Gets note by public id
    *
    * @param publicId - note public id
-   * @returns { Promise<InsertedNote | null> } found note
+   * @returns { Promise<Note | null> } found note
    */
   public async getNoteByPublicId(publicId: string): Promise<Note | null> {
     const note = await this.model.findOne({
