@@ -203,7 +203,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const noteSettings = await noteService.addNoteSettings(addedNote.id, enabled);
 
-    reply.send(noteSettings.publicId);
+    return reply.send(noteSettings.publicId);
   });
 
   /**
