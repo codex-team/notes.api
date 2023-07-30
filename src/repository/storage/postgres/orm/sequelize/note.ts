@@ -172,7 +172,7 @@ export default class NoteSequelizeStorage {
    * Gets note settings by id
    *
    * @param id - note id
-   * @returns { Promise<InsertedNote | null> } found note
+   * @returns { Promise<NotesSettings | null> } found note
    */
   public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
     const noteSettings = await this.settingsModel.findOne({
