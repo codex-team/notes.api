@@ -60,10 +60,10 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
   const editorToolsStorage = new EditorToolsStorage(orm);
 
   await noteStorage.model.sync();
+  await noteStorage.settingsModel.sync();
   await userStorage.model.sync();
   await userSessionStorage.model.sync();
   await editorToolsStorage.model.sync();
-
 
   /**
    * Create transport instances

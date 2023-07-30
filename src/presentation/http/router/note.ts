@@ -3,6 +3,7 @@ import type NoteService from '@domain/service/note.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
 import type Note from '@domain/entities/note.js';
+import type NotesSettings from '@domain/entities/notesSettings.js';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
 
 /**
@@ -96,7 +97,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const noteSettings = await noteService.getNoteSettingsByNoteId(note.id);
 
-    if (noteSettings.enabled) {
+    if (noteSettings?.enabled) {
       /**
        * Create success response
        */
@@ -117,6 +118,40 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     };
 
     reply.send(response);
+  });
+
+  /**
+   * Get noteSettings by id
+   */
+  fastify.get<{ Params: GetNoteByIdOptions }>('/:id/settings', async (request, reply) => {
+    const params = request.params;
+    /**
+     * TODO: Validate request params
+     */
+    const { id } = params;
+
+    const noteSettings = await noteService.getNoteSettingsByPublicId(id);
+
+    /**
+     * Check if note does not exist
+     */
+    if (!noteSettings) {
+      const response: ErrorResponse = {
+        status: StatusCodes.NOT_FOUND,
+        message: 'Note not found',
+      };
+
+      return reply.send(response);
+    }
+
+    /**
+     * Create success response
+     */
+    const response: SuccessResponse<NotesSettings> = {
+      data: noteSettings,
+    };
+
+    return reply.send(response);
   });
 
   /**

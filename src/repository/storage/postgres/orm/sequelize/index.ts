@@ -42,7 +42,7 @@ export default class SequelizeOrm {
       await this.conn.authenticate();
       databaseLogger.info(`Database connected to ${this.conn.config.host}:${this.conn.config.port}`);
     } catch (error) {
-      databaseLogger.error('Unable to connect to the database:', error);
+      databaseLogger.error(error);
     }
   }
 

@@ -54,6 +54,16 @@ export default class NoteRepository {
   }
 
   /**
+   * Gets note settings by id
+   *
+   * @param id - note id
+   * @returns { Promise<NotesSettings | null> } - found note
+   */
+  public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
+    return await this.storage.getNoteSettingsById(id);
+  }
+
+  /**
    * Gets note by hostname
    *
    * @param hostname - custom hostname
@@ -96,11 +106,21 @@ export default class NoteRepository {
   /**
    * Get note settings by note id
    *
+   * @param id - note public id
+   * @returns { Promise<NotesSettings | null> } found note settings
+   */
+  public async getNoteSettingsByPublicId(id: string): Promise<NotesSettings> {
+    return await this.storage.getNoteSettingsByPublicId(id);
+  }
+
+  /**
+   * Get note settings by note id
+   *
    * @param id - note id
    * @returns { Promise<NotesSettings | null> } found note settings
    */
   public async getNoteSettingsByNoteId(id: number): Promise<NotesSettings> {
-    return await this.storage.findSettingsById(id);
+    return await this.storage.getNoteSettingsByNoteId(id);
   }
 
   /**

@@ -171,6 +171,35 @@ export default class NoteSequelizeStorage {
   }
 
   /**
+   * Gets note settings by id
+   *
+   * @param id - note id
+   * @returns { Promise<NotesSettings | null> } found note
+   */
+  public async getNoteSettingsById(id: number): Promise<NotesSettings | null> {
+    const noteSettings = await this.settingsModel.findOne({
+      where: {
+        id,
+      },
+    });
+
+    /**
+     * If note settings not found, return null
+     */
+    if (!noteSettings) {
+      return null;
+    }
+
+    return {
+      id: noteSettings.id,
+      noteId: noteSettings.note_id,
+      publicId: noteSettings.public_id,
+      enabled: noteSettings.enabled,
+      customHostname: noteSettings.custom_hostname,
+    };
+  }
+
+  /**
    * Gets note by id
    *
    * @param hostname - custom hostname
@@ -237,10 +266,39 @@ export default class NoteSequelizeStorage {
   /**
    * Get note settings
    *
+   * @param noteId - note public id
+   * @returns { Promise<NotesSettings | null> } - note settings
+   */
+  public async getNoteSettingsByPublicId(noteId: string): Promise<NotesSettings> {
+    const settings = await this.settingsModel.findOne({
+      where: {
+        public_id: noteId,
+      },
+    });
+
+    if (!settings) {
+      /**
+       * TODO: improve exceptions
+       */
+      throw new Error('Note settings not found');
+    }
+
+    return {
+      id: settings.id,
+      noteId: settings.note_id,
+      customHostname: settings.custom_hostname,
+      publicId: settings.public_id,
+      enabled: settings.enabled,
+    };
+  }
+
+  /**
+   * Get note settings
+   *
    * @param noteId - note id
    * @returns { Promise<NotesSettings | null> } - note settings
    */
-  public async findSettingsById(noteId: number): Promise<NotesSettings> {
+  public async getNoteSettingsByNoteId(noteId: number): Promise<NotesSettings> {
     const settings = await this.settingsModel.findOne({
       where: {
         note_id: noteId,
