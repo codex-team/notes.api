@@ -157,11 +157,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Add new note
    */
-  fastify.post('/', { preHandler: opts.middlewares.authRequired }, async (request, reply) => {
+  fastify.post<{ Body: AddNoteOptions }>('/', { preHandler: opts.middlewares.authRequired }, async (request, reply) => {
     /**
      * TODO: Validate request query
      */
-    const { title, content, enabled } = request.query as AddNoteOptions;
+    const { title, content, enabled } = request.body;
 
     const addedNote = await noteService.addNote(title, content);
 
