@@ -29,6 +29,11 @@ interface AddNoteOptions {
    * Note content
    */
   content: JSON;
+
+  /**
+   * Is note public
+   */
+  enabled?: boolean;
 }
 
 /**
@@ -156,11 +161,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * TODO: Validate request query
      */
-    const { title, content } = request.query as AddNoteOptions;
+    const { title, content, enabled } = request.query as AddNoteOptions;
 
     const addedNote = await noteService.addNote(title, content);
 
-    return reply.send(addedNote);
+    const noteSettings = await noteService.addNoteSettings(addedNote.id, enabled);
+
+    return reply.send(noteSettings.publicId);
   });
 
   /**
