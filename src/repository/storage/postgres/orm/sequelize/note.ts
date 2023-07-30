@@ -270,7 +270,7 @@ export default class NoteSequelizeStorage {
   public async getNoteSettingsByPublicId(noteId: string): Promise<NotesSettings> {
     const settings = await this.settingsModel.findOne({
       where: {
-        note_id: noteId,
+        public_id: noteId,
       },
     });
 
