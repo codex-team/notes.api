@@ -4,6 +4,7 @@ import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type Note from '@domain/entities/note.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
+import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -273,7 +274,7 @@ export default class NoteSequelizeStorage {
     customHostname,
     publicId,
     enabled,
-  }: NotesSettings
+  }: NotesSettingsCreationAttributes
   ): Promise<NotesSettings> {
     const settings = await this.settingsModel.create({
       note_id: noteId,

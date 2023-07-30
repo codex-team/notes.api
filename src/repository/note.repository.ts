@@ -1,6 +1,7 @@
 import Note from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
+import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -107,7 +108,7 @@ export default class NoteRepository {
    *
    * @param settings - note settings
    */
-  public async addNoteSettings(settings: NotesSettings): Promise<NotesSettings> {
+  public async addNoteSettings(settings: NotesSettingsCreationAttributes): Promise<NotesSettings> {
     return await this.storage.insertNoteSettings(settings);
   }
 }

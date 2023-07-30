@@ -83,7 +83,6 @@ export default class NoteService {
     const publicId = nanoid(publicIdLength);
 
     return await this.repository.addNoteSettings({
-      id: 0,
       noteId: noteId,
       publicId: publicId,
       enabled: enabled,
