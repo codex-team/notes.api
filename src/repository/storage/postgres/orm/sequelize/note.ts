@@ -2,9 +2,11 @@ import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptio
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type Note from '@domain/entities/note.js';
+import type { NoteCreationAttributes } from '@domain/entities/note.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
+import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -26,6 +28,11 @@ export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAt
    * Note content
    */
   public declare content: Note['content'];
+
+  /**
+   * Note creator, user identifier, who created this note
+   */
+  public declare creator_id: Note['creator'];
 }
 
 
@@ -77,6 +84,14 @@ export default class NoteSequelizeStorage {
       },
       title: DataTypes.STRING,
       content: DataTypes.JSON,
+      creator_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: UserModel,
+          key: 'id',
+        },
+      },
     }, {
       tableName: this.tableName,
       sequelize: this.database,
@@ -126,20 +141,21 @@ export default class NoteSequelizeStorage {
   /**
    * Insert note to database
    *
-   * @param title - note title
-   * @param content - note content
+   * @param options - note creation options
    * @returns { Note } - created note
    */
-  public async createNote(title: string, content: JSON): Promise<Note> {
+  public async createNote(options: NoteCreationAttributes): Promise<Note> {
     const createdNote = await this.model.create({
-      title,
-      content,
+      title: options.title,
+      content: options.content,
+      creator_id: options.creator,
     });
 
     return {
       id: createdNote.id,
       title: createdNote.title,
       content: createdNote.content,
+      creator: createdNote.creator_id,
     };
   }
 
@@ -167,6 +183,7 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
+      creator: note.creator_id,
     };
   }
 
@@ -231,6 +248,7 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
+      creator: note.creator_id,
     };
   }
 
@@ -260,6 +278,7 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
+      creator: note.creator_id,
     };
   };
 

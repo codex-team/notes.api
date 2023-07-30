@@ -1,4 +1,4 @@
-import Note from '@domain/entities/note.js';
+import type Note from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import { nanoid } from 'nanoid';
 import type NoteRepository from '@repository/note.repository.js';
@@ -26,18 +26,15 @@ export default class NoteService {
    *
    * @param title - note title
    * @param content - note content
+   * @param creator - note creator
    * @returns { Note } added note object
    */
-  public async addNote(title: string, content: JSON): Promise<Note> {
-    const note = new Note(title, content);
-
-    const addedNote = await this.repository.addNote(note);
-
-    return {
-      id: addedNote.id,
-      title: addedNote.title,
-      content: addedNote.content,
-    };
+  public async addNote(title: string, content: JSON, creator: number): Promise<Note> {
+    return await this.repository.addNote({
+      title,
+      content,
+      creator,
+    });
   }
 
   /**

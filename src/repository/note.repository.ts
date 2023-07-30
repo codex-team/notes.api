@@ -1,4 +1,5 @@
-import Note from '@domain/entities/note.js';
+import type Note from '@domain/entities/note.js';
+import type { NoteCreationAttributes } from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
@@ -24,13 +25,11 @@ export default class NoteRepository {
   /**
    * Add note
    *
-   * @param note - note to add
+   * @param options - note adding options
    * @returns { Promise<Note> } added note
    */
-  public async addNote({ title, content }: Note): Promise<Note> {
-    const insertedNote = await this.storage.createNote(title, content);
-
-    return new Note(insertedNote.title, insertedNote.content, insertedNote.id);
+  public async addNote(options: NoteCreationAttributes): Promise<Note> {
+    return await this.storage.createNote(options);
   }
 
   /**
@@ -40,17 +39,7 @@ export default class NoteRepository {
    * @returns { Promise<Note | null> } found note
    */
   public async getNoteById(id: number): Promise<Note | null> {
-    const noteData = await this.storage.getNoteById(id);
-
-    if (!noteData) {
-      return null;
-    }
-
-    return new Note(
-      noteData.title,
-      noteData.content,
-      noteData.id
-    );
+    return await this.storage.getNoteById(id);
   }
 
   /**
@@ -70,17 +59,7 @@ export default class NoteRepository {
    * @returns { Promise<Note | null> } found note
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
-    const noteData = await this.storage.getNoteByHostname(hostname);
-
-    if (!noteData) {
-      return null;
-    }
-
-    return new Note(
-      noteData.title,
-      noteData.content,
-      noteData.id
-    );
+    return await this.storage.getNoteByHostname(hostname);
   }
 
   /**
@@ -90,17 +69,7 @@ export default class NoteRepository {
    * @returns { Promise<Note | null> } found note
    */
   public async getNoteByPublicId(publicId: string): Promise<Note | null> {
-    const noteData = await this.storage.getNoteByPublicId(publicId);
-
-    if (!noteData) {
-      return null;
-    }
-
-    return new Note(
-      noteData.title,
-      noteData.content,
-      noteData.id
-    );
+    return await this.storage.getNoteByPublicId(publicId);
   }
 
   /**
