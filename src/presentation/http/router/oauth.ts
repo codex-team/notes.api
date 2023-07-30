@@ -40,7 +40,6 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
     /**
      * Get referer from request headers
      */
-    const referer = request.headers.referer as string;
     const { token } = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
 
     const user = await opts.userService.getUserByProvider(token.access_token, Provider.GOOGLE);
@@ -72,7 +71,7 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
       <html>
         <head>
           <script>
-            window.opener.postMessage({ accessToken: '${accessToken}', refreshToken: '${refreshToken}' }, '${referer}');
+            window.opener.postMessage({ accessToken: '${accessToken}', refreshToken: '${refreshToken}' }, '*');
             window.close();
           </script>
         </head>
