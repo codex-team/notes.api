@@ -101,4 +101,13 @@ export default class NoteRepository {
   public async getNoteSettingsByNoteId(id: number): Promise<NotesSettings> {
     return await this.storage.findSettingsById(id);
   }
+
+  /**
+   * Add note settings
+   *
+   * @param settings - note settings
+   */
+  public async addNoteSettings(settings: NotesSettings): Promise<NotesSettings> {
+    return await this.storage.insertNoteSettings(settings);
+  }
 }

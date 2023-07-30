@@ -3,7 +3,7 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type Note from '@domain/entities/note.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
-import type NotesSettings from '@domain/entities/notesSettings';
+import type NotesSettings from '@domain/entities/notesSettings.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -114,6 +114,7 @@ export default class NoteSequelizeStorage {
     }, {
       tableName: this.settingsTableName,
       sequelize: this.database,
+      timestamps: false,
     });
 
     /** NoteModel and NotesSettingsModel are connected as ONE-TO-ONE */
@@ -251,6 +252,35 @@ export default class NoteSequelizeStorage {
        */
       throw new Error('Note settings not found');
     }
+
+    return {
+      id: settings.id,
+      noteId: settings.note_id,
+      customHostname: settings.custom_hostname,
+      publicId: settings.public_id,
+      enabled: settings.enabled,
+    };
+  }
+
+  /**
+   * Insert note settings
+   *
+   * @param options - note settings options
+   * @returns { Promise<NotesSettings> } - inserted note settings
+   */
+  public async insertNoteSettings({
+    noteId,
+    customHostname,
+    publicId,
+    enabled,
+  }: NotesSettings
+  ): Promise<NotesSettings> {
+    const settings = await this.settingsModel.create({
+      note_id: noteId,
+      custom_hostname: customHostname,
+      public_id: publicId,
+      enabled: enabled,
+    });
 
     return {
       id: settings.id,

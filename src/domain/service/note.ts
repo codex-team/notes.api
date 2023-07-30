@@ -1,6 +1,7 @@
 import Note from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
+import { nanoid } from 'nanoid';
 
 /**
  * Note service
@@ -67,5 +68,25 @@ export default class NoteService {
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
     return await this.repository.getNoteByHostname(hostname);
+  }
+
+  /**
+   * Adds note settings
+   *
+   * @param noteId - note id
+   * @param enabled - is note enabled
+   * @returns { Promise<NotesSettings> } note settings
+   */
+  public async addNoteSettings(noteId: number, enabled: boolean = true): Promise<NotesSettings> {
+    const publicIdLength = 10;
+
+    const publicId = nanoid(publicIdLength);
+
+    return await this.repository.addNoteSettings({
+      id: 0,
+      noteId: noteId,
+      publicId: publicId,
+      enabled: enabled,
+    });
   }
 }

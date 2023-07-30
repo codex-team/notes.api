@@ -17,7 +17,7 @@ export default interface NotesSettings {
   /**
    * Custom hostname
    */
-  customHostname: string;
+  customHostname?: string;
 
   /**
    * Public id to get note via link, not by integer identifier, but by string hash
