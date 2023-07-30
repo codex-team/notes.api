@@ -100,4 +100,15 @@ export default class NoteRepository {
   public async addNoteSettings(settings: NotesSettingsCreationAttributes): Promise<NotesSettings> {
     return await this.storage.insertNoteSettings(settings);
   }
+
+  /**
+   * Patch note settings
+   *
+   * @param data - note settings new values
+   * @param id - note settings id
+   * @returns { Promise<NotesSettings> } patched note settings
+   */
+  public async patchNoteSettings(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
+    return await this.storage.patchNoteSettings(data, id);
+  }
 }

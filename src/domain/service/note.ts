@@ -95,4 +95,17 @@ export default class NoteService {
       enabled: enabled,
     });
   }
+
+  /**
+   * Partially updates note settings
+   *
+   * @param data - note settings data with new values
+   * @param noteId - note public id
+   * @returns { Promise<NotesSettings> } updated note settings
+   */
+  public async patchNoteSettings(data: Partial<NotesSettings>, noteId: NotesSettings['publicId']): Promise<NotesSettings | null> {
+    const noteSettings = await this.repository.getNoteSettingsByPublicId(noteId);
+
+    return await this.repository.patchNoteSettings(data, noteSettings.id);
+  }
 }
