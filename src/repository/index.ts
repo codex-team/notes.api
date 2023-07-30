@@ -54,10 +54,12 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
   /**
    * Create storage instances
    */
-  const noteStorage = new NoteStorage(orm);
   const userStorage = new UserStorage(orm);
+  const noteStorage = new NoteStorage(orm);
   const userSessionStorage = new UserSessionStorage(orm);
   const editorToolsStorage = new EditorToolsStorage(orm);
+
+  console.log('Database structure prepared');
 
   /**
    * Prepare db structure
