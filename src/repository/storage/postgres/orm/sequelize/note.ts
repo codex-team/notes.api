@@ -102,6 +102,15 @@ export default class NoteSequelizeStorage {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      public_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      enabled: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
     }, {
       tableName: this.settingsTableName,
       sequelize: this.database,
@@ -182,6 +191,8 @@ export default class NoteSequelizeStorage {
     return {
       id: noteSettings.id,
       noteId: noteSettings.note_id,
+      publicId: noteSettings.public_id,
+      enabled: noteSettings.enabled,
       customHostname: noteSettings.custom_hostname,
     };
   }
@@ -218,6 +229,64 @@ export default class NoteSequelizeStorage {
       id: note.id,
       title: note.title,
       content: note.content,
+    };
+  }
+
+  /**
+   * Gets note by public id
+   *
+   * @param publicId - note public id
+   * @returns { Promise<InsertedNote | null> } found note
+   */
+  public async getNoteByPublicId(publicId: string): Promise<Note | null> {
+    const note = await this.model.findOne({
+      where: {
+        '$notes_settings.public_id$': publicId,
+      },
+      include: {
+        model: this.settingsModel,
+        as: this.settingsModel.tableName,
+        required: true,
+      },
+    });
+
+    if (!note) {
+      return null;
+    }
+
+    return {
+      id: note.id,
+      title: note.title,
+      content: note.content,
+    };
+  };
+
+  /**
+   * Get note settings
+   *
+   * @param noteId - note id
+   * @returns { Promise<NotesSettings | null> } - note settings
+   */
+  public async findSettingsById(noteId: number): Promise<NotesSettings> {
+    const settings = await this.settingsModel.findOne({
+      where: {
+        note_id: noteId,
+      },
+    });
+
+    if (!settings) {
+      /**
+       * TODO: improve exceptions
+       */
+      throw new Error('Note settings not found');
+    }
+
+    return {
+      id: settings.id,
+      noteId: settings.note_id,
+      customHostname: settings.custom_hostname,
+      publicId: settings.public_id,
+      enabled: settings.enabled,
     };
   }
 }

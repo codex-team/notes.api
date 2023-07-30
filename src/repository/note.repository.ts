@@ -81,4 +81,34 @@ export default class NoteRepository {
       noteData.id
     );
   }
+
+  /**
+   * Get note by public id
+   *
+   * @param publicId - public id
+   * @returns { Promise<Note | null> } found note
+   */
+  public async getNoteByPublicId(publicId: string): Promise<Note | null> {
+    const noteData = await this.storage.getNoteByPublicId(publicId);
+
+    if (!noteData) {
+      return null;
+    }
+
+    return new Note(
+      noteData.title,
+      noteData.content,
+      noteData.id
+    );
+  }
+
+  /**
+   * Get note settings by note id
+   *
+   * @param id - note id
+   * @returns { Promise<NotesSettings | null> } found note settings
+   */
+  public async getNoteSettingsByNoteId(id: number): Promise<NotesSettings> {
+    return await this.storage.findSettingsById(id);
+  }
 }
