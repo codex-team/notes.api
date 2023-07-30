@@ -66,20 +66,21 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
     const refreshToken = await opts.authService.signRefreshToken(user.id);
 
     /**
-     * Set tokens to cookies and redirect to referer
+     * Show page with script passing parent window postMessage with tokens
      */
-    reply.setCookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      path: '/',
-      domain: opts.cookieDomain,
-    }).setCookie('accessToken', accessToken, {
-      httpOnly: true,
-      path: '/',
-      domain: opts.cookieDomain,
-    })
-      .redirect(referer);
-
-    reply.redirect(referer);
+    reply.type('text/html').send(`
+      <html>
+        <head>
+          <script>
+            window.opener.postMessage({ accessToken: '${accessToken}', refreshToken: '${refreshToken}' }, '${referer}');
+            window.close();
+          </script>
+        </head>
+        <body>
+          <p>You are awesome! ᕕ( ͡° ͜ʖ ͡°)ᕗ</p>
+        </body>
+      </html>
+    `);
   });
   done();
 };
