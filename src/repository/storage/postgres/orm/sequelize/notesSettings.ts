@@ -20,7 +20,7 @@ export class NotesSettingsModel extends Model<InferAttributes<NotesSettingsModel
   /**
    * Custom hostname
    */
-  public declare custom_hostname: string;
+  public declare custom_hostname: CreationOptional<string>;
 
   /**
    * Public id
