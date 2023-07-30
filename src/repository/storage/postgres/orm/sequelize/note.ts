@@ -264,10 +264,39 @@ export default class NoteSequelizeStorage {
   /**
    * Get note settings
    *
+   * @param noteId - note public id
+   * @returns { Promise<NotesSettings | null> } - note settings
+   */
+  public async getNoteSettingsByPublicId(noteId: string): Promise<NotesSettings> {
+    const settings = await this.settingsModel.findOne({
+      where: {
+        note_id: noteId,
+      },
+    });
+
+    if (!settings) {
+      /**
+       * TODO: improve exceptions
+       */
+      throw new Error('Note settings not found');
+    }
+
+    return {
+      id: settings.id,
+      noteId: settings.note_id,
+      customHostname: settings.custom_hostname,
+      publicId: settings.public_id,
+      enabled: settings.enabled,
+    };
+  }
+
+  /**
+   * Get note settings
+   *
    * @param noteId - note id
    * @returns { Promise<NotesSettings | null> } - note settings
    */
-  public async findSettingsById(noteId: number): Promise<NotesSettings> {
+  public async getNoteSettingsByNoteId(noteId: number): Promise<NotesSettings> {
     const settings = await this.settingsModel.findOne({
       where: {
         note_id: noteId,
