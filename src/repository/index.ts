@@ -58,11 +58,12 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
   const userStorage = new UserStorage(orm);
   const userSessionStorage = new UserSessionStorage(orm);
   const editorToolsStorage = new EditorToolsStorage(orm);
-  noteStorage.model.sync()
-  noteStorage.settingsModel.sync()
-  userStorage.model.sync()
-  userSessionStorage.model.sync()
-  editorToolsStorage.model.sync()
+
+  noteStorage.model.sync();
+  noteStorage.settingsModel.sync();
+  userStorage.model.sync();
+  userSessionStorage.model.sync();
+  editorToolsStorage.model.sync();
 
   /**
    * Create transport instances
