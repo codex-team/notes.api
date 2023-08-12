@@ -17,3 +17,4 @@ Use `app-config.yaml` to configure the application.
 ## Contributing
 
 You can find documentation for developers and contributors in the [DEVELOPMENT.md](./DEVELOPMENT.md) file.
+You can find documentation for a production deploy in the [DEPLOYMENT.md](./DEPLOYMENT.md) file.
