@@ -1,3 +1,5 @@
+TRUNCATE TABLE public.notes CASCADE;
+
 ALTER TABLE IF EXISTS public.notes
     ADD COLUMN public_id character(10) NOT NULL;
 
