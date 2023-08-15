@@ -1,6 +1,8 @@
 import pg, { type ClientConfig } from 'pg';
 import { migrate } from 'postgres-migrations';
 import config from './../../../../infrastructure/config/index.js';
+import logger from './../../../../infrastructure/logging/index.js';
+
 
 /**
  * Connects to the database and runs migrations
@@ -8,7 +10,7 @@ import config from './../../../../infrastructure/config/index.js';
  * @param migrationsPath - path to migrations files
  */
 export async function runTenantMigrations(migrationsPath: string): Promise<void> {
-  console.log('🚚 Running migrations...');
+  logger.info('🚚 Running migrations...');
 
   const dbConfig: ClientConfig =  {
     connectionString: config.database.dsn,
@@ -23,10 +25,10 @@ export async function runTenantMigrations(migrationsPath: string): Promise<void>
     const result = await migrate({ client }, migrationsPath);
 
     if (result.length === 0) {
-      console.log('✅ Nothing to migrate');
+      logger.info('✅ Nothing to migrate');
     } else {
       result.forEach((migration) => {
-        console.log(`✅ ${migration.name} migrated successfully`);
+        logger.info(`✅ ${migration.name} migrated successfully`);
       });
     }
   } finally {

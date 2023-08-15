@@ -1,7 +1,7 @@
 import { pino } from 'pino';
 import * as process from 'process';
-import type { LoggingConfig } from '@infrastructure/config/index.js';
-import appConfig from '@infrastructure/config/index.js';
+import type { LoggingConfig } from '../config/index.js';
+import appConfig from '../config/index.js';
 
 const loggerConfig = process.env['NODE_ENV'] === 'production'
   ? {}
