@@ -1,7 +1,7 @@
-import type Note from '@domain/entities/note.js';
+import type { Note, NotePublicId } from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
-import { nanoid } from 'nanoid';
 import type NoteRepository from '@repository/note.repository.js';
+import { createPublicId } from '@infrastructure/utils/id.js';
 
 /**
  * Note service
@@ -24,14 +24,13 @@ export default class NoteService {
   /**
    * Adds note
    *
-   * @param title - note title
    * @param content - note content
    * @param creatorId - note creator
    * @returns { Note } added note object
    */
-  public async addNote(title: string, content: JSON, creatorId: Note['creatorId']): Promise<Note> {
+  public async addNote(content: JSON, creatorId: Note['creatorId']): Promise<Note> {
     return await this.repository.addNote({
-      title,
+      publicId: createPublicId(),
       content,
       creatorId,
     });
@@ -43,7 +42,7 @@ export default class NoteService {
    * @param id - note id
    * @returns { Promise<Note | null> } note
    */
-  public async getNoteById(id: NotesSettings['publicId']): Promise<Note | null> {
+  public async getNoteById(id: NotePublicId): Promise<Note | null> {
     return await this.repository.getNoteByPublicId(id);
   }
 
@@ -53,7 +52,10 @@ export default class NoteService {
    * @param id - note public id
    * @returns { Promise<NotesSettings | null> } note settings
    */
-  public async getNoteSettingsByPublicId(id: NotesSettings['publicId']): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NotesSettings> {
+    /**
+     * @todo get internal id by public id and resolve note settings by the internal id
+     */
     return await this.repository.getNoteSettingsByPublicId(id);
   }
 
@@ -85,13 +87,8 @@ export default class NoteService {
    * @returns { Promise<NotesSettings> } note settings
    */
   public async addNoteSettings(noteId: Note['id'], enabled: boolean = true): Promise<NotesSettings> {
-    const publicIdLength = 10;
-
-    const publicId = nanoid(publicIdLength);
-
     return await this.repository.addNoteSettings({
       noteId: noteId,
-      publicId: publicId,
       enabled: enabled,
     });
   }
@@ -103,7 +100,7 @@ export default class NoteService {
    * @param noteId - note public id
    * @returns { Promise<NotesSettings> } updated note settings
    */
-  public async patchNoteSettings(data: Partial<NotesSettings>, noteId: NotesSettings['publicId']): Promise<NotesSettings | null> {
+  public async patchNoteSettings(data: Partial<NotesSettings>, noteId: NotePublicId): Promise<NotesSettings | null> {
     const noteSettings = await this.repository.getNoteSettingsByPublicId(noteId);
 
     return await this.repository.patchNoteSettings(data, noteSettings.id);

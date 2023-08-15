@@ -23,11 +23,6 @@ export class NotesSettingsModel extends Model<InferAttributes<NotesSettingsModel
   public declare custom_hostname: CreationOptional<string>;
 
   /**
-   * Public id
-   */
-  public declare public_id: string;
-
-  /**
    * Is note public
    */
   public declare enabled: CreationOptional<boolean>;
