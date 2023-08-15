@@ -239,11 +239,6 @@ export default class NoteSequelizeStorage {
       where: {
         publicId,
       },
-      include: {
-        model: this.settingsModel,
-        as: this.settingsModel.tableName,
-        required: true,
-      },
     });
 
     return note;
