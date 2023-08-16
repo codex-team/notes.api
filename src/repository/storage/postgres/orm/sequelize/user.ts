@@ -245,7 +245,7 @@ export default class UserSequelizeStorage {
     /**
      * Check if id or email is provided
      */
-    if (id) {
+    if (id !== undefined) {
       /**
        * Find user by id
        */
@@ -254,7 +254,7 @@ export default class UserSequelizeStorage {
           id,
         },
       });
-    } else if (email) {
+    } else if (email !== undefined) {
       /**
        * Find user by email
        */

@@ -55,7 +55,7 @@ export default class HttpServer implements API {
     /**
      * Register openapi documentation
      */
-    this.server.register(fastifySwagger, {
+    await this.server.register(fastifySwagger, {
       openapi: {
         info: {
           title: 'NoteX openapi',
@@ -68,14 +68,14 @@ export default class HttpServer implements API {
       },
     });
 
-    this.server.register(cookie, {
+    await this.server.register(cookie, {
       secret: this.config.cookieSecret,
     });
 
     /**
      * Serve openapi UI and JSON scheme
      */
-    this.server.register(fastifySwaggerUI, {
+    await this.server.register(fastifySwaggerUI, {
       routePrefix: '/openapi',
       uiConfig: {
         docExpansion: 'list',
@@ -87,31 +87,31 @@ export default class HttpServer implements API {
     /**
      * Register all routers
      */
-    this.server.register(NoteRouter, {
+    await this.server.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
       middlewares: middlewares,
     });
-    this.server.register(OauthRouter, {
+    await this.server.register(OauthRouter, {
       prefix: '/oauth',
       userService: domainServices.userService,
       authService: domainServices.authService,
       cookieDomain: this.config.cookieDomain,
     });
-    this.server.register(AuthRouter, {
+    await this.server.register(AuthRouter, {
       prefix: '/auth',
       authService: domainServices.authService,
     });
-    this.server.register(UserRouter, {
+    await this.server.register(UserRouter, {
       prefix: '/user',
       userService: domainServices.userService,
       middlewares: middlewares,
     });
-    this.server.register(AIRouter, {
+    await this.server.register(AIRouter, {
       prefix: '/ai',
       aiService: domainServices.aiService,
     });
-    this.server.register(EditorToolsRouter, {
+    await this.server.register(EditorToolsRouter, {
       prefix: '/editor-tools',
       editorToolsService: domainServices.editorToolsService,
     });
@@ -120,7 +120,7 @@ export default class HttpServer implements API {
     /**
      * Register oauth2 plugin
      */
-    this.server.register(fastifyOauth2, {
+    await this.server.register(fastifyOauth2, {
       name: 'googleOAuth2',
       scope: ['profile', 'email'],
       credentials: {
@@ -137,7 +137,9 @@ export default class HttpServer implements API {
     /**
      * Allow cors for allowed origins from config
      */
-    this.server.register(cors, { origin: this.config.allowedOrigins });
+    await this.server.register(cors, {
+      origin: this.config.allowedOrigins,
+    });
 
     await this.server.listen({
       host: this.config.host,

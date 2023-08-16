@@ -1,8 +1,9 @@
+import notEmpty from '@infrastructure/utils/notEmpty.js';
 import type OpenAIApi from './transport/openai-api';
 import type { GetCompletionResponsePayload } from './transport/openai-api/types/GetCompletionResponsePayload';
 
 /**
- * Repository that estabishes access to data from business logic
+ * Repository that establishes access to data from business logic
  */
 export default class AIRepository {
   /**
@@ -30,6 +31,10 @@ export default class AIRepository {
 
     const response = await this.openaiTransport.postWithToken<GetCompletionResponsePayload>('/chat/completions', body);
 
-    return response?.choices[0].message.content || '';
+    if (response !== null && notEmpty(response.choices[0].message.content)) {
+      return response.choices[0].message.content;
+    }
+
+    return  '';
   }
 }

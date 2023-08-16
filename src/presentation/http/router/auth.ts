@@ -52,9 +52,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
         message: 'Session is not valid',
       };
 
-      reply.send(response);
-
-      return;
+      return reply.send(response);
     }
 
     const accessToken = opts.authService.signAccessToken({ id: userSession.userId });
@@ -69,7 +67,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
       },
     };
 
-    reply.send(response);
+    return reply.send(response);
   });
 
   /**
@@ -84,7 +82,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
       data: 'OK',
     };
 
-    reply.status(StatusCodes.OK).send(response);
+    await reply.status(StatusCodes.OK).send(response);
   });
   done();
 };

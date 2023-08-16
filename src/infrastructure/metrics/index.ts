@@ -31,14 +31,16 @@ export default async function runMetricsServer(): Promise<void> {
   });
 
   metricsServer.get('/', (_request, reply) => {
-    reply
+    return reply
       .code(StatusCodes.OK)
       .type('text/html')
       .send(homePage);
   });
 
   metricsServer.get('/metrics', async (_request, reply) => {
-    reply.code(StatusCodes.OK).send(await register.metrics());
+    return reply
+      .code(StatusCodes.OK)
+      .send(await register.metrics());
   });
 
   metricsServer.get('/health', async (_request, reply) => {
@@ -48,7 +50,9 @@ export default async function runMetricsServer(): Promise<void> {
       date: new Date(),
     };
 
-    reply.status(StatusCodes.OK).send(data);
+    return reply
+      .status(StatusCodes.OK)
+      .send(data);
   });
 
   await metricsServer.listen({

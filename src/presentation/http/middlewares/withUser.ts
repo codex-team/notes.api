@@ -1,5 +1,6 @@
 import type { preHandlerHookHandler } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
+import notEmpty from '@infrastructure/utils/notEmpty.js';
 
 /**
  * Middleware for routes, which should have user data
@@ -21,7 +22,7 @@ export default (authService: AuthService): preHandlerHookHandler => {
     /**
      * If authorization header is not present, return unauthorized response
      */
-    if (!authorizationHeader) {
+    if (!notEmpty(authorizationHeader)) {
       done();
 
       return;
