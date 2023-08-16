@@ -1,5 +1,4 @@
-import type Note from '@domain/entities/note.js';
-import type { NoteCreationAttributes } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NotePublicId } from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
@@ -68,7 +67,7 @@ export default class NoteRepository {
    * @param publicId - public id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteByPublicId(publicId: NotesSettings['publicId']): Promise<Note | null> {
+  public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
     return await this.storage.getNoteByPublicId(publicId);
   }
 
@@ -78,7 +77,10 @@ export default class NoteRepository {
    * @param id - note public id
    * @returns { Promise<NotesSettings | null> } found note settings
    */
-  public async getNoteSettingsByPublicId(id: NotesSettings['publicId']): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NotesSettings> {
+    /**
+     * @todo get internal id by public id and resolve note settings by the internal id
+     */
     return await this.storage.getNoteSettingsByPublicId(id);
   }
 

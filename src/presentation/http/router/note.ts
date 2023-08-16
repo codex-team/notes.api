@@ -2,7 +2,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
-import type Note from '@domain/entities/note.js';
+import type { Note, NotePublicId } from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
 
@@ -13,7 +13,7 @@ interface GetNoteByIdOptions {
   /**
    * Note id
    */
-  id: NotesSettings['publicId'];
+  id: NotePublicId;
 }
 
 /**
@@ -21,19 +21,9 @@ interface GetNoteByIdOptions {
  */
 interface AddNoteOptions {
   /**
-   * Note title
-   */
-  title: string;
-
-  /**
    * Note content
    */
   content: JSON;
-
-  /**
-   * Is note public
-   */
-  enabled?: boolean;
 }
 
 /**
@@ -97,7 +87,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const noteSettings = await noteService.getNoteSettingsByNoteId(note.id);
 
-    if (noteSettings?.enabled) {
+    if (noteSettings?.enabled === true) {
       /**
        * Create success response
        */
@@ -117,11 +107,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       message: 'Permission denied',
     };
 
-    reply.send(response);
+    await reply.send(response);
   });
 
   /**
    * Get noteSettings by id
+   *
+   * @todo move to the NoteSettings Router
    */
   fastify.get<{ Params: GetNoteByIdOptions }>('/:id/settings', async (request, reply) => {
     const params = request.params;
@@ -186,24 +178,34 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   });
 
   /**
-   * Add new note
+   * Add a new note
    */
-  fastify.post<{ Body: AddNoteOptions }>('/', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
+  fastify.post<{ Body: AddNoteOptions }>('/', {
+    preHandler: [
+      opts.middlewares.authRequired,
+      opts.middlewares.withUser,
+    ],
+  }, async (request, reply) => {
     /**
      * TODO: Validate request query
      */
-    const { title, content, enabled } = request.body;
+    const { content } = request.body;
 
     /**
      * Get user id from request context, because we have auth middleware
      */
     const user = request.ctx.auth.id;
 
-    const addedNote = await noteService.addNote(title, content, user);
+    const addedNote = await noteService.addNote(content, user);
 
-    const noteSettings = await noteService.addNoteSettings(addedNote.id, enabled);
+    /**
+     * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
+     */
+    await noteService.addNoteSettings(addedNote.id);
 
-    return reply.send(noteSettings.publicId);
+    return reply.send({
+      id: addedNote.publicId,
+    });
   });
 
   /**
