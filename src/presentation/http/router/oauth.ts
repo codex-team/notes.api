@@ -53,9 +53,7 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
         message: 'User not found',
       };
 
-      reply.send(response);
-
-      return;
+      return reply.send(response);
     }
 
     /**
@@ -67,7 +65,7 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
     /**
      * Show page with script passing parent window postMessage with tokens
      */
-    reply.type('text/html').send(`
+    return reply.type('text/html').send(`
       <html>
         <head>
           <script>

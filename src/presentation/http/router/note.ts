@@ -5,6 +5,7 @@ import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/Ht
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
+import notEmpty from '@infrastructure/utils/notEmpty.js';
 
 /**
  * Get note by id options
@@ -127,7 +128,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if note does not exist
      */
-    if (!noteSettings) {
+    if (!notEmpty(noteSettings)) {
       const response: ErrorResponse = {
         status: StatusCodes.NOT_FOUND,
         message: 'Note not found',
