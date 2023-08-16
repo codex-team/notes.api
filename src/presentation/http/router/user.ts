@@ -1,6 +1,7 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
 import type UserService from '@domain/service/user.js';
+import type User from '@domain/entities/user';
 
 /**
  * Interface for the user router
@@ -33,14 +34,30 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   /**
    * Get user by session
    */
-  fastify.get('/myself', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
+  fastify.get<{
+    Reply: Pick<User, 'id' | 'name' | 'email' | 'photo'>,
+  }>('/myself', {
+    preHandler: [
+      opts.middlewares.authRequired,
+      opts.middlewares.withUser,
+    ],
+    schema: {
+      response: {
+        '2xx': {
+          $ref: 'User',
+        },
+      },
+    },
+  }, async (request, reply) => {
     const userId = request.ctx.auth.id;
 
     const user = await userService.getUserById(userId);
 
-    return reply.send({
-      data: user,
-    });
+    if (user === null) {
+      return fastify.notFound(reply, 'User not found');
+    }
+
+    return reply.send(user);
   });
 
   /**

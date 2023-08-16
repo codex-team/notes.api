@@ -1,6 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
-import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
+import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import { StatusCodes } from 'http-status-codes';
 import type AuthSession from '@domain/entities/authSession.js';
 
@@ -38,6 +38,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
    */
   fastify.post<{
     Body: AuthOptions;
+    Reply: AuthSession | ErrorResponse;
   }>('/', async (request, reply) => {
     const { token } = request.body;
 
@@ -47,12 +48,11 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
      * Check if session is valid
      */
     if (!userSession) {
-      const response: ErrorResponse = {
-        status: StatusCodes.UNAUTHORIZED,
-        message: 'Session is not valid',
-      };
-
-      return reply.send(response);
+      return reply
+        .code(StatusCodes.UNAUTHORIZED)
+        .send({
+          message: 'Session is not valid',
+        });
     }
 
     const accessToken = opts.authService.signAccessToken({ id: userSession.userId });
@@ -60,14 +60,10 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     await opts.authService.removeSessionByRefreshToken(token);
     const refreshToken = await opts.authService.signRefreshToken(userSession.userId);
 
-    const response: SuccessResponse<AuthSession> = {
-      data: {
-        accessToken,
-        refreshToken,
-      },
-    };
-
-    return reply.send(response);
+    return reply.send({
+      accessToken,
+      refreshToken,
+    });
   });
 
   /**
@@ -75,14 +71,13 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
    */
   fastify.delete<{
     Body: AuthOptions;
+    Reply: { ok: boolean }
   }>('/', async (request, reply) => {
     await opts.authService.removeSessionByRefreshToken(request.body.token);
 
-    const response: SuccessResponse<string> = {
-      data: 'OK',
-    };
-
-    await reply.status(StatusCodes.OK).send(response);
+    return reply.status(StatusCodes.OK).send({
+      ok: true,
+    });
   });
   done();
 };

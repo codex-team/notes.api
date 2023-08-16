@@ -2,8 +2,6 @@ import type { FastifyPluginCallback } from 'fastify';
 import type UserService from '@domain/service/user.js';
 import { Provider } from '@domain/service/user.js';
 import type AuthService from '@domain/service/auth.js';
-import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
-import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the oauth router.
@@ -48,12 +46,7 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
      * Check if user exists
      */
     if (!user) {
-      const response: ErrorResponse = {
-        status: StatusCodes.NOT_FOUND,
-        message: 'User not found',
-      };
-
-      return reply.send(response);
+      return fastify.notFound(reply, 'User not found');
     }
 
     /**

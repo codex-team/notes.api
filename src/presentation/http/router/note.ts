@@ -1,7 +1,7 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import { StatusCodes } from 'http-status-codes';
-import type { ErrorResponse, SuccessResponse } from '@presentation/http/types/HttpResponse.js';
+import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
@@ -65,7 +65,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Get note by id
    */
-  fastify.get<{ Params: GetNoteByIdOptions }>('/:id', { preHandler: opts.middlewares.withUser }, async (request, reply) => {
+  fastify.get<{
+    Params: GetNoteByIdOptions,
+    Reply: Note | ErrorResponse
+  }>('/:id', { preHandler: opts.middlewares.withUser }, async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
@@ -77,38 +80,24 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if note does not exist
      */
-    if (!note) {
-      const response: ErrorResponse = {
-        status: StatusCodes.NOT_FOUND,
-        message: 'Note not found',
-      };
-
-      return reply.send(response);
+    if (note === null) {
+      return fastify.notFound(reply, 'Note not found');
     }
 
     const noteSettings = await noteService.getNoteSettingsByNoteId(note.id);
 
     if (noteSettings?.enabled === true) {
-      /**
-       * Create success response
-       */
-      const response: SuccessResponse<Note> = {
-        data: note,
-      };
-
-      return reply.send(response);
+      return reply.send(note);
     }
 
     /**
      * TODO: add check for collaborators by request context from auth middleware
      */
-
-    const response: ErrorResponse = {
-      status: StatusCodes.UNAUTHORIZED,
-      message: 'Permission denied',
-    };
-
-    await reply.send(response);
+    return reply
+      .code(StatusCodes.UNAUTHORIZED)
+      .send({
+        message: 'Permission denied',
+      });
   });
 
   /**
@@ -116,7 +105,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    *
    * @todo move to the NoteSettings Router
    */
-  fastify.get<{ Params: GetNoteByIdOptions }>('/:id/settings', async (request, reply) => {
+  fastify.get<{
+    Params: GetNoteByIdOptions,
+    Reply: NotesSettings
+  }>('/:id/settings', async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
@@ -129,22 +121,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Check if note does not exist
      */
     if (!notEmpty(noteSettings)) {
-      const response: ErrorResponse = {
-        status: StatusCodes.NOT_FOUND,
-        message: 'Note not found',
-      };
-
-      return reply.send(response);
+      return fastify.notFound(reply, 'Note settings not found');
     }
 
-    /**
-     * Create success response
-     */
-    const response: SuccessResponse<NotesSettings> = {
-      data: noteSettings,
-    };
-
-    return reply.send(response);
+    return reply.send(noteSettings);
   });
 
   /**
@@ -152,7 +132,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   fastify.patch<{
     Body: Partial<NotesSettings>,
-    Params: GetNoteByIdOptions
+    Params: GetNoteByIdOptions,
+    Reply: NotesSettings,
   }>('/:id/settings', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
     const noteId = request.params.id;
 
@@ -162,26 +143,21 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const updatedNoteSettings = await noteService.patchNoteSettings(request.body, noteId);
 
-    if (!updatedNoteSettings) {
-      const response: ErrorResponse = {
-        status: StatusCodes.NOT_FOUND,
-        message: 'Note setting not found',
-      };
-
-      return reply.send(response);
+    if (updatedNoteSettings === null) {
+      return fastify.notFound(reply, 'Note settings not found');
     }
 
-    const response: SuccessResponse<NotesSettings> = {
-      data: updatedNoteSettings,
-    };
-
-    return reply.send(response);
+    return reply.send(updatedNoteSettings);
   });
 
   /**
-   * Add a new note
+   * Adds a new note.
+   * Responses with note public id.
    */
-  fastify.post<{ Body: AddNoteOptions }>('/', {
+  fastify.post<{
+    Body: AddNoteOptions,
+    Reply: { id: NotePublicId }
+  }>('/', {
     preHandler: [
       opts.middlewares.authRequired,
       opts.middlewares.withUser,
@@ -212,7 +188,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   /**
    * Get note by custom hostname
    */
-  fastify.get<{ Params: ResolveHostnameOptions }>('/resolve-hostname/:hostname', async (request, reply) => {
+  fastify.get<{
+    Params: ResolveHostnameOptions,
+    Reply: Note
+  }>('/resolve-hostname/:hostname', async (request, reply) => {
     const params = request.params;
 
     const note = await noteService.getNoteByHostname(params.hostname);
@@ -220,23 +199,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if note does not exist
      */
-    if (!note) {
-      const response: ErrorResponse = {
-        status: StatusCodes.NOT_FOUND,
-        message: 'Note not found',
-      };
-
-      return reply.send(response);
+    if (note === null) {
+      return fastify.notFound(reply, 'Note not found');
     }
 
-    /**
-     * Create success response
-     */
-    const response: SuccessResponse<Note> = {
-      data: note,
-    };
-
-    return reply.send(response);
+    return reply.send(note);
   });
 
   done();

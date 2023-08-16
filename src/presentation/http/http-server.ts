@@ -15,6 +15,7 @@ import cookie from '@fastify/cookie';
 import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from './router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
+import { StatusCodes } from 'http-status-codes';
 
 const appServerLogger = getLogger('appServer');
 
@@ -140,6 +141,50 @@ export default class HttpServer implements API {
     await this.server.register(cors, {
       origin: this.config.allowedOrigins,
     });
+
+    this.server.addSchema({
+      $id: 'User',
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        email: { type: 'string' },
+        name: { type: 'string' },
+        photo: { type: 'string' },
+      },
+    });
+
+    /**
+     * Custom method for sending 404 error
+     *
+     * @example
+     *
+     *  if (note === null) {
+     *    return fastify.notFound(reply, 'Note not found');
+     *  }
+     *
+     * @param reply - fastify reply instance
+     * @param message - custom message
+     */
+    this.server.decorate('notFound', async (reply, message = 'Not found') => {
+      await reply
+        .code(StatusCodes.NOT_FOUND)
+        .type('application/json')
+        .send({
+          message,
+        });
+    });
+
+    // this.server.setErrorHandler(function (error, request, reply) {
+    //   if (error instanceof Fastify.errorCodes.FST_ERR_BAD_STATUS_CODE) {
+    //     // Log error
+    //     this.log.error(error)
+    //     // Send error response
+    //     reply.status(500).send({ ok: false })
+    //   } else {
+    //     // fastify will use parent error handler to handle this
+    //     reply.send(error)
+    //   }
+    // })
 
     await this.server.listen({
       host: this.config.host,
