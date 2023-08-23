@@ -15,6 +15,8 @@ import cookie from '@fastify/cookie';
 import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from './router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
+import NotFoundDecorator from './decorators/notFound.js';
+import { addSchema } from './schema/index.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -140,6 +142,16 @@ export default class HttpServer implements API {
     await this.server.register(cors, {
       origin: this.config.allowedOrigins,
     });
+
+    /**
+     * Add Fastify schema for validation and serialization
+     */
+    addSchema(this.server);
+
+    /**
+     * Custom method for sending 404 error
+     */
+    this.server.decorate('notFound', NotFoundDecorator);
 
     await this.server.listen({
       host: this.config.host,
