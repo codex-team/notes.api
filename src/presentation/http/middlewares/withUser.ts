@@ -14,14 +14,17 @@ export default (authService: AuthService): preHandlerHookHandler => {
    *
    * @param request - request object
    * @param reply - reply object
+   * @param done - done callback
    */
-  return async (request, reply) => {
+  return async (request, reply, done) => {
     const authorizationHeader = request.headers.authorization;
 
     /**
      * If authorization header is not present, return unauthorized response
      */
     if (!notEmpty(authorizationHeader)) {
+      done();
+
       return reply;
     }
 
@@ -40,6 +43,8 @@ export default (authService: AuthService): preHandlerHookHandler => {
         auth: tokenPayload,
       };
     } finally {
+      done();
+
       return reply;
     }
   };

@@ -15,8 +15,9 @@ export default (authService: AuthService): preHandlerHookHandler => {
    *
    * @param request - request object
    * @param reply - reply object
+   * @param done - done callback
    */
-  return async (request, reply) => {
+  return async (request, reply, done) => {
     const authorizationHeader = request.headers.authorization;
 
     /**
@@ -38,7 +39,7 @@ export default (authService: AuthService): preHandlerHookHandler => {
     try {
       await authService.verifyAccessToken(token);
 
-      return reply;
+      done();
     } catch (error) {
       return reply
         .code(StatusCodes.UNAUTHORIZED)
