@@ -95,11 +95,13 @@ export default class HttpServer implements API {
       noteService: domainServices.noteService,
       middlewares: middlewares,
     });
+
     await this.server.register(NoteSettingsRouter, {
       prefix: '/note',
-      noteService: domainServices.noteService,
+      noteService: domainServices.noteSettingsService,
       middlewares: middlewares,
     });
+
     await this.server.register(OauthRouter, {
       prefix: '/oauth',
       userService: domainServices.userService,

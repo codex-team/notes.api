@@ -1,5 +1,5 @@
 import type { FastifyPluginCallback } from 'fastify';
-import type NoteService from '@domain/service/note.js';
+import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type { NotePublicId } from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
@@ -16,13 +16,13 @@ interface GetNoteByIdOptions {
 }
 
 /**
- * Interface for the note router.
+ * Interface for the note settings router.
  */
-interface NoteRouterOptions {
+interface NoteSettingsRouterOptions {
   /**
-   * Note service instance
+   * Note Settings service instance
    */
-  noteService: NoteService,
+  noteService: NoteSettingsService,
 
   /**
    * Middlewares
@@ -31,13 +31,13 @@ interface NoteRouterOptions {
 }
 
 /**
- * Note router plugin
+ * Note Settings router plugin
  *
  * @param fastify - fastify instance
  * @param opts - empty options
  * @param done - callback
  */
-const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, done) => {
+const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fastify, opts, done) => {
   /**
    * Get note service from options
    */
@@ -96,4 +96,4 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   done();
 };
 
-export default NoteRouter;
+export default NoteSettingsRouter;
