@@ -1,6 +1,7 @@
 import type { DatabaseConfig } from '@infrastructure/config/index.js';
 import NoteStorage from './storage/note.storage.js';
 import NoteRepository from './note.repository.js';
+import NoteSettingsRepository from './noteSettings.repository.js';
 import Orm from './storage/postgres/orm/index.js';
 import UserSessionRepository from '@repository/userSession.repository.js';
 import UserSessionStorage from '@repository/storage/userSession.storage.js';
@@ -20,6 +21,11 @@ export interface Repositories {
    * Note repository instance
    */
   noteRepository: NoteRepository,
+
+  /**
+   * Note settings repository instance
+   */
+  noteSettingsRepository: NoteSettingsRepository,
 
   /**
    * User session repository instance
@@ -87,6 +93,7 @@ export async function init(orm: Orm): Promise<Repositories> {
    * Create repositories
    */
   const noteRepository = new NoteRepository(noteStorage);
+  const noteSettingsRepository = new NoteSettingsRepository(noteStorage);
   const userSessionRepository = new UserSessionRepository(userSessionStorage);
   const userRepository = new UserRepository(userStorage, googleApiTransport);
   const aiRepository = new AIRepository(openaiApiTransport);
@@ -94,6 +101,7 @@ export async function init(orm: Orm): Promise<Repositories> {
 
   return {
     noteRepository,
+    noteSettingsRepository,
     userSessionRepository,
     userRepository,
     aiRepository,
