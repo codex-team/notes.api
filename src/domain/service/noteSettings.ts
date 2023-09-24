@@ -7,12 +7,12 @@ import type NoteSettingsRepository from '@repository/noteSettings.repository.js'
  */
 export default class NoteSettingsService {
   /**
-   * Note repository
+   * Note Settings repository
    */
   public repository: NoteSettingsRepository;
 
   /**
-   * Note service constructor
+   * Note Settings service constructor
    *
    * @param repository - note repository
    */

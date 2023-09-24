@@ -39,7 +39,7 @@ interface NoteSettingsRouterOptions {
  */
 const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fastify, opts, done) => {
   /**
-   * Get note service from options
+   * Get note settings service from options
    */
   const noteSettingsService = opts.noteSettingsService;
 

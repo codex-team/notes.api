@@ -8,12 +8,12 @@ import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSett
  */
 export default class NoteSettingsRepository {
   /**
-   * Note storage instance
+   * Note Setting storage instance
    */
   public storage: NoteStorage;
 
   /**
-   * Note repository constructor
+   * Note Settings repository constructor
    *
    * @param storage - storage for note
    */
