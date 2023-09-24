@@ -1,5 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
+import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
@@ -51,6 +52,11 @@ interface NoteRouterOptions {
   noteService: NoteService,
 
   /**
+   * Note Settings service instance
+   */
+  noteSettingsService: NoteSettingsService,
+
+  /**
    * Middlewares
    */
   middlewares: Middlewares,
@@ -75,6 +81,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Get note service from options
    */
   const noteService = opts.noteService;
+  const noteSettingsService = opts.noteSettingsService;
 
   /**
    * Get note by id
@@ -98,7 +105,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return fastify.notFound(reply, 'Note not found');
     }
 
-    const noteSettings = await noteService.getNoteSettingsByNoteId(note.id);
+    const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(note.id);
 
     if (noteSettings?.enabled === true) {
       return reply.send(note);
@@ -142,7 +149,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
      */
-    await noteService.addNoteSettings(addedNote.id);
+    await noteSettingsService.addNoteSettings(addedNote.id);
 
     return reply.send({
       id: addedNote.publicId,

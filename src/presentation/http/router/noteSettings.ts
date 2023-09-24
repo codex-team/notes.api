@@ -22,7 +22,7 @@ interface NoteSettingsRouterOptions {
   /**
    * Note Settings service instance
    */
-  noteService: NoteSettingsService,
+  noteSettingsService: NoteSettingsService,
 
   /**
    * Middlewares
@@ -41,7 +41,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   /**
    * Get note service from options
    */
-  const noteService = opts.noteService;
+  const noteSettingsService = opts.noteSettingsService;
 
   /**
    * Get noteSettings by id
@@ -58,7 +58,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
      */
     const { id } = params;
 
-    const noteSettings = await noteService.getNoteSettingsByPublicId(id);
+    const noteSettings = await noteSettingsService.getNoteSettingsByPublicId(id);
 
     /**
      * Check if note does not exist
@@ -84,7 +84,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
      * TODO: check is user collaborator
      */
 
-    const updatedNoteSettings = await noteService.patchNoteSettings(request.body, noteId);
+    const updatedNoteSettings = await noteSettingsService.patchNoteSettings(request.body, noteId);
 
     if (updatedNoteSettings === null) {
       return fastify.notFound(reply, 'Note settings not found');
