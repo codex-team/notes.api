@@ -1,6 +1,6 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
-import fastify from 'fastify';
+import fastify, { FastifyInstance } from 'fastify';
 import type Server from '@presentation/server.interface.js';
 import type { DomainServices } from '@domain/index.js';
 import cors from '@fastify/cors';
@@ -17,8 +17,15 @@ import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from '@presentation/http/router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
+import type * as http from 'http';
+import type { pino } from 'pino';
 
 const appServerLogger = getLogger('appServer');
+
+/**
+ * Type shortcut for fastify server instance
+ */
+type FastifyServer = FastifyInstance<http.Server, http.IncomingMessage, http.ServerResponse, pino.Logger>;
 
 /**
  * Http server implementation
@@ -27,52 +34,62 @@ export default class HttpServer implements Server {
   /**
    * Fastify server instance
    */
-  public server = fastify({
-    logger: appServerLogger,
-  });
+  public server: FastifyServer | undefined;
 
   /**
-   * Middlewares
+   * Http server config
    */
-  private readonly middlewares: Middlewares;
+  private config: HttpApiConfig | undefined;
 
   /**
-   * Creates http server instance
-   *
-   * @param config - http server config
+   * Constructs http server
+   * @param config - http server config 
    * @param domainServices - instances of domain services
    */
-  constructor(
-    private readonly config: HttpApiConfig,
-    private readonly domainServices: DomainServices) {
-    this.config = config;
-    this.middlewares = initMiddlewares(domainServices);
+  public static async init(
+    config: HttpApiConfig,
+    domainServices: DomainServices,
+  ): Promise<HttpServer> {
+    const server = fastify({
+      logger: appServerLogger,
+    });
+    const middlewares = initMiddlewares(domainServices);
 
-    void this.addOpenapiDocs();
-    void this.addCookies();
-    void this.addOpenapiUI();
-    void this.addApplicationAPI();
-    void this.addOauth2();
-    void this.addCORS();
-    this.addSchema();
-    this.add404Handling();
+    await HttpServer.addOpenapiDocs(server);
+    await HttpServer.addCookies(server, config);
+    await HttpServer.addOpenapiUI(server);
+    await HttpServer.addAPI(server, config, domainServices, middlewares);
+    await HttpServer.addOauth2(server, config);
+    await HttpServer.addCORS(server, config);
+    HttpServer.addSchema(server);
+    HttpServer.add404Handling(server);
+
+    const api = new HttpServer();
+
+    api.server = server;
+    api.config = config;
+
+    return api;
   }
 
   /**
    * Runs http server
    */
   public async run(): Promise<void> {
-    await this.server.listen({
-      host: this.config.host,
-      port: this.config.port,
-    });
+      if (this.server === undefined || this.config === undefined) {
+        throw new Error('Server is not initialized');
+      }
+      await this.server.listen({
+        host: this.config.host,
+        port: this.config.port,
+      });
   }
 
   /**
    * Registers openapi documentation
    */
-  private async addOpenapiDocs(): Promise<void> {
-    await this.server.register(fastifySwagger, {
+  private static async addOpenapiDocs(server: FastifyServer): Promise<void> {
+    await server.register(fastifySwagger, {
       openapi: {
         info: {
           title: 'NoteX openapi',
@@ -88,9 +105,11 @@ export default class HttpServer implements Server {
 
   /**
    * Serves openapi UI and JSON scheme
+   * 
+   * @param server - fastify server instance
    */
-  private async addOpenapiUI(): Promise<void> {
-    await this.server.register(fastifySwaggerUI, {
+  private static async addOpenapiUI(server: FastifyServer): Promise<void> {
+    await server.register(fastifySwaggerUI, {
       routePrefix: '/openapi',
       uiConfig: {
         docExpansion: 'list',
@@ -102,91 +121,109 @@ export default class HttpServer implements Server {
 
   /**
    * Adds support for reading and setting cookies
+   * 
+   * @param server - fastify server instance
+   * @param config - http server config
    */
-  private async addCookies(): Promise<void> {
-    await this.server.register(cookie, {
-      secret: this.config.cookieSecret,
+  private static async addCookies(server: FastifyServer, config: HttpApiConfig): Promise<void> {
+    await server.register(cookie, {
+      secret: config.cookieSecret,
     });
   }
 
   /**
    * Registers all routers
+   * 
+   * @param server - fastify server instance
+   * @param config - http server config
+   * @param domainServices - instances of domain services
+   * @param middlewares - middlewares
    */
-  private async addApplicationAPI(): Promise<void> {
-    await this.server.register(NoteRouter, {
+  private static async addAPI(server: FastifyServer, config: HttpApiConfig, domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
+    await server.register(NoteRouter, {
       prefix: '/note',
-      noteService: this.domainServices.noteService,
-      middlewares: this.middlewares,
+      noteService: domainServices.noteService,
+      middlewares: middlewares,
     });
 
-    await this.server.register(OauthRouter, {
+    await server.register(OauthRouter, {
       prefix: '/oauth',
-      userService: this.domainServices.userService,
-      authService: this.domainServices.authService,
-      cookieDomain: this.config.cookieDomain,
+      userService: domainServices.userService,
+      authService: domainServices.authService,
+      cookieDomain: config.cookieDomain,
     });
 
-    await this.server.register(AuthRouter, {
+    await server.register(AuthRouter, {
       prefix: '/auth',
-      authService: this.domainServices.authService,
+      authService: domainServices.authService,
     });
 
-    await this.server.register(UserRouter, {
+    await server.register(UserRouter, {
       prefix: '/user',
-      userService: this.domainServices.userService,
-      middlewares: this.middlewares,
+      userService: domainServices.userService,
+      middlewares: middlewares,
     });
 
-    await this.server.register(AIRouter, {
+    await server.register(AIRouter, {
       prefix: '/ai',
-      aiService: this.domainServices.aiService,
+      aiService: domainServices.aiService,
     });
 
-    await this.server.register(EditorToolsRouter, {
+    await server.register(EditorToolsRouter, {
       prefix: '/editor-tools',
-      editorToolsService: this.domainServices.editorToolsService,
+      editorToolsService: domainServices.editorToolsService,
     });
   }
 
   /**
    * Registers oauth2 plugin
+   * 
+   * @param server - fastify server instance
+   * @param config - http server config
    */
-  private async addOauth2(): Promise<void> {
-    await this.server.register(fastifyOauth2, {
+  private static async addOauth2(server: FastifyServer, config: HttpApiConfig): Promise<void> {
+    await server.register(fastifyOauth2, {
       name: 'googleOAuth2',
       scope: ['profile', 'email'],
       credentials: {
         client: {
-          id: this.config.oauth2.google.clientId,
-          secret: this.config.oauth2.google.clientSecret,
+          id: config.oauth2.google.clientId,
+          secret: config.oauth2.google.clientSecret,
         },
         auth: fastifyOauth2.GOOGLE_CONFIGURATION,
       },
-      startRedirectPath: this.config.oauth2.google.redirectUrl,
-      callbackUri: this.config.oauth2.google.callbackUrl,
+      startRedirectPath: config.oauth2.google.redirectUrl,
+      callbackUri: config.oauth2.google.callbackUrl,
     });
   }
 
   /**
    * Allows cors for allowed origins from config
+   * 
+   * @param server - fastify server instance
+   * @param config - http server config
    */
-  private async addCORS(): Promise<void> {
-    await this.server.register(cors, {
-      origin: this.config.allowedOrigins,
+  private static async addCORS(server: FastifyServer, config: HttpApiConfig): Promise<void> {
+    await server.register(cors, {
+      origin: config.allowedOrigins,
     });
   }
 
   /**
    * Add Fastify schema for validation and serialization
+   * 
+   * @param server - fastify server instance
    */
-  private addSchema(): void {
-    this.server.addSchema(UserSchema);
+  private static addSchema(server: FastifyServer): void {
+    server.addSchema(UserSchema);
   }
 
   /**
    * Custom method for sending 404 error
+   * 
+   * @param server - fastify server instance
    */
-  private add404Handling(): void {
-    this.server.decorate('notFound', NotFoundDecorator);
+  private static add404Handling(server: FastifyServer): void {
+    server.decorate('notFound', NotFoundDecorator);
   }
 }

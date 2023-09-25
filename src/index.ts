@@ -4,17 +4,18 @@ import API from '@presentation/index.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import { init as initRepositories } from '@repository/index.js';
+import fastify from 'fastify';
 
 /**
  * Application entry point
  */
 const start = async (): Promise<void> => {
   try {
+    
     const repositories = await initRepositories(config.database);
     const domainServices = initDomainServices(repositories, config);
-
-    const api = new API(config.httpApi, domainServices);
-
+    const api = await API.init(config.httpApi, domainServices);
+    
     await api.run();
 
     if (config.metrics.enabled) {
@@ -34,3 +35,4 @@ try {
   logger.fatal('Failed to start application ' + err);
   process.exit(1);
 }
+

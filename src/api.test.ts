@@ -11,12 +11,31 @@ describe('API', () => {
     const repositories = await initRepositories(config.database);
     const domainServices = initDomainServices(repositories, config);
 
-    api = new API(config.httpApi, domainServices);
+    api = await API.init(config.httpApi, domainServices);
   });
 
   describe('Notes', () => {
-    test('GET /:id returns note of correct structure', () => {
+    test('GET /:id returns note of correct structure', async () => {
       expect(api.server).not.toBeNull();
+
+      const response = await api.server?.inject({
+        method: 'GET',
+        url: '/note/1',
+      });
+
+
+
+      // try {
+      //   const response = await api.server.inject({
+      //     method: 'GET',
+      //     url: '/note/1',
+      //   });
+
+      // } catch (err) {
+      //   console.log(err)
+      // }
+
+      expect(response?.statusCode).toBe(200);
     });
   });
 });
