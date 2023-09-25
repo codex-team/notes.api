@@ -15,7 +15,8 @@
       "@lib/*": ["lib/*"],
       "@domain/*": ["domain/*"],
       "@repository/*": ["repository/*"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "ts-node": {
     // Tell ts-node CLI to install the --loader automatically

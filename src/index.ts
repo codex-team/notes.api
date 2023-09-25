@@ -10,11 +10,12 @@ import { init as initRepositories } from '@repository/index.js';
  */
 const start = async (): Promise<void> => {
   try {
-    const api = new API(config.httpApi);
     const repositories = await initRepositories(config.database);
     const domainServices = initDomainServices(repositories, config);
 
-    await api.run(domainServices);
+    const api = new API(config.httpApi, domainServices);
+
+    await api.run();
 
     if (config.metrics.enabled) {
       await runMetricsServer();

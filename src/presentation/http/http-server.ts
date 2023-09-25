@@ -1,62 +1,77 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
 import fastify from 'fastify';
-import type API from '@presentation/api.interface.js';
-import NoteRouter from '@presentation/http/router/note.js';
+import type Server from '@presentation/server.interface.js';
 import type { DomainServices } from '@domain/index.js';
 import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
-import OauthRouter from '@presentation/http/router/oauth.js';
-import initMiddlewares from '@presentation/http/middlewares/index.js';
-import AuthRouter from '@presentation/http/router/auth.js';
+import initMiddlewares, { type Middlewares } from '@presentation/http/middlewares/index.js';
 import cookie from '@fastify/cookie';
-import UserRouter from '@presentation/http/router/user.js';
-import AIRouter from './router/ai.js';
-import EditorToolsRouter from './router/editorTools.js';
 import NotFoundDecorator from './decorators/notFound.js';
-import { addSchema } from './schema/index.js';
+import NoteRouter from '@presentation/http/router/note.js';
+import OauthRouter from '@presentation/http/router/oauth.js';
+import AuthRouter from '@presentation/http/router/auth.js';
+import UserRouter from '@presentation/http/router/user.js';
+import AIRouter from '@presentation/http/router/ai.js';
+import EditorToolsRouter from './router/editorTools.js';
+import { UserSchema } from './schema/User.js';
 
 const appServerLogger = getLogger('appServer');
 
 /**
  * Http server implementation
  */
-export default class HttpServer implements API {
+export default class HttpServer implements Server {
   /**
    * Fastify server instance
    */
-  private server = fastify({
+  public server = fastify({
     logger: appServerLogger,
   });
 
   /**
-   * Http server config
+   * Middlewares
    */
-  private readonly config: HttpApiConfig;
+  private readonly middlewares: Middlewares;
 
   /**
    * Creates http server instance
    *
    * @param config - http server config
+   * @param domainServices - instances of domain services
    */
-  constructor(config: HttpApiConfig) {
+  constructor(
+    private readonly config: HttpApiConfig,
+    private readonly domainServices: DomainServices) {
     this.config = config;
-  }
+    this.middlewares = initMiddlewares(domainServices);
 
+    void this.addOpenapiDocs();
+    void this.addCookies();
+    void this.addOpenapiUI();
+    void this.addApplicationAPI();
+    void this.addOauth2();
+    void this.addCORS();
+    this.addSchema();
+    this.add404Handling();
+  }
 
   /**
    * Runs http server
-   *
-   * @param domainServices - instances of domain services
    */
-  public async run(domainServices: DomainServices): Promise<void> {
-    const middlewares = initMiddlewares(domainServices);
+  public async run(): Promise<void> {
+    await this.server.listen({
+      host: this.config.host,
+      port: this.config.port,
+    });
+  }
 
-    /**
-     * Register openapi documentation
-     */
+  /**
+   * Registers openapi documentation
+   */
+  private async addOpenapiDocs(): Promise<void> {
     await this.server.register(fastifySwagger, {
       openapi: {
         info: {
@@ -69,14 +84,12 @@ export default class HttpServer implements API {
         } ],
       },
     });
+  }
 
-    await this.server.register(cookie, {
-      secret: this.config.cookieSecret,
-    });
-
-    /**
-     * Serve openapi UI and JSON scheme
-     */
+  /**
+   * Serves openapi UI and JSON scheme
+   */
+  private async addOpenapiUI(): Promise<void> {
     await this.server.register(fastifySwaggerUI, {
       routePrefix: '/openapi',
       uiConfig: {
@@ -85,43 +98,60 @@ export default class HttpServer implements API {
       },
       transformSpecificationClone: true,
     });
+  }
 
-    /**
-     * Register all routers
-     */
+  /**
+   * Adds support for reading and setting cookies
+   */
+  private async addCookies(): Promise<void> {
+    await this.server.register(cookie, {
+      secret: this.config.cookieSecret,
+    });
+  }
+
+  /**
+   * Registers all routers
+   */
+  private async addApplicationAPI(): Promise<void> {
     await this.server.register(NoteRouter, {
       prefix: '/note',
-      noteService: domainServices.noteService,
-      middlewares: middlewares,
+      noteService: this.domainServices.noteService,
+      middlewares: this.middlewares,
     });
+
     await this.server.register(OauthRouter, {
       prefix: '/oauth',
-      userService: domainServices.userService,
-      authService: domainServices.authService,
+      userService: this.domainServices.userService,
+      authService: this.domainServices.authService,
       cookieDomain: this.config.cookieDomain,
     });
+
     await this.server.register(AuthRouter, {
       prefix: '/auth',
-      authService: domainServices.authService,
+      authService: this.domainServices.authService,
     });
+
     await this.server.register(UserRouter, {
       prefix: '/user',
-      userService: domainServices.userService,
-      middlewares: middlewares,
+      userService: this.domainServices.userService,
+      middlewares: this.middlewares,
     });
+
     await this.server.register(AIRouter, {
       prefix: '/ai',
-      aiService: domainServices.aiService,
+      aiService: this.domainServices.aiService,
     });
+
     await this.server.register(EditorToolsRouter, {
       prefix: '/editor-tools',
-      editorToolsService: domainServices.editorToolsService,
+      editorToolsService: this.domainServices.editorToolsService,
     });
+  }
 
-
-    /**
-     * Register oauth2 plugin
-     */
+  /**
+   * Registers oauth2 plugin
+   */
+  private async addOauth2(): Promise<void> {
     await this.server.register(fastifyOauth2, {
       name: 'googleOAuth2',
       scope: ['profile', 'email'],
@@ -135,27 +165,28 @@ export default class HttpServer implements API {
       startRedirectPath: this.config.oauth2.google.redirectUrl,
       callbackUri: this.config.oauth2.google.callbackUrl,
     });
+  }
 
-    /**
-     * Allow cors for allowed origins from config
-     */
+  /**
+   * Allows cors for allowed origins from config
+   */
+  private async addCORS(): Promise<void> {
     await this.server.register(cors, {
       origin: this.config.allowedOrigins,
     });
+  }
 
-    /**
-     * Add Fastify schema for validation and serialization
-     */
-    addSchema(this.server);
+  /**
+   * Add Fastify schema for validation and serialization
+   */
+  private addSchema(): void {
+    this.server.addSchema(UserSchema);
+  }
 
-    /**
-     * Custom method for sending 404 error
-     */
+  /**
+   * Custom method for sending 404 error
+   */
+  private add404Handling(): void {
     this.server.decorate('notFound', NotFoundDecorator);
-
-    await this.server.listen({
-      host: this.config.host,
-      port: this.config.port,
-    });
   }
 }

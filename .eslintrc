@@ -2,6 +2,10 @@
   "extends": [
     "codex/ts"
   ],
+  "plugins": ["vitest"],
+  "env": {
+    "vitest/globals": true
+  },
   "rules": {
     "@typescript-eslint/naming-convention": [
       "error",

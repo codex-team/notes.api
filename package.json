@@ -5,14 +5,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && tsc-alias",
     "dev": "nodemon --watch './src/**/*.ts' --ext ts --exec 'npm run start:dev'",
     "start": "node dist/index.js -c app-config.yaml -c app-config.local.yaml",
     "start:dev": "npm run build && node dist/index.js -c app-config.yaml -c app-config.local.yaml",
     "migrate": "node --loader ts-node/esm ./src/repository/storage/postgres/migrations/index.ts -c app-config.local.yaml",
     "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix"
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "vitest"
   },
   "author": "",
   "license": "ISC",
@@ -22,12 +22,14 @@
     "@types/pg": "^8.10.2",
     "eslint": "^8.41.0",
     "eslint-config-codex": "^1.8.3",
+    "eslint-plugin-vitest": "^0.3.1",
     "nodemon": "^2.0.22",
     "pino-pretty": "^10.0.0",
     "postgres-migrations": "^5.3.0",
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.6",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vitest": "^0.34.5"
   },
   "dependencies": {
     "@codex-team/config-loader": "^1.0.0",
