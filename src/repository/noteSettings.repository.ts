@@ -1,6 +1,6 @@
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
-import type NoteStorage from '@repository/storage/note.storage.js';
+import type NoteSettingsStorage from '@repository/storage/noteSettings.storage.js';
 import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
 
 /**
@@ -10,14 +10,14 @@ export default class NoteSettingsRepository {
   /**
    * Note Setting storage instance
    */
-  public storage: NoteStorage;
+  public storage: NoteSettingsStorage;
 
   /**
    * Note Settings repository constructor
    *
    * @param storage - storage for note
    */
-  constructor(storage: NoteStorage) {
+  constructor(storage: NoteSettingsStorage) {
     this.storage = storage;
   }
 
