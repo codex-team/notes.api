@@ -2,6 +2,8 @@ import type { Note, NoteCreationAttributes, NotePublicId } from '@domain/entitie
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
+import type { NoteCreatorId } from '@domain/entities/note.js';
+import type { NoteList } from '@domain/entities/noteList';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -39,6 +41,16 @@ export default class NoteRepository {
    */
   public async getNoteById(id: Note['id']): Promise<Note | null> {
     return await this.storage.getNoteById(id);
+  }
+
+  /**
+   * Gets note list by creator id
+   *
+   * @param id - note creator id
+   * @returns { Promise<NoteList | null> } note
+   */
+  public async getNoteListByCreatorId(id: NoteCreatorId): Promise<NoteList | null> {
+    return await this.storage.getNoteListByCreatorId(id);
   }
 
   /**

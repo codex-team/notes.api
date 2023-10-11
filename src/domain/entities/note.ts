@@ -9,6 +9,11 @@ export type NoteInternalId = number;
 export type NotePublicId = string;
 
 /**
+ * Id from DataBase. Used to query Note by User (creator) id
+ */
+export type NoteCreatorId = number;
+
+/**
  * Note entity
  */
 export interface Note {
@@ -28,9 +33,9 @@ export interface Note {
   content: JSON;
 
   /**
-   * Note creator
+   * Note creator id
    */
-  creatorId: number;
+  creatorId: NoteCreatorId;
 }
 
 

@@ -1,7 +1,8 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteInternalId, NotePublicId, NoteCreatorId } from '@domain/entities/note.js';
+import type {NoteList} from '@domain/entities/noteList';
 import type { NoteCreationAttributes } from '@domain/entities/note.js';
 import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
@@ -243,6 +244,21 @@ export default class NoteSequelizeStorage {
 
     return note;
   };
+
+  /**
+   * Gets note list by creator id
+   *
+   * @param creatorId - note creator id
+   * @returns { Promise<NoteList | null> } note
+   */
+  public async getNoteListByCreatorId(creatorId: NoteCreatorId): Promise<NoteList | null> {
+    const noteList = await this.model.findAll({
+      where: {
+        creatorId,
+      },
+    });
+    return noteList;
+  }
 
   /**
    * Get note settings
