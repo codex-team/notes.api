@@ -40,6 +40,8 @@ export default (authService: AuthService): preHandlerHookHandler => {
       await authService.verifyAccessToken(token);
 
       done();
+
+      return reply;
     } catch (error) {
       return reply
         .code(StatusCodes.UNAUTHORIZED)
