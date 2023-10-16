@@ -1,6 +1,7 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
-import fastify, { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
+import fastify from 'fastify';
 import type Server from '@presentation/server.interface.js';
 import type { DomainServices } from '@domain/index.js';
 import cors from '@fastify/cors';
@@ -43,12 +44,13 @@ export default class HttpServer implements Server {
 
   /**
    * Constructs http server
-   * @param config - http server config 
+   *
+   * @param config - http server config
    * @param domainServices - instances of domain services
    */
   public static async init(
     config: HttpApiConfig,
-    domainServices: DomainServices,
+    domainServices: DomainServices
   ): Promise<HttpServer> {
     const server = fastify({
       logger: appServerLogger,
@@ -73,20 +75,9 @@ export default class HttpServer implements Server {
   }
 
   /**
-   * Runs http server
-   */
-  public async run(): Promise<void> {
-      if (this.server === undefined || this.config === undefined) {
-        throw new Error('Server is not initialized');
-      }
-      await this.server.listen({
-        host: this.config.host,
-        port: this.config.port,
-      });
-  }
-
-  /**
    * Registers openapi documentation
+   *
+   * @param server - fastify server instance
    */
   private static async addOpenapiDocs(server: FastifyServer): Promise<void> {
     await server.register(fastifySwagger, {
@@ -105,7 +96,7 @@ export default class HttpServer implements Server {
 
   /**
    * Serves openapi UI and JSON scheme
-   * 
+   *
    * @param server - fastify server instance
    */
   private static async addOpenapiUI(server: FastifyServer): Promise<void> {
@@ -121,7 +112,7 @@ export default class HttpServer implements Server {
 
   /**
    * Adds support for reading and setting cookies
-   * 
+   *
    * @param server - fastify server instance
    * @param config - http server config
    */
@@ -133,7 +124,7 @@ export default class HttpServer implements Server {
 
   /**
    * Registers all routers
-   * 
+   *
    * @param server - fastify server instance
    * @param config - http server config
    * @param domainServices - instances of domain services
@@ -177,7 +168,7 @@ export default class HttpServer implements Server {
 
   /**
    * Registers oauth2 plugin
-   * 
+   *
    * @param server - fastify server instance
    * @param config - http server config
    */
@@ -199,7 +190,7 @@ export default class HttpServer implements Server {
 
   /**
    * Allows cors for allowed origins from config
-   * 
+   *
    * @param server - fastify server instance
    * @param config - http server config
    */
@@ -211,7 +202,7 @@ export default class HttpServer implements Server {
 
   /**
    * Add Fastify schema for validation and serialization
-   * 
+   *
    * @param server - fastify server instance
    */
   private static addSchema(server: FastifyServer): void {
@@ -220,10 +211,24 @@ export default class HttpServer implements Server {
 
   /**
    * Custom method for sending 404 error
-   * 
+   *
    * @param server - fastify server instance
    */
   private static add404Handling(server: FastifyServer): void {
     server.decorate('notFound', NotFoundDecorator);
+  }
+
+
+  /**
+   * Runs http server
+   */
+  public async run(): Promise<void> {
+    if (this.server === undefined || this.config === undefined) {
+      throw new Error('Server is not initialized');
+    }
+    await this.server.listen({
+      host: this.config.host,
+      port: this.config.port,
+    });
   }
 }
