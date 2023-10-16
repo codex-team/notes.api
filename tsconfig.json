@@ -19,6 +19,7 @@
     },
     "types": ["vitest/globals"]
   },
+  "include": ["src/**/*.ts", "vitest.config.js", ".eslintrc.cjs",],
   "ts-node": {
     // Tell ts-node CLI to install the --loader automatically
     "esm": true
