@@ -4,22 +4,13 @@ import notes from '../test-data/notes.json';
 import notesSettings from '../test-data/notes-settings.json';
 
 /**
- * Now date in format that matches postgres timestamp format
- */
-const nowDateString = new Date(Date.now()).toISOString()
-  .split('T')
-  .join(' ')
-  .split('.')[0];
-
-
-/**
  * Fills in the database with users data
  *
  * @param db - SequelizeOrm instance
  */
 async function insertUsers(db: SequelizeOrm): Promise<void> {
   for (const user of users) {
-    await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.name}', '${user.email}', '${nowDateString}')`);
+    await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.name}', '${user.email}', '${user.created_at}')`);
   }
 }
 
@@ -30,7 +21,7 @@ async function insertUsers(db: SequelizeOrm): Promise<void> {
  */
 async function insertNotes(db: SequelizeOrm): Promise<void> {
   for (const note of notes) {
-    await db.connection.query(`INSERT INTO public.notes (id, "public_id", "creator_id", "created_at", "updated_at") VALUES (${note.id}, '${note.public_id}', '${note.creator_id}', '${nowDateString}', '${nowDateString}')`);
+    await db.connection.query(`INSERT INTO public.notes (id, "public_id", "creator_id", "created_at", "updated_at") VALUES (${note.id}, '${note.public_id}', '${note.creator_id}', '${note.created_at}', '${note.updated_at}')`);
   }
 }
 
