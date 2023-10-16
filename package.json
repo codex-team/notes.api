@@ -12,7 +12,8 @@
     "migrate": "node --loader ts-node/esm ./src/repository/storage/postgres/migrations/index.ts -c app-config.local.yaml",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "test": "vitest"
+    "test": "vitest",
+    "test:verbose": "DEBUG=testcontainers* yarn test"
   },
   "author": "",
   "license": "ISC",
