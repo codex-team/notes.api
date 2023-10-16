@@ -25,7 +25,7 @@ export default (authService: AuthService): preHandlerHookHandler => {
     if (!notEmpty(authorizationHeader)) {
       done();
 
-      return;
+      return reply;
     }
 
     /**
@@ -44,6 +44,8 @@ export default (authService: AuthService): preHandlerHookHandler => {
       };
     } finally {
       done();
+
+      return reply;
     }
   };
 };

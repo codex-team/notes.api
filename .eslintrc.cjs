@@ -23,5 +23,6 @@ module.exports = {
         },
       },
     ],
+    'jsdoc/require-returns-type': "off"
   },
 };
