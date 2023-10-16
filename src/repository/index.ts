@@ -38,18 +38,24 @@ export interface Repositories {
   editorToolsRepository: EditorToolsRepository,
 }
 
-/**
- * Initiate repositories
- *
- * @param databaseConfig - database config
- */
-export async function init(databaseConfig: DatabaseConfig): Promise<Repositories> {
+export async function initORM(databaseConfig: DatabaseConfig): Promise<Orm> {
   const orm = new Orm(databaseConfig);
 
   /**
    * Test the connection by trying to authenticate
    */
   await orm.authenticate();
+
+  return orm;
+}
+
+/**
+ * Initiate repositories
+ *
+ * @param orm - ORM instance
+ */
+export async function init(orm: Orm): Promise<Repositories> {
+
 
   /**
    * Create storage instances

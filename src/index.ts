@@ -3,16 +3,15 @@ import logger from '@infrastructure/logging/index.js';
 import API from '@presentation/index.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
 import { init as initDomainServices } from '@domain/index.js';
-import { init as initRepositories } from '@repository/index.js';
-import fastify from 'fastify';
+import { initORM, init as initRepositories } from '@repository/index.js';
 
 /**
  * Application entry point
  */
 const start = async (): Promise<void> => {
   try {
-    
-    const repositories = await initRepositories(config.database);
+    const orm = await initORM(config.database);
+    const repositories = await initRepositories(orm);
     const domainServices = initDomainServices(repositories, config);
     const api = await API.init(config.httpApi, domainServices);
     
