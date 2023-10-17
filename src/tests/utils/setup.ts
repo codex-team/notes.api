@@ -7,13 +7,18 @@ import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import config from '@infrastructure/config/index.js';
 import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate';
-import API from '@presentation/http/http-server.js';
+import API from '@presentation/http/http-api.js';
 
 import { beforeAll, afterAll } from 'vitest';
+import type { FastifyServer } from 'fastify';
 
 declare global {
+  /**
+   * Globally exposed variable, containing reference to http server object.
+   * Is accessed as 'global.server' in tests
+   */
   /* eslint-disable-next-line no-var */
-  var api: API | undefined;
+  var api: FastifyServer | undefined;
 }
 
 /**
@@ -24,7 +29,8 @@ const migrationsPath = path.join(process.cwd(), 'migrations', 'tenant');
 let postgresContainer: StartedPostgreSqlContainer | undefined;
 
 beforeAll(async () => {
-  postgresContainer = await new PostgreSqlContainer().withUsername('postgres')
+  postgresContainer = await new PostgreSqlContainer()
+    .withUsername('postgres')
     .start();
 
   const orm = await initORM({ dsn: postgresContainer.getConnectionUri() });
@@ -35,7 +41,7 @@ beforeAll(async () => {
   await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
   await insertData(orm);
 
-  global.api = api;
+  global.api = api.getServer();
 });
 
 afterAll(async () => {

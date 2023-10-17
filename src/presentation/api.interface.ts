@@ -1,7 +1,7 @@
 /**
  * API interface
  */
-export default interface Server {
+export default interface Api {
   /**
    * Runs API module
    */

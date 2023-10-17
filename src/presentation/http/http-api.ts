@@ -1,8 +1,8 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyServer } from 'fastify';
 import fastify from 'fastify';
-import type Server from '@presentation/server.interface.js';
+import type Api from '@presentation/api.interface.js';
 import type { DomainServices } from '@domain/index.js';
 import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
@@ -18,24 +18,17 @@ import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from '@presentation/http/router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
-import type * as http from 'http';
-import type { pino } from 'pino';
 
 const appServerLogger = getLogger('appServer');
 
 /**
- * Type shortcut for fastify server instance
- */
-type FastifyServer = FastifyInstance<http.Server, http.IncomingMessage, http.ServerResponse, pino.Logger>;
-
-/**
  * Http server implementation
  */
-export default class HttpServer implements Server {
+export default class HttpApi implements Api {
   /**
    * Fastify server instance
    */
-  public server: FastifyServer | undefined;
+  private server: FastifyServer | undefined;
 
   /**
    * Http server config
@@ -51,22 +44,22 @@ export default class HttpServer implements Server {
   public static async init(
     config: HttpApiConfig,
     domainServices: DomainServices
-  ): Promise<HttpServer> {
+  ): Promise<HttpApi> {
     const server = fastify({
       logger: appServerLogger,
     });
     const middlewares = initMiddlewares(domainServices);
 
-    await HttpServer.addOpenapiDocs(server);
-    await HttpServer.addCookies(server, config);
-    await HttpServer.addOpenapiUI(server);
-    await HttpServer.addAPI(server, config, domainServices, middlewares);
-    await HttpServer.addOauth2(server, config);
-    await HttpServer.addCORS(server, config);
-    HttpServer.addSchema(server);
-    HttpServer.add404Handling(server);
+    await HttpApi.addOpenapiDocs(server);
+    await HttpApi.addCookies(server, config);
+    await HttpApi.addOpenapiUI(server);
+    await HttpApi.addAPI(server, config, domainServices, middlewares);
+    await HttpApi.addOauth2(server, config);
+    await HttpApi.addCORS(server, config);
+    HttpApi.addSchema(server);
+    HttpApi.add404Handling(server);
 
-    const api = new HttpServer();
+    const api = new HttpApi();
 
     api.server = server;
     api.config = config;
@@ -230,5 +223,12 @@ export default class HttpServer implements Server {
       host: this.config.host,
       port: this.config.port,
     });
+  }
+
+  /**
+   * Returns server instance
+   */
+  public getServer(): FastifyServer | undefined {
+    return this.server;
   }
 }

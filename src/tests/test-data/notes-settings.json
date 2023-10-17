@@ -2,7 +2,7 @@
   {
     "id": 1,
     "note_id": 1,
-    "custom_hostname": "note_hostname",
+    "custom_hostname": "codex.so",
     "enabled": true
   }
 ]

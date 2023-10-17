@@ -1,9 +1,9 @@
 
 import { describe, test, expect } from 'vitest';
 
-describe('Notes API', () => {
-  describe('Get note by custom hostname', () => {
-    test('GET note/resolve-hostname/:hostname returns note of correct structure', async () => {
+describe('Note API', () => {
+  describe('GET note/resolve-hostname/:hostname ', () => {
+    test('Returns note with specified hostname', async () => {
       const expectedStatus = 200;
       /* eslint-disable @typescript-eslint/naming-convention */
       const expectedNote = {
@@ -14,7 +14,7 @@ describe('Notes API', () => {
         'createdAt': '2023-10-16T13:49:19.000Z',
         'updatedAt': '2023-10-16T13:49:19.000Z',
         'notes_settings':  {
-          'custom_hostname': 'note_hostname',
+          'custom_hostname': 'codex.so',
           'enabled': true,
           'id': 1,
           'note_id': 1,
@@ -22,9 +22,9 @@ describe('Notes API', () => {
       };
       /* eslint-enable @typescript-eslint/naming-convention */
 
-      const response = await global.api?.server?.inject({
+      const response = await global.api?.inject({
         method: 'GET',
-        url: '/note/resolve-hostname/note_hostname',
+        url: '/note/resolve-hostname/codex.so',
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -34,10 +34,10 @@ describe('Notes API', () => {
       expect(body).toStrictEqual(expectedNote);
     });
 
-    test('GET note/resolve-hostname/:hostname returns 404 when note not found', async () => {
+    test('Rreturns 404 when note not found', async () => {
       const expectedStatus = 404;
 
-      const response = await global.api?.server?.inject({
+      const response = await global.api?.inject({
         method: 'GET',
         url: '/note/resolve-hostname/incorrect_hostname',
       });
