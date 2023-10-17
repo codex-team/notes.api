@@ -17,7 +17,6 @@
       "@domain/*": ["domain/*"],
       "@repository/*": ["repository/*"]
     },
-    "types": ["vitest/globals"]
   },
   "include": ["src/**/*.ts", "vitest.config.js", ".eslintrc.cjs",],
   "ts-node": {
