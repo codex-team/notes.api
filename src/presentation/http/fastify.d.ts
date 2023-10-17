@@ -5,10 +5,11 @@ import type { pino } from 'pino';
 
 declare module 'fastify' {
   export interface FastifyInstance<
-    HttpServer = http.Server,
-    HttpRequest = http.IncomingMessage,
-    HttpResponse = http.ServerResponse,
-    FastifyBaseLogger
+    RawServer extends fastify.RawServerBase = fastify.RawServerDefault,
+    RawRequest extends fastify.RawRequestDefaultExpression<RawServer> = fastify.RawRequestDefaultExpression<RawServer>,
+    RawReply extends fastify.RawReplyDefaultExpression<RawServer> = fastify.RawReplyDefaultExpression<RawServer>,
+    Logger extends fastify.FastifyBaseLogger = fastify.FastifyBaseLogger,
+    TypeProvider extends fastify.FastifyTypeProvider = fastify.FastifyTypeProviderDefault,
   > {
     /**
      * Custom method for sending 404 error

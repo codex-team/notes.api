@@ -1,6 +1,7 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
-import type { FastifyServer } from 'fastify';
+import type { FastifyInstance } from 'fastify';
+import type { FastifyBaseLogger } from 'fastify';
 import fastify from 'fastify';
 import type Api from '@presentation/api.interface.js';
 import type { DomainServices } from '@domain/index.js';
@@ -18,6 +19,8 @@ import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from '@presentation/http/router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
+import type { RequestParams, Response } from '@presentation/api.interface.js';
+
 
 const appServerLogger = getLogger('appServer');
 
@@ -28,7 +31,7 @@ export default class HttpApi implements Api {
   /**
    * Fastify server instance
    */
-  private server: FastifyServer | undefined;
+  private server: FastifyInstance | undefined;
 
   /**
    * Http server config
@@ -46,18 +49,18 @@ export default class HttpApi implements Api {
     domainServices: DomainServices
   ): Promise<HttpApi> {
     const server = fastify({
-      logger: appServerLogger,
+      logger: appServerLogger as FastifyBaseLogger,
     });
     const middlewares = initMiddlewares(domainServices);
 
     await HttpApi.addOpenapiDocs(server);
     await HttpApi.addCookies(server, config);
     await HttpApi.addOpenapiUI(server);
-    await HttpApi.addAPI(server, config, domainServices, middlewares);
+    await HttpApi.addApiRoutes(server, config, domainServices, middlewares);
     await HttpApi.addOauth2(server, config);
     await HttpApi.addCORS(server, config);
     HttpApi.addSchema(server);
-    HttpApi.add404Handling(server);
+    HttpApi.addDecorators(server);
 
     const api = new HttpApi();
 
@@ -72,7 +75,7 @@ export default class HttpApi implements Api {
    *
    * @param server - fastify server instance
    */
-  private static async addOpenapiDocs(server: FastifyServer): Promise<void> {
+  private static async addOpenapiDocs(server: FastifyInstance): Promise<void> {
     await server.register(fastifySwagger, {
       openapi: {
         info: {
@@ -92,7 +95,7 @@ export default class HttpApi implements Api {
    *
    * @param server - fastify server instance
    */
-  private static async addOpenapiUI(server: FastifyServer): Promise<void> {
+  private static async addOpenapiUI(server: FastifyInstance): Promise<void> {
     await server.register(fastifySwaggerUI, {
       routePrefix: '/openapi',
       uiConfig: {
@@ -109,7 +112,7 @@ export default class HttpApi implements Api {
    * @param server - fastify server instance
    * @param config - http server config
    */
-  private static async addCookies(server: FastifyServer, config: HttpApiConfig): Promise<void> {
+  private static async addCookies(server: FastifyInstance, config: HttpApiConfig): Promise<void> {
     await server.register(cookie, {
       secret: config.cookieSecret,
     });
@@ -123,7 +126,7 @@ export default class HttpApi implements Api {
    * @param domainServices - instances of domain services
    * @param middlewares - middlewares
    */
-  private static async addAPI(server: FastifyServer, config: HttpApiConfig, domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
+  private static async addApiRoutes(server: FastifyInstance, config: HttpApiConfig, domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
     await server.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
@@ -165,7 +168,7 @@ export default class HttpApi implements Api {
    * @param server - fastify server instance
    * @param config - http server config
    */
-  private static async addOauth2(server: FastifyServer, config: HttpApiConfig): Promise<void> {
+  private static async addOauth2(server: FastifyInstance, config: HttpApiConfig): Promise<void> {
     await server.register(fastifyOauth2, {
       name: 'googleOAuth2',
       scope: ['profile', 'email'],
@@ -187,7 +190,7 @@ export default class HttpApi implements Api {
    * @param server - fastify server instance
    * @param config - http server config
    */
-  private static async addCORS(server: FastifyServer, config: HttpApiConfig): Promise<void> {
+  private static async addCORS(server: FastifyInstance, config: HttpApiConfig): Promise<void> {
     await server.register(cors, {
       origin: config.allowedOrigins,
     });
@@ -198,16 +201,16 @@ export default class HttpApi implements Api {
    *
    * @param server - fastify server instance
    */
-  private static addSchema(server: FastifyServer): void {
+  private static addSchema(server: FastifyInstance): void {
     server.addSchema(UserSchema);
   }
 
   /**
-   * Custom method for sending 404 error
+   * Add custom decorators
    *
    * @param server - fastify server instance
    */
-  private static add404Handling(server: FastifyServer): void {
+  private static addDecorators(server: FastifyInstance): void {
     server.decorate('notFound', NotFoundDecorator);
   }
 
@@ -226,9 +229,24 @@ export default class HttpApi implements Api {
   }
 
   /**
-   * Returns server instance
+   * Performs fake request to API routes.
+   * Used for API testing
+   *
+   * @param params - request options
    */
-  public getServer(): FastifyServer | undefined {
-    return this.server;
+  public async fakeRequest(params: RequestParams): Promise<Response | undefined> {
+    const response =  await this.server?.inject(params);
+
+    if (response === undefined) {
+      return;
+    }
+
+    return {
+      statusCode: response.statusCode,
+      body: response.body,
+      headers: response.headers,
+      json: response.json,
+    };
   }
 }
+

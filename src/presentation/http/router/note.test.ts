@@ -22,7 +22,7 @@ describe('Note API', () => {
       };
       /* eslint-enable @typescript-eslint/naming-convention */
 
-      const response = await global.api?.inject({
+      const response = await global.api?.fakeRequest({
         method: 'GET',
         url: '/note/resolve-hostname/codex.so',
       });
@@ -37,7 +37,7 @@ describe('Note API', () => {
     test('Rreturns 404 when note not found', async () => {
       const expectedStatus = 404;
 
-      const response = await global.api?.inject({
+      const response = await global.api?.fakeRequest({
         method: 'GET',
         url: '/note/resolve-hostname/incorrect_hostname',
       });

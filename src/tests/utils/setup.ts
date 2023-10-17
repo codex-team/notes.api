@@ -10,7 +10,7 @@ import { runTenantMigrations } from '@repository/storage/postgres/migrations/mig
 import API from '@presentation/http/http-api.js';
 
 import { beforeAll, afterAll } from 'vitest';
-import type { FastifyServer } from 'fastify';
+import type Api from '@presentation/api.interface';
 
 declare global {
   /**
@@ -18,7 +18,7 @@ declare global {
    * Is accessed as 'global.server' in tests
    */
   /* eslint-disable-next-line no-var */
-  var api: FastifyServer | undefined;
+  var api: Api | undefined;
 }
 
 /**
@@ -41,7 +41,7 @@ beforeAll(async () => {
   await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
   await insertData(orm);
 
-  global.api = api.getServer();
+  global.api = api;
 });
 
 afterAll(async () => {
