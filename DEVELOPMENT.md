@@ -1,11 +1,8 @@
 # Development
 
-## Running in development mode
+## Setup local database
 
-To run application in development mode you need to run `npm run dev` command.
-It will start application with `nodemon` and restart it on any changes in source code.
-
-You can try to build and run it in local Docker (see `postgres.yml`):
+You can install PostgreSQL local https://www.postgresql.org/download/ or use Docker (see `postgres.yml`):
 ```
 version: "3.2"
 services:
@@ -21,6 +18,23 @@ services:
 
 To run it execute: `docker compose -f postgres.yml up -d` where `-d` is used for background run.
 If you have outdated version of docker, try use `docker-compose` instead of `docker compose` (https://docs.docker.com/compose/)
+
+## Running application in development mode
+
+To run application in development mode you need to run `npm run dev` command.
+It will start application with `nodemon` and restart it on any changes in source code.
+
+You can try to build and run it in local Docker:
+```
+version: "3.2"
+services:
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "127.0.0.1:3000:3000"
+```
 
 ## Configuration
 
