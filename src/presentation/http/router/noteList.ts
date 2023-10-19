@@ -1,25 +1,16 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteListService from '@domain/service/noteList';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
-import type { NoteCreatorId } from '@domain/entities/note';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse';
 import { StatusCodes } from 'http-status-codes';
 import type { NoteList } from '@domain/entities/noteList';
-
-
-interface GetNoteListById {
-  /**
-   * Note id
-   */
-  id: NoteCreatorId;
-};
 
 /**
  * Interface for the noteList router.
  */
 interface NoteListRouterOptions {
   /**
-   * Note service instance
+   * Note list service instance
    */
   noteListService: NoteListService,
 
@@ -31,7 +22,7 @@ interface NoteListRouterOptions {
 
 
 /**
- * Note router plugin
+ * Note list router plugin
  *
  * @param fastify - fastify instance
  * @param opts - empty options
@@ -42,15 +33,15 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
   const noteListService = opts.noteListService;
 
   /**
-   * Get note by id
+   * Get note list by userId
    */
-  fastify.get<{ Params: GetNoteListById }>('/', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
+  fastify.get('/', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
     const userId = request.ctx.auth.id;
 
     const noteList = await noteListService.getNoteListByCreatorId(userId);
 
     /**
-     * Check if noteList does not exist
+     * Check if note list does not exist
      */
     if (!noteList) {
       const response: ErrorResponse = {
