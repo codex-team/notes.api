@@ -9,7 +9,7 @@ export type NoteInternalId = number;
 export type NotePublicId = string;
 
 /**
- * Id from DataBase. Used to query Note by User (creator) id
+ * Id from DataBase. Used to query Note by Creator id
  */
 export type NoteCreatorId = number;
 
