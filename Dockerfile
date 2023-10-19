@@ -15,7 +15,7 @@ FROM node:18-alpine AS runner
 WORKDIR /usr/app
 
 COPY --from=builder /app/dist ./dist
-COPY package.json ./
+COPY package.json package-lock.json ./
 RUN npm install
 COPY ./app-config.yaml .
 
