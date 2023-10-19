@@ -13,6 +13,7 @@ services:
   postgres:
     image: postgres
     environment:
+      POSTGRES_DB: codex-notes
       POSTGRES_PASSWORD: example
     ports:
       - 127.0.0.1:5432:5432
