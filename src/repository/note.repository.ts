@@ -34,6 +34,17 @@ export default class NoteRepository {
   }
 
   /**
+   * Update note content in a store using note public id
+   *
+   * @param publicId - note public id
+   * @param content - new content
+   * @returns Note on success, null on failure
+   */
+  public async updateNoteContentByPublicId(publicId: NotePublicId, content: Note['content'] ): Promise<Note | null> {
+    return await this.storage.updateNoteContentByPublicId(publicId, content);
+  }
+
+  /**
    * Gets note by id
    *
    * @param id - note id

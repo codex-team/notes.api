@@ -28,6 +28,22 @@ interface AddNoteOptions {
 }
 
 /**
+ * Payload for update note request
+ */
+interface UpdateNoteOptions {
+  /**
+   * Note public id
+   */
+  id: NotePublicId;
+
+  /**
+   * New content
+   */
+  content: JSON;
+}
+
+
+/**
  * Interface for the note router.
  */
 interface NoteRouterOptions {
@@ -184,6 +200,34 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       id: addedNote.publicId,
     });
   });
+
+  /**
+   * Updates note by id.
+   */
+  fastify.patch<{
+    Body: UpdateNoteOptions,
+    Reply: {
+      updatedAt: Note['updatedAt'],
+    }
+  }>('/', {
+    preHandler: [
+      opts.middlewares.authRequired,
+      opts.middlewares.withUser,
+    ],
+  }, async (request, reply) => {
+    /**
+     * @todo Validate request params
+     * @todo Check user access right
+     */
+    const { id, content } = request.body;
+
+    const note = await noteService.updateNoteContentByPublicId(id, content);
+
+    return reply.send({
+      updatedAt: note.updatedAt,
+    });
+  });
+
 
   /**
    * Get note by custom hostname

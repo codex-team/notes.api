@@ -34,6 +34,16 @@ export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAt
    * Note creator, user identifier, who created this note
    */
   public declare creatorId: Note['creatorId'];
+
+  /**
+   * Time when note was created
+   */
+  public declare createdAt: CreationOptional<Note['createdAt']>;
+
+  /**
+   * Last time when note was updated
+   */
+  public declare updatedAt: CreationOptional<Note['updatedAt']>;
 }
 
 
@@ -96,6 +106,8 @@ export default class NoteSequelizeStorage {
           key: 'id',
         },
       },
+      createdAt: DataTypes.DATE,
+      updatedAt: DataTypes.DATE,
     }, {
       tableName: this.tableName,
       sequelize: this.database,
@@ -153,6 +165,30 @@ export default class NoteSequelizeStorage {
     });
 
     return createdNote;
+  }
+
+  /**
+   * Update note content by public id
+   *
+   * @param publicId - note public id
+   * @param content - new content
+   * @returns Note on success, null on failure
+   */
+  public async updateNoteContentByPublicId(publicId: NotePublicId, content: Note['content']): Promise<Note | null> {
+    const [affectedRowsCount, affectedRows] = await this.model.update({
+      content,
+    }, {
+      where: {
+        publicId,
+      },
+      returning: true,
+    });
+
+    if (affectedRowsCount !== 1) {
+      return null;
+    }
+
+    return affectedRows[0];
   }
 
   /**
