@@ -9,7 +9,7 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_PASSWORD: pass
+      POSTGRES_PASSWORD: example
     ports:
       - 127.0.0.1:5432:5432
     volumes:
@@ -28,18 +28,28 @@ You can try to build and run it in local Docker:
 ```
 version: "3.2"
 services:
-  api:
+    api:
     build:
       dockerfile: Dockerfile
       context: .
     ports:
       - "127.0.0.1:3000:3000"
+    volumes:
+      - ./app-config.yaml:/usr/app/app-config.yaml
+    restart: unless-stopped
 ```
 
 ## Configuration
 
-Default application configuration is stored in `app-config.yaml` file.
-To override default configuration you can create `app-config.local.yaml` file and override any configuration value.
+Default application configuration is stored in `app-config.yaml` file. This file is intended for docker configuration since it's using `dsn: 'postgres://postgres:example@postgres:5432/codex-notes'`.
+
+To override default configuration you can create `app-config.local.yaml` file and override any configuration value locally.
+You can also override settings in docker by overriding `app-config.local.yaml` via volumes:
+```
+    volumes:
+      - ./app-config.yaml:/usr/app/app-config.yaml
+      - ./app-config.local.yaml:/usr/app/app-config.local.yaml
+```
 
 ## Logging
 
