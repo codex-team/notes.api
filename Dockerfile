@@ -18,7 +18,10 @@ COPY --from=builder /app/dist ./dist
 COPY package.json package-lock.json ./
 RUN npm install
 COPY ./app-config.yaml .
+COPY ./migrations ./migrations
+COPY ./init.sh .
 
 USER node
 ENV NODE_ENV="production"
-CMD ["node", "dist/index.js"]
+
+CMD ["/bin/sh", "init.sh"]

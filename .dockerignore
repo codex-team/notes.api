@@ -9,6 +9,8 @@
 !package.json
 !package-lock.json
 !tsconfig.json
+!migrations
+!init.sh
 
 # Ignore unnecessary files inside allowed directories
 **/*~
