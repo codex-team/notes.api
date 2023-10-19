@@ -1,5 +1,4 @@
 app-config.local.yaml
-docker-compose.yml
 .idea
 dist
 database

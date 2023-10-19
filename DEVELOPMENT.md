@@ -2,10 +2,20 @@
 
 ## Setup local database
 
-You can install PostgreSQL local https://www.postgresql.org/download/ or use Docker (see `postgres.yml`):
+You can install PostgreSQL local https://www.postgresql.org/download/ or use Docker (see `docker-compose.yml`):
 ```
 version: "3.2"
 services:
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - 127.0.0.1:1337:1337
+    volumes:
+      - ./app-config.yaml:/usr/app/app-config.yaml
+    restart: unless-stopped
+
   postgres:
     image: postgres
     environment:
@@ -16,7 +26,7 @@ services:
       - ./database:/var/lib/postgresql/data
 ```
 
-To run it execute: `docker compose -f postgres.yml up -d` where `-d` is used for background run.
+To run it execute: `docker compose up -d postgres` where `-d` is used for background run.
 If you have outdated version of docker, try use `docker-compose` instead of `docker compose` (https://docs.docker.com/compose/)
 
 ## Running application in development mode
@@ -24,20 +34,7 @@ If you have outdated version of docker, try use `docker-compose` instead of `doc
 To run application in development mode you need to run `npm run dev` command.
 It will start application with `nodemon` and restart it on any changes in source code.
 
-You can try to build and run it in local Docker:
-```
-version: "3.2"
-services:
-    api:
-    build:
-      dockerfile: Dockerfile
-      context: .
-    ports:
-      - "127.0.0.1:3000:3000"
-    volumes:
-      - ./app-config.yaml:/usr/app/app-config.yaml
-    restart: unless-stopped
-```
+You can try to build and run it in local Docker with `docker compose up api` (you can add `-d` flag for a background run).
 
 ## Configuration
 
