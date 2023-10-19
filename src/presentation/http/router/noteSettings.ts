@@ -51,7 +51,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   fastify.get<{
     Params: GetNoteByIdOptions,
     Reply: NotesSettings
-  }>('/:id/settings', async (request, reply) => {
+  }>('/:id', async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
@@ -77,14 +77,14 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Body: Partial<NotesSettings>,
     Params: GetNoteByIdOptions,
     Reply: NotesSettings,
-  }>('/:id/settings', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
+  }>('/:id', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
     const noteId = request.params.id;
 
     /**
      * TODO: check is user collaborator
      */
 
-    const updatedNoteSettings = await noteSettingsService.patchNoteSettings(request.body, noteId);
+    const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByPublicId(request.body, noteId);
 
     if (updatedNoteSettings === null) {
       return fastify.notFound(reply, 'Note settings not found');

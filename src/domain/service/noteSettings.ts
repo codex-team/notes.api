@@ -3,7 +3,7 @@ import type NotesSettings from '@domain/entities/notesSettings.js';
 import type NoteSettingsRepository from '@repository/noteSettings.repository.js';
 
 /**
- * Note service
+ * Service responsible for Note Settings
  */
 export default class NoteSettingsService {
   /**
@@ -64,9 +64,9 @@ export default class NoteSettingsService {
    * @param noteId - note public id
    * @returns { Promise<NotesSettings> } updated note settings
    */
-  public async patchNoteSettings(data: Partial<NotesSettings>, noteId: NotePublicId): Promise<NotesSettings | null> {
+  public async patchNoteSettingsByPublicId(data: Partial<NotesSettings>, noteId: NotePublicId): Promise<NotesSettings | null> {
     const noteSettings = await this.repository.getNoteSettingsByPublicId(noteId);
 
-    return await this.repository.patchNoteSettings(data, noteSettings.id);
+    return await this.repository.patchNoteSettingsByPublicId(data, noteSettings.id);
   }
 }

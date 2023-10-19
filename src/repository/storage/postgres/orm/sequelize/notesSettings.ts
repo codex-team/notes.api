@@ -212,7 +212,7 @@ export default class NoteSettingsSequelizeStorage {
    * @param data - note settings new data
    * @param id - note settings id
    */
-  public async patchNoteSettings(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
+  public async patchNoteSettingsByPublicId(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
     const settingsToUpdate = await this.model.findByPk(id);
 
     /**

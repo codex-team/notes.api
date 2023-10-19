@@ -73,7 +73,7 @@ export default class NoteSequelizeStorage {
    *
    * @param ormInstance - ORM instance
    */
-  constructor({ connection }: Orm, settingsModal: typeof NotesSettingsModel) {
+  constructor({ connection }: Orm, settingsModel: typeof NotesSettingsModel) {
     this.database = connection;
 
     /**
@@ -109,7 +109,7 @@ export default class NoteSequelizeStorage {
     /**
      * Initiate note settings model
      */
-    this.settingsModel = settingsModal;
+    this.settingsModel = settingsModel;
 
     /** NoteModel and NotesSettingsModel are connected as ONE-TO-ONE */
     this.model.hasOne(this.settingsModel, {

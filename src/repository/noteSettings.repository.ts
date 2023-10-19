@@ -70,7 +70,7 @@ export default class NoteSettingsRepository {
    * @param id - note settings id
    * @returns { Promise<NotesSettings> } patched note settings
    */
-  public async patchNoteSettings(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
-    return await this.storage.patchNoteSettings(data, id);
+  public async patchNoteSettingsByPublicId(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
+    return await this.storage.patchNoteSettingsByPublicId(data, id);
   }
 }
