@@ -13,9 +13,9 @@ const start = async (): Promise<void> => {
     const orm = await initORM(config.database);
     const repositories = await initRepositories(orm);
     const domainServices = initDomainServices(repositories, config);
-    const api = new API();
+    const api = new API(config.httpApi);
 
-    await api.init(config.httpApi, domainServices);
+    await api.init(domainServices);
     await api.run();
 
     if (config.metrics.enabled) {

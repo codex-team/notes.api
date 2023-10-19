@@ -34,33 +34,30 @@ export default class HttpApi implements Api {
   private server: FastifyInstance | undefined;
 
   /**
-   * Http server config
+   * Constructs the instance
+   *
+   * @param config - http server config
    */
-  private config: HttpApiConfig | undefined;
+  constructor(private readonly config: HttpApiConfig) { }
 
   /**
    * Initializes http server
    *
-   * @param config - http server config
    * @param domainServices - instances of domain services
    */
-  public async init(
-    config: HttpApiConfig,
-    domainServices: DomainServices
-  ): Promise<void> {
+  public async init(domainServices: DomainServices): Promise<void> {
     this.server = fastify({
       logger: appServerLogger as FastifyBaseLogger,
     });
-    this.config = config;
 
     const middlewares = initMiddlewares(domainServices);
 
     await this.addOpenapiDocs();
-    await this.addCookies(config);
+    await this.addCookies();
     await this.addOpenapiUI();
-    await this.addApiRoutes(config, domainServices, middlewares);
-    await this.addOauth2(config);
-    await this.addCORS(config);
+    await this.addApiRoutes(domainServices, middlewares);
+    await this.addOauth2();
+    await this.addCORS();
     this.addSchema();
     this.addDecorators();
   }
@@ -135,23 +132,20 @@ export default class HttpApi implements Api {
 
   /**
    * Adds support for reading and setting cookies
-   *
-   * @param config - http server config
    */
-  private async addCookies(config: HttpApiConfig): Promise<void> {
+  private async addCookies(): Promise<void> {
     await this.server?.register(cookie, {
-      secret: config.cookieSecret,
+      secret: this.config.cookieSecret,
     });
   }
 
   /**
    * Registers all routers
    *
-   * @param config - http server config
    * @param domainServices - instances of domain services
    * @param middlewares - middlewares
    */
-  private async addApiRoutes(config: HttpApiConfig, domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
+  private async addApiRoutes(domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
     await this.server?.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
@@ -162,7 +156,7 @@ export default class HttpApi implements Api {
       prefix: '/oauth',
       userService: domainServices.userService,
       authService: domainServices.authService,
-      cookieDomain: config.cookieDomain,
+      cookieDomain: this.config.cookieDomain,
     });
 
     await this.server?.register(AuthRouter, {
@@ -190,32 +184,29 @@ export default class HttpApi implements Api {
   /**
    * Registers oauth2 plugin
    *
-   * @param config - http server config
    */
-  private async addOauth2(config: HttpApiConfig): Promise<void> {
+  private async addOauth2(): Promise<void> {
     await this.server?.register(fastifyOauth2, {
       name: 'googleOAuth2',
       scope: ['profile', 'email'],
       credentials: {
         client: {
-          id: config.oauth2.google.clientId,
-          secret: config.oauth2.google.clientSecret,
+          id: this.config.oauth2.google.clientId,
+          secret: this.config.oauth2.google.clientSecret,
         },
         auth: fastifyOauth2.GOOGLE_CONFIGURATION,
       },
-      startRedirectPath: config.oauth2.google.redirectUrl,
-      callbackUri: config.oauth2.google.callbackUrl,
+      startRedirectPath: this.config.oauth2.google.redirectUrl,
+      callbackUri: this.config.oauth2.google.callbackUrl,
     });
   }
 
   /**
    * Allows cors for allowed origins from config
-   *
-   * @param config - http server config
    */
-  private async addCORS(config: HttpApiConfig): Promise<void> {
+  private async addCORS(): Promise<void> {
     await this.server?.register(cors, {
-      origin: config.allowedOrigins,
+      origin: this.config.allowedOrigins,
     });
   }
 

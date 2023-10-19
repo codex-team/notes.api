@@ -36,9 +36,9 @@ beforeAll(async () => {
   const orm = await initORM({ dsn: postgresContainer.getConnectionUri() });
   const repositories = await initRepositories(orm);
   const domainServices = initDomainServices(repositories, config);
-  const api = new API();
+  const api = new API(config.httpApi);
 
-  await api.init(config.httpApi, domainServices);
+  await api.init(domainServices);
 
   await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
   await insertData(orm);

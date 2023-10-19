@@ -1,5 +1,4 @@
 import type { DomainServices } from '@domain/index';
-import type { HttpApiConfig } from '@infrastructure/config';
 import type * as http from 'http';
 
 /**
@@ -10,10 +9,9 @@ export default interface Api {
   /**
    * Initializes http server
    *
-   * @param config - http server config
    * @param domainServices - instances of domain services
    */
-  init( config: HttpApiConfig, domainServices: DomainServices): Promise<void>;
+  init(domainServices: DomainServices): Promise<void>;
 
   /**
    * Runs API module
