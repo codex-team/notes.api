@@ -39,179 +39,30 @@ export default class HttpApi implements Api {
   private config: HttpApiConfig | undefined;
 
   /**
-   * Constructs http server
+   * Initializes http server
    *
    * @param config - http server config
    * @param domainServices - instances of domain services
    */
-  public static async init(
+  public async init(
     config: HttpApiConfig,
     domainServices: DomainServices
-  ): Promise<HttpApi> {
-    const server = fastify({
+  ): Promise<void> {
+    this.server = fastify({
       logger: appServerLogger as FastifyBaseLogger,
     });
+    this.config = config;
+
     const middlewares = initMiddlewares(domainServices);
 
-    await HttpApi.addOpenapiDocs(server);
-    await HttpApi.addCookies(server, config);
-    await HttpApi.addOpenapiUI(server);
-    await HttpApi.addApiRoutes(server, config, domainServices, middlewares);
-    await HttpApi.addOauth2(server, config);
-    await HttpApi.addCORS(server, config);
-    HttpApi.addSchema(server);
-    HttpApi.addDecorators(server);
-
-    const api = new HttpApi();
-
-    api.server = server;
-    api.config = config;
-
-    return api;
-  }
-
-  /**
-   * Registers openapi documentation
-   *
-   * @param server - fastify server instance
-   */
-  private static async addOpenapiDocs(server: FastifyInstance): Promise<void> {
-    await server.register(fastifySwagger, {
-      openapi: {
-        info: {
-          title: 'NoteX openapi',
-          description: 'Fastify REST API',
-          version: '0.1.0',
-        },
-        servers: [ {
-          url: 'http://localhost',
-        } ],
-      },
-    });
-  }
-
-  /**
-   * Serves openapi UI and JSON scheme
-   *
-   * @param server - fastify server instance
-   */
-  private static async addOpenapiUI(server: FastifyInstance): Promise<void> {
-    await server.register(fastifySwaggerUI, {
-      routePrefix: '/openapi',
-      uiConfig: {
-        docExpansion: 'list',
-        deepLinking: false,
-      },
-      transformSpecificationClone: true,
-    });
-  }
-
-  /**
-   * Adds support for reading and setting cookies
-   *
-   * @param server - fastify server instance
-   * @param config - http server config
-   */
-  private static async addCookies(server: FastifyInstance, config: HttpApiConfig): Promise<void> {
-    await server.register(cookie, {
-      secret: config.cookieSecret,
-    });
-  }
-
-  /**
-   * Registers all routers
-   *
-   * @param server - fastify server instance
-   * @param config - http server config
-   * @param domainServices - instances of domain services
-   * @param middlewares - middlewares
-   */
-  private static async addApiRoutes(server: FastifyInstance, config: HttpApiConfig, domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
-    await server.register(NoteRouter, {
-      prefix: '/note',
-      noteService: domainServices.noteService,
-      middlewares: middlewares,
-    });
-
-    await server.register(OauthRouter, {
-      prefix: '/oauth',
-      userService: domainServices.userService,
-      authService: domainServices.authService,
-      cookieDomain: config.cookieDomain,
-    });
-
-    await server.register(AuthRouter, {
-      prefix: '/auth',
-      authService: domainServices.authService,
-    });
-
-    await server.register(UserRouter, {
-      prefix: '/user',
-      userService: domainServices.userService,
-      middlewares: middlewares,
-    });
-
-    await server.register(AIRouter, {
-      prefix: '/ai',
-      aiService: domainServices.aiService,
-    });
-
-    await server.register(EditorToolsRouter, {
-      prefix: '/editor-tools',
-      editorToolsService: domainServices.editorToolsService,
-    });
-  }
-
-  /**
-   * Registers oauth2 plugin
-   *
-   * @param server - fastify server instance
-   * @param config - http server config
-   */
-  private static async addOauth2(server: FastifyInstance, config: HttpApiConfig): Promise<void> {
-    await server.register(fastifyOauth2, {
-      name: 'googleOAuth2',
-      scope: ['profile', 'email'],
-      credentials: {
-        client: {
-          id: config.oauth2.google.clientId,
-          secret: config.oauth2.google.clientSecret,
-        },
-        auth: fastifyOauth2.GOOGLE_CONFIGURATION,
-      },
-      startRedirectPath: config.oauth2.google.redirectUrl,
-      callbackUri: config.oauth2.google.callbackUrl,
-    });
-  }
-
-  /**
-   * Allows cors for allowed origins from config
-   *
-   * @param server - fastify server instance
-   * @param config - http server config
-   */
-  private static async addCORS(server: FastifyInstance, config: HttpApiConfig): Promise<void> {
-    await server.register(cors, {
-      origin: config.allowedOrigins,
-    });
-  }
-
-  /**
-   * Add Fastify schema for validation and serialization
-   *
-   * @param server - fastify server instance
-   */
-  private static addSchema(server: FastifyInstance): void {
-    server.addSchema(UserSchema);
-  }
-
-  /**
-   * Add custom decorators
-   *
-   * @param server - fastify server instance
-   */
-  private static addDecorators(server: FastifyInstance): void {
-    server.decorate('notFound', NotFoundDecorator);
+    await this.addOpenapiDocs();
+    await this.addCookies(config);
+    await this.addOpenapiUI();
+    await this.addApiRoutes(config, domainServices, middlewares);
+    await this.addOauth2(config);
+    await this.addCORS(config);
+    this.addSchema();
+    this.addDecorators();
   }
 
 
@@ -247,6 +98,139 @@ export default class HttpApi implements Api {
       headers: response.headers,
       json: response.json,
     };
+  }
+
+  /**
+   * Registers openapi documentation
+   *
+   */
+  private async addOpenapiDocs(): Promise<void> {
+    await this.server?.register(fastifySwagger, {
+      openapi: {
+        info: {
+          title: 'NoteX openapi',
+          description: 'Fastify REST API',
+          version: '0.1.0',
+        },
+        servers: [ {
+          url: 'http://localhost',
+        } ],
+      },
+    });
+  }
+
+  /**
+   * Serves openapi UI and JSON scheme
+   */
+  private async addOpenapiUI(): Promise<void> {
+    await this.server?.register(fastifySwaggerUI, {
+      routePrefix: '/openapi',
+      uiConfig: {
+        docExpansion: 'list',
+        deepLinking: false,
+      },
+      transformSpecificationClone: true,
+    });
+  }
+
+  /**
+   * Adds support for reading and setting cookies
+   *
+   * @param config - http server config
+   */
+  private async addCookies(config: HttpApiConfig): Promise<void> {
+    await this.server?.register(cookie, {
+      secret: config.cookieSecret,
+    });
+  }
+
+  /**
+   * Registers all routers
+   *
+   * @param config - http server config
+   * @param domainServices - instances of domain services
+   * @param middlewares - middlewares
+   */
+  private async addApiRoutes(config: HttpApiConfig, domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
+    await this.server?.register(NoteRouter, {
+      prefix: '/note',
+      noteService: domainServices.noteService,
+      middlewares: middlewares,
+    });
+
+    await this.server?.register(OauthRouter, {
+      prefix: '/oauth',
+      userService: domainServices.userService,
+      authService: domainServices.authService,
+      cookieDomain: config.cookieDomain,
+    });
+
+    await this.server?.register(AuthRouter, {
+      prefix: '/auth',
+      authService: domainServices.authService,
+    });
+
+    await this.server?.register(UserRouter, {
+      prefix: '/user',
+      userService: domainServices.userService,
+      middlewares: middlewares,
+    });
+
+    await this.server?.register(AIRouter, {
+      prefix: '/ai',
+      aiService: domainServices.aiService,
+    });
+
+    await this.server?.register(EditorToolsRouter, {
+      prefix: '/editor-tools',
+      editorToolsService: domainServices.editorToolsService,
+    });
+  }
+
+  /**
+   * Registers oauth2 plugin
+   *
+   * @param config - http server config
+   */
+  private async addOauth2(config: HttpApiConfig): Promise<void> {
+    await this.server?.register(fastifyOauth2, {
+      name: 'googleOAuth2',
+      scope: ['profile', 'email'],
+      credentials: {
+        client: {
+          id: config.oauth2.google.clientId,
+          secret: config.oauth2.google.clientSecret,
+        },
+        auth: fastifyOauth2.GOOGLE_CONFIGURATION,
+      },
+      startRedirectPath: config.oauth2.google.redirectUrl,
+      callbackUri: config.oauth2.google.callbackUrl,
+    });
+  }
+
+  /**
+   * Allows cors for allowed origins from config
+   *
+   * @param config - http server config
+   */
+  private async addCORS(config: HttpApiConfig): Promise<void> {
+    await this.server?.register(cors, {
+      origin: config.allowedOrigins,
+    });
+  }
+
+  /**
+   * Add Fastify schema for validation and serialization
+   */
+  private addSchema(): void {
+    this.server?.addSchema(UserSchema);
+  }
+
+  /**
+   * Add custom decorators
+   */
+  private addDecorators(): void {
+    this.server?.decorate('notFound', NotFoundDecorator);
   }
 }
 

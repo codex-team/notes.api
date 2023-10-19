@@ -7,7 +7,7 @@ import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import config from '@infrastructure/config/index.js';
 import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate';
-import API from '@presentation/http/http-api.js';
+import API from '@presentation/index.js';
 
 import { beforeAll, afterAll } from 'vitest';
 import type Api from '@presentation/api.interface';
@@ -36,7 +36,9 @@ beforeAll(async () => {
   const orm = await initORM({ dsn: postgresContainer.getConnectionUri() });
   const repositories = await initRepositories(orm);
   const domainServices = initDomainServices(repositories, config);
-  const api = await API.init(config.httpApi, domainServices);
+  const api = new API();
+
+  await api.init(config.httpApi, domainServices);
 
   await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
   await insertData(orm);
