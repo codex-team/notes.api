@@ -50,16 +50,29 @@ export default class HttpApi implements Api {
       logger: appServerLogger as FastifyBaseLogger,
     });
 
-    const middlewares = initMiddlewares(domainServices);
-
-    await this.addOpenapiDocs();
+    /**
+     * To guarantee consistent and predictable behavior,
+     * it's highly recommended to always load plugins in order as shown below:
+     *
+     *   └── plugins (from the Fastify ecosystem)
+     *   └── your plugins (your custom plugins)
+     *   └── decorators
+     *   └── hooks
+     *   └── your services
+     *
+     * @see https://fastify.dev/docs/latest/Guides/Getting-Started#loading-order-of-your-plugins
+     */
     await this.addCookies();
+    await this.addOpenapiDocs();
     await this.addOpenapiUI();
-    await this.addApiRoutes(domainServices, middlewares);
     await this.addOauth2();
     await this.addCORS();
+
     this.addSchema();
     this.addDecorators();
+
+    const middlewares = initMiddlewares(domainServices);
+    await this.addApiRoutes(domainServices, middlewares);
   }
 
 
