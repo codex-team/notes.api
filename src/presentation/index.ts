@@ -1,6 +1,6 @@
-import HttpServer from './http/http-server.js';
+import HttpApi from './http/http-api.js';
 
 /**
  * Current API implementation
  */
-export default HttpServer;
+export default HttpApi;

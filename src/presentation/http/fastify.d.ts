@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, no-unused-vars */
 import type * as fastify from 'fastify';
 import type * as http from 'http';
+import type { pino } from 'pino';
 
 declare module 'fastify' {
   export interface FastifyInstance<
-    HttpServer = http.Server,
-    HttpRequest = http.IncomingMessage,
-    HttpResponse = http.ServerResponse
+    RawServer extends fastify.RawServerBase = fastify.RawServerDefault,
+    RawRequest extends fastify.RawRequestDefaultExpression<RawServer> = fastify.RawRequestDefaultExpression<RawServer>,
+    RawReply extends fastify.RawReplyDefaultExpression<RawServer> = fastify.RawReplyDefaultExpression<RawServer>,
+    Logger extends fastify.FastifyBaseLogger = fastify.FastifyBaseLogger,
+    TypeProvider extends fastify.FastifyTypeProvider = fastify.FastifyTypeProviderDefault,
   > {
     /**
      * Custom method for sending 404 error
@@ -22,4 +25,8 @@ declare module 'fastify' {
      */
     notFound: (reply: fastify.FastifyReply, message?: string) => Promise<void>;
   }
+  /**
+   * Type shortcut for fastify server instance
+   */
+  type FastifyServer = FastifyInstance<http.Server, http.IncomingMessage, http.ServerResponse, pino.Logger>;
 }

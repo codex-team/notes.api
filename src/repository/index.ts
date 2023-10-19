@@ -39,11 +39,11 @@ export interface Repositories {
 }
 
 /**
- * Initiate repositories
+ * Initiate ORM
  *
  * @param databaseConfig - database config
  */
-export async function init(databaseConfig: DatabaseConfig): Promise<Repositories> {
+export async function initORM(databaseConfig: DatabaseConfig): Promise<Orm> {
   const orm = new Orm(databaseConfig);
 
   /**
@@ -51,6 +51,15 @@ export async function init(databaseConfig: DatabaseConfig): Promise<Repositories
    */
   await orm.authenticate();
 
+  return orm;
+}
+
+/**
+ * Initiate repositories
+ *
+ * @param orm - ORM instance
+ */
+export async function init(orm: Orm): Promise<Repositories> {
   /**
    * Create storage instances
    */

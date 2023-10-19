@@ -1,4 +1,5 @@
 import path from 'path';
+import config from './../../../../infrastructure/config/index.js';
 import { runTenantMigrations } from './migrate.js';
 
 /**
@@ -10,5 +11,5 @@ void (async () => {
   /**
    * Runs migrations
    */
-  await runTenantMigrations(migrationsPath);
+  await runTenantMigrations(migrationsPath, config.database.dsn);
 })();
