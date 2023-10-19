@@ -39,17 +39,17 @@ See `src/presentation/http/router/note.test.ts` for example
 - Execute all the tests:
 
   ``` 
-  yarn test 
+  npm run test 
   ```
 
 - Execute all tests in verbose mode:
   ``` 
-  yarn test:verbose 
+  npm run test:verbose 
   ```
   Use this command for troubleshooting test DB. It will output all testcontainers logs.
 - Execute specific tests
   ```
-  yarn test note
+  npm run test note
   ```
   This command will execute only test files which have names starting with 'note'.
 
