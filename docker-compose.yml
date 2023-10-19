@@ -13,8 +13,9 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_DB: codex-notes
-      POSTGRES_PASSWORD: example
+      POSTGRES_USER: codex
+      POSTGRES_DB: notes
+      POSTGRES_PASSWORD: postgres
     ports:
       - 127.0.0.1:5432:5432
     volumes:
