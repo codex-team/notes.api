@@ -56,7 +56,7 @@ declare module 'fastify' {
 
   /**
    * Augment FastifyRequest to add userId property.
-   * This property will be used by Auth Middleware
+   * This property added by Auth Middleware
    */
   export interface FastifyRequest {
     userId: AuthPayload['id'] | null
