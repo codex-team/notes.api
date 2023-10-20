@@ -8,7 +8,7 @@ import notEmpty from '@infrastructure/utils/notEmpty.js';
 /**
  * Get note by id options
  */
-interface GetNoteByIdOptions {
+interface GetNoteSettingsByNodeIdOptions {
   /**
    * Note id
    */
@@ -49,7 +49,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * @todo move to the NoteSettings Router
    */
   fastify.get<{
-    Params: GetNoteByIdOptions,
+    Params: GetNoteSettingsByNodeIdOptions,
     Reply: NotesSettings
   }>('/:id', async (request, reply) => {
     const params = request.params;
@@ -75,7 +75,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    */
   fastify.patch<{
     Body: Partial<NotesSettings>,
-    Params: GetNoteByIdOptions,
+    Params: GetNoteSettingsByNodeIdOptions,
     Reply: NotesSettings,
   }>('/:id', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
     const noteId = request.params.id;
