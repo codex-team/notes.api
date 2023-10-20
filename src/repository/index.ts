@@ -72,7 +72,14 @@ export async function init(orm: Orm): Promise<Repositories> {
    */
   const userStorage = new UserStorage(orm);
   const noteSettingsStorage = new NoteSettingsStorage(orm);
-  const noteStorage = new NoteStorage(orm, noteSettingsStorage.model);
+  const noteStorage = new NoteStorage(orm);
+
+  /**
+   * Create associations between note and note settings
+   */
+  noteStorage.createAssociationWithNoteSettingsModel(noteSettingsStorage.model);
+  noteSettingsStorage.createAssociationWithNoteModel(noteStorage.model);
+
   const userSessionStorage = new UserSessionStorage(orm);
   const editorToolsStorage = new EditorToolsStorage(orm);
 
