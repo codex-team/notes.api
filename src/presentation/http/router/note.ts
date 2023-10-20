@@ -12,7 +12,7 @@ interface GetNoteByIdOptions {
   /**
    * Note id
    */
-  noteId: NotePublicId;
+  id: NotePublicId;
 }
 
 /**
