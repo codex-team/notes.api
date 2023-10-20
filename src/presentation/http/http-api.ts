@@ -245,7 +245,7 @@ export default class HttpApi implements Api {
   }
 
   /**
-   * Add custom decorators
+   * Add middlewares
    *
    * @param domainServices - instances of domain services
    */
@@ -258,7 +258,7 @@ export default class HttpApi implements Api {
   }
 
   /**
-   * Add "onRoute" hook that will add "preHandler" checking policies passed from route config
+   * Add "onRoute" hook that will add "preHandler" checking policies passed through the route config
    */
   private addPolicyHook(): void {
     this.server?.addHook('onRoute', (routeOptions) => {

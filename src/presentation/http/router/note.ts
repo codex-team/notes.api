@@ -83,14 +83,14 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.get<{
     Params: GetNoteByIdOptions,
     Reply: Note | ErrorResponse
-  }>('/:noteId', async (request, reply) => {
+  }>('/:id', async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
      */
-    const { noteId } = params;
+    const { id } = params;
 
-    const note = await noteService.getNoteById(noteId);
+    const note = await noteService.getNoteById(id);
 
     /**
      * Check if note does not exist
