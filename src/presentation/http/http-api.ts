@@ -1,7 +1,6 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
-import type { FastifyInstance } from 'fastify';
-import type { FastifyBaseLogger } from 'fastify';
+import type { FastifyInstance, FastifyBaseLogger } from 'fastify';
 import fastify from 'fastify';
 import type Api from '@presentation/api.interface.js';
 import type { DomainServices } from '@domain/index.js';
@@ -9,7 +8,7 @@ import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
-import initMiddlewares, { type Middlewares } from '@presentation/http/middlewares/index.js';
+import addAuthMiddleware from '@presentation/http/middlewares/auth.js';
 import cookie from '@fastify/cookie';
 import NotFoundDecorator from './decorators/notFound.js';
 import NoteRouter from '@presentation/http/router/note.js';
@@ -19,6 +18,7 @@ import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from '@presentation/http/router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
+import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
 
@@ -69,12 +69,13 @@ export default class HttpApi implements Api {
     await this.addOauth2();
     await this.addCORS();
 
+    this.addMiddlewares(domainServices);
+
     this.addSchema();
     this.addDecorators();
+    this.addPoliciesCheckHook();
 
-    const middlewares = initMiddlewares(domainServices);
-
-    await this.addApiRoutes(domainServices, middlewares);
+    await this.addApiRoutes(domainServices);
   }
 
 
@@ -82,9 +83,10 @@ export default class HttpApi implements Api {
    * Runs http server
    */
   public async run(): Promise<void> {
-    if (this.server === undefined || this.config === undefined) {
+    if (this.server === undefined) {
       throw new Error('Server is not initialized');
     }
+
     await this.server.listen({
       host: this.config.host,
       port: this.config.port,
@@ -158,20 +160,17 @@ export default class HttpApi implements Api {
    * Registers all routers
    *
    * @param domainServices - instances of domain services
-   * @param middlewares - middlewares
    */
-  private async addApiRoutes(domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
+  private async addApiRoutes(domainServices: DomainServices): Promise<void> {
     await this.server?.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
       noteSettingsService: domainServices.noteSettingsService,
-      middlewares: middlewares,
     });
 
     await this.server?.register(NoteSettingsRouter, {
       prefix: '/note-settings',
       noteSettingsService: domainServices.noteSettingsService,
-      middlewares: middlewares,
     });
 
     await this.server?.register(OauthRouter, {
@@ -189,7 +188,6 @@ export default class HttpApi implements Api {
     await this.server?.register(UserRouter, {
       prefix: '/user',
       userService: domainServices.userService,
-      middlewares: middlewares,
     });
 
     await this.server?.register(AIRouter, {
@@ -244,6 +242,47 @@ export default class HttpApi implements Api {
    */
   private addDecorators(): void {
     this.server?.decorate('notFound', NotFoundDecorator);
+  }
+
+  /**
+   * Add middlewares
+   *
+   * @param domainServices - instances of domain services
+   */
+  private addMiddlewares(domainServices: DomainServices): void {
+    if (this.server === undefined) {
+      throw new Error('Server is not initialized');
+    }
+
+    addAuthMiddleware(this.server, domainServices.authService, appServerLogger);
+  }
+
+  /**
+   * Add "onRoute" hook that will add "preHandler" checking policies passed through the route config
+   */
+  private addPoliciesCheckHook(): void {
+    this.server?.addHook('onRoute', (routeOptions) => {
+      const policies = routeOptions.config?.policy ?? [];
+
+      if (policies.length === 0) {
+        return;
+      }
+
+      /**
+       * Save original route preHandler(s) if exists
+       */
+      if (routeOptions.preHandler === undefined) {
+        routeOptions.preHandler = [];
+      } else if (!Array.isArray(routeOptions.preHandler) ) {
+        routeOptions.preHandler = [ routeOptions.preHandler ];
+      }
+
+      routeOptions.preHandler.push(async (request, reply) => {
+        for (const policy of policies) {
+          await Policies[policy](request, reply);
+        }
+      });
+    });
   }
 }
 
