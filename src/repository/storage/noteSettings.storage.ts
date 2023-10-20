@@ -1,4 +1,4 @@
-import NoteSettingsSequelizeStorage from './postgres/orm/sequelize/notesSettings.js';
+import NoteSettingsSequelizeStorage from './postgres/orm/sequelize/noteSettings.js';
 /**
  * Current note storage
  */

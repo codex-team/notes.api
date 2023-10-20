@@ -1,5 +1,5 @@
 import type { Note, NotePublicId } from '@domain/entities/note.js';
-import type NotesSettings from '@domain/entities/notesSettings.js';
+import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsRepository from '@repository/noteSettings.repository.js';
 
 /**
@@ -24,9 +24,9 @@ export default class NoteSettingsService {
    * Gets note settings by public id
    *
    * @param id - note public id
-   * @returns { Promise<NotesSettings | null> } note settings
+   * @returns { Promise<NoteSettings | null> } note settings
    */
-  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings> {
     /**
      * @todo get internal id by public id and resolve note settings by the internal id
      */
@@ -37,9 +37,9 @@ export default class NoteSettingsService {
    * Gets note settings by note id
    *
    * @param id - note id
-   * @returns { Promise<NotesSettings | null> } note
+   * @returns { Promise<NoteSettings | null> } note
    */
-  public async getNoteSettingsByNoteId(id: Note['id']): Promise<NotesSettings | null> {
+  public async getNoteSettingsByNoteId(id: Note['id']): Promise<NoteSettings | null> {
     return await this.repository.getNoteSettingsByNoteId(id);
   }
 
@@ -48,9 +48,9 @@ export default class NoteSettingsService {
    *
    * @param noteId - note id
    * @param enabled - is note enabled
-   * @returns { Promise<NotesSettings> } note settings
+   * @returns { Promise<NoteSettings> } note settings
    */
-  public async addNoteSettings(noteId: Note['id'], enabled: boolean = true): Promise<NotesSettings> {
+  public async addNoteSettings(noteId: Note['id'], enabled: boolean = true): Promise<NoteSettings> {
     return await this.repository.addNoteSettings({
       noteId: noteId,
       enabled: enabled,
@@ -62,9 +62,9 @@ export default class NoteSettingsService {
    *
    * @param data - note settings data with new values
    * @param noteId - note public id
-   * @returns { Promise<NotesSettings> } updated note settings
+   * @returns { Promise<NoteSettings> } updated note settings
    */
-  public async patchNoteSettingsByPublicId(data: Partial<NotesSettings>, noteId: NotePublicId): Promise<NotesSettings | null> {
+  public async patchNoteSettingsByPublicId(data: Partial<NoteSettings>, noteId: NotePublicId): Promise<NoteSettings | null> {
     const noteSettings = await this.repository.getNoteSettingsByPublicId(noteId);
 
     return await this.repository.patchNoteSettingsByPublicId(data, noteSettings.id);

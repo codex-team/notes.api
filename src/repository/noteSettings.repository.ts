@@ -1,7 +1,7 @@
 import type { Note, NotePublicId } from '@domain/entities/note.js';
-import type NotesSettings from '@domain/entities/notesSettings.js';
+import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsStorage from '@repository/storage/noteSettings.storage.js';
-import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
+import type { NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -25,9 +25,9 @@ export default class NoteSettingsRepository {
    * Gets note settings by id
    *
    * @param id - note id
-   * @returns { Promise<NotesSettings | null> } - found note
+   * @returns { Promise<NoteSettings | null> } - found note
    */
-  public async getNoteSettingsById(id: NotesSettings['id']): Promise<NotesSettings | null> {
+  public async getNoteSettingsById(id: NoteSettings['id']): Promise<NoteSettings | null> {
     return await this.storage.getNoteSettingsById(id);
   }
 
@@ -35,9 +35,9 @@ export default class NoteSettingsRepository {
    * Get note settings by note id
    *
    * @param id - note public id
-   * @returns { Promise<NotesSettings | null> } found note settings
+   * @returns { Promise<NoteSettings | null> } found note settings
    */
-  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings> {
     /**
      * @todo get internal id by public id and resolve note settings by the internal id
      */
@@ -48,9 +48,9 @@ export default class NoteSettingsRepository {
    * Get note settings by note id
    *
    * @param id - note id
-   * @returns { Promise<NotesSettings | null> } found note settings
+   * @returns { Promise<NoteSettings | null> } found note settings
    */
-  public async getNoteSettingsByNoteId(id: Note['id']): Promise<NotesSettings> {
+  public async getNoteSettingsByNoteId(id: Note['id']): Promise<NoteSettings> {
     return await this.storage.getNoteSettingsByNoteId(id);
   }
 
@@ -59,7 +59,7 @@ export default class NoteSettingsRepository {
    *
    * @param settings - note settings
    */
-  public async addNoteSettings(settings: NotesSettingsCreationAttributes): Promise<NotesSettings> {
+  public async addNoteSettings(settings: NoteSettingsCreationAttributes): Promise<NoteSettings> {
     return await this.storage.insertNoteSettings(settings);
   }
 
@@ -68,9 +68,9 @@ export default class NoteSettingsRepository {
    *
    * @param data - note settings new values
    * @param id - note settings id
-   * @returns { Promise<NotesSettings> } patched note settings
+   * @returns { Promise<NoteSettings> } patched note settings
    */
-  public async patchNoteSettingsByPublicId(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
+  public async patchNoteSettingsByPublicId(data: Partial<NoteSettings>, id: NoteSettings['id']): Promise<NoteSettings | null> {
     return await this.storage.patchNoteSettingsByPublicId(data, id);
   }
 }

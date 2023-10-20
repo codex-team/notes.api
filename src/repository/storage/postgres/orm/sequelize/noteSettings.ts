@@ -3,34 +3,34 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { NotePublicId } from '@domain/entities/note.js';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
-import type NotesSettings from '@domain/entities/notesSettings.js';
-import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
+import type NoteSettings from '@domain/entities/noteSettings.js';
+import type { NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
 /**
  * Class representing a notes settings model in database
  */
-export class NotesSettingsModel extends Model<InferAttributes<NotesSettingsModel>, InferCreationAttributes<NotesSettingsModel>> {
+export class NoteSettingsModel extends Model<InferAttributes<NoteSettingsModel>, InferCreationAttributes<NoteSettingsModel>> {
   /**
    * Note Settings id
    */
-  public declare id: CreationOptional<NotesSettings['id']>;
+  public declare id: CreationOptional<NoteSettings['id']>;
 
   /**
    * Note ID
    */
-  public declare note_id: NotesSettings['noteId'];
+  public declare note_id: NoteSettings['noteId'];
 
   /**
    * Custom hostname
    */
-  public declare custom_hostname: CreationOptional<NotesSettings['customHostname']>;
+  public declare custom_hostname: CreationOptional<NoteSettings['customHostname']>;
 
   /**
    * Is note public
    */
-  public declare enabled: CreationOptional<NotesSettings['enabled']>;
+  public declare enabled: CreationOptional<NoteSettings['enabled']>;
 }
 
 /**
@@ -40,7 +40,7 @@ export default class NoteSettingsSequelizeStorage {
   /**
    * Notes settings model in database
    */
-  public model: typeof NotesSettingsModel;
+  public model: typeof NoteSettingsModel;
 
   /**
    * Database instance
@@ -50,7 +50,7 @@ export default class NoteSettingsSequelizeStorage {
   /**
    * Settings table name
    */
-  private readonly tableName = 'notes_settings';
+  private readonly tableName = 'note_settings';
 
   /**
    * Constructor for note storage
@@ -60,11 +60,10 @@ export default class NoteSettingsSequelizeStorage {
   constructor({ connection }: Orm) {
     this.database = connection;
 
-    console.log("GIVE ME THE ONNECTION", this.database)
     /**
      * Initiate note settings model
      */
-    this.model = NotesSettingsModel.init({
+    this.model = NoteSettingsModel.init({
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -99,9 +98,9 @@ export default class NoteSettingsSequelizeStorage {
    * Gets note settings by id
    *
    * @param id - note id
-   * @returns { Promise<NotesSettings | null> } found note
+   * @returns { Promise<NoteSettings | null> } found note
    */
-  public async getNoteSettingsById(id: NotesSettings['id']): Promise<NotesSettings | null> {
+  public async getNoteSettingsById(id: NoteSettings['id']): Promise<NoteSettings | null> {
     const noteSettings = await this.model.findOne({
       where: {
         id,
@@ -127,9 +126,9 @@ export default class NoteSettingsSequelizeStorage {
    * Get note settings
    *
    * @param noteId - note id
-   * @returns { Promise<NotesSettings | null> } - note settings
+   * @returns { Promise<NoteSettings | null> } - note settings
    */
-  public async getNoteSettingsByNoteId(noteId: NotesSettings['noteId']): Promise<NotesSettings> {
+  public async getNoteSettingsByNoteId(noteId: NoteSettings['noteId']): Promise<NoteSettings> {
     const settings = await this.model.findOne({
       where: {
         note_id: noteId,
@@ -155,12 +154,12 @@ export default class NoteSettingsSequelizeStorage {
    * Get note settings
    *
    * @param id - note internal id
-   * @returns { Promise<NotesSettings | null> } - note settings
+   * @returns { Promise<NoteSettings | null> } - note settings
    *
    * @deprecated
    * @todo resolve note setting by internal id
    */
-  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NotesSettings> {
+  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings> {
     const settings = await this.model.findOne({
       where: {
         id: id,
@@ -186,14 +185,14 @@ export default class NoteSettingsSequelizeStorage {
    * Insert note settings
    *
    * @param options - note settings options
-   * @returns { Promise<NotesSettings> } - inserted note settings
+   * @returns { Promise<NoteSettings> } - inserted note settings
    */
   public async insertNoteSettings({
     noteId,
     customHostname,
     enabled,
-  }: NotesSettingsCreationAttributes
-  ): Promise<NotesSettings> {
+  }: NoteSettingsCreationAttributes
+  ): Promise<NoteSettings> {
     const settings = await this.model.create({
       note_id: noteId,
       custom_hostname: customHostname,
@@ -214,7 +213,7 @@ export default class NoteSettingsSequelizeStorage {
    * @param data - note settings new data
    * @param id - note settings id
    */
-  public async patchNoteSettingsByPublicId(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
+  public async patchNoteSettingsByPublicId(data: Partial<NoteSettings>, id: NoteSettings['id']): Promise<NoteSettings | null> {
     const settingsToUpdate = await this.model.findByPk(id);
 
     /**
