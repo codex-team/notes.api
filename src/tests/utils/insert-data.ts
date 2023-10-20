@@ -1,7 +1,7 @@
 import type SequelizeOrm from '@repository/storage/postgres/orm/index.js';
 import users from '../test-data/users.json';
 import notes from '../test-data/notes.json';
-import notesSettings from '../test-data/notes-settings.json';
+import noteSettings from '../test-data/notes-settings.json';
 
 /**
  * Fills in the database with users data
@@ -30,9 +30,9 @@ async function insertNotes(db: SequelizeOrm): Promise<void> {
  *
  * @param db - SequelizeOrm instance
  */
-async function insertNotesSettings(db: SequelizeOrm): Promise<void> {
-  for (const noteSettings of notesSettings) {
-    await db.connection.query(`INSERT INTO public.notes_settings (id, "note_id", "custom_hostname", "enabled") VALUES (${noteSettings.id}, '${noteSettings.note_id}', '${noteSettings.custom_hostname}', ${noteSettings.enabled})`);
+async function insertNoteSettings(db: SequelizeOrm): Promise<void> {
+  for (const noteSetting of noteSettings) {
+    await db.connection.query(`INSERT INTO public.notes_settings (id, "note_id", "custom_hostname", "enabled") VALUES (${noteSetting.id}, '${noteSetting.note_id}', '${noteSetting.custom_hostname}', ${noteSetting.enabled})`);
   }
 }
 
@@ -45,6 +45,6 @@ async function insertNotesSettings(db: SequelizeOrm): Promise<void> {
 export async function insertData(db: SequelizeOrm): Promise<void> {
   await insertUsers(db);
   await insertNotes(db);
-  await insertNotesSettings(db);
+  await insertNoteSettings(db);
 }
 

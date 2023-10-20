@@ -6,14 +6,15 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && tsc-alias",
-    "dev": "nodemon --watch './src/**/*.ts' --ext ts --exec 'npm run start:dev'",
+    "dev": "nodemon --watch './src/**/*.ts' --ext ts --exec 'yarn start:dev'",
     "start": "node dist/index.js -c app-config.yaml -c app-config.local.yaml",
-    "start:dev": "npm run build && node dist/index.js -c app-config.yaml -c app-config.local.yaml",
+    "start:dev": "yarn build && node dist/index.js -c app-config.yaml -c app-config.local.yaml",
     "migrate": "node --loader ts-node/esm ./src/repository/storage/postgres/migrations/index.ts -c app-config.yaml -c app-config.local.yaml",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "vitest",
-    "test:verbose": "DEBUG=testcontainers* yarn test"
+    "test:verbose": "DEBUG=testcontainers* yarn test",
+    "typecheck": "tsc --noEmit -p ."
   },
   "author": "",
   "license": "ISC",
@@ -52,5 +53,6 @@
     "sequelize": "^6.31.1",
     "testcontainers": "^10.2.1",
     "zod": "^3.21.4"
-  }
+  },
+  "packageManager": "yarn@3.6.4"
 }

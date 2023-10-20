@@ -22,6 +22,7 @@ import { UserSchema } from './schema/User.js';
 import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import notEmpty from '@infrastructure/utils/notEmpty.js';
+import NoteSettingsRouter from './router/noteSettings.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -73,9 +74,8 @@ export default class HttpApi implements Api {
     this.addSchema();
     this.addDecorators(domainServices);
     this.addPolicyHook();
+
     const middlewares = initMiddlewares(domainServices);
-
-
     await this.addApiRoutes(domainServices, middlewares);
   }
 
@@ -166,6 +166,13 @@ export default class HttpApi implements Api {
     await this.server?.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
+      noteSettingsService: domainServices.noteSettingsService,
+      middlewares: middlewares,
+    });
+
+    await this.server?.register(NoteSettingsRouter, {
+      prefix: '/note-settings',
+      noteSettingsService: domainServices.noteSettingsService,
       middlewares: middlewares,
     });
 
