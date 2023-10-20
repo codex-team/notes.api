@@ -73,7 +73,7 @@ export default class HttpApi implements Api {
 
     this.addSchema();
     this.addDecorators();
-    this.addPolicyHook();
+    this.addPoliciesCheckHook();
 
     await this.addApiRoutes(domainServices);
   }
@@ -260,7 +260,7 @@ export default class HttpApi implements Api {
   /**
    * Add "onRoute" hook that will add "preHandler" checking policies passed through the route config
    */
-  private addPolicyHook(): void {
+  private addPoliciesCheckHook(): void {
     this.server?.addHook('onRoute', (routeOptions) => {
       const policies = routeOptions.config?.policy ?? [];
 
