@@ -1,7 +1,7 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type { Note, NotePublicId } from '@domain/entities/note.js';
+import type { NotePublicId } from '@domain/entities/note.js';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type NotesSettings from '@domain/entities/notesSettings.js';
 import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
@@ -15,22 +15,22 @@ export class NotesSettingsModel extends Model<InferAttributes<NotesSettingsModel
   /**
    * Note Settings id
    */
-  public declare id: CreationOptional<number>;
+  public declare id: CreationOptional<NotesSettings['id']>;
 
   /**
    * Note ID
    */
-  public declare note_id: number;
+  public declare note_id: NotesSettings['noteId'];
 
   /**
    * Custom hostname
    */
-  public declare custom_hostname: CreationOptional<string>;
+  public declare custom_hostname: CreationOptional<NotesSettings['customHostname']>;
 
   /**
    * Is note public
    */
-  public declare enabled: CreationOptional<boolean>;
+  public declare enabled: CreationOptional<NotesSettings['enabled']>;
 }
 
 /**
@@ -60,6 +60,7 @@ export default class NoteSettingsSequelizeStorage {
   constructor({ connection }: Orm) {
     this.database = connection;
 
+    console.log("GIVE ME THE ONNECTION", this.database)
     /**
      * Initiate note settings model
      */
@@ -73,7 +74,7 @@ export default class NoteSettingsSequelizeStorage {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: NoteModel,
+          model: NoteModel.tableName,
           key: 'id',
         },
       },
@@ -90,6 +91,7 @@ export default class NoteSettingsSequelizeStorage {
       tableName: this.tableName,
       sequelize: this.database,
       timestamps: false,
+      underscored: true, // use snake_case for fields in db
     });
   }
 

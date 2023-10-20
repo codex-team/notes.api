@@ -49,7 +49,7 @@ export default class NoteRepository {
   public async getNoteById(id: Note['id']): Promise<Note | null> {
     return await this.storage.getNoteById(id);
   }
- 
+
   /**
    * Gets note by hostname
    *
@@ -69,5 +69,4 @@ export default class NoteRepository {
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
     return await this.storage.getNoteByPublicId(publicId);
   }
-
 }

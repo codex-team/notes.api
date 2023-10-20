@@ -3,7 +3,7 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type { NoteCreationAttributes } from '@domain/entities/note.js';
-import { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
+import type { NotesSettingsModel } from '@repository/storage/postgres/orm/sequelize/notesSettings.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -72,6 +72,7 @@ export default class NoteSequelizeStorage {
    * Constructor for note storage
    *
    * @param ormInstance - ORM instance
+   * @param settingsModel - note customization parameters
    */
   constructor({ connection }: Orm, settingsModel: typeof NotesSettingsModel) {
     this.database = connection;
@@ -114,7 +115,7 @@ export default class NoteSequelizeStorage {
     /** NoteModel and NotesSettingsModel are connected as ONE-TO-ONE */
     this.model.hasOne(this.settingsModel, {
       foreignKey: 'note_id',
-      as: this.settingsModel.tableName
+      as: this.settingsModel.tableName,
     });
   }
 
