@@ -19,7 +19,9 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_PASSWORD: example
+      POSTGRES_USER: codex
+      POSTGRES_DB: notes
+      POSTGRES_PASSWORD: postgres
     ports:
       - 127.0.0.1:5432:5432
     volumes:
@@ -27,7 +29,14 @@ services:
 ```
 
 To run it execute: `docker compose up -d postgres` where `-d` is used for background run.
-If you have outdated version of docker, try use `docker-compose` instead of `docker compose` (https://docs.docker.com/compose/)
+If you have outdated version of docker, try use `docker-compose` instead of `docker compose` (https://docs.docker.com/compose/).
+
+To flush the database, just delete the `database` folder and restart the container:
+```
+rm -rf database
+docker compose down 
+docker compose up -d postgres
+```
 
 ## Running application in development mode
 
