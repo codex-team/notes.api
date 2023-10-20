@@ -19,7 +19,9 @@ import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from '@presentation/http/router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
+import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
+import notEmpty from '@infrastructure/utils/notEmpty.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -69,9 +71,11 @@ export default class HttpApi implements Api {
     await this.addCORS();
 
     this.addSchema();
-    this.addDecorators();
-
+    this.addDecorators(domainServices);
+    this.addPolicyHook();
     const middlewares = initMiddlewares(domainServices);
+
+
     await this.addApiRoutes(domainServices, middlewares);
   }
 
@@ -232,9 +236,62 @@ export default class HttpApi implements Api {
 
   /**
    * Add custom decorators
+   *
+   * @param domainServices
    */
-  private addDecorators(): void {
+  private addDecorators(domainServices: DomainServices): void {
     this.server?.decorate('notFound', NotFoundDecorator);
+
+    this.server?.addHook('preHandler', (request, reply, done) => {
+      const authorizationHeader = request.headers.authorization;
+
+      if (notEmpty(authorizationHeader)) {
+        const token = authorizationHeader.replace('Bearer ', '');
+
+        try {
+          request.userId = domainServices.authService.verifyAccessToken(token)['id'];
+        } catch (error) {
+          appServerLogger.error('Invalid Access Token');
+          appServerLogger.error(error);
+        }
+      }
+      done();
+    });
+    this.server?.decorateRequest('userId', null);
+  }
+
+  /**
+   * Add "onRoute" hook that will check policies passed from route config
+   */
+  private addPolicyHook(): void {
+    this.server?.addHook('onRoute', (routeOptions) => {
+      const policies = routeOptions.config?.policy ?? [];
+
+      if (policies.length === 0) {
+        return;
+      }
+
+      if (routeOptions.preHandler === undefined) {
+        routeOptions.preHandler = [];
+      } else if (!Array.isArray(routeOptions.preHandler) ) {
+        routeOptions.preHandler = [ routeOptions.preHandler ];
+      }
+
+      routeOptions.preHandler.push(async (request, reply) => {
+        for (const policy of policies) {
+          // const result = await Policies[policy](ctx);
+          await Policies[policy](request, reply);
+
+          // if (result === false) {
+          //   return reply
+          //     .code(401)
+          //     .send({
+          //       message: 'Permission denied',
+          //     });
+          // }
+        }
+      });
+    });
   }
 }
 

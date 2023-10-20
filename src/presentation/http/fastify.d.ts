@@ -2,6 +2,8 @@
 import type * as fastify from 'fastify';
 import type * as http from 'http';
 import type { pino } from 'pino';
+import type Policies from './policies/index.js';
+import type AuthPayload from '@domain/entities/authPayload.js';
 
 declare module 'fastify' {
   export interface FastifyInstance<
@@ -29,4 +31,18 @@ declare module 'fastify' {
    * Type shortcut for fastify server instance
    */
   type FastifyServer = FastifyInstance<http.Server, http.IncomingMessage, http.ServerResponse, pino.Logger>;
+
+  /**
+   * Augment FastifyRequest.routeConfig to respect "policy" property
+   */
+  export interface FastifyContextConfig {
+    /**
+     * Policy names to apply to the route
+     */
+    policy?: Array<keyof typeof Policies>;
+  }
+
+  export interface FastifyRequest {
+    userId: AuthPayload['id'] | null
+  }
 }

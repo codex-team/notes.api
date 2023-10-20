@@ -14,7 +14,7 @@ interface GetNoteByIdOptions {
   /**
    * Note id
    */
-  id: NotePublicId;
+  noteId: NotePublicId;
 }
 
 /**
@@ -84,14 +84,20 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.get<{
     Params: GetNoteByIdOptions,
     Reply: Note | ErrorResponse
-  }>('/:id', { preHandler: opts.middlewares.withUser }, async (request, reply) => {
+  }>('/:noteId', {
+    config: {
+      policy: [
+        'canUserReadNote',
+      ],
+    },
+  }, async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
      */
-    const { id } = params;
+    const { noteId } = params;
 
-    const note = await noteService.getNoteById(id);
+    const note = await noteService.getNoteById(noteId);
 
     /**
      * Check if note does not exist
@@ -106,9 +112,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return reply.send(note);
     }
 
-    /**
-     * TODO: add check for collaborators by request context from auth middleware
-     */
     return reply
       .code(StatusCodes.UNAUTHORIZED)
       .send({
@@ -186,6 +189,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     /**
      * Get user id from request context, because we have auth middleware
+     *
+     * @todo this is unsafe access
      */
     const user = request.ctx.auth.id;
 
