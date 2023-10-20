@@ -38,10 +38,26 @@ declare module 'fastify' {
   export interface FastifyContextConfig {
     /**
      * Policy names to apply to the route
+     *
+     * @example
+     *
+     *    fastify.post('/note', {
+     *      config: {
+     *        policy: [
+     *          'authRequired',
+     *        ],
+     *      },
+     *    }, async (request, reply) => {
+     *      // ...
+     *    })
      */
     policy?: Array<keyof typeof Policies>;
   }
 
+  /**
+   * Augment FastifyRequest to add userId property.
+   * This property will be used by Auth Middleware
+   */
   export interface FastifyRequest {
     userId: AuthPayload['id'] | null
   }

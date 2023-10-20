@@ -69,8 +69,10 @@ export default class HttpApi implements Api {
     await this.addOauth2();
     await this.addCORS();
 
+    this.addMiddlewares(domainServices);
+
     this.addSchema();
-    this.addDecorators(domainServices);
+    this.addDecorators();
     this.addPolicyHook();
 
     await this.addApiRoutes(domainServices);
@@ -158,7 +160,6 @@ export default class HttpApi implements Api {
    * Registers all routers
    *
    * @param domainServices - instances of domain services
-   * @param middlewares - middlewares
    */
   private async addApiRoutes(domainServices: DomainServices): Promise<void> {
     await this.server?.register(NoteRouter, {
@@ -238,15 +239,21 @@ export default class HttpApi implements Api {
 
   /**
    * Add custom decorators
-   *
-   * @param domainServices
    */
-  private addDecorators(domainServices: DomainServices): void {
+  private addDecorators(): void {
+    this.server?.decorate('notFound', NotFoundDecorator);
+  }
+
+  /**
+   * Add custom decorators
+   *
+   * @param domainServices - instances of domain services
+   */
+  private addMiddlewares(domainServices: DomainServices): void {
     if (this.server === undefined) {
       throw new Error('Server is not initialized');
     }
 
-    this.server?.decorate('notFound', NotFoundDecorator);
     addAuthMiddleware(this.server, domainServices.authService, appServerLogger);
   }
 
@@ -270,9 +277,9 @@ export default class HttpApi implements Api {
         routeOptions.preHandler = [ routeOptions.preHandler ];
       }
 
-      routeOptions.preHandler.push(async (request, reply, done) => {
+      routeOptions.preHandler.push(async (request, reply) => {
         for (const policy of policies) {
-          Policies[policy](request, reply, done);
+          await Policies[policy](request, reply);
         }
       });
     });

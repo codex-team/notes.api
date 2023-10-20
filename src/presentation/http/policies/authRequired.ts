@@ -1,4 +1,4 @@
-import type { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { StatusCodes } from 'http-status-codes';
 
 /**
@@ -8,7 +8,7 @@ import { StatusCodes } from 'http-status-codes';
  * @param reply - Fastify reply object
  * @param done - done callback
  */
-export default async function authRequired(request: FastifyRequest, reply: FastifyReply, done: HookHandlerDoneFunction): Promise<void> {
+export default async function authRequired(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const { userId } = request;
 
   if (userId === null) {
@@ -18,6 +18,4 @@ export default async function authRequired(request: FastifyRequest, reply: Fasti
         message: 'Permission denied',
       });
   }
-
-  done();
 }
