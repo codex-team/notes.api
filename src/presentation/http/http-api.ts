@@ -20,6 +20,7 @@ import AIRouter from '@presentation/http/router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
+import NoteSettingsRouter from './router/noteSettings.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -72,6 +73,7 @@ export default class HttpApi implements Api {
     this.addDecorators();
 
     const middlewares = initMiddlewares(domainServices);
+
     await this.addApiRoutes(domainServices, middlewares);
   }
 
@@ -162,6 +164,13 @@ export default class HttpApi implements Api {
     await this.server?.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
+      noteSettingsService: domainServices.noteSettingsService,
+      middlewares: middlewares,
+    });
+
+    await this.server?.register(NoteSettingsRouter, {
+      prefix: '/note-settings',
+      noteSettingsService: domainServices.noteSettingsService,
       middlewares: middlewares,
     });
 

@@ -13,7 +13,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "vitest",
-    "test:verbose": "DEBUG=testcontainers* yarn test"
+    "test:verbose": "DEBUG=testcontainers* yarn test",
+    "typecheck": "tsc --noEmit -p ."
   },
   "author": "",
   "license": "ISC",
