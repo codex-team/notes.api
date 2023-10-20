@@ -34,13 +34,13 @@ If you have outdated version of docker, try use `docker-compose` instead of `doc
 To flush the database, just delete the `database` folder and restart the container:
 ```
 rm -rf database
-docker compose down 
+docker compose down
 docker compose up -d postgres
 ```
 
 ## Running application in development mode
 
-To run application in development mode you need to run `npm run dev` command.
+To run application in development mode you need to run `yarn dev` command.
 It will start application with `nodemon` and restart it on any changes in source code.
 
 You can try to build and run it in local Docker with `docker compose up api` (you can add `-d` flag for a background run).
