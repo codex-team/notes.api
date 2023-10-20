@@ -4,7 +4,6 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
-import type { Middlewares } from '@presentation/http/middlewares/index.js';
 
 /**
  * Get note by id options
@@ -55,11 +54,6 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
-
-  /**
-   * Middlewares
-   */
-  middlewares: Middlewares,
 }
 
 interface ResolveHostnameOptions {
@@ -89,13 +83,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.get<{
     Params: GetNoteByIdOptions,
     Reply: Note | ErrorResponse
-  }>('/:noteId', {
-    config: {
-      policy: [
-        'canUserReadNote',
-      ],
-    },
-  }, async (request, reply) => {
+  }>('/:noteId', async (request, reply) => {
     const params = request.params;
     /**
      * TODO: Validate request params
@@ -130,17 +118,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   fastify.post<{
     Body: AddNoteOptions,
-    Reply: { id: NotePublicId }
+    Reply: { id: NotePublicId },
   }>('/', {
-    preHandler: [
-      opts.middlewares.authRequired,
-      opts.middlewares.withUser,
-    ],
     config: {
       policy: [
         'authRequired',
       ],
-    }
+    },
   }, async (request, reply) => {
     /**
      * TODO: Validate request query
@@ -148,7 +132,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const { content } = request.body;
     const { userId } = request;
 
-    const addedNote = await noteService.addNote(content, userId);
+    const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
@@ -169,10 +153,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       updatedAt: Note['updatedAt'],
     }
   }>('/', {
-    preHandler: [
-      opts.middlewares.authRequired,
-      opts.middlewares.withUser,
-    ],
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
   }, async (request, reply) => {
     /**
      * @todo Validate request params

@@ -8,7 +8,6 @@ import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
-import initMiddlewares, { type Middlewares } from '@presentation/http/middlewares/index.js';
 import addAuthMiddleware from '@presentation/http/middlewares/auth.js';
 import cookie from '@fastify/cookie';
 import NotFoundDecorator from './decorators/notFound.js';
@@ -74,9 +73,7 @@ export default class HttpApi implements Api {
     this.addDecorators(domainServices);
     this.addPolicyHook();
 
-    const middlewares = initMiddlewares(domainServices);
-
-    await this.addApiRoutes(domainServices, middlewares);
+    await this.addApiRoutes(domainServices);
   }
 
 
@@ -163,18 +160,16 @@ export default class HttpApi implements Api {
    * @param domainServices - instances of domain services
    * @param middlewares - middlewares
    */
-  private async addApiRoutes(domainServices: DomainServices, middlewares: Middlewares): Promise<void> {
+  private async addApiRoutes(domainServices: DomainServices): Promise<void> {
     await this.server?.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
       noteSettingsService: domainServices.noteSettingsService,
-      middlewares: middlewares,
     });
 
     await this.server?.register(NoteSettingsRouter, {
       prefix: '/note-settings',
       noteSettingsService: domainServices.noteSettingsService,
-      middlewares: middlewares,
     });
 
     await this.server?.register(OauthRouter, {
@@ -192,7 +187,6 @@ export default class HttpApi implements Api {
     await this.server?.register(UserRouter, {
       prefix: '/user',
       userService: domainServices.userService,
-      middlewares: middlewares,
     });
 
     await this.server?.register(AIRouter, {

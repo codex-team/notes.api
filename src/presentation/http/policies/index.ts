@@ -1,5 +1,5 @@
-import canUserReadNote from './canUserReadNote.js';
+import authRequired from './authRequired.js';
 
 export default {
-  canUserReadNote,
+  authRequired,
 };
