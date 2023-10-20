@@ -67,10 +67,6 @@ export default class NoteSettingsService {
   public async patchNoteSettingsByPublicId(data: Partial<NoteSettings>, noteId: NotePublicId): Promise<NoteSettings | null> {
     const noteSettings = await this.repository.getNoteSettingsByPublicId(noteId);
 
-    if (!noteSettings) {
-      return null;
-    }
-
     return await this.repository.patchNoteSettingsByPublicId(data, noteSettings.id);
   }
 }

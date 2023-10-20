@@ -195,12 +195,13 @@ export default class NoteSequelizeStorage {
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
     if (!this.settingsModel) {
-      return null;
+      throw new Error('Note settings model not initialized');
     }
+
     /**
      * select note which has hostname in its settings
      */
-    const note = await this.model.findOne({
+    return await this.model.findOne({
       where: {
         '$notes_settings.custom_hostname$': hostname,
       },
@@ -210,8 +211,6 @@ export default class NoteSequelizeStorage {
         required: true,
       },
     });
-
-    return note;
   }
 
   /**

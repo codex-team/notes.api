@@ -182,12 +182,12 @@ export default class NoteSettingsSequelizeStorage {
    * @deprecated
    * @todo resolve note setting by internal id
    */
-  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings | null> {
+  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings> {
     /**
      * Check if note model is initialized
      */
     if (!this.noteModel) {
-      return null;
+      throw new Error('Note model not initialized');
     }
 
     const settings = await this.model.findOne({

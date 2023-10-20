@@ -37,7 +37,7 @@ export default class NoteSettingsRepository {
    * @param id - note public id
    * @returns { Promise<NoteSettings | null> } found note settings
    */
-  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings | null> {
+  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings> {
     /**
      * @todo get internal id by public id and resolve note settings by the internal id
      */
