@@ -1,7 +1,6 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
-import type { FastifyInstance } from 'fastify';
-import type { FastifyBaseLogger } from 'fastify';
+import type { FastifyInstance, FastifyBaseLogger } from 'fastify';
 import fastify from 'fastify';
 import type Api from '@presentation/api.interface.js';
 import type { DomainServices } from '@domain/index.js';
@@ -10,6 +9,7 @@ import fastifyOauth2 from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import initMiddlewares, { type Middlewares } from '@presentation/http/middlewares/index.js';
+import addAuthMiddleware from '@presentation/http/middlewares/auth.js';
 import cookie from '@fastify/cookie';
 import NotFoundDecorator from './decorators/notFound.js';
 import NoteRouter from '@presentation/http/router/note.js';
@@ -21,7 +21,6 @@ import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
 import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
-import notEmpty from '@infrastructure/utils/notEmpty.js';
 import NoteSettingsRouter from './router/noteSettings.js';
 
 
@@ -76,6 +75,7 @@ export default class HttpApi implements Api {
     this.addPolicyHook();
 
     const middlewares = initMiddlewares(domainServices);
+
     await this.addApiRoutes(domainServices, middlewares);
   }
 
@@ -84,9 +84,10 @@ export default class HttpApi implements Api {
    * Runs http server
    */
   public async run(): Promise<void> {
-    if (this.server === undefined || this.config === undefined) {
+    if (this.server === undefined) {
       throw new Error('Server is not initialized');
     }
+
     await this.server.listen({
       host: this.config.host,
       port: this.config.port,
@@ -247,28 +248,16 @@ export default class HttpApi implements Api {
    * @param domainServices
    */
   private addDecorators(domainServices: DomainServices): void {
+    if (this.server === undefined) {
+      throw new Error('Server is not initialized');
+    }
+
     this.server?.decorate('notFound', NotFoundDecorator);
-
-    this.server?.addHook('preHandler', (request, reply, done) => {
-      const authorizationHeader = request.headers.authorization;
-
-      if (notEmpty(authorizationHeader)) {
-        const token = authorizationHeader.replace('Bearer ', '');
-
-        try {
-          request.userId = domainServices.authService.verifyAccessToken(token)['id'];
-        } catch (error) {
-          appServerLogger.error('Invalid Access Token');
-          appServerLogger.error(error);
-        }
-      }
-      done();
-    });
-    this.server?.decorateRequest('userId', null);
+    addAuthMiddleware(this.server, domainServices.authService, appServerLogger);
   }
 
   /**
-   * Add "onRoute" hook that will check policies passed from route config
+   * Add "onRoute" hook that will add "preHandler" checking policies passed from route config
    */
   private addPolicyHook(): void {
     this.server?.addHook('onRoute', (routeOptions) => {
@@ -278,24 +267,18 @@ export default class HttpApi implements Api {
         return;
       }
 
+      /**
+       * Save original route preHandler(s) if exists
+       */
       if (routeOptions.preHandler === undefined) {
         routeOptions.preHandler = [];
       } else if (!Array.isArray(routeOptions.preHandler) ) {
         routeOptions.preHandler = [ routeOptions.preHandler ];
       }
 
-      routeOptions.preHandler.push(async (request, reply) => {
+      routeOptions.preHandler.push(async (request, reply, done) => {
         for (const policy of policies) {
-          // const result = await Policies[policy](ctx);
-          await Policies[policy](request, reply);
-
-          // if (result === false) {
-          //   return reply
-          //     .code(401)
-          //     .send({
-          //       message: 'Permission denied',
-          //     });
-          // }
+          Policies[policy](request, reply, done);
         }
       });
     });

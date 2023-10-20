@@ -136,20 +136,19 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       opts.middlewares.authRequired,
       opts.middlewares.withUser,
     ],
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    }
   }, async (request, reply) => {
     /**
      * TODO: Validate request query
      */
     const { content } = request.body;
+    const { userId } = request;
 
-    /**
-     * Get user id from request context, because we have auth middleware
-     *
-     * @todo this is unsafe access
-     */
-    const user = request.ctx.auth.id;
-
-    const addedNote = await noteService.addNote(content, user);
+    const addedNote = await noteService.addNote(content, userId);
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
