@@ -6,7 +6,6 @@ import { StatusCodes } from 'http-status-codes';
  *
  * @param request - Fastify request object
  * @param reply - Fastify reply object
- * @param done - done callback
  */
 export default async function authRequired(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const { userId } = request;
