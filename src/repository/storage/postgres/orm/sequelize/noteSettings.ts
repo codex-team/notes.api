@@ -47,6 +47,9 @@ export default class NoteSettingsSequelizeStorage {
    */
   private readonly database: Sequelize;
 
+  /**
+   * Note model instance
+   */
   private noteModel: typeof NoteModel | null = null;
 
   /**
