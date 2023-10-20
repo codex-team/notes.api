@@ -14,7 +14,7 @@ DO $$
 BEGIN
   IF EXISTS(SELECT *
     FROM information_schema.columns
-    WHERE table_name='notes' and column_name='createdAt')
+    WHERE table_name='notes' and column_name='updatedAt')
   THEN
       ALTER TABLE "public"."notes" RENAME COLUMN "updatedAt" TO "updated_at";
   END IF;
