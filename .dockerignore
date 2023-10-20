@@ -11,6 +11,9 @@
 !tsconfig.json
 !migrations
 !init.sh
+!yarn.lock
+!.yarnrc.yml
+!.yarn/releases
 
 # Ignore unnecessary files inside allowed directories
 **/*~

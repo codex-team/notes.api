@@ -3,10 +3,10 @@
 ## How to run
 
 1. Install Node.js and npm
-2. Install dependencies: `npm install`
+2. Install dependencies: `yarn install`
 3. Create config file for local overrides: `cp app-config.yaml app-config.local.yaml`
-4. Build: `npm run build`
-5. Run: `npm run start`
+4. Build: `yarn build`
+5. Run: `yarn start`
 
 ## Configuration
 
