@@ -1,9 +1,8 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteListService from '@domain/service/noteList';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
-import type { ErrorResponse } from '@presentation/http/types/HttpResponse';
+import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import { StatusCodes } from 'http-status-codes';
-import type { NoteList } from '@domain/entities/noteList';
 
 /**
  * Interface for the noteList router.
@@ -46,17 +45,13 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     if (!noteList) {
       const response: ErrorResponse = {
         code: StatusCodes.NOT_FOUND,
-        message: 'Note not found Test Answer',
+        message: 'Note list not found',
       };
 
       return reply.send(response);
     }
 
-    const response: {data:NoteList} = {
-      data: noteList,
-    };
-
-    return reply.send(response);
+    return reply.send(noteList);
   });
 
   done();

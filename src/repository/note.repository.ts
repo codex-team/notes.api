@@ -3,7 +3,7 @@ import type NotesSettings from '@domain/entities/notesSettings.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
 import type { NoteCreatorId } from '@domain/entities/note.js';
-import type { NoteList } from '@domain/entities/noteList';
+import type { NoteList } from '@domain/entities/noteList.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level

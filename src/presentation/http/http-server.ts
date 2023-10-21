@@ -97,7 +97,7 @@ export default class HttpServer implements API {
     });
 
     await this.server.register(NoteListRouter, {
-      prefix: '/noteList',
+      prefix: '/notes',
       noteListService: domainServices.noteListService,
       middlewares: middlewares,
     });
