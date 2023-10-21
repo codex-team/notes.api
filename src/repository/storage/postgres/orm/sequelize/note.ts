@@ -120,7 +120,7 @@ export default class NoteSequelizeStorage {
      */
     this.model.hasOne(this.settingsModel, {
       foreignKey: 'note_id',
-      as: this.settingsModel.tableName,
+      as: 'noteSettings',
     });
   }
 
@@ -217,11 +217,11 @@ export default class NoteSequelizeStorage {
      */
     return await this.model.findOne({
       where: {
-        '$notes_settings.custom_hostname$': hostname,
+        '$noteSettings.custom_hostname$': hostname,
       },
       include: {
         model: this.settingsModel,
-        as: this.settingsModel.tableName,
+        as: 'noteSettings',
         required: true,
       },
     });
