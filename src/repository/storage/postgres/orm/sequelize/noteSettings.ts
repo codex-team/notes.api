@@ -5,8 +5,6 @@ import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type { NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';
 
-/* eslint-disable @typescript-eslint/naming-convention */
-
 /**
  * Class representing a notes settings model in database
  */
@@ -19,17 +17,17 @@ export class NoteSettingsModel extends Model<InferAttributes<NoteSettingsModel>,
   /**
    * Note ID
    */
-  public declare note_id: NoteSettings['noteId'];
+  public declare noteId: NoteSettings['noteId'];
 
   /**
    * Custom hostname
    */
-  public declare custom_hostname: CreationOptional<NoteSettings['customHostname']>;
+  public declare customHostname: CreationOptional<NoteSettings['customHostname']>;
 
   /**
    * Is note public
    */
-  public declare is_public: CreationOptional<NoteSettings['isPublic']>;
+  public declare isPublic: CreationOptional<NoteSettings['isPublic']>;
 }
 
 /**
@@ -73,7 +71,7 @@ export default class NoteSettingsSequelizeStorage {
         autoIncrement: true,
         primaryKey: true,
       },
-      note_id: {
+      noteId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -81,11 +79,11 @@ export default class NoteSettingsSequelizeStorage {
           key: 'id',
         },
       },
-      custom_hostname: {
+      customHostname: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      is_public: {
+      isPublic: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
@@ -118,12 +116,7 @@ export default class NoteSettingsSequelizeStorage {
       return null;
     }
 
-    return {
-      id: noteSettings.id,
-      noteId: noteSettings.note_id,
-      isPublic: noteSettings.is_public,
-      customHostname: noteSettings.custom_hostname,
-    };
+    return noteSettings;
   }
 
   /**
@@ -135,7 +128,7 @@ export default class NoteSettingsSequelizeStorage {
   public async getNoteSettingsByNoteId(noteId: NoteSettings['noteId']): Promise<NoteSettings> {
     const settings = await this.model.findOne({
       where: {
-        note_id: noteId,
+        noteId: noteId,
       },
     });
 
@@ -146,12 +139,7 @@ export default class NoteSettingsSequelizeStorage {
       throw new Error('Note settings not found');
     }
 
-    return {
-      id: settings.id,
-      noteId: settings.note_id,
-      customHostname: settings.custom_hostname,
-      isPublic: settings.is_public,
-    };
+    return settings;
   }
 
   /**
@@ -185,17 +173,12 @@ export default class NoteSettingsSequelizeStorage {
   }: NoteSettingsCreationAttributes
   ): Promise<NoteSettings> {
     const settings = await this.model.create({
-      note_id: noteId,
-      custom_hostname: customHostname,
-      is_public: isPublic,
+      noteId,
+      customHostname,
+      isPublic,
     });
 
-    return {
-      id: settings.id,
-      noteId: settings.note_id,
-      customHostname: settings.custom_hostname,
-      isPublic: settings.is_public,
-    };
+    return settings;
   }
 
   /**
@@ -214,18 +197,6 @@ export default class NoteSettingsSequelizeStorage {
       return null;
     }
 
-    const values = {
-      enabled: data.isPublic,
-      custom_hostname: data.customHostname,
-    };
-
-    const updatedSettings = await settingsToUpdate.update(values);
-
-    return {
-      id: updatedSettings.id,
-      noteId: updatedSettings.note_id,
-      customHostname: updatedSettings.custom_hostname,
-      isPublic: updatedSettings.is_public,
-    };
+    return await settingsToUpdate.update(data);
   }
 }
