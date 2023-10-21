@@ -129,11 +129,11 @@ export default class HttpApi implements Api {
         },
         servers: [ {
           url: 'http://localhost:1337',
-          description: 'Localhost environment'
+          description: 'Localhost environment',
         }, {
           url: 'https://notex.so',
-          description: 'Stage environment'
-        }],
+          description: 'Stage environment',
+        } ],
         components: {
           securitySchemes: {
             oAuthGoogle: {
@@ -143,14 +143,15 @@ export default class HttpApi implements Api {
                 authorizationCode: {
                   authorizationUrl: 'https://notex.so/oauth/google/login',
                   scopes: {
+                    // eslint-disable-next-line @typescript-eslint/naming-convention
                     'notes_management': 'Create, read, update and delete notes',
                   },
-                  tokenUrl: ''
-                }
-              }
-            }
-          }
-        }
+                  tokenUrl: '',
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
