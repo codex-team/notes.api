@@ -11,16 +11,6 @@ export const NoteSchema = {
       'maxLength': 10,
       'minLength': 10,
     },
-  },
-};
-
-export const NoteEditPayloadSchema = {
-  $id: 'NoteOptionSchema',
-  type: 'object',
-  properties: {
-    id: {
-      '$ref': 'NoteSchema#/properties/id',
-    },
     'content': {
       'type': 'object',
       'properties': {
@@ -34,6 +24,29 @@ export const NoteEditPayloadSchema = {
           'type':'string',
         },
       },
+    },
+  },
+};
+
+export const GetNoteSchema = {
+  $id: 'GetNoteSchema',
+  type: 'object',
+  properties: {
+    id: {
+      '$ref': 'NoteSchema#/properties/id',
+    },
+  },
+};
+
+export const NoteEditPayloadSchema = {
+  $id: 'NoteOptionSchema',
+  type: 'object',
+  properties: {
+    id: {
+      '$ref': 'NoteSchema#/properties/id',
+    },
+    'content': {
+      '$ref': 'NoteSchema#/properties/content',
     },
   },
 };

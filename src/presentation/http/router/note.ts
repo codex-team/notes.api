@@ -4,7 +4,7 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
-import { NoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
+import { GetNoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
 
 /**
  * Get note by id options
@@ -85,9 +85,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Params: GetNoteByIdOptions,
     Reply: Note | ErrorResponse
   }>('/:id', {
-    preHandler: opts.middlewares.withUser,
     schema: {
-      params: NoteSchema,
+      params: GetNoteSchema,
     },
   }, async (request, reply) => {
     const params = request.params;
