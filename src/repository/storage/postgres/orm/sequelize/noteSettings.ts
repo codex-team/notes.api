@@ -1,7 +1,6 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional, ModelStatic } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type { NotePublicId } from '@domain/entities/note.js';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type { NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';
@@ -174,49 +173,6 @@ export default class NoteSettingsSequelizeStorage {
   }
 
   /**
-   * Get note settings
-   *
-   * @param id - note internal id
-   * @returns { Promise<NoteSettings | null> } - note settings
-   *
-   * @deprecated
-   * @todo resolve note setting by internal id
-   */
-  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings> {
-    /**
-     * Check if note model is initialized
-     */
-    if (!this.noteModel) {
-      throw new Error('Note model not initialized');
-    }
-
-    const settings = await this.model.findOne({
-      where: {
-        '$notes.public_id$': id,
-      },
-      include: {
-        model: this.noteModel,
-        as: this.noteModel.tableName,
-        required: true,
-      },
-    });
-
-    if (!settings) {
-      /**
-       * TODO: improve exceptions
-       */
-      throw new Error('Note settings not found');
-    }
-
-    return {
-      id: settings.id,
-      noteId: settings.note_id,
-      customHostname: settings.custom_hostname,
-      enabled: settings.enabled,
-    };
-  }
-
-  /**
    * Insert note settings
    *
    * @param options - note settings options
@@ -245,10 +201,10 @@ export default class NoteSettingsSequelizeStorage {
   /**
    * Update note settings
    *
-   * @param data - note settings new data
    * @param id - note settings id
+   * @param data - note settings new data
    */
-  public async patchNoteSettingsByPublicId(data: Partial<NoteSettings>, id: NoteSettings['id']): Promise<NoteSettings | null> {
+  public async patchNoteSettingsById(id: NoteSettings['id'], data: Partial<NoteSettings>): Promise<NoteSettings | null> {
     const settingsToUpdate = await this.model.findByPk(id);
 
     /**

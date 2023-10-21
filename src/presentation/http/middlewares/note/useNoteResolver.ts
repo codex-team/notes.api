@@ -42,19 +42,11 @@ export default function useNoteResolver(noteService: NoteService): {
       let note: Note | undefined;
 
       try {
-        switch (request.method) {
-          case 'GET':
-            note = await resolveNoteByPublicId(request.params);
-            break;
-          case 'POST':
-            note = await resolveNoteByPublicId(request.params);
-            break;
-          case 'PUT':
-          case 'PATCH':
-          case 'DELETE':
-            note = await resolveNoteByPublicId(request.body);
-            break;
-        }
+        /**
+         * All methods (GET, POST, PATCH, etc) could have note public id just in route params,
+         * so we don't check for query and body at the moment
+         */
+        note = await resolveNoteByPublicId(request.params);
 
         if (note) {
           request.noteId = note.id;

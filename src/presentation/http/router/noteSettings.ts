@@ -1,17 +1,19 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
-import type { NotePublicId } from '@domain/entities/note.js';
+import type { NoteInternalId } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import notEmpty from '@infrastructure/utils/notEmpty.js';
+import useNoteResolver from '../middlewares/note/useNoteResolver.js';
+import type NoteService from '@domain/service/note.js';
 
 /**
  * Get note by id options
  */
 interface GetNoteSettingsByNodeIdOptions {
   /**
-   * Note id
+   * Note internal id
    */
-  id: NotePublicId;
+  id: NoteInternalId;
 }
 
 /**
@@ -21,7 +23,12 @@ interface NoteSettingsRouterOptions {
   /**
    * Note Settings service instance
    */
-  noteSettingsService: NoteSettingsService,
+  noteSettingsService: NoteSettingsService;
+
+  /**
+   * Note service instance
+   */
+  noteService: NoteService;
 }
 
 /**
@@ -33,24 +40,35 @@ interface NoteSettingsRouterOptions {
  */
 const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fastify, opts, done) => {
   /**
-   * Get note settings service from options
+   * Get domain services from options
    */
   const noteSettingsService = opts.noteSettingsService;
+  const noteService = opts.noteService;
 
   /**
-   * Get noteSettings by id
+   * Prepare note id resolver middleware
+   * It should be used in routes that accepts note public id
+   */
+  const { noteIdResolver } = useNoteResolver(noteService);
+
+  /**
+   * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware
    */
   fastify.get<{
     Params: GetNoteSettingsByNodeIdOptions,
     Reply: NoteSettings
-  }>('/:id', async (request, reply) => {
-    const params = request.params;
+  }>('/:id', {
+    preHandler: [
+      noteIdResolver,
+    ],
+  }, async (request, reply) => {
     /**
      * TODO: Validate request params
      */
-    const { id } = params;
+    const noteId = request.noteId as number;
 
-    const noteSettings = await noteSettingsService.getNoteSettingsByPublicId(id);
+
+    const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
     /**
      * Check if note does not exist
@@ -63,7 +81,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   });
 
   /**
-   * Patch noteSettings by note public id
+   * Patch noteSettings by note id
    */
   fastify.patch<{
     Body: Partial<NoteSettings>,
@@ -75,14 +93,25 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
         'authRequired',
       ],
     },
+    preHandler: [
+      noteIdResolver,
+    ],
   }, async (request, reply) => {
-    const noteId = request.params.id;
+    const noteId = request.noteId as number;
+
+    /**
+     * @todo validate data
+     */
+    const { customHostname, enabled } = request.body;
 
     /**
      * TODO: check is user collaborator
      */
 
-    const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByPublicId(request.body, noteId);
+    const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
+      customHostname,
+      enabled,
+    });
 
     if (updatedNoteSettings === null) {
       return fastify.notFound(reply, 'Note settings not found');
