@@ -55,10 +55,17 @@ declare module 'fastify' {
   }
 
   /**
-   * Augment FastifyRequest to add userId property.
-   * This property added by Auth Middleware
+   * Augment FastifyRequest to respect properties added by middlewares
    */
   export interface FastifyRequest {
-    userId: AuthPayload['id'] | null
+    /**
+     * This property added by userIdResolver middleware
+     */
+    userId: AuthPayload['id'] | null;
+
+    /**
+     * This property added by noteIdResolver middleware
+     */
+    noteId: number | undefined;
   }
 }

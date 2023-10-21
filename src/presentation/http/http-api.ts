@@ -8,7 +8,7 @@ import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
-import addAuthMiddleware from '@presentation/http/middlewares/auth.js';
+import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
 import cookie from '@fastify/cookie';
 import NotFoundDecorator from './decorators/notFound.js';
 import NoteRouter from '@presentation/http/router/note.js';
@@ -71,7 +71,7 @@ export default class HttpApi implements Api {
     await this.addOauth2();
     await this.addCORS();
 
-    this.addMiddlewares(domainServices);
+    this.addCommonMiddlewares(domainServices);
 
     this.addSchema();
     this.addDecorators();
@@ -129,8 +129,29 @@ export default class HttpApi implements Api {
           version: '0.1.0',
         },
         servers: [ {
-          url: 'http://localhost',
-        } ],
+          url: 'http://localhost:1337',
+          description: 'Localhost environment'
+        }, {
+          url: 'https://notex.so',
+          description: 'Stage environment'
+        }],
+        components: {
+          securitySchemes: {
+            oAuthGoogle: {
+              type: 'oauth2',
+              description: 'Provied authorization uses OAuth 2 with Google',
+              flows: {
+                authorizationCode: {
+                  authorizationUrl: 'https://notex.so/oauth/google/login',
+                  scopes: {
+                    'notes_management': 'Create, read, update and delete notes',
+                  },
+                  tokenUrl: ''
+                }
+              }
+            }
+          }
+        }
       },
     });
   }
@@ -178,6 +199,7 @@ export default class HttpApi implements Api {
     await this.server?.register(NoteSettingsRouter, {
       prefix: '/note-settings',
       noteSettingsService: domainServices.noteSettingsService,
+      noteService: domainServices.noteService,
     });
 
     await this.server?.register(OauthRouter, {
@@ -257,12 +279,12 @@ export default class HttpApi implements Api {
    *
    * @param domainServices - instances of domain services
    */
-  private addMiddlewares(domainServices: DomainServices): void {
+  private addCommonMiddlewares(domainServices: DomainServices): void {
     if (this.server === undefined) {
       throw new Error('Server is not initialized');
     }
 
-    addAuthMiddleware(this.server, domainServices.authService, appServerLogger);
+    addUserIdResolver(this.server, domainServices.authService, appServerLogger);
   }
 
   /**
