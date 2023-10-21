@@ -67,9 +67,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
      */
     const noteId = request.noteId as number;
 
-    console.log('note id: ', noteId);
-
-
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
     /**
