@@ -122,13 +122,18 @@ export default class UserSequelizeStorage {
     return editorTool;
   }
 
+  /**
+   * Get bunch of tools by their ids
+   *
+   * @param editorToolIds - tool ids
+   */
   public async getToolsByIds(editorToolIds: EditorTool['id'][]): Promise<EditorTool[]> {
     const editorTools = await this.model.findAll({
       where: {
         id: {
           includes: editorToolIds,
-        }
-      }
+        },
+      },
     });
 
     return editorTools;

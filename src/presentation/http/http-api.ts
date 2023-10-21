@@ -23,6 +23,7 @@ import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
 import NoteListRouter from '@presentation/http/router/noteList.js';
+import { EditorToolSchema } from './schema/EditorTool.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -266,6 +267,7 @@ export default class HttpApi implements Api {
   private addSchema(): void {
     this.server?.addSchema(UserSchema);
     this.server?.addSchema(NoteSchema);
+    this.server?.addSchema(EditorToolSchema);
   }
 
   /**
