@@ -47,7 +47,8 @@ export default class UserService {
   }
 
   /**
-   * Get installed user tools
+   * Get user extensions that contains only editoTools for now
+   * TODO: Simplify extenisons
    *
    * @param userId - user unique identifier
    */
