@@ -8,7 +8,7 @@ import { isEmpty } from '@infrastructure/utils/empty.js';
  * @param request - Fastify request object
  * @param reply - Fastify reply object
  */
-export default async function notePublicOrUserInTeam(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export default async function userInTeam(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const { userId } = request;
 
   if (isEmpty(userId)) {
