@@ -13,7 +13,7 @@ describe('Note API', () => {
         'content': null,
         'createdAt': '2023-10-16T13:49:19.000Z',
         'updatedAt': '2023-10-16T13:49:19.000Z',
-        'notesSettings':  {
+        'noteSettings':  {
           'custom_hostname': 'codex.so',
           'enabled': true,
           'id': 1,
