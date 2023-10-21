@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
+import { GetNoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
 
 /**
  * Get note by id options
@@ -89,16 +90,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   fastify.get<{
     Params: GetNoteByIdOptions,
-    Reply: Note | ErrorResponse
+    Reply: Note | ErrorResponse,
   }>('/:notePublicId', {
     preHandler: [
       noteIdResolver,
     ],
+    schema: {
+      params: GetNoteSchema,
+    },
   }, async (request, reply) => {
-    /**
-     * TODO: Validate request params
-     */
-
     const noteId = request.noteId as number;
     const note = await noteService.getNoteById(noteId);
 
@@ -163,6 +163,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       updatedAt: Note['updatedAt'],
     }
   }>('/', {
+    schema: {
+      body: NoteEditPayloadSchema,
+    },
     config: {
       policy: [
         'authRequired',
@@ -170,7 +173,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
   }, async (request, reply) => {
     /**
-     * @todo Validate request params
      * @todo Check user access right
      */
     const noteId = request.noteId as number;

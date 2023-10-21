@@ -18,6 +18,7 @@ import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from '@presentation/http/router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
+import { NoteSchema } from './schema/Note.js';
 import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
@@ -236,6 +237,7 @@ export default class HttpApi implements Api {
    */
   private addSchema(): void {
     this.server?.addSchema(UserSchema);
+    this.server?.addSchema(NoteSchema);
   }
 
   /**
