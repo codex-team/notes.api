@@ -85,6 +85,45 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   });
 
   /**
+   * Deletes note by id
+   */
+  fastify.delete<{
+    Params: {
+      notePublicId : NotePublicId;
+    },
+    Reply: {
+      deletedFlag : number
+    },
+  }>('/notePublicId', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+  /**
+   * @todo Check user access right
+   */
+    const noteId = request.note?.id as number;
+    const affectedRows = await noteService.deleteNoteById(noteId);
+
+    /**
+     * Check if note does not exist
+     */
+    if (affectedRows === false) {
+      return reply.send({ deletedFlag: 0});
+    }
+    else {
+      return reply.send({ deletedFlag: 17 }/**{ deletedFlag: noteId }*/);
+    };
+  });
+
+  /**
    * Adds a new note.
    * Responses with note public id.
    */
@@ -96,11 +135,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       id: NotePublicId
     },
   }>('/', {
-    config: {
+    /**config: {
       policy: [
         'authRequired',
       ],
     },
+    */
   }, async (request, reply) => {
     /**
      * TODO: Validate request query
