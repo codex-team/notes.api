@@ -107,7 +107,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
      * TODO: check is user collaborator
      */
 
-    console.log(enabled)
     const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
       customHostname,
       enabled,
