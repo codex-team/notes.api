@@ -76,7 +76,7 @@ export default class NoteRepository {
    * @param id - note creator id
    * @returns { Promise<NoteList> } note
    */
-  public async getNoteListByCreatorId(id: number): Promise<NoteList> {
+  public async getNoteListByCreatorId(id: number): Promise<Note[]> {
     return await this.storage.getNoteListByCreatorId(id);
   }
 }

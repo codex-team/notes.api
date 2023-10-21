@@ -26,6 +26,8 @@ export default class NoteListService {
    * @returns { Promise<NoteList> } note
    */
   public async getNoteListByCreatorId(id: number): Promise<NoteList> {
-    return await this.repository.getNoteListByCreatorId(id);
+    return {
+      items: await this.repository.getNoteListByCreatorId(id),
+    };
   }
 }

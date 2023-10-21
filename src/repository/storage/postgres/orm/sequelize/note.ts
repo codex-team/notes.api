@@ -192,16 +192,14 @@ export default class NoteSequelizeStorage {
    * @param creatorId - note creator id
    * @returns { Promise<NoteList> } note
    */
-  public async getNoteListByCreatorId(creatorId: number): Promise<NoteList> {
+  public async getNoteListByCreatorId(creatorId: number): Promise<Note[]> {
     const noteList  = await this.model.findAll({
       where: {
         creatorId,
       },
     });
 
-    return {
-      items: noteList,
-    };
+    return noteList;
   }
   /**
    * Gets note by id
