@@ -128,8 +128,29 @@ export default class HttpApi implements Api {
           version: '0.1.0',
         },
         servers: [ {
-          url: 'http://localhost',
-        } ],
+          url: 'http://localhost:1337',
+          description: 'Localhost environment'
+        }, {
+          url: 'https://notex.so',
+          description: 'Stage environment'
+        }],
+        components: {
+          securitySchemes: {
+            oAuthGoogle: {
+              type: 'oauth2',
+              description: 'Provied authorization uses OAuth 2 with Google',
+              flows: {
+                authorizationCode: {
+                  authorizationUrl: 'https://notex.so/oauth/google/login',
+                  scopes: {
+                    'notes_management': 'Create, read, update and delete notes',
+                  },
+                  tokenUrl: ''
+                }
+              }
+            }
+          }
+        }
       },
     });
   }
