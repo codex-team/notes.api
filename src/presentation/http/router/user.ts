@@ -1,5 +1,4 @@
 import type { FastifyPluginCallback } from 'fastify';
-import type { Middlewares } from '@presentation/http/middlewares/index.js';
 import type UserService from '@domain/service/user.js';
 import type User from '@domain/entities/user.js';
 
@@ -11,11 +10,6 @@ interface UserRouterOptions {
    * User service instance
    */
   userService: UserService,
-
-  /**
-   * Middlewares
-   */
-  middlewares: Middlewares,
 }
 
 /**
@@ -37,10 +31,11 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   fastify.get<{
     Reply: Pick<User, 'id' | 'name' | 'email' | 'photo'>,
   }>('/myself', {
-    preHandler: [
-      opts.middlewares.authRequired,
-      opts.middlewares.withUser,
-    ],
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
     schema: {
       response: {
         '2xx': {
@@ -49,7 +44,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
       },
     },
   }, async (request, reply) => {
-    const userId = request.ctx.auth.id;
+    const userId = request.userId as number;
 
     const user = await userService.getUserById(userId);
 
@@ -63,8 +58,14 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   /**
    * Get user extensions
    */
-  fastify.get('/editor-tools', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
-    const userId = request.ctx.auth.id;
+  fastify.get('/editor-tools', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+  }, async (request, reply) => {
+    const userId = request.userId as number;
 
     const editorTools = await userService.getUserEditorTools(userId) ?? [];
 

@@ -1,2 +1,2 @@
 ALTER TABLE IF EXISTS public.notes_settings
-    DROP COLUMN public_id;
+    DROP COLUMN IF EXISTS public_id;

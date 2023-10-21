@@ -1,2 +1,2 @@
 ALTER TABLE IF EXISTS public.notes
-    DROP COLUMN title;
+    DROP COLUMN IF EXISTS title;

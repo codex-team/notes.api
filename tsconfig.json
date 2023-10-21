@@ -7,6 +7,7 @@
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule":true,
     "strict": true,
     "skipLibCheck": true,
     "paths": {
@@ -15,8 +16,14 @@
       "@lib/*": ["lib/*"],
       "@domain/*": ["domain/*"],
       "@repository/*": ["repository/*"]
-    }
+    },
   },
+  "include": [
+    "src/**/*.ts",
+    "vitest.config.js",
+    ".eslintrc.cjs",
+    "fastify.d.ts",
+  ],
   "ts-node": {
     // Tell ts-node CLI to install the --loader automatically
     "esm": true

@@ -55,26 +55,6 @@ export default class NoteRepository {
   }
 
   /**
-   * Gets note list by creator id
-   *
-   * @param id - note creator id
-   * @returns { Promise<NoteList | null> } note
-   */
-  public async getNoteListByCreatorId(id: NoteCreatorId): Promise<NoteList | null> {
-    return await this.storage.getNoteListByCreatorId(id);
-  }
-
-  /**
-   * Gets note settings by id
-   *
-   * @param id - note id
-   * @returns { Promise<NotesSettings | null> } - found note
-   */
-  public async getNoteSettingsById(id: NotesSettings['id']): Promise<NotesSettings | null> {
-    return await this.storage.getNoteSettingsById(id);
-  }
-
-  /**
    * Gets note by hostname
    *
    * @param hostname - custom hostname

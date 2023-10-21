@@ -28,7 +28,7 @@ logging:
   database: info
 
 database:
-  dsn: 'postgres://postgres:pass@localhost:5432/codex-notes'
+  dsn: 'postgres://codex:postgres@postgres:5432/notes'
 
 openai:
   token: 'token'
