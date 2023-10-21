@@ -201,7 +201,7 @@ export default class NoteSequelizeStorage {
     /**
      * If note not found, return null
      */
-    return affectedRows === 1;
+    return affectedRows > 0;
   }
 
   /**
