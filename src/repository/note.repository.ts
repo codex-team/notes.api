@@ -1,6 +1,5 @@
 import type { Note, NoteCreationAttributes, NotePublicId } from '@domain/entities/note.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
-import type { NoteCreatorId } from '@domain/entities/note.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 
 /**
@@ -78,7 +77,7 @@ export default class NoteRepository {
    * @param id - note creator id
    * @returns { Promise<NoteList | null> } note
    */
-  public async getNoteListByCreatorId(id: NoteCreatorId): Promise<NoteList | null> {
+  public async getNoteListByCreatorId(id: number): Promise<NoteList | null> {
     return await this.storage.getNoteListByCreatorId(id);
   }
 }

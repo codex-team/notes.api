@@ -1,10 +1,8 @@
-import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
-import type { ModelStatic } from 'sequelize';
+import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, Sequelize } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type { Note, NoteInternalId, NotePublicId, NoteCreatorId } from '@domain/entities/note.js';
-import type { NoteList} from '@domain/entities/noteList.js';
-import type { NoteCreationAttributes } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { NoteList } from '@domain/entities/noteList.js';
 import type { NoteSettingsModel } from '@repository/storage/postgres/orm/sequelize/noteSettings.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 
@@ -194,8 +192,8 @@ export default class NoteSequelizeStorage {
    * @param creatorId - note creator id
    * @returns { Promise<NoteList | null> } note
    */
-  public async getNoteListByCreatorId(creatorId: NoteCreatorId): Promise<NoteList | null> {
-    const noteList = await this.model.findAll({
+  public async getNoteListByCreatorId(creatorId: number): Promise<NoteList | null> {
+    const noteList  = await this.model.findAll({
       where: {
         creatorId,
       },
@@ -204,8 +202,23 @@ export default class NoteSequelizeStorage {
     if (noteList.length === 0) {
       return null;
     };
+    /**
+     *  Converting a NoteModel array to a NoteList object
+     */
+    const noteListItems: Note[] = noteList.map((noteModel) => {
+      return {
+        id: noteModel.id,
+        publicId: noteModel.publicId,
+        content: noteModel.content,
+        creatorId: noteModel.creatorId,
+        createdAt: noteModel.createdAt,
+        updatedAt: noteModel.updatedAt,
+      };
+    });
 
-    return noteList;
+    return {
+      items: noteListItems,
+    };
   }
   /**
    * Gets note by id

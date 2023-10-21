@@ -1,3 +1,5 @@
+import type User from '@domain/entities/user.js';
+
 /**
  * Note internal id. Used to query Note by internal API
  */
@@ -7,11 +9,6 @@ export type NoteInternalId = number;
  * Id visible for users. Used to query Note by public API
  */
 export type NotePublicId = string;
-
-/**
- * Id from DataBase. Used to query Note by Creator id
- */
-export type NoteCreatorId = number;
 
 /**
  * Note entity
@@ -35,7 +32,7 @@ export interface Note {
   /**
    * Note creator id
    */
-  creatorId: NoteCreatorId;
+  creatorId: User['id'];
 
   /**
    * When note was created
