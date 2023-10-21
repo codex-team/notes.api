@@ -1,11 +1,10 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
-import type { NoteInternalId } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import notEmpty from '@infrastructure/utils/notEmpty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
-import { NotePublicId } from '@domain/entities/note.js';
+import type { NotePublicId } from '@domain/entities/note.js';
 
 /**
  * Interface for the note settings router.
