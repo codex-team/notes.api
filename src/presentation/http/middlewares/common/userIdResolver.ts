@@ -10,7 +10,7 @@ import notEmpty from '@infrastructure/utils/notEmpty.js';
  * @param authService - auth domain service
  * @param logger - logger instance
  */
-export default function addAuthMiddleware(server: FastifyInstance, authService: AuthService, logger: typeof Logger ): void {
+export default function addUserIdResolver(server: FastifyInstance, authService: AuthService, logger: typeof Logger ): void {
   /**
    * Default userId value — null
    */

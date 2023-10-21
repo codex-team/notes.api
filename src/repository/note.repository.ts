@@ -61,10 +61,9 @@ export default class NoteRepository {
   }
 
   /**
-   * Get note by public id
+   * Returns note by public id. Null if note does not exist.
    *
    * @param publicId - public id
-   * @returns { Promise<Note | null> } found note
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
     return await this.storage.getNoteByPublicId(publicId);

@@ -1,4 +1,4 @@
-import type { Note, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 
@@ -54,13 +54,33 @@ export default class NoteService {
   }
 
   /**
-   * Gets note by id
+   * Returns note by id
    *
-   * @param id - note id
-   * @returns { Promise<Note | null> } note
+   * @param id - note internal id
    */
-  public async getNoteById(id: NotePublicId): Promise<Note | null> {
-    return await this.repository.getNoteByPublicId(id);
+  public async getNoteById(id: NoteInternalId): Promise<Note> {
+    const note = await this.repository.getNoteById(id);
+
+    if (note === null) {
+      throw new Error(`Note with id ${id} was not found`);
+    }
+
+    return note;
+  }
+
+  /**
+   * Returns note by public id
+   *
+   * @param publicId - note public id
+   */
+  public async getNoteByPublicId(publicId: NotePublicId): Promise<Note> {
+    const note = await this.repository.getNoteByPublicId(publicId);
+
+    if (note === null) {
+      throw new Error(`Note with public id ${publicId} was not found`);
+    }
+
+    return note;
   }
 
   /**

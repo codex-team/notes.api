@@ -4,15 +4,16 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
+import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 
 /**
  * Get note by id options
  */
 interface GetNoteByIdOptions {
   /**
-   * Note id
+   * Public id got from url
    */
-  id: NotePublicId;
+  notePublicId: NotePublicId;
 }
 
 /**
@@ -78,19 +79,28 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const noteSettingsService = opts.noteSettingsService;
 
   /**
+   * Prepare note id resolver middleware
+   * It should be used in routes that accepts note public id
+   */
+  const { noteIdResolver } = useNoteResolver(noteService);
+
+  /**
    * Get note by id
    */
   fastify.get<{
     Params: GetNoteByIdOptions,
     Reply: Note | ErrorResponse
-  }>('/:id', async (request, reply) => {
-    const params = request.params;
+  }>('/:notePublicId', {
+    preHandler: [
+      noteIdResolver,
+    ],
+  }, async (request, reply) => {
     /**
      * TODO: Validate request params
      */
-    const { id } = params;
 
-    const note = await noteService.getNoteById(id);
+    const noteId = request.noteId as number;
+    const note = await noteService.getNoteById(noteId);
 
     /**
      * Check if note does not exist

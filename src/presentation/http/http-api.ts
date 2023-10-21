@@ -8,7 +8,7 @@ import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
-import addAuthMiddleware from '@presentation/http/middlewares/auth.js';
+import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
 import cookie from '@fastify/cookie';
 import NotFoundDecorator from './decorators/notFound.js';
 import NoteRouter from '@presentation/http/router/note.js';
@@ -69,7 +69,7 @@ export default class HttpApi implements Api {
     await this.addOauth2();
     await this.addCORS();
 
-    this.addMiddlewares(domainServices);
+    this.addCommonMiddlewares(domainServices);
 
     this.addSchema();
     this.addDecorators();
@@ -249,12 +249,12 @@ export default class HttpApi implements Api {
    *
    * @param domainServices - instances of domain services
    */
-  private addMiddlewares(domainServices: DomainServices): void {
+  private addCommonMiddlewares(domainServices: DomainServices): void {
     if (this.server === undefined) {
       throw new Error('Server is not initialized');
     }
 
-    addAuthMiddleware(this.server, domainServices.authService, appServerLogger);
+    addUserIdResolver(this.server, domainServices.authService, appServerLogger);
   }
 
   /**
