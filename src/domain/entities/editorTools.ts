@@ -3,9 +3,14 @@
  */
 export default interface EditorTool {
   /**
-   * Unique identifier of the tool
+   * Unique identifier of the tool. Nano-ID
    */
   id: string;
+
+  /**
+   * Technical id of the tool, like 'header', 'list', 'linkTool'
+   */
+  pluginId: string;
 
   /**
    * User-friendly plugin title

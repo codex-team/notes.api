@@ -26,6 +26,10 @@ export default class EditorToolsService {
     return await this.repository.getTools();
   }
 
+  public async getToolsByIds(editorToolIds: EditorTool['id'][] ): Promise<EditorTool[] | null> {
+    return await this.repository.getToolsByIds(editorToolIds);
+  }
+
   /**
    * Adding custom editor tool
    *
@@ -33,6 +37,6 @@ export default class EditorToolsService {
    * @returns {Promise<EditorTool | null>} editor tool data
    */
   public async addTool(tool: EditorTool): Promise<EditorTool | null> {
-    return await this.repository.addTools(tool);
+    return await this.repository.addTool(tool);
   }
 }

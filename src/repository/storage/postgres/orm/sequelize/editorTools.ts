@@ -5,10 +5,11 @@ import type EditorTool from '@domain/entities/editorTools.js';
 
 
 interface AddToolOptions {
-    id: EditorTool['id'];
-    name: EditorTool['name'];
-    class: EditorTool['class'];
-    source: EditorTool['source'];
+  id: EditorTool['id'];
+  pluginId: EditorTool['pluginId'];
+  name: EditorTool['name'];
+  class: EditorTool['class'];
+  source: EditorTool['source'];
 }
 
 /**
@@ -16,17 +17,22 @@ interface AddToolOptions {
  */
 export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, InferCreationAttributes<EditorToolModel>> {
   /**
-   * Editor tool unique id
+   * Editor tool unique id, Nano-ID
    */
   public declare id: EditorTool['id'];
 
   /**
-   * Editor tool title
+   * Custom name that uses in editor initiazliation. e.g. 'code'
+   */
+  public declare pluginId: EditorTool['pluginId'];
+
+  /**
+   * Editor tool title. e.g. 'Code tool 3000'
    */
   public declare name: EditorTool['name'];
 
   /**
-   * User tool class name
+   * User tool class name. e.g. 'CodeTool'
    */
   public declare class: EditorTool['class'];
 
@@ -72,6 +78,10 @@ export default class UserSequelizeStorage {
         allowNull: false,
         primaryKey: true,
       },
+      pluginId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -96,18 +106,32 @@ export default class UserSequelizeStorage {
    */
   public async addTool({
     id,
+    pluginId,
     name,
     class: editorToolClass,
     source,
   }: AddToolOptions): Promise<EditorTool> {
     const editorTool = await this.model.create({
       id,
+      pluginId,
       name,
       class: editorToolClass,
       source,
     });
 
     return editorTool;
+  }
+
+  public async getToolsByIds(editorToolIds: EditorTool['id'][]): Promise<EditorTool[]> {
+    const editorTools = await this.model.findAll({
+      where: {
+        id: {
+          includes: editorToolIds,
+        }
+      }
+    });
+
+    return editorTools;
   }
 
   /**

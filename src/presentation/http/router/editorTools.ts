@@ -40,7 +40,33 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   /**
    * Add editor tool to the library of all tools
    */
-  fastify.post<{ Body: EditorTool }>('/add-tool', async (request, reply) => {
+  fastify.post<{ Body: EditorTool }>('/add-tool', {
+    schema: {
+      body: {
+        pluginId: {
+          type: 'string',
+          description: 'Plugin id that editor will use, e.g. "warning", "list", "linkTool"'
+        },
+        name: {
+          type: 'string',
+          description: 'User-friendly name that will be shown in marketplace, .e.g "Warning tool 3000"'
+        },
+        class: {
+          type: 'string',
+          description: 'Name of the plugin\'s class, e.g. "LinkTool", "Checklist", "Header"'
+        },
+        source: {
+          type: "object",
+          properties: {
+            cdn: {
+              type: 'string',
+              description: "Tool URL in content delivery network",
+            }
+          }
+        }
+      }
+    }
+  },async (request, reply) => {
     const editorTool = request.body;
 
     const tool = await editorToolsService.addTool(editorTool);
