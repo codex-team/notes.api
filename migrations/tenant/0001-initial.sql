@@ -30,7 +30,7 @@ BEGIN
         SELECT FROM pg_catalog.pg_roles
         WHERE  rolname = 'codex') THEN
 
-        RAISE NOTICE 'Role "my_codexuser" already exists. Skipping.';
+        RAISE NOTICE 'Role "codex" already exists. Skipping.';
     ELSE
         CREATE ROLE codex LOGIN PASSWORD '';
    END IF;
