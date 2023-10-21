@@ -2,6 +2,7 @@ import type UserRepository from '@repository/user.repository.js';
 import { Provider } from '@repository/user.repository.js';
 import type User from '@domain/entities/user.js';
 import type { UserEditorTool } from '@domain/entities/userExtensions.js';
+import type EditorTool from '@domain/entities/editorTools';
 
 export {
   Provider
@@ -55,5 +56,25 @@ export default class UserService {
     const user = await this.getUserById(userId);
 
     return user?.extensions?.editorTools;
+  }
+
+  /**
+   * Adds editor tool to user settings by its id
+   *
+   * @param options - user id & editor tool
+   */
+  public async addUserEditorTool({
+    userId,
+    editorToolId,
+  }: {
+    userId: User['id'],
+    editorToolId: EditorTool['id'],
+  }): Promise<void> {
+    return await this.repository.addUserEditorTool({
+      userId,
+      editorTool: {
+        id: editorToolId,
+      },
+    });
   }
 }

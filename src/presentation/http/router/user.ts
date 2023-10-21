@@ -1,6 +1,7 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type UserService from '@domain/service/user.js';
 import type User from '@domain/entities/user.js';
+import type EditorToolsService from '@domain/service/editorTools';
 
 /**
  * Interface for the user router
@@ -10,6 +11,11 @@ interface UserRouterOptions {
    * User service instance
    */
   userService: UserService,
+
+  /**
+   * Service editor tool
+   */
+  editorToolsService: EditorToolsService,
 }
 
 /**
@@ -24,6 +30,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
    * Manage user data
    */
   const userService = opts.userService;
+  const editorToolsService = opts.editorToolsService;
 
   /**
    * Get user by session
@@ -64,13 +71,64 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
         'authRequired',
       ],
     },
+    schema: {
+      response: {
+        '2xx': {
+          description: 'Editor tool fields',
+          content: {
+            'application/json': {
+              schema: {
+                data: {
+                  type: 'array',
+                  items: {
+                    '$ref': 'EditorToolSchema',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   }, async (request, reply) => {
     const userId = request.userId as number;
 
-    const editorTools = await userService.getUserEditorTools(userId) ?? [];
+    const userExtensionTools = await userService.getUserEditorTools(userId) ?? [];
+    const editorToolIds = userExtensionTools.map(tools => tools.id);
+    const editorTools = await editorToolsService.getToolsByIds(editorToolIds) ?? [];
 
     return reply.send({
       data: editorTools,
+    });
+  });
+
+  fastify.put<{
+    Body: { toolId: string }
+  }>('/editor-tools', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+    schema: {
+      body: {
+        toolId: {
+          type: 'string',
+          description: 'Unique editor tool id',
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const editorToolId = request.body.toolId;
+    const userId = request.userId as number;
+
+    await userService.addUserEditorTool({
+      userId,
+      editorToolId,
+    });
+
+    return reply.send({
+      data: editorToolId,
     });
   });
 

@@ -29,7 +29,27 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   /**
    * Get all avaiable editor tools
    */
-  fastify.get('/all', async (_, reply) => {
+  fastify.get('/all', {
+    schema: {
+      response: {
+        '2xx': {
+          description: 'Editor tool fields',
+          content: {
+            'application/json': {
+              schema: {
+                data: {
+                  type: 'array',
+                  items: {
+                    '$ref': 'EditorToolSchema',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  }, async (_, reply) => {
     const tools = await editorToolsService.getTools();
 
     return reply.send({
