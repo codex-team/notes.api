@@ -52,13 +52,12 @@ export default class NoteRepository {
   }
 
   /**
-   * Deletes note by id 
-   * 
+   * Deletes note by id
+   *
    * @param id - note id
-   * @returns { Promise<boolean | null> }
    */
-  public async deleteNoteById(id: NoteInternalId){
-    return await this.storage.deleteNoteById(id)
+  public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
+    return await this.storage.deleteNoteById(id);
   }
 
   /**
