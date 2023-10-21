@@ -1,7 +1,5 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteListService from '@domain/service/noteList.js';
-import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
-import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the noteList router.
