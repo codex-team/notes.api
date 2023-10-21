@@ -123,7 +123,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.post<{
     Body: AddNoteOptions,
     Reply: { id: NotePublicId },
+    Reply: { id: NotePublicId },
   }>('/', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
     config: {
       policy: [
         'authRequired',
@@ -134,11 +140,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * TODO: Validate request query
      */
     const { content } = request.body;
-
-    /**
-     * Get user id from request context, because we have auth middleware
-     */
-    const user = request.ctx.auth.id;
+    const { userId } = request;
 
     const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
 
