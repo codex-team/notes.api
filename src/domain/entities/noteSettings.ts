@@ -20,7 +20,7 @@ export default interface NoteSettings {
   /**
    * Is note public for everyone or only for collaborators
    */
-  enabled: boolean;
+  isPublic: boolean;
 }
 
 /**

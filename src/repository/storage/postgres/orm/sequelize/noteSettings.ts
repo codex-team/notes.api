@@ -29,7 +29,7 @@ export class NoteSettingsModel extends Model<InferAttributes<NoteSettingsModel>,
   /**
    * Is note public
    */
-  public declare enabled: CreationOptional<NoteSettings['enabled']>;
+  public declare is_public: CreationOptional<NoteSettings['isPublic']>;
 }
 
 /**
@@ -85,7 +85,7 @@ export default class NoteSettingsSequelizeStorage {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      enabled: {
+      is_public: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
@@ -121,7 +121,7 @@ export default class NoteSettingsSequelizeStorage {
     return {
       id: noteSettings.id,
       noteId: noteSettings.note_id,
-      enabled: noteSettings.enabled,
+      isPublic: noteSettings.is_public,
       customHostname: noteSettings.custom_hostname,
     };
   }
@@ -150,7 +150,7 @@ export default class NoteSettingsSequelizeStorage {
       id: settings.id,
       noteId: settings.note_id,
       customHostname: settings.custom_hostname,
-      enabled: settings.enabled,
+      isPublic: settings.is_public,
     };
   }
 
@@ -181,20 +181,20 @@ export default class NoteSettingsSequelizeStorage {
   public async insertNoteSettings({
     noteId,
     customHostname,
-    enabled,
+    isPublic,
   }: NoteSettingsCreationAttributes
   ): Promise<NoteSettings> {
     const settings = await this.model.create({
       note_id: noteId,
       custom_hostname: customHostname,
-      enabled: enabled,
+      is_public: isPublic,
     });
 
     return {
       id: settings.id,
       noteId: settings.note_id,
       customHostname: settings.custom_hostname,
-      enabled: settings.enabled,
+      isPublic: settings.is_public,
     };
   }
 
@@ -215,7 +215,7 @@ export default class NoteSettingsSequelizeStorage {
     }
 
     const values = {
-      enabled: data.enabled,
+      enabled: data.isPublic,
       custom_hostname: data.customHostname,
     };
 
@@ -225,7 +225,7 @@ export default class NoteSettingsSequelizeStorage {
       id: updatedSettings.id,
       noteId: updatedSettings.note_id,
       customHostname: updatedSettings.custom_hostname,
-      enabled: updatedSettings.enabled,
+      isPublic: updatedSettings.is_public,
     };
   }
 }

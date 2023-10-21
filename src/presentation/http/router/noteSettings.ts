@@ -96,7 +96,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     /**
      * @todo validate data
      */
-    const { customHostname, enabled } = request.body;
+    const { customHostname, isPublic } = request.body;
 
     /**
      * TODO: check is user collaborator
@@ -104,7 +104,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
       customHostname,
-      enabled,
+      isPublic,
     });
 
     if (updatedNoteSettings === null) {
