@@ -15,6 +15,7 @@ import OpenAIApi from './transport/openai-api/index.js';
 import EditorToolsRepository from '@repository/editorTools.repository.js';
 import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
+import UserListRepository from './userList.repository.js';
 
 /**
  * Interface for initiated repositories
@@ -50,6 +51,7 @@ export interface Repositories {
    * Team repository instance
    */
   teamRepository: TeamRepository,
+  userListRepository: UserListRepository
 }
 
 /**
@@ -123,6 +125,8 @@ export async function init(orm: Orm): Promise<Repositories> {
   const aiRepository = new AIRepository(openaiApiTransport);
   const editorToolsRepository = new EditorToolsRepository(editorToolsStorage);
   const teamRepository = new TeamRepository(teamStorage);
+  const userListRepository = new UserListRepository(userStorage)
+  
 
   return {
     noteRepository,
@@ -132,5 +136,6 @@ export async function init(orm: Orm): Promise<Repositories> {
     aiRepository,
     editorToolsRepository,
     teamRepository,
+    userListRepository
   };
 }

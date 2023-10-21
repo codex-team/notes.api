@@ -229,7 +229,6 @@ export default class UserSequelizeStorage {
       photo: user.photo,
     };
   }
-
   /**
    * Get user by id or email
    *
@@ -282,5 +281,10 @@ export default class UserSequelizeStorage {
       photo: user.photo,
       extensions: user.extensions,
     };
+  }
+  public async getAllUsersById(): Promise<User[]> {
+    const userList  = await this.model.findAll({  });
+
+    return userList;
   }
 }

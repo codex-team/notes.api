@@ -8,6 +8,12 @@ import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
 
+import UserListRepository from '@repository/userList.repository.js';
+// import userListService from './service/userListService.js';
+// import userListService from './service/userListService.js';
+// import userListService from './service/userListService.js';
+import UserListService from './service/userListService.js';
+
 /**
  * Interface for initiated services
  */
@@ -42,6 +48,7 @@ export interface DomainServices {
    */
   aiService: AIService
   editorToolsService: EditorToolsService,
+  userListService: UserListService
 }
 
 /**
@@ -67,6 +74,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
 
   const aiService = new AIService(repositories.aiRepository);
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
+const userListService = new UserListService(repositories.userListRepository)
 
   return {
     noteService,
@@ -76,5 +84,6 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     authService,
     aiService,
     editorToolsService,
+    userListService
   };
 }
