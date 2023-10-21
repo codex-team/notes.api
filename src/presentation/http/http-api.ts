@@ -22,6 +22,7 @@ import { NoteSchema } from './schema/Note.js';
 import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
+import NoteListRouter from '@presentation/http/router/noteList.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -167,6 +168,11 @@ export default class HttpApi implements Api {
       prefix: '/note',
       noteService: domainServices.noteService,
       noteSettingsService: domainServices.noteSettingsService,
+    });
+
+    await this.server?.register(NoteListRouter, {
+      prefix: '/notes',
+      noteListService: domainServices.noteListService,
     });
 
     await this.server?.register(NoteSettingsRouter, {

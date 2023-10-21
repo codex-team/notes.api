@@ -1,7 +1,5 @@
 import type { Note, NoteCreationAttributes, NotePublicId } from '@domain/entities/note.js';
-import type NotesSettings from '@domain/entities/notesSettings.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
-import type { NotesSettingsCreationAttributes } from '@domain/entities/notesSettings.js';
 import type { NoteCreatorId } from '@domain/entities/note.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 
@@ -40,7 +38,7 @@ export default class NoteRepository {
    * @param content - new content
    * @returns Note on success, null on failure
    */
-  public async updateNoteContentByPublicId(publicId: NotePublicId, content: Note['content'] ): Promise<Note | null> {
+  public async updateNoteContentByPublicId(publicId: NotePublicId, content: Note['content']): Promise<Note | null> {
     return await this.storage.updateNoteContentByPublicId(publicId, content);
   }
 
@@ -75,45 +73,12 @@ export default class NoteRepository {
   }
 
   /**
-   * Get note settings by note id
+   * Gets note list by creator id
    *
-   * @param id - note public id
-   * @returns { Promise<NotesSettings | null> } found note settings
+   * @param id - note creator id
+   * @returns { Promise<NoteList | null> } note
    */
-  public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NotesSettings> {
-    /**
-     * @todo get internal id by public id and resolve note settings by the internal id
-     */
-    return await this.storage.getNoteSettingsByPublicId(id);
-  }
-
-  /**
-   * Get note settings by note id
-   *
-   * @param id - note id
-   * @returns { Promise<NotesSettings | null> } found note settings
-   */
-  public async getNoteSettingsByNoteId(id: Note['id']): Promise<NotesSettings> {
-    return await this.storage.getNoteSettingsByNoteId(id);
-  }
-
-  /**
-   * Add note settings
-   *
-   * @param settings - note settings
-   */
-  public async addNoteSettings(settings: NotesSettingsCreationAttributes): Promise<NotesSettings> {
-    return await this.storage.insertNoteSettings(settings);
-  }
-
-  /**
-   * Patch note settings
-   *
-   * @param data - note settings new values
-   * @param id - note settings id
-   * @returns { Promise<NotesSettings> } patched note settings
-   */
-  public async patchNoteSettings(data: Partial<NotesSettings>, id: NotesSettings['id']): Promise<NotesSettings | null> {
-    return await this.storage.patchNoteSettings(data, id);
+  public async getNoteListByCreatorId(id: NoteCreatorId): Promise<NoteList | null> {
+    return await this.storage.getNoteListByCreatorId(id);
   }
 }
