@@ -294,9 +294,9 @@ export default class NoteSequelizeStorage {
       },
     });
 
-    // if (noteList.length === 0) {
-    //   return null;
-    // };
+    if (noteList.length === 0) {
+      return null;
+    };
 
     return noteList;
   }
