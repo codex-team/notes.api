@@ -1,5 +1,5 @@
 import type { FastifyPluginCallback } from 'fastify';
-import type NoteListService from '@domain/service/noteList';
+import type NoteListService from '@domain/service/noteList.js';
 import type { Middlewares } from '@presentation/http/middlewares/index.js';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import { StatusCodes } from 'http-status-codes';
@@ -35,9 +35,9 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
    * Get note list by userId
    */
   fastify.get('/', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
-    const userId = request.ctx.auth.id;
+    const creatorId = request.ctx.auth.id;
 
-    const noteList = await noteListService.getNoteListByCreatorId(userId);
+    const noteList = await noteListService.getNoteListByCreatorId(creatorId);
 
     /**
      * Check if note list does not exist
