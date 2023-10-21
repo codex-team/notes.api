@@ -73,7 +73,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(note.id);
 
-    if (noteSettings?.enabled === true) {
+    /**
+     * Check if note is public or user is owner
+     */
+    if (noteSettings.isPublic || note.creatorId === request.userId) {
       return reply.send(note);
     }
 

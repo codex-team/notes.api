@@ -20,7 +20,6 @@ interface NoteListRouterOptions {
  * @param done - callback
  */
 const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, opts, done) => {
-
   const noteListService = opts.noteListService;
 
   /**
@@ -41,4 +40,5 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
 
   done();
 };
+
 export default NoteListRouter;

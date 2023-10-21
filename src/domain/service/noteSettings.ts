@@ -33,13 +33,13 @@ export default class NoteSettingsService {
    * Adds note settings
    *
    * @param noteId - note id
-   * @param enabled - is note enabled
+   * @param isPublic - is note public
    * @returns added note settings
    */
-  public async addNoteSettings(noteId: NoteInternalId, enabled: boolean = true): Promise<NoteSettings> {
+  public async addNoteSettings(noteId: NoteInternalId, isPublic: boolean = true): Promise<NoteSettings> {
     return await this.repository.addNoteSettings({
       noteId: noteId,
-      enabled: enabled,
+      isPublic: isPublic,
     });
   }
 
