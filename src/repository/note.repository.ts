@@ -1,4 +1,4 @@
-import type { Note, NoteCreationAttributes, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 
 /**
@@ -30,14 +30,13 @@ export default class NoteRepository {
   }
 
   /**
-   * Update note content in a store using note public id
+   * Update note content in a store
    *
-   * @param publicId - note public id
+   * @param id - note internal id
    * @param content - new content
-   * @returns Note on success, null on failure
    */
-  public async updateNoteContentByPublicId(publicId: NotePublicId, content: Note['content'] ): Promise<Note | null> {
-    return await this.storage.updateNoteContentByPublicId(publicId, content);
+  public async updateNoteContentById(id: NoteInternalId, content: Note['content'] ): Promise<Note | null> {
+    return await this.storage.updateNoteContentById(id, content);
   }
 
   /**
@@ -46,7 +45,7 @@ export default class NoteRepository {
    * @param id - note id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteById(id: Note['id']): Promise<Note | null> {
+  public async getNoteById(id: NoteInternalId): Promise<Note | null> {
     return await this.storage.getNoteById(id);
   }
 
@@ -61,10 +60,9 @@ export default class NoteRepository {
   }
 
   /**
-   * Get note by public id
+   * Returns note by public id. Null if note does not exist.
    *
    * @param publicId - public id
-   * @returns { Promise<Note | null> } found note
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
     return await this.storage.getNoteByPublicId(publicId);

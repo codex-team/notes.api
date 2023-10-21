@@ -142,18 +142,18 @@ export default class NoteSequelizeStorage {
   }
 
   /**
-   * Update note content by public id
+   * Update note content by id
    *
-   * @param publicId - note public id
+   * @param id - note internal id
    * @param content - new content
    * @returns Note on success, null on failure
    */
-  public async updateNoteContentByPublicId(publicId: NotePublicId, content: Note['content']): Promise<Note | null> {
+  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note | null> {
     const [affectedRowsCount, affectedRows] = await this.model.update({
       content,
     }, {
       where: {
-        publicId,
+        id,
       },
       returning: true,
     });

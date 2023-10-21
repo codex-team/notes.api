@@ -4,6 +4,7 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
+import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import { GetNoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
 
 /**
@@ -11,9 +12,9 @@ import { GetNoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
  */
 interface GetNoteByIdOptions {
   /**
-   * Note id
+   * Public id got from url
    */
-  id: NotePublicId;
+  notePublicId: NotePublicId;
 }
 
 /**
@@ -79,21 +80,27 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const noteSettingsService = opts.noteSettingsService;
 
   /**
-   * Get note by id with schema JSON (validate request params)
+   * Prepare note id resolver middleware
+   * It should be used in routes that accepts note public id
+   */
+  const { noteIdResolver } = useNoteResolver(noteService);
+
+  /**
+   * Get note by id
    */
   fastify.get<{
     Params: GetNoteByIdOptions,
-    Reply: Note | ErrorResponse
-  }>('/:id', {
+    Reply: Note | ErrorResponse,
+  }>('/:notePublicId', {
+    preHandler: [
+      noteIdResolver,
+    ],
     schema: {
       params: GetNoteSchema,
     },
   }, async (request, reply) => {
-    const params = request.params;
-
-    const { id } = params;
-
-    const note = await noteService.getNoteById(id);
+    const noteId = request.noteId as number;
+    const note = await noteService.getNoteById(noteId);
 
     /**
      * Check if note does not exist
@@ -168,9 +175,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * @todo Check user access right
      */
-    const { id, content } = request.body;
+    const noteId = request.noteId as number;
+    const { content } = request.body;
 
-    const note = await noteService.updateNoteContentByPublicId(id, content);
+    const note = await noteService.updateNoteContentById(noteId, content);
 
     return reply.send({
       updatedAt: note.updatedAt,
