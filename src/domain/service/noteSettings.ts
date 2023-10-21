@@ -64,14 +64,13 @@ export default class NoteSettingsService {
   }
 
   /**
-   * Get team relations by note id and user id
+   * Get user role in team by user id and note id
    *
-   * @param userId - user id to check his permissions
-   * @param noteId - note id where user should have permissions
-   * @returns team relation
+   * @param userId - user id to check his role
+   * @param noteId - note id where user should have role
    */
-  public async getTeamByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<Team | null> {
-    return await this.teamRepository.getByUserIdAndNoteId(userId, noteId);
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<string | null> {
+    return await this.teamRepository.getUserRoleByUserIdAndNoteId(userId, noteId);
   }
 
   /**
