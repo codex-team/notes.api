@@ -40,7 +40,7 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
                 data: {
                   type: 'array',
                   items: {
-                    '$ref': 'EditorToolSchema',
+                    $ref: 'EditorToolSchema',
                   },
                 },
               },
@@ -60,10 +60,12 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   /**
    * Add editor tool to the library of all tools
    */
-  fastify.post<{ Body: EditorTool }>('/add-tool', {
+  fastify.post<{
+    Body: EditorTool
+  }>('/add-tool', {
     schema: {
       body: {
-        '$ref': 'EditorToolSchema',
+        $ref: 'EditorToolSchema',
       },
       response: {
         '2xx': {
@@ -72,7 +74,7 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
             'application/json': {
               schema: {
                 data: {
-                  '$ref': 'EditorToolSchema',
+                  $ref: 'EditorToolSchema',
                 },
               },
             },

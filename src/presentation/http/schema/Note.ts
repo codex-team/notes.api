@@ -27,3 +27,26 @@ export const NoteSchema = {
     },
   },
 };
+
+export const GetNoteSchema = {
+  $id: 'GetNoteSchema',
+  type: 'object',
+  properties: {
+    id: {
+      $ref: 'NoteSchema#/properties/id',
+    },
+  },
+};
+
+export const NoteEditPayloadSchema = {
+  $id: 'NoteOptionSchema',
+  type: 'object',
+  properties: {
+    id: {
+      $ref: 'NoteSchema#/properties/id',
+    },
+    content: {
+      $ref: 'NoteSchema#/properties/content',
+    },
+  },
+};

@@ -1,7 +1,6 @@
 import type UserRepository from '@repository/user.repository.js';
 import { Provider } from '@repository/user.repository.js';
 import type User from '@domain/entities/user.js';
-import type { UserEditorTool } from '@domain/entities/userExtensions.js';
 import type EditorTool from '@domain/entities/editorTools';
 
 export {
@@ -52,10 +51,10 @@ export default class UserService {
    *
    * @param userId - user unique identifier
    */
-  public async getUserEditorTools(userId: User['id']): Promise<UserEditorTool[] | undefined> {
+  public async getUserExtensions(userId: User['id']): Promise<User['extensions'] | undefined> {
     const user = await this.getUserById(userId);
 
-    return user?.extensions?.editorTools;
+    return user?.extensions;
   }
 
   /**

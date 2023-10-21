@@ -39,13 +39,13 @@ export default class EditorToolsService {
   /**
    * Adding custom editor tool
    *
-   * @param tool - all data about the editor plugin
+   * @param editorTool - all data about the editor plugin
    * @returns {Promise<EditorTool | null>} editor tool data
    */
-  public async addTool(tool: Omit<EditorTool, 'id'>): Promise<EditorTool | null> {
+  public async addTool(editorTool: Omit<EditorTool, 'id'>): Promise<EditorTool | null> {
     return await this.repository.addTool({
       id: createEditorToolId(),
-      ...tool,
+      ...editorTool,
     });
   }
 }

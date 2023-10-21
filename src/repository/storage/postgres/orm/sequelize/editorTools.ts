@@ -1,5 +1,5 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes } from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Op } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 
@@ -131,7 +131,7 @@ export default class UserSequelizeStorage {
     const editorTools = await this.model.findAll({
       where: {
         id: {
-          includes: editorToolIds,
+          [Op.in]: editorToolIds,
         },
       },
     });

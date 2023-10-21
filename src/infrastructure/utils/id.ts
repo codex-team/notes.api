@@ -11,7 +11,7 @@ export function createPublicId(length: number = 10): string {
 }
 
 /**
- * Create private id for editor tools
+ * Create unique identifier for editor tools
  * Used in editor tools and user settings
  *
  * @param length - id length

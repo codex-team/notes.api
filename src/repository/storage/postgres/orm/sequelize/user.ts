@@ -280,6 +280,7 @@ export default class UserSequelizeStorage {
       name: user.name,
       createdAt: user.created_at,
       photo: user.photo,
+      extensions: user.extensions,
     };
   }
 }

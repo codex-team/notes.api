@@ -81,7 +81,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
                 data: {
                   type: 'array',
                   items: {
-                    '$ref': 'EditorToolSchema',
+                    $ref: 'EditorToolSchema',
                   },
                 },
               },
@@ -93,9 +93,9 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const userId = request.userId as number;
 
-    const userExtensionTools = await userService.getUserEditorTools(userId) ?? [];
-    const editorToolIds = userExtensionTools.map(tools => tools.id);
-    const editorTools = await editorToolsService.getToolsByIds(editorToolIds) ?? [];
+    const userExtensions = await userService.getUserExtensions(userId);
+    const userEditorToolIds = userExtensions?.editorTools?.map(tools => tools.id) ?? [];
+    const editorTools = await editorToolsService.getToolsByIds(userEditorToolIds) ?? [];
 
     return reply.send({
       data: editorTools,
