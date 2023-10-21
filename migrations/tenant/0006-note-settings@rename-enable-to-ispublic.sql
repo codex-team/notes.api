@@ -1,2 +1,2 @@
-ALTER TABLE IF EXISTS public.notes_settings
-    RENAME COLUMN IF EXISTS enabled TO is_public;
+ALTER TABLE IF EXISTS public.note_settings
+    RENAME COLUMN enabled TO is_public;
