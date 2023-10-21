@@ -25,8 +25,7 @@ export default async function userInTeam(request: FastifyRequest, reply: Fastify
   const { creatorId } = request.note;
 
   /**
-   * If note is public, everyone can access it
-   * If note is private, only creator can access it
+   * Check if user can edit note
    */
   if (creatorId !== userId) {
     return await reply.forbidden();
