@@ -1,4 +1,4 @@
-import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { NoteInternalId } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsStorage from '@repository/storage/noteSettings.storage.js';
 import type { NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';

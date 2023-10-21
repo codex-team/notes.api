@@ -1,10 +1,10 @@
-import type { FastifyReply, FastifyRequest, preHandlerHookHandler } from 'fastify';
+import type { FastifyRequest, preHandlerHookHandler } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import notEmpty from '@infrastructure/utils/notEmpty.js';
 import { StatusCodes } from 'http-status-codes';
 import hasProperty from '@infrastructure/utils/hasProperty.js';
 import { getLogger } from '@infrastructure/logging/index.js';
-import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note';
+import type { Note, NotePublicId } from '@domain/entities/note';
 
 /**
  * Add middleware for resolve Note internal id by public id and add it to request
