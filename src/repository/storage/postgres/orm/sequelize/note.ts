@@ -1,5 +1,6 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
+import type { ModelStatic } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type { NoteCreationAttributes } from '@domain/entities/note.js';
@@ -56,7 +57,7 @@ export default class NoteSequelizeStorage {
   /**
    * Notes settings model in database
    */
-  public settingsModel: typeof NoteSettingsModel;
+  public settingsModel: typeof NoteSettingsModel | null = null;
 
   /**
    * Database instance
@@ -72,9 +73,8 @@ export default class NoteSequelizeStorage {
    * Constructor for note storage
    *
    * @param ormInstance - ORM instance
-   * @param settingsModel - note customization parameters
    */
-  constructor({ connection }: Orm, settingsModel: typeof NoteSettingsModel) {
+  constructor({ connection }: Orm) {
     this.database = connection;
 
     /**
@@ -106,13 +106,19 @@ export default class NoteSequelizeStorage {
       sequelize: this.database,
       underscored: true, // use snake_case for fields in db
     });
+  }
+
+  /**
+   * Creates association with note settings model
+   *
+   * @param model - initialized note settings model
+   */
+  public createAssociationWithNoteSettingsModel(model: ModelStatic<NoteSettingsModel>): void {
+    this.settingsModel = model;
 
     /**
-     * Initiate note settings model
+     * Create association with note settings, one-to-one
      */
-    this.settingsModel = settingsModel;
-
-    /** NoteModel and NoteSettingsModel are connected as ONE-TO-ONE */
     this.model.hasOne(this.settingsModel, {
       foreignKey: 'note_id',
       as: this.settingsModel.tableName,
@@ -188,10 +194,14 @@ export default class NoteSequelizeStorage {
    * @returns { Promise<Note | null> } found note
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
+    if (!this.settingsModel) {
+      throw new Error('Note settings model not initialized');
+    }
+
     /**
      * select note which has hostname in its settings
      */
-    const note = await this.model.findOne({
+    return await this.model.findOne({
       where: {
         '$notes_settings.custom_hostname$': hostname,
       },
@@ -201,8 +211,6 @@ export default class NoteSequelizeStorage {
         required: true,
       },
     });
-
-    return note;
   }
 
   /**

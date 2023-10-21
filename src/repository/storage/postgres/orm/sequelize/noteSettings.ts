@@ -1,4 +1,4 @@
-import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional, ModelStatic } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { NotePublicId } from '@domain/entities/note.js';
@@ -46,6 +46,11 @@ export default class NoteSettingsSequelizeStorage {
    * Database instance
    */
   private readonly database: Sequelize;
+
+  /**
+   * Note model instance
+   */
+  private noteModel: typeof NoteModel | null = null;
 
   /**
    * Settings table name
@@ -151,6 +156,24 @@ export default class NoteSettingsSequelizeStorage {
   }
 
   /**
+   * Creates association with note model to make joins
+   *
+   * @param model - initialized note model
+   */
+  public createAssociationWithNoteModel(model: ModelStatic<NoteModel>): void {
+    this.noteModel = model;
+
+    /**
+     * Make one-to-one association with note model
+     * We can not create note settings without note
+     */
+    this.model.belongsTo(model, {
+      foreignKey: 'note_id',
+      as: this.noteModel.tableName,
+    });
+  }
+
+  /**
    * Get note settings
    *
    * @param id - note internal id
@@ -160,9 +183,21 @@ export default class NoteSettingsSequelizeStorage {
    * @todo resolve note setting by internal id
    */
   public async getNoteSettingsByPublicId(id: NotePublicId): Promise<NoteSettings> {
+    /**
+     * Check if note model is initialized
+     */
+    if (!this.noteModel) {
+      throw new Error('Note model not initialized');
+    }
+
     const settings = await this.model.findOne({
       where: {
-        id: id,
+        '$notes.public_id$': id,
+      },
+      include: {
+        model: this.noteModel,
+        as: this.noteModel.tableName,
+        required: true,
       },
     });
 

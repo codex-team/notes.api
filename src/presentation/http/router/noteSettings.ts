@@ -2,7 +2,6 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type { NotePublicId } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
-import type { Middlewares } from '@presentation/http/middlewares/index.js';
 import notEmpty from '@infrastructure/utils/notEmpty.js';
 
 /**
@@ -23,11 +22,6 @@ interface NoteSettingsRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
-
-  /**
-   * Middlewares
-   */
-  middlewares: Middlewares,
 }
 
 /**
@@ -45,8 +39,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
   /**
    * Get noteSettings by id
-   *
-   * @todo move to the NoteSettings Router
    */
   fastify.get<{
     Params: GetNoteSettingsByNodeIdOptions,
@@ -77,7 +69,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Body: Partial<NoteSettings>,
     Params: GetNoteSettingsByNodeIdOptions,
     Reply: NoteSettings,
-  }>('/:id', { preHandler: [opts.middlewares.authRequired, opts.middlewares.withUser] }, async (request, reply) => {
+  }>('/:id', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+  }, async (request, reply) => {
     const noteId = request.params.id;
 
     /**

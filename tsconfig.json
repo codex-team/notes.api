@@ -18,7 +18,12 @@
       "@repository/*": ["repository/*"]
     },
   },
-  "include": ["src/**/*.ts", "vitest.config.js", ".eslintrc.cjs",],
+  "include": [
+    "src/**/*.ts",
+    "vitest.config.js",
+    ".eslintrc.cjs",
+    "fastify.d.ts",
+  ],
   "ts-node": {
     // Tell ts-node CLI to install the --loader automatically
     "esm": true

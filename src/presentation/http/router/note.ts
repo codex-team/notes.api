@@ -4,7 +4,7 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
-import type { Middlewares } from '@presentation/http/middlewares/index.js';
+import { NoteSchema, NoteOptionsShema } from '../schema/Note.js';
 
 /**
  * Get note by id options
@@ -55,11 +55,6 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
-
-  /**
-   * Middlewares
-   */
-  middlewares: Middlewares,
 }
 
 interface ResolveHostnameOptions {
@@ -84,16 +79,19 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const noteSettingsService = opts.noteSettingsService;
 
   /**
-   * Get note by id
+   * Get note by id with shema JSON (validate request params)
    */
   fastify.get<{
     Params: GetNoteByIdOptions,
     Reply: Note | ErrorResponse
-  }>('/:id', { preHandler: opts.middlewares.withUser }, async (request, reply) => {
+  }>('/:id', {
+    preHandler: opts.middlewares.withUser,
+    schema: {
+      params: NoteSchema,
+    },
+  }, async (request, reply) => {
     const params = request.params;
-    /**
-     * TODO: Validate request params
-     */
+
     const { id } = params;
 
     const note = await noteService.getNoteById(id);
@@ -111,9 +109,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return reply.send(note);
     }
 
-    /**
-     * TODO: add check for collaborators by request context from auth middleware
-     */
     return reply
       .code(StatusCodes.UNAUTHORIZED)
       .send({
@@ -127,12 +122,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   fastify.post<{
     Body: AddNoteOptions,
-    Reply: { id: NotePublicId }
+    Reply: { id: NotePublicId },
   }>('/', {
-    preHandler: [
-      opts.middlewares.authRequired,
-      opts.middlewares.withUser,
-    ],
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
   }, async (request, reply) => {
     /**
      * TODO: Validate request query
@@ -144,7 +140,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const user = request.ctx.auth.id;
 
-    const addedNote = await noteService.addNote(content, user);
+    const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
@@ -165,13 +161,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       updatedAt: Note['updatedAt'],
     }
   }>('/', {
-    preHandler: [
-      opts.middlewares.authRequired,
-      opts.middlewares.withUser,
-    ],
+    schema: {
+      body: NoteOptionsShema,
+    },
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
   }, async (request, reply) => {
     /**
-     * @todo Validate request params
      * @todo Check user access right
      */
     const { id, content } = request.body;
