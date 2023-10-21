@@ -39,7 +39,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * Prepare note id resolver middleware
    * It should be used in routes that accepts note public id
    */
-  const { noteIdResolver } = useNoteResolver(noteService);
+  const { noteResolver } = useNoteResolver(noteService);
 
   /**
    * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware
@@ -51,13 +51,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Reply: NoteSettings
   }>('/:notePublicId', {
     preHandler: [
-      noteIdResolver,
+      noteResolver,
     ],
   }, async (request, reply) => {
     /**
      * TODO: Validate request params
      */
-    const noteId = request.noteId as number;
+    const noteId = request.note?.id as number;
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
@@ -87,10 +87,10 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       ],
     },
     preHandler: [
-      noteIdResolver,
+      noteResolver,
     ],
   }, async (request, reply) => {
-    const noteId = request.noteId as number;
+    const noteId = request.note?.id as number;
 
     /**
      * @todo validate data

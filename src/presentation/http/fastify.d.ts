@@ -4,6 +4,8 @@ import type * as http from 'http';
 import type { pino } from 'pino';
 import type Policies from './policies/index.js';
 import type AuthPayload from '@domain/entities/authPayload.js';
+import type { Note } from '@domain/entities/note.js';
+import type NoteSettings from '@domain/entities/noteSettings.js';
 
 declare module 'fastify' {
   export interface FastifyInstance<
@@ -64,8 +66,13 @@ declare module 'fastify' {
     userId: AuthPayload['id'] | null;
 
     /**
-     * This property added by noteIdResolver middleware
+     * This property added by noteResolver middleware
      */
-    noteId: number | undefined;
+    note: Note | null;
+
+    /**
+     * This property added by noteSettingsResolver middleware
+     */
+    noteSettings: NoteSettings | null;
   }
 }

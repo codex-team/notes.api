@@ -1,10 +1,10 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
-import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
+import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 
 /**
  * Interface for the note router.
@@ -39,7 +39,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Prepare note id resolver middleware
    * It should be used in routes that accepts note public id
    */
-  const { noteIdResolver } = useNoteResolver(noteService);
+  const { noteResolver } = useNoteResolver(noteService);
+  /**
+   * Prepare note settings resolver middleware
+   * It should be used to use note settings in middlewares
+   */
+  const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
 
   /**
    * Get note by id
@@ -50,6 +55,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Reply: Note | ErrorResponse,
   }>('/:notePublicId', {
+    config: {
+      policy: [
+        'notePublicOrUserInTeam',
+      ],
+    },
     schema: {
       params: {
         notePublicId: {
@@ -58,11 +68,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       },
     },
     preHandler: [
-      noteIdResolver,
+      noteResolver,
+      noteSettingsResolver,
     ],
   }, async (request, reply) => {
-    const noteId = request.noteId as number;
-    const note = await noteService.getNoteById(noteId);
+    const { note } = request;
 
     /**
      * Check if note does not exist
@@ -71,20 +81,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return fastify.notFound(reply, 'Note not found');
     }
 
-    const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(note.id);
-
-    /**
-     * Check if note is public or user is owner
-     */
-    if (noteSettings.isPublic || note.creatorId === request.userId) {
-      return reply.send(note);
-    }
-
-    return reply
-      .code(StatusCodes.UNAUTHORIZED)
-      .send({
-        message: 'Permission denied',
-      });
+    return reply.send(note);
   });
 
   /**
@@ -155,13 +152,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       ],
     },
     preHandler: [
-      noteIdResolver,
+      noteResolver,
     ],
   }, async (request, reply) => {
     /**
      * @todo Check user access right
      */
-    const noteId = request.noteId as number;
+    const noteId = request.note?.id as number;
     const { content } = request.body;
 
     const note = await noteService.updateNoteContentById(noteId, content);
