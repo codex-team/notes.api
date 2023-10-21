@@ -5,16 +5,7 @@ import type NoteSettings from '@domain/entities/noteSettings.js';
 import notEmpty from '@infrastructure/utils/notEmpty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
-
-/**
- * Get note by id options
- */
-interface GetNoteSettingsByNodeIdOptions {
-  /**
-   * Note internal id
-   */
-  id: NoteInternalId;
-}
+import { NotePublicId } from '@domain/entities/note.js';
 
 /**
  * Interface for the note settings router.
@@ -55,7 +46,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware
    */
   fastify.get<{
-    Params: GetNoteSettingsByNodeIdOptions,
+    Params: {
+      notePublicId: NotePublicId;
+    },
     Reply: NoteSettings
   }>('/:notePublicId', {
     preHandler: [
@@ -84,7 +77,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    */
   fastify.patch<{
     Body: Partial<NoteSettings>,
-    Params: GetNoteSettingsByNodeIdOptions,
+    Params: {
+      notePublicId: NotePublicId;
+    },
     Reply: NoteSettings,
   }>('/:notePublicId', {
     config: {
