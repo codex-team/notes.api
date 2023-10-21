@@ -1,6 +1,9 @@
 import type { NoteInternalId } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsRepository from '@repository/noteSettings.repository.js';
+import type TeamRepository from '@repository/team.repository.js';
+import type { Team, TeamCreationAttributes } from '@domain/entities/team.js';
+import type User from '@domain/entities/user.js';
 
 /**
  * Service responsible for Note Settings
@@ -9,15 +12,19 @@ export default class NoteSettingsService {
   /**
    * Note Settings repository
    */
-  public repository: NoteSettingsRepository;
+  public noteSettingsRepository: NoteSettingsRepository;
+
+  private readonly teamRepository: TeamRepository;
 
   /**
    * Note Settings service constructor
    *
-   * @param repository - note repository
+   * @param noteSettingsrepository - note settings repository
+   * @param teamRepository - team repository
    */
-  constructor(repository: NoteSettingsRepository) {
-    this.repository = repository;
+  constructor(noteSettingsrepository: NoteSettingsRepository, teamRepository: TeamRepository) {
+    this.noteSettingsRepository = noteSettingsrepository;
+    this.teamRepository = teamRepository;
   }
 
   /**
@@ -26,7 +33,7 @@ export default class NoteSettingsService {
    * @param id - note internal id
    */
   public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings> {
-    return await this.repository.getNoteSettingsByNoteId(id);
+    return await this.noteSettingsRepository.getNoteSettingsByNoteId(id);
   }
 
   /**
@@ -37,7 +44,7 @@ export default class NoteSettingsService {
    * @returns added note settings
    */
   public async addNoteSettings(noteId: NoteInternalId, isPublic: boolean = true): Promise<NoteSettings> {
-    return await this.repository.addNoteSettings({
+    return await this.noteSettingsRepository.addNoteSettings({
       noteId: noteId,
       isPublic: isPublic,
     });
@@ -51,8 +58,48 @@ export default class NoteSettingsService {
    * @returns updated note settings
    */
   public async patchNoteSettingsByNoteId(noteId: NoteInternalId, data: Partial<NoteSettings>): Promise<NoteSettings | null> {
-    const noteSettings = await this.repository.getNoteSettingsByNoteId(noteId);
+    const noteSettings = await this.noteSettingsRepository.getNoteSettingsByNoteId(noteId);
 
-    return await this.repository.patchNoteSettingsById(noteSettings.id, data);
+    return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
+  }
+
+  /**
+   * Get team relations by note id and user id
+   *
+   * @param userId - user id to check his permissions
+   * @param noteId - note id where user should have permissions
+   * @returns team relation
+   */
+  public async getTeamByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<Team | null> {
+    return await this.teamRepository.getByUserIdAndNoteId(userId, noteId);
+  }
+
+  /**
+   * Get all team relations by note id
+   *
+   * @param noteId - note id to get all team relations
+   * @returns team relations
+   */
+  public async getTeamByNoteId(noteId: NoteInternalId): Promise<Team[]> {
+    return await this.teamRepository.getByNoteId(noteId);
+  }
+
+  /**
+   * Remove team relation by id
+   *
+   * @param id - team relation id
+   */
+  public async removeTeamRelationById(id: Team['id']): Promise<boolean> {
+    return await this.teamRepository.removeRelationById(id);
+  }
+
+  /**
+   * Creates team relation
+   *
+   * @param team - data for team creation
+   * @returns created team
+   */
+  public async createTeamRelation(team: TeamCreationAttributes): Promise<Team> {
+    return await this.teamRepository.create(team);
   }
 }

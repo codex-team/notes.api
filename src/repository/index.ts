@@ -13,6 +13,8 @@ import UserRepository from '@repository/user.repository.js';
 import AIRepository from './ai.repository.js';
 import OpenAIApi from './transport/openai-api/index.js';
 import EditorToolsRepository from '@repository/editorTools.repository.js';
+import TeamRepository from '@repository/team.repository.js';
+import TeamStorage from '@repository/storage/team.storage.js';
 
 /**
  * Interface for initiated repositories
@@ -43,6 +45,11 @@ export interface Repositories {
    */
   aiRepository: AIRepository
   editorToolsRepository: EditorToolsRepository,
+
+  /**
+   * Team repository instance
+   */
+  teamRepository: TeamRepository,
 }
 
 /**
@@ -73,12 +80,19 @@ export async function init(orm: Orm): Promise<Repositories> {
   const userStorage = new UserStorage(orm);
   const noteSettingsStorage = new NoteSettingsStorage(orm);
   const noteStorage = new NoteStorage(orm);
+  const teamStorage = new TeamStorage(orm);
 
   /**
    * Create associations between note and note settings
    */
   noteStorage.createAssociationWithNoteSettingsModel(noteSettingsStorage.model);
   noteSettingsStorage.createAssociationWithNoteModel(noteStorage.model);
+
+  /**
+   * Create associations between note and team, user and team
+   */
+  teamStorage.createAssociationWithNoteModel(noteStorage.model);
+  teamStorage.createAssociationWithUserModel(userStorage.model);
 
   const userSessionStorage = new UserSessionStorage(orm);
   const editorToolsStorage = new EditorToolsStorage(orm);
@@ -88,6 +102,7 @@ export async function init(orm: Orm): Promise<Repositories> {
    */
   await userStorage.model.sync();
   await noteStorage.model.sync();
+  await teamStorage.model.sync();
   await noteSettingsStorage.model.sync();
   await userSessionStorage.model.sync();
   await editorToolsStorage.model.sync();
@@ -107,6 +122,7 @@ export async function init(orm: Orm): Promise<Repositories> {
   const userRepository = new UserRepository(userStorage, googleApiTransport);
   const aiRepository = new AIRepository(openaiApiTransport);
   const editorToolsRepository = new EditorToolsRepository(editorToolsStorage);
+  const teamRepository = new TeamRepository(teamStorage);
 
   return {
     noteRepository,
@@ -115,5 +131,6 @@ export async function init(orm: Orm): Promise<Repositories> {
     userRepository,
     aiRepository,
     editorToolsRepository,
+    teamRepository,
   };
 }

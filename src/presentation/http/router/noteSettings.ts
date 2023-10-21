@@ -5,6 +5,7 @@ import notEmpty from '@infrastructure/utils/notEmpty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import type { NotePublicId } from '@domain/entities/note.js';
+import type { Team } from '@domain/entities/team.js';
 
 /**
  * Interface for the note settings router.
@@ -111,6 +112,23 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     }
 
     return reply.send(updatedNoteSettings);
+  });
+
+  fastify.get<{
+    Params: {
+      notePublicId: NotePublicId,
+    },
+    Reply: Team[],
+  }>('/:notePublicId/team', {
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+
+    const team = await noteSettingsService.getTeamByNoteId(noteId);
+
+    return reply.send(team);
   });
 
   done();
