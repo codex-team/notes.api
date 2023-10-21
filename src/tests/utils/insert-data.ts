@@ -32,7 +32,7 @@ async function insertNotes(db: SequelizeOrm): Promise<void> {
  */
 async function insertNoteSettings(db: SequelizeOrm): Promise<void> {
   for (const noteSetting of noteSettings) {
-    await db.connection.query(`INSERT INTO public.notes_settings (id, "note_id", "custom_hostname", "enabled") VALUES (${noteSetting.id}, '${noteSetting.note_id}', '${noteSetting.custom_hostname}', ${noteSetting.enabled})`);
+    await db.connection.query(`INSERT INTO public.note_settings (id, "note_id", "custom_hostname", "enabled") VALUES (${noteSetting.id}, '${noteSetting.note_id}', '${noteSetting.custom_hostname}', ${noteSetting.enabled})`);
   }
 }
 
