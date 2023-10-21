@@ -38,18 +38,6 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     const { userId } = request;
     const noteList = await noteListService.getNoteListByCreatorId(userId as number);
 
-    /**
-     * Check if note list does not exist
-     */
-    if (!noteList) {
-      const response: ErrorResponse = {
-        code: StatusCodes.NOT_FOUND,
-        message: 'Note list not found',
-      };
-
-      return reply.send(response);
-    }
-
     return reply.send(noteList);
   });
 
