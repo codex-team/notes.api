@@ -36,15 +36,13 @@ export default class NoteService {
   }
 
   /**
-   * Updates note
+   * Updates a note
    *
-   * @param id - note id
+   * @param id - note internal id
    * @param content - new content
-   * @returns updated note
-   * @throws { Error } if note was not updated
    */
-  public async updateNoteContentByPublicId(id: NotePublicId, content: Note['content']): Promise<Note> {
-    const updatedNote = await this.repository.updateNoteContentByPublicId(id, content);
+  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note> {
+    const updatedNote = await this.repository.updateNoteContentById(id, content);
 
     if (updatedNote === null) {
       throw new Error(`Note with id ${id} was not updated`);

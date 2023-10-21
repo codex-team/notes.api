@@ -173,9 +173,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * @todo Validate request params
      * @todo Check user access right
      */
-    const { id, content } = request.body;
+    const noteId = request.noteId as number;
+    const { content } = request.body;
 
-    const note = await noteService.updateNoteContentByPublicId(id, content);
+    const note = await noteService.updateNoteContentById(noteId, content);
 
     return reply.send({
       updatedAt: note.updatedAt,
