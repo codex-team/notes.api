@@ -2,7 +2,7 @@ import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptio
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
-import type { Team, TeamCreationAttributes } from '@domain/entities/team.js';
+import type { Team, TeamMemberCreationAttributes, TeamMember } from '@domain/entities/team.js';
 import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
@@ -13,19 +13,19 @@ import type { NoteInternalId } from '@domain/entities/note.js';
  */
 export class TeamsModel extends Model<InferAttributes<TeamsModel>, InferCreationAttributes<TeamsModel>> {
   /**
-   * Collaborator relation id
+   * team member id
    */
-  public declare id: CreationOptional<Team['id']>;
+  public declare id: CreationOptional<TeamMember['id']>;
 
   /**
    * Note ID
    */
-  public declare noteId: Team['noteId'];
+  public declare noteId: TeamMember['noteId'];
 
   /**
    * Team member user id
    */
-  public declare userId: Team['userId'];
+  public declare userId: TeamMember['userId'];
 
   /**
    * Team member role, show what user can do with note
@@ -145,21 +145,22 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
-   * Create new team relation
+   * Create new team member
    *
-   * @param data - team relation data
+   * @param data - team member data
    */
-  public async insert(data: TeamCreationAttributes): Promise<Team> {
+  public async insert(data: TeamMemberCreationAttributes): Promise<TeamMember> {
     return await this.model.create(data);
   }
 
   /**
    * Get user role by user id and note id
+   * If user is not a member of note, return null
    *
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<string | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
     const res = await this.model.findOne({
       where: {
         userId,
@@ -171,12 +172,12 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
-   * Get all team relations by note id
+   * Get all team members by note id
    *
-   * @param noteId - note id to get all team relations
+   * @param noteId - note id to get all team members
    * @returns team relations
    */
-  public async getByNoteId(noteId: NoteInternalId): Promise<Team[]> {
+  public async getMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
     return await this.model.findAll({
       where: {
         noteId,
@@ -185,11 +186,11 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
-   * Remove team relation by id
+   * Remove team member by id
    *
-   * @param id - team relation id
+   * @param id - team member id
    */
-  public async removeRelationById(id: Team['id']): Promise<boolean> {
+  public async removeTeamMemberById(id: TeamMember['id']): Promise<boolean> {
     const affectedRows = await this.model.destroy({
       where: {
         id,

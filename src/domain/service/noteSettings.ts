@@ -2,7 +2,7 @@ import type { NoteInternalId } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsRepository from '@repository/noteSettings.repository.js';
 import type TeamRepository from '@repository/team.repository.js';
-import type { Team, TeamCreationAttributes } from '@domain/entities/team.js';
+import type { MemberRole, Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 
 /**
@@ -65,40 +65,41 @@ export default class NoteSettingsService {
 
   /**
    * Get user role in team by user id and note id
+   * If user is not a member of note, return null
    *
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<string | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
     return await this.teamRepository.getUserRoleByUserIdAndNoteId(userId, noteId);
   }
 
   /**
-   * Get all team relations by note id
+   * Get all team members by note id
    *
-   * @param noteId - note id to get all team relations
-   * @returns team relations
+   * @param noteId - note id to get all team members
+   * @returns team members
    */
-  public async getTeamByNoteId(noteId: NoteInternalId): Promise<Team[]> {
+  public async getTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
     return await this.teamRepository.getByNoteId(noteId);
   }
 
   /**
-   * Remove team relation by id
+   * Remove team member by id
    *
-   * @param id - team relation id
+   * @param id - team member id
    */
-  public async removeTeamRelationById(id: Team['id']): Promise<boolean> {
-    return await this.teamRepository.removeRelationById(id);
+  public async removeTeamMemberById(id: Team['id']): Promise<boolean> {
+    return await this.teamRepository.removeMemberById(id);
   }
 
   /**
-   * Creates team relation
+   * Creates team member
    *
-   * @param team - data for team creation
-   * @returns created team
+   * @param team - data for team member creation
+   * @returns created team member
    */
-  public async createTeamRelation(team: TeamCreationAttributes): Promise<Team> {
+  public async createTeamMember(team: TeamMemberCreationAttributes): Promise<TeamMember> {
     return await this.teamRepository.create(team);
   }
 }

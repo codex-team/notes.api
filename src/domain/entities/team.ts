@@ -17,7 +17,7 @@ export enum MemberRole {
  * Class representing a team entity
  * Team is a relation between note and user, which shows what user can do with note
  */
-export interface Team {
+export interface TeamMember {
     /**
      * Team relation id
      */
@@ -39,4 +39,6 @@ export interface Team {
     role:  MemberRole;
 }
 
-export type TeamCreationAttributes = Omit<Team, 'id'>;
+export type Team = TeamMember[];
+
+export type TeamMemberCreationAttributes = Omit<TeamMember, 'id'>;
