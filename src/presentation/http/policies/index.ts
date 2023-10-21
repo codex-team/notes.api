@@ -1,7 +1,7 @@
 import authRequired from './authRequired.js';
-import checkPermission from './checkPermissions.js';
+import notePublicOrUserInTeam from './notePublicOrUserInTeam.js';
 
 export default {
   authRequired,
-  checkPermission,
+  notePublicOrUserInTeam,
 };

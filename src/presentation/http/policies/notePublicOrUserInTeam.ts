@@ -7,7 +7,7 @@ import { StatusCodes } from 'http-status-codes';
  * @param request - Fastify request object
  * @param reply - Fastify reply object
  */
-export default async function checkPermission(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export default async function notePublicOrUserInTeam(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const { userId } = request;
 
   /**

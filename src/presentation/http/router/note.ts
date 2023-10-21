@@ -57,7 +57,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }>('/:notePublicId', {
     config: {
       policy: [
-        'checkPermission',
+        'notePublicOrUserInTeam',
       ],
     },
     schema: {
