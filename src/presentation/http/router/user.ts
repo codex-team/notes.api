@@ -102,6 +102,11 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     });
   });
 
+  /**
+   * Add editor tool to user extensions.
+   * These editor tools are used when creating new notes.
+   * Tool is linked by it's id.
+   */
   fastify.post<{
     Body: { toolId: string }
   }>('/editor-tools', {

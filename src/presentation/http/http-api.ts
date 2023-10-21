@@ -134,7 +134,7 @@ export default class HttpApi implements Api {
           description: 'Localhost environment',
         }, {
           url: 'https://api.notex.so',
-          description: 'Stage environment',
+          description: 'Production environment',
         } ],
         components: {
           securitySchemes: {

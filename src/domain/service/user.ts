@@ -71,7 +71,7 @@ export default class UserService {
   }): Promise<void> {
     return await this.repository.addUserEditorTool({
       userId,
-      editorTool: {
+      tool: {
         id: editorToolId,
       },
     });

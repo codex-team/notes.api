@@ -49,7 +49,7 @@ export interface AddUserToolOptions {
   /**
    * Editor tool data
    */
-  editorTool: UserEditorTool;
+  tool: UserEditorTool;
 }
 
 /**
@@ -173,7 +173,7 @@ export default class UserSequelizeStorage {
    */
   public async addUserEditorTool({
     userId,
-    editorTool,
+    tool: editorTool,
   }: AddUserToolOptions): Promise<void> {
     await this.model.update({
       extensions: fn('array_append', col('editorTools'), editorTool),
