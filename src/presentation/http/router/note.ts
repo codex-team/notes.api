@@ -4,7 +4,7 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
-import { NoteSchema, NoteOptionsShema } from '../schema/Note.js';
+import { NoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
 
 /**
  * Get note by id options
@@ -79,7 +79,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const noteSettingsService = opts.noteSettingsService;
 
   /**
-   * Get note by id with shema JSON (validate request params)
+   * Get note by id with schema JSON (validate request params)
    */
   fastify.get<{
     Params: GetNoteByIdOptions,
@@ -123,13 +123,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.post<{
     Body: AddNoteOptions,
     Reply: { id: NotePublicId },
-    Reply: { id: NotePublicId },
   }>('/', {
-    config: {
-      policy: [
-        'authRequired',
-      ],
-    },
     config: {
       policy: [
         'authRequired',
@@ -164,7 +158,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     }
   }>('/', {
     schema: {
-      body: NoteOptionsShema,
+      body: NoteEditPayloadSchema,
     },
     config: {
       policy: [

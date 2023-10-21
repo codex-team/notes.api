@@ -1,7 +1,6 @@
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
 import type { FastifyInstance, FastifyBaseLogger } from 'fastify';
-import type { FastifyInstance, FastifyBaseLogger } from 'fastify';
 import fastify from 'fastify';
 import type Api from '@presentation/api.interface.js';
 import type { DomainServices } from '@domain/index.js';
@@ -9,7 +8,6 @@ import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
-import addAuthMiddleware from '@presentation/http/middlewares/auth.js';
 import addAuthMiddleware from '@presentation/http/middlewares/auth.js';
 import cookie from '@fastify/cookie';
 import NotFoundDecorator from './decorators/notFound.js';

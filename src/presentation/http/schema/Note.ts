@@ -14,8 +14,8 @@ export const NoteSchema = {
   },
 };
 
-export const NoteOptionsShema = {
-  $id: 'NoteOptionShema',
+export const NoteEditPayloadSchema = {
+  $id: 'NoteOptionSchema',
   type: 'object',
   properties: {
     id: {
