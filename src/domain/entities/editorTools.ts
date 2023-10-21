@@ -24,6 +24,11 @@ export default interface EditorTool {
   class: string;
 
   /**
+   * Is plugin included by default in the editor
+   */
+  isDefault?: boolean;
+
+  /**
    * Source of the tool to get it's code
    */
   source: {

@@ -19,6 +19,11 @@ export const EditorToolSchema = {
       type: 'string',
       description: 'Name of the plugin\'s class, e.g. "LinkTool", "Checklist", "Header"',
     },
+    isDefault: {
+      type: 'boolean',
+      description: 'Is plugin included by default in the editor',
+      default: false,
+    },
     source: {
       type: 'object',
       properties: {

@@ -102,7 +102,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     });
   });
 
-  fastify.put<{
+  fastify.post<{
     Body: { toolId: string }
   }>('/editor-tools', {
     config: {
