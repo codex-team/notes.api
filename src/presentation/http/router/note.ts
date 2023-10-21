@@ -5,43 +5,6 @@ import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
-import { GetNoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
-
-/**
- * Get note by id options
- */
-interface GetNoteByIdOptions {
-  /**
-   * Public id got from url
-   */
-  notePublicId: NotePublicId;
-}
-
-/**
- * Add note options
- */
-interface AddNoteOptions {
-  /**
-   * Note content
-   */
-  content: JSON;
-}
-
-/**
- * Payload for update note request
- */
-interface UpdateNoteOptions {
-  /**
-   * Note public id
-   */
-  id: NotePublicId;
-
-  /**
-   * New content
-   */
-  content: JSON;
-}
-
 
 /**
  * Interface for the note router.
@@ -56,13 +19,6 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
-}
-
-interface ResolveHostnameOptions {
-  /**
-   * Custom Hostname
-   */
-  hostname: string;
 }
 
 /**
@@ -89,15 +45,21 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Get note by id
    */
   fastify.get<{
-    Params: GetNoteByIdOptions,
+    Params: {
+      notePublicId: NotePublicId;
+    },
     Reply: Note | ErrorResponse,
   }>('/:notePublicId', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
     preHandler: [
       noteIdResolver,
     ],
-    schema: {
-      params: GetNoteSchema,
-    },
   }, async (request, reply) => {
     const noteId = request.noteId as number;
     const note = await noteService.getNoteById(noteId);
@@ -127,8 +89,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Responses with note public id.
    */
   fastify.post<{
-    Body: AddNoteOptions,
-    Reply: { id: NotePublicId },
+    Body: {
+      content: JSON;
+    },
+    Reply: {
+      id: NotePublicId
+    },
   }>('/', {
     config: {
       policy: [
@@ -158,19 +124,36 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Updates note by id.
    */
   fastify.patch<{
-    Body: UpdateNoteOptions,
+    Params: {
+      notePublicId: NotePublicId,
+    },
+    Body: {
+      content: JSON;
+    },
     Reply: {
       updatedAt: Note['updatedAt'],
     }
-  }>('/', {
+  }>('/:notePublicId', {
     schema: {
-      body: NoteEditPayloadSchema,
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      body: {
+        content: {
+          $ref: 'NoteSchema#/properties/content',
+        },
+      },
     },
     config: {
       policy: [
         'authRequired',
       ],
     },
+    preHandler: [
+      noteIdResolver,
+    ],
   }, async (request, reply) => {
     /**
      * @todo Check user access right
@@ -190,7 +173,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Get note by custom hostname
    */
   fastify.get<{
-    Params: ResolveHostnameOptions,
+    Params: {
+      /**
+       * Custom Hostname to search note by
+       */
+      hostname: string;
+    },
     Reply: Note
   }>('/resolve-hostname/:hostname', async (request, reply) => {
     const params = request.params;
