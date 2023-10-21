@@ -188,16 +188,15 @@ export default class NoteSequelizeStorage {
 
   /**
    * Deletes note by id
-   * 
+   *
    * @param id - internal id
-   * @returns { Promise<boolean> }
    */
-  public async deleteNoteById(id: NoteInternalId){
+  public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
     const note = await this.model.destroy({
       where:{
         id,
-      }
-    })
+      },
+    });
 
     /**
      * If note not found, return null
@@ -205,7 +204,7 @@ export default class NoteSequelizeStorage {
     if (!note) {
       return false;
     }
-    else{
+    else {
       return true;
     }
   }
