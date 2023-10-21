@@ -22,6 +22,21 @@ SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
+-- Create role "codex" if it does not exist
+DO
+$do$
+BEGIN
+    IF EXISTS (
+        SELECT FROM pg_catalog.pg_roles
+        WHERE  rolname = 'codex') THEN
+
+        RAISE NOTICE 'Role "my_codexuser" already exists. Skipping.';
+    ELSE
+        CREATE ROLE codex LOGIN PASSWORD '';
+   END IF;
+END
+$do$;
+
 --
 -- TOC entry 222 (class 1259 OID 16441)
 -- Name: editor_tools; Type: TABLE; Schema: public; Owner: codex

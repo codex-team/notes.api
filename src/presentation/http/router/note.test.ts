@@ -13,7 +13,7 @@ describe('Note API', () => {
         'content': null,
         'createdAt': '2023-10-16T13:49:19.000Z',
         'updatedAt': '2023-10-16T13:49:19.000Z',
-        'notes_settings':  {
+        'notesSettings':  {
           'custom_hostname': 'codex.so',
           'enabled': true,
           'id': 1,
@@ -34,7 +34,7 @@ describe('Note API', () => {
       expect(body).toStrictEqual(expectedNote);
     });
 
-    test('Rreturns 404 when note not found', async () => {
+    test('Returns 404 when note not found', async () => {
       const expectedStatus = 404;
 
       const response = await global.api?.fakeRequest({
@@ -49,4 +49,8 @@ describe('Note API', () => {
       expect(body).toStrictEqual({ message: 'Note not found' });
     });
   });
+
+  // describe('GET fdgfdgf', () => {
+  //   test('')
+  // })
 });
