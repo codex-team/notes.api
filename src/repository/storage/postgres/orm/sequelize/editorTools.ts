@@ -3,15 +3,6 @@ import { Model, DataTypes, Op } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 
-
-interface AddToolOptions {
-  id: EditorTool['id'];
-  pluginId: EditorTool['pluginId'];
-  name: EditorTool['name'];
-  class: EditorTool['class'];
-  source: EditorTool['source'];
-}
-
 /**
  * Class representing an EditorTool model in database
  */
@@ -24,17 +15,17 @@ export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, Inf
   /**
    * Custom name that uses in editor initiazliation. e.g. 'code'
    */
-  public declare pluginId: EditorTool['pluginId'];
+  public declare name: EditorTool['name'];
 
   /**
    * Editor tool title. e.g. 'Code tool 3000'
    */
-  public declare name: EditorTool['name'];
+  public declare title: EditorTool['title'];
 
   /**
    * User tool class name. e.g. 'CodeTool'
    */
-  public declare class: EditorTool['class'];
+  public declare exportName: EditorTool['exportName'];
 
   /**
    * Editor tool sources
@@ -78,15 +69,15 @@ export default class UserSequelizeStorage {
         allowNull: false,
         primaryKey: true,
       },
-      pluginId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      class: {
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      exportName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -106,16 +97,16 @@ export default class UserSequelizeStorage {
    */
   public async addTool({
     id,
-    pluginId,
     name,
-    class: editorToolClass,
+    title,
+    exportName,
     source,
-  }: AddToolOptions): Promise<EditorTool> {
+  }: EditorTool): Promise<EditorTool> {
     const editorTool = await this.model.create({
       id,
-      pluginId,
       name,
-      class: editorToolClass,
+      title,
+      exportName,
       source,
     });
 

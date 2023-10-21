@@ -7,15 +7,15 @@ export const EditorToolSchema = {
       readOnly: true,
       description: 'Unique tool id',
     },
-    pluginId: {
+    name: {
       type: 'string',
       description: 'Plugin id that editor will use, e.g. "warning", "list", "linkTool"',
     },
-    name: {
+    title: {
       type: 'string',
       description: 'User-friendly name that will be shown in marketplace, .e.g "Warning tool 3000"',
     },
-    class: {
+    exportName: {
       type: 'string',
       description: 'Name of the plugin\'s class, e.g. "LinkTool", "Checklist", "Header"',
     },
