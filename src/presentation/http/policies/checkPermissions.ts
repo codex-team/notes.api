@@ -2,7 +2,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { StatusCodes } from 'http-status-codes';
 
 /**
- * Policy to enforce user to be logged in
+ * Policy to check does user have permission to access note
  *
  * @param request - Fastify request object
  * @param reply - Fastify reply object
@@ -10,6 +10,9 @@ import { StatusCodes } from 'http-status-codes';
 export default async function checkPermission(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const { userId } = request;
 
+  /**
+   * If note or noteSettings not resolved, we can't check permissions
+   */
   if (!request.note || !request.noteSettings) {
     return await reply
       .code(StatusCodes.NOT_ACCEPTABLE)
@@ -21,10 +24,10 @@ export default async function checkPermission(request: FastifyRequest, reply: Fa
   const { creatorId } = request.note;
   const { isPublic } = request.noteSettings;
 
-  console.log('creatorId', creatorId);
-  console.log('userId', userId);
-  console.log('isPublic', isPublic);
-
+  /**
+   * If note is public, everyone can access it
+   * If note is private, only creator can access it
+   */
   if (!isPublic && creatorId !== userId) {
     await reply
       .code(StatusCodes.UNAUTHORIZED)

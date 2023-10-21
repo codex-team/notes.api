@@ -5,14 +5,13 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings';
 
 /**
- * Add middleware for resolve Note settinds and add it to request
+ * Add middleware for resolve Note settings and add it to request
  *
- * @param noteService - note domain service
- * @param noteSettingsService
+ * @param noteSettingsService - note settings domain service
  */
 export default function useNoteSettingsResolver(noteSettingsService: NoteSettingsService): {
     /**
-     * Resolve Note by public id and add it to request
+     * Resolve Note settings by note and add it to request
      *
      * Use this middleware as "preHandler" hook with a particular route
      */
@@ -31,10 +30,7 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
         if (!request.note) {
           throw new Error('Note did not resolved');
         }
-        /**
-         * All methods (GET, POST, PATCH, etc) could have note public id just in route params,
-         * so we don't check for query and body at the moment
-         */
+
         noteSettings = await noteSettingsService.getNoteSettingsByNoteId(request.note.id);
 
         request.noteSettings = noteSettings;

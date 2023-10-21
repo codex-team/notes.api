@@ -41,6 +41,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * It should be used in routes that accepts note public id
    */
   const { noteResolver } = useNoteResolver(noteService);
+  /**
+   * Prepare note settings resolver middleware
+   * It should be used to use note settings in middlewares
+   */
   const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
 
   /**

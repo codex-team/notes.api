@@ -57,7 +57,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     /**
      * TODO: Validate request params
      */
-    const noteId = request.note!.id as number;
+    const noteId = request.note?.id as number;
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
@@ -90,7 +90,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       noteResolver,
     ],
   }, async (request, reply) => {
-    const noteId = request.note!.id as number;
+    const noteId = request.note?.id as number;
 
     /**
      * @todo validate data
