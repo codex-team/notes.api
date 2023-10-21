@@ -4,6 +4,7 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
+import { GetNoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
 
 /**
  * Get note by id options
@@ -78,16 +79,18 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const noteSettingsService = opts.noteSettingsService;
 
   /**
-   * Get note by id
+   * Get note by id with schema JSON (validate request params)
    */
   fastify.get<{
     Params: GetNoteByIdOptions,
     Reply: Note | ErrorResponse
-  }>('/:id', async (request, reply) => {
+  }>('/:id', {
+    schema: {
+      params: GetNoteSchema,
+    },
+  }, async (request, reply) => {
     const params = request.params;
-    /**
-     * TODO: Validate request params
-     */
+
     const { id } = params;
 
     const note = await noteService.getNoteById(id);
@@ -153,6 +156,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       updatedAt: Note['updatedAt'],
     }
   }>('/', {
+    schema: {
+      body: NoteEditPayloadSchema,
+    },
     config: {
       policy: [
         'authRequired',
@@ -160,7 +166,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
   }, async (request, reply) => {
     /**
-     * @todo Validate request params
      * @todo Check user access right
      */
     const { id, content } = request.body;
