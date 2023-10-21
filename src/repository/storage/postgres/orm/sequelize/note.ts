@@ -201,23 +201,10 @@ export default class NoteSequelizeStorage {
 
     if (noteList.length === 0) {
       return null;
-    };
-    /**
-     *  Converting a NoteModel array to a NoteList object
-     */
-    const noteListItems: Note[] = noteList.map((noteModel) => {
-      return {
-        id: noteModel.id,
-        publicId: noteModel.publicId,
-        content: noteModel.content,
-        creatorId: noteModel.creatorId,
-        createdAt: noteModel.createdAt,
-        updatedAt: noteModel.updatedAt,
-      };
-    });
+    }
 
     return {
-      items: noteListItems,
+      items: noteList,
     };
   }
   /**
