@@ -1,6 +1,9 @@
 import type NoteRepository from '@repository/note.repository';
 import type { NoteList } from '@domain/entities/noteList';
 
+/**
+ * Note list service
+ */
 export default class NoteListService {
   /**
    * Note repository
