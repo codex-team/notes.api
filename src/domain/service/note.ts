@@ -36,6 +36,15 @@ export default class NoteService {
   }
 
   /**
+   * Deletes note by id
+   * @param id - note internal id
+   * @returns { Promise<boolean | null> }
+   */
+  public async deleteNoteById(id: NoteInternalId){
+    return await this.repository.deleteNoteById(id);
+  }
+
+  /**
    * Updates a note
    *
    * @param id - note internal id

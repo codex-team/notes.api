@@ -42,13 +42,23 @@ export default class NoteRepository {
   }
 
   /**
-   * Gets note by id
+   * Gets note by internal id
    *
    * @param id - note id
    * @returns { Promise<Note | null> } found note
    */
   public async getNoteById(id: NoteInternalId): Promise<Note | null> {
     return await this.storage.getNoteById(id);
+  }
+
+  /**
+   * Deletes note by id 
+   * 
+   * @param id - note id
+   * @returns { Promise<boolean | null> }
+   */
+  public async deleteNoteById(id: NoteInternalId){
+    return await this.storage.deleteNoteById(id)
   }
 
   /**
