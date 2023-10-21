@@ -49,7 +49,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     const user = await userService.getUserById(userId);
 
     if (user === null) {
-      return fastify.notFound(reply, 'User not found');
+      return reply.notFound('User not found');
     }
 
     return reply.send(user);

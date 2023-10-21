@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { StatusCodes } from 'http-status-codes';
+import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Policy to check does user have permission to access note
@@ -13,12 +13,8 @@ export default async function notePublicOrUserInTeam(request: FastifyRequest, re
   /**
    * If note or noteSettings not resolved, we can't check permissions
    */
-  if (!request.note || !request.noteSettings) {
-    return await reply
-      .code(StatusCodes.NOT_ACCEPTABLE)
-      .send({
-        message: 'Note not found',
-      });
+  if (isEmpty(request.note) || isEmpty(request.noteSettings)) {
+    return await reply.notAcceptable('Note not found');
   };
 
   const { creatorId } = request.note;
@@ -28,11 +24,7 @@ export default async function notePublicOrUserInTeam(request: FastifyRequest, re
    * If note is public, everyone can access it
    * If note is private, only creator can access it
    */
-  if (!isPublic && creatorId !== userId) {
-    await reply
-      .code(StatusCodes.UNAUTHORIZED)
-      .send({
-        message: 'Permission denied',
-      });
+  if (isPublic === false && creatorId !== userId) {
+    return await reply.forbidden();
   }
 }

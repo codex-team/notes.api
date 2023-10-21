@@ -1,4 +1,4 @@
-import notEmpty from '@infrastructure/utils/notEmpty.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 import type OpenAIApi from './transport/openai-api';
 import type { GetCompletionResponsePayload } from './transport/openai-api/types/GetCompletionResponsePayload';
 
