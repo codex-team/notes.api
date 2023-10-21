@@ -51,10 +51,10 @@ export default class UserService {
    *
    * @param userId - user unique identifier
    */
-  public async getUserExtensions(userId: User['id']): Promise<User['extensions'] | undefined> {
+  public async getUserExtensions(userId: User['id']): Promise<User['extensions']> {
     const user = await this.getUserById(userId);
 
-    return user?.extensions;
+    return user?.extensions ?? {};
   }
 
   /**
