@@ -57,7 +57,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   fastify.get<{
     Params: GetNoteSettingsByNodeIdOptions,
     Reply: NoteSettings
-  }>('/:id', {
+  }>('/:notePublicId', {
     preHandler: [
       noteIdResolver,
     ],
@@ -66,6 +66,8 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
      * TODO: Validate request params
      */
     const noteId = request.noteId as number;
+
+    console.log('note id: ', noteId);
 
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
@@ -87,7 +89,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Body: Partial<NoteSettings>,
     Params: GetNoteSettingsByNodeIdOptions,
     Reply: NoteSettings,
-  }>('/:id', {
+  }>('/:notePublicId', {
     config: {
       policy: [
         'authRequired',
@@ -108,6 +110,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
      * TODO: check is user collaborator
      */
 
+    console.log(enabled)
     const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
       customHostname,
       enabled,
