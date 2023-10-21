@@ -49,8 +49,4 @@ describe('Note API', () => {
       expect(body).toStrictEqual({ message: 'Note not found' });
     });
   });
-
-  // describe('GET fdgfdgf', () => {
-  //   test('')
-  // })
 });

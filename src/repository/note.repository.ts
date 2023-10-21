@@ -1,5 +1,6 @@
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
+import type { NoteList } from '@domain/entities/noteList.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -34,6 +35,7 @@ export default class NoteRepository {
    *
    * @param id - note internal id
    * @param content - new content
+   * @returns Note on success, null on failure
    */
   public async updateNoteContentById(id: NoteInternalId, content: Note['content'] ): Promise<Note | null> {
     return await this.storage.updateNoteContentById(id, content);
@@ -66,5 +68,15 @@ export default class NoteRepository {
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
     return await this.storage.getNoteByPublicId(publicId);
+  }
+
+  /**
+   * Gets note list by creator id
+   *
+   * @param id - note creator id
+   * @returns { Promise<NoteList> } note
+   */
+  public async getNoteListByCreatorId(id: number): Promise<Note[]> {
+    return await this.storage.getNoteListByCreatorId(id);
   }
 }
