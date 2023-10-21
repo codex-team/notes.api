@@ -1,7 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
-import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
