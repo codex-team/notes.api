@@ -7,17 +7,17 @@ import { getLogger } from '@infrastructure/logging/index.js';
 import type { Note, NotePublicId } from '@domain/entities/note';
 
 /**
- * Add middleware for resolve Note internal id by public id and add it to request
+ * Add middleware for resolve Note by public id and add it to request
  *
  * @param noteService - note domain service
  */
 export default function useNoteResolver(noteService: NoteService): {
   /**
-   * Resolve Note internal id by public id and add it to request
+   * Resolve Note by public id and add it to request
    *
    * Use this middleware as "preHandler" hook with a particular route
    */
-  noteIdResolver: preHandlerHookHandler;
+  noteResolver: preHandlerHookHandler;
 } {
   /**
    * Get logger instance
@@ -38,7 +38,7 @@ export default function useNoteResolver(noteService: NoteService): {
   }
 
   return {
-    noteIdResolver: async function noteIdResolver(request, reply) {
+    noteResolver: async function noteIdResolver(request, reply) {
       let note: Note | undefined;
 
       try {
@@ -49,7 +49,7 @@ export default function useNoteResolver(noteService: NoteService): {
         note = await resolveNoteByPublicId(request.params);
 
         if (note) {
-          request.noteId = note.id;
+          request.note = note;
         } else {
           throw new Error('Note not found');
         }
