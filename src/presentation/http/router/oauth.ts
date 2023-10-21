@@ -46,7 +46,7 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
      * Check if user exists
      */
     if (!user) {
-      return fastify.notFound(reply, 'User not found');
+      return reply.notFound('User not found');
     }
 
     /**

@@ -10,7 +10,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
 import cookie from '@fastify/cookie';
-import NotFoundDecorator from './decorators/notFound.js';
+import { notFound, forbidden, unauthorized, notAcceptable } from './decorators/index.js';
 import NoteRouter from '@presentation/http/router/note.js';
 import OauthRouter from '@presentation/http/router/oauth.js';
 import AuthRouter from '@presentation/http/router/auth.js';
@@ -272,7 +272,10 @@ export default class HttpApi implements Api {
    * Add custom decorators
    */
   private addDecorators(): void {
-    this.server?.decorate('notFound', NotFoundDecorator);
+    this.server?.decorateReply('notFound', notFound);
+    this.server?.decorateReply('forbidden', forbidden);
+    this.server?.decorateReply('unauthorized', unauthorized);
+    this.server?.decorateReply('notAcceptable', notAcceptable);
   }
 
   /**

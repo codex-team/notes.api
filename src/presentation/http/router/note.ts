@@ -40,6 +40,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * It should be used in routes that accepts note public id
    */
   const { noteResolver } = useNoteResolver(noteService);
+
   /**
    * Prepare note settings resolver middleware
    * It should be used to use note settings in middlewares
@@ -78,7 +79,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Check if note does not exist
      */
     if (note === null) {
-      return fastify.notFound(reply, 'Note not found');
+      return reply.notFound('Note not found');
     }
 
     return reply.send(note);
@@ -149,15 +150,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     config: {
       policy: [
         'authRequired',
+        'userInTeam',
       ],
     },
     preHandler: [
       noteResolver,
     ],
   }, async (request, reply) => {
-    /**
-     * @todo Check user access right
-     */
     const noteId = request.note?.id as number;
     const { content } = request.body;
 
@@ -189,7 +188,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Check if note does not exist
      */
     if (note === null) {
-      return fastify.notFound(reply, 'Note not found');
+      return reply.notFound('Note not found');
     }
 
     return reply.send(note);

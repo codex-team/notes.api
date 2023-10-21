@@ -1,5 +1,4 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { StatusCodes } from 'http-status-codes';
 
 /**
  * Policy to enforce user to be logged in
@@ -11,10 +10,6 @@ export default async function authRequired(request: FastifyRequest, reply: Fasti
   const { userId } = request;
 
   if (userId === null) {
-    await reply
-      .code(StatusCodes.UNAUTHORIZED)
-      .send({
-        message: 'Permission denied',
-      });
+    return await reply.unauthorized();
   }
 }

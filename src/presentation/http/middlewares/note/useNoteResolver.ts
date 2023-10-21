@@ -1,6 +1,6 @@
 import type { FastifyRequest, preHandlerHookHandler } from 'fastify';
 import type NoteService from '@domain/service/note.js';
-import notEmpty from '@infrastructure/utils/notEmpty.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 import { StatusCodes } from 'http-status-codes';
 import hasProperty from '@infrastructure/utils/hasProperty.js';
 import { getLogger } from '@infrastructure/logging/index.js';
