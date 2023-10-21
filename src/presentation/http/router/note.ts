@@ -95,7 +95,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Reply: {
       deletedFlag : number
     },
-  }>('/notePublicId', {
+  }>('/:notePublicId', {
     schema: {
       params: {
         notePublicId: {
