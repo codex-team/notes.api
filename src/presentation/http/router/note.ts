@@ -115,7 +115,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if note does not exist
      */
-    return reply.send({ deletedFlag : deletedFlag});
+    return reply.send({ deletedFlag : deletedFlag });
   });
 
   /**
@@ -130,12 +130,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       id: NotePublicId
     },
   }>('/', {
-    /**config: {
+    config: {
       policy: [
         'authRequired',
       ],
     },
-    */
   }, async (request, reply) => {
     /**
      * TODO: Validate request query
