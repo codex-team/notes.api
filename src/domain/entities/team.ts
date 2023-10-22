@@ -2,15 +2,15 @@ import type { NoteInternalId } from './note.js';
 import type User from './user.js';
 
 export enum MemberRole {
-    /**
-     * Team member can read and write notes
-     */
-    read = 'read',
+  /**
+   * Team member can read and write notes
+   */
+  read = 'read',
 
-    /**
-     * Team member can only read notes
-     */
-    write = 'write',
+  /**
+   * Team member can only read notes
+   */
+  write = 'write',
 }
 
 /**
@@ -18,25 +18,25 @@ export enum MemberRole {
  * Team is a relation between note and user, which shows what user can do with note
  */
 export interface TeamMember {
-    /**
-     * Team relation id
-     */
-    id: number;
+  /**
+   * Team relation id
+   */
+  id: number;
 
-    /**
-     * Note ID
-     */
-    noteId: NoteInternalId;
+  /**
+   * Note ID
+   */
+  noteId: NoteInternalId;
 
-    /**
-     * Team member user id
-     */
-    userId: User['id'];
+  /**
+   * Team member user id
+   */
+  userId: User['id'];
 
-    /**
-     * Team member role, show what user can do with note
-     */
-    role:  MemberRole;
+  /**
+   * Team member role, show what user can do with note
+   */
+  role:  MemberRole;
 }
 
 export type Team = TeamMember[];
