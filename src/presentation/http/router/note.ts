@@ -103,6 +103,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         },
       },
     },
+    config: {
+      policy: [
+        'authRequired',
+        'userInTeam',
+      ],
+    },
     preHandler: [
       noteResolver,
     ],

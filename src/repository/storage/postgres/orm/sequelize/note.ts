@@ -199,7 +199,7 @@ export default class NoteSequelizeStorage {
     });
 
     /**
-     * If note not found, return null
+     * If note not found return false
      */
     return affectedRows > 0;
   }
