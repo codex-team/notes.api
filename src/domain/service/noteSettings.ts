@@ -89,7 +89,7 @@ export default class NoteSettingsService {
    *
    * @param id - team member id
    */
-  public async removeTeamMemberById(id: Team['id']): Promise<boolean> {
+  public async removeTeamMemberById(id: TeamMember['id']): Promise<boolean> {
     return await this.teamRepository.removeMemberById(id);
   }
 

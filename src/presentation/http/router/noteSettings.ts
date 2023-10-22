@@ -121,7 +121,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId,
     },
-    Reply: Team[],
+    Reply: Team,
   }>('/:notePublicId/team', {
     preHandler: [
       noteResolver,
