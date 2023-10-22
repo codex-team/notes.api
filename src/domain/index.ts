@@ -52,7 +52,7 @@ export interface DomainServices {
  */
 export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
   const noteService = new NoteService(repositories.noteRepository);
-  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository);
+  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository);
 
   const noteListService = new NoteListService(repositories.noteRepository);
 
