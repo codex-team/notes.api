@@ -11,7 +11,7 @@ export default class NoteListService {
   public repository: NoteRepository;
 
   /**
-   * Number of notes shown in one time
+   * Number of notes shown in one portion
    */
 
   private readonly portionSize = 30;
