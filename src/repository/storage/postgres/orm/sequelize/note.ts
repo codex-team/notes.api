@@ -187,6 +187,24 @@ export default class NoteSequelizeStorage {
   }
 
   /**
+   * Deletes note by id
+   *
+   * @param id - internal id
+   */
+  public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
+    const affectedRows = await this.model.destroy({
+      where:{
+        id,
+      },
+    });
+
+    /**
+     * If note not found return false
+     */
+    return affectedRows > 0;
+  }
+
+  /**
    * Gets note list by creator id
    *
    * @param creatorId - note creator id
