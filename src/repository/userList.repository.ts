@@ -1,5 +1,5 @@
 import type UserStorage from '@repository/storage/user.storage.js';
-import type { UserList } from '@domain/entities/userList';
+import type User from '@domain/entities/user';
 
 
 /**
@@ -17,9 +17,11 @@ export default class UserListRepository {
   }
 
   /**
+   * Gets note list by creator id
    *
+   * @returns { Promise<UserList> } user
    */
-  public async getAllUsers(): Promise<UserList> {
+  public async getAllUsers(): Promise<User[]> {
     return await this.storage.getAllUsers();
   }
 }
