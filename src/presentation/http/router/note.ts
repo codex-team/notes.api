@@ -93,7 +93,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId : NotePublicId;
     },
     Reply: {
-      deletedFlag : boolean
+      isDeleted : boolean
     },
   }>('/:notePublicId', {
     schema: {
@@ -111,12 +111,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * @todo Check user access right
    */
     const noteId = request.note?.id as number;
-    const deletedFlag = await noteService.deleteNoteById(noteId);
+    const isDeleted = await noteService.deleteNoteById(noteId);
 
     /**
      * Check if note does not exist
      */
-    return reply.send({ deletedFlag : deletedFlag });
+    return reply.send({ isDeleted : isDeleted });
   });
 
   /**
