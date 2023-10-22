@@ -103,7 +103,6 @@ export default class NoteSequelizeStorage {
     }, {
       tableName: this.tableName,
       sequelize: this.database,
-      underscored: true,
     });
   }
 
