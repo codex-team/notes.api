@@ -25,15 +25,38 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
   /**
    * Get note list by userId
    */
-  fastify.get('/', {
+  fastify.get<{
+    Querystring: {
+      offset: number,
+      limit: number,
+    },
+  }>('/', {
     config: {
       policy: [
         'authRequired',
       ],
     },
+    schema: {
+      querystring: {
+        offset: {
+          type: 'number',
+        },
+        limit: {
+          type: 'number',
+          minimum: 1,
+          maximum: 30,
+        },
+      },
+    },
   }, async (request, reply) => {
-    const { userId } = request;
-    const noteList = await noteListService.getNoteListByCreatorId(userId as number);
+    const userId = request.userId as number;
+    const offset = request.query.offset;
+
+    /**
+     * if limit > 30 or limit < 1 error throws (in scedule)
+     */
+    const limit = request.query.limit;
+    const noteList = await noteListService.getNoteListByCreatorId(userId, offset, limit);
 
     return reply.send(noteList);
   });

@@ -208,10 +208,14 @@ export default class NoteSequelizeStorage {
    * Gets note list by creator id
    *
    * @param creatorId - note creator id
+   * @param offset - number of skipped notes
+   * @param limit - number of notes to get
    * @returns { Promise<NoteList> } note
    */
-  public async getNoteListByCreatorId(creatorId: number): Promise<Note[]> {
+  public async getNoteListByCreatorId(creatorId: number, offset: number, limit: number): Promise<Note[]> {
     const noteList  = await this.model.findAll({
+      offset: offset,
+      limit: limit,
       where: {
         creatorId,
       },
