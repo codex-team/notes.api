@@ -1,5 +1,5 @@
+import userSessions from '@test/test-data/userSessions.json';
 import { describe, test, expect } from 'vitest';
-import userSessions from 'tests/test-data/userSessions.json';
 
 const refresh_token = userSessions[0]['refresh_tocken'];
 const access_token = await global.api?.fakeRequest({
@@ -8,17 +8,18 @@ const access_token = await global.api?.fakeRequest({
 });
 
 describe('NoteList API', () => {
-  describe('GET notes?page', () => {
+  describe('GET /notes?page', () => {
     test('Returns noteList with specified lenght (not for last page)', async () => {
       const expectedStatus = 200;
       const portionSize = 30;
+      const pageNumber = 1;
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: '/notes/&page=1',
+        url: `/notes/&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -31,13 +32,14 @@ describe('NoteList API', () => {
     test('Returns noteList with specified lenght (for last page)', async () => {
       const expectedStatus = 200;
       const portionSize = 20;
+      const pageNumber = 2;
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: '/notes/&page=2',
+        url: `/notes/&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -47,15 +49,16 @@ describe('NoteList API', () => {
       expect(body).toHaveLength(portionSize);
     });
 
-    test('Returns noteList with no items if page*portionSize > numberOfNotes', async () => {
+    test('Returns noteList with no items if it has no notes', async () => {
       const expectedStatus = 200;
+      const pageNumber = 3;
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: '/notes/&page=3',
+        url: `/notes/&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -68,27 +71,30 @@ describe('NoteList API', () => {
 
     test('Returns 400 when page < 0', async () => {
       const expextedStatus = 400;
+      const pageNumber = 0;
+
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: '/notes/&page=0',
+        url: `/notes/&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expextedStatus);
     });
 
-    test('Returns 400 when page > 0', async () => {
+    test('Returns 400 when page is too large', async () => {
       const expextedStatus = 400;
+      const pageNumber = 31;
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: '/notes/&page=31',
+        url: `/notes/&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expextedStatus);
