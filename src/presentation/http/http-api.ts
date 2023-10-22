@@ -230,7 +230,7 @@ export default class HttpApi implements Api {
     await this.server?.register(AllUsersRouter, {
       prefix: '/',
       userListService: domainServices.userListService,
-    })
+    });
 
     await this.server?.register(EditorToolsRouter, {
       prefix: '/editor-tools',

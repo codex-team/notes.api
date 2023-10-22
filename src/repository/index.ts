@@ -126,7 +126,6 @@ export async function init(orm: Orm): Promise<Repositories> {
   const editorToolsRepository = new EditorToolsRepository(editorToolsStorage);
   const teamRepository = new TeamRepository(teamStorage);
   const userListRepository = new UserListRepository(userStorage)
-  
 
   return {
     noteRepository,

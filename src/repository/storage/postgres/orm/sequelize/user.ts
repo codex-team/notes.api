@@ -282,7 +282,7 @@ export default class UserSequelizeStorage {
       extensions: user.extensions,
     };
   }
-  public async getAllUsersById(): Promise<User[]> {
+  public async getAllUsers(): Promise<User[]> {
     const userList  = await this.model.findAll({  });
 
     return userList;

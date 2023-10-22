@@ -7,11 +7,6 @@ import type { AppConfig } from '@infrastructure/config/index.js';
 import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
-
-import UserListRepository from '@repository/userList.repository.js';
-// import userListService from './service/userListService.js';
-// import userListService from './service/userListService.js';
-// import userListService from './service/userListService.js';
 import UserListService from './service/userListService.js';
 
 /**
@@ -74,7 +69,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
 
   const aiService = new AIService(repositories.aiRepository);
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
-const userListService = new UserListService(repositories.userListRepository)
+  const userListService = new UserListService(repositories.userListRepository)
 
   return {
     noteService,
