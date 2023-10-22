@@ -13,7 +13,9 @@ export default class NoteListService {
   /**
    * Number of notes shown in one time
    */
+
   private readonly portionSize = 30;
+
   /**
    * Note service constructor
    *
@@ -32,6 +34,7 @@ export default class NoteListService {
    */
   public async getNoteListByCreatorId(id: number, page: number): Promise<NoteList> {
     const offset = (page - 1) * this.portionSize;
+
     return {
       items: await this.repository.getNoteListByCreatorId(id, offset, this.portionSize),
     };
