@@ -287,7 +287,7 @@ export default class UserSequelizeStorage {
    * Get list users
    * @returns { Promise<UserList> } - found all users  
    */
-  public async getUserList(): Promise<User[]> {
+  public async getAllUsers(): Promise<User[]> {
     const userList  = await this.model.findAll({  });
 
     return userList;

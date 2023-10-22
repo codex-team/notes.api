@@ -21,7 +21,7 @@ export default class UserListRepository {
    *
    * @returns { Promise<UserList> } user
    */
-  public async getUserList(): Promise<User[]> {
-    return await this.storage.getUserList();
+  public async getAllUsers(): Promise<User[]> {
+    return await this.storage.getAllUsers();
   }
 }

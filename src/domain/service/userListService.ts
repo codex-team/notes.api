@@ -23,7 +23,7 @@ export default class UserListService {
    */
   public async getUserList(): Promise<UserList>  {
     return {
-      users: await this.repository.getUserList(),
+      users: await this.repository.getAllUsers(),
     };
   }
 }
