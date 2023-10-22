@@ -63,10 +63,14 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     repositories.userSessionRepository
   );
 
-  const userService = new UserService(repositories.userRepository);
-
-  const aiService = new AIService(repositories.aiRepository);
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
+  const userService = new UserService(repositories.userRepository, {
+    editorTools: editorToolsService,
+    /**
+     * @todo find a way how to resolve circular dependency
+     */
+  });
+  const aiService = new AIService(repositories.aiRepository);
 
   return {
     noteService,

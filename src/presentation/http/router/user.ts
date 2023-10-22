@@ -30,7 +30,6 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
    * Manage user data
    */
   const userService = opts.userService;
-  const editorToolsService = opts.editorToolsService;
 
   /**
    * Get user by session
@@ -93,17 +92,10 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const userId = request.userId as number;
 
-    const userEditorToolIds = await userService.getUserEditorTools(userId);
-    const defaultEditorTools = await editorToolsService.getDefaultEditorTools();
-    const uniqueDefaultEditorTools = defaultEditorTools.filter(({ id }) => !userEditorToolIds.includes(id));
-    const userEditorTools = await editorToolsService.getToolsByIds(userEditorToolIds) ?? [];
-
-    // Combine user tools and default tools
-    // TODO: load tools in notes service
-    const mergedTools = [...userEditorTools, ...uniqueDefaultEditorTools];
+    const tools = await userService.getUserEditorTools(userId);
 
     return reply.send({
-      data: mergedTools,
+      data: tools,
     });
   });
 
