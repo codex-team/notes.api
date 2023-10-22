@@ -4,7 +4,6 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type User from '@domain/entities/user.js';
 import type { UserEditorTool } from '@domain/entities/userExtensions.js';
-import { UserList } from '@domain/entities/userList';
 
 /**
  * Query options for getting user
@@ -288,7 +287,7 @@ export default class UserSequelizeStorage {
    * Get list users
    * @returns { Promise<UserList> } - found all users  
    */
-  public async getAllUsers(): Promise<User[]> {
+  public async getUserList(): Promise<User[]> {
     const userList  = await this.model.findAll({  });
 
     return userList;

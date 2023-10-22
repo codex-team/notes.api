@@ -21,9 +21,9 @@ export default class UserListService {
    *
    * @returns { Promise<UserList> } user
    */
-  public async getAllUsers(): Promise<UserList>  {
+  public async getUserList(): Promise<UserList>  {
     return {
-      users: await this.repository.getAllUsers(),
+      users: await this.repository.getUserList(),
     };
   }
 }

@@ -22,7 +22,7 @@ const AllUsersRouter: FastifyPluginCallback<UsersRouterOptions> = (fastify, opts
   fastify.get('/allUsers', {
 
   }, async (_, reply) => {
-    const userList = await usersService.getAllUsers();
+    const userList = await usersService.getUserList();
 
     return reply.send(userList);
   });
