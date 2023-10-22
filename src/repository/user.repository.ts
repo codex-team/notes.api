@@ -1,9 +1,9 @@
 import type User from '@domain/entities/user.js';
-import type { UserEditorTool } from '@domain/entities/userExtensions.js';
 import type UserStorage from '@repository/storage/user.storage.js';
 import type GoogleApiTransport from '@repository/transport/google-api/index.js';
 import type GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
 import type { AddUserToolOptions } from '@repository/storage/postgres/orm/sequelize/user';
+import type EditorTool from '@domain/entities/editorTools';
 
 /**
  * OAuth provider
@@ -27,7 +27,7 @@ interface RemoveUserEditorToolOptions {
   /**
    * Editor tool identifier
    */
-  editorToolId: UserEditorTool['id'];
+  toolId: EditorTool['id'];
 }
 
 /**
@@ -127,10 +127,10 @@ export default class UserRepository {
    *
    * @param options - identifiers of user and tool
    */
-  public async addUserEditorTool({ userId, tool }: AddUserToolOptions): Promise<void> {
+  public async addUserEditorTool({ userId, toolId }: AddUserToolOptions): Promise<void> {
     await this.storage.addUserEditorTool({
       userId,
-      tool,
+      toolId,
     });
   }
 
@@ -139,22 +139,22 @@ export default class UserRepository {
    *
    * @param options - identifiers of user and tool
    */
-  public async removeUserEditorTool({ userId, editorToolId }: RemoveUserEditorToolOptions): Promise<void> {
+  public async removeUserEditorTool({ userId, toolId }: RemoveUserEditorToolOptions): Promise<void> {
     const user = await this.getUserById(userId);
 
     if (!user) {
-      throw new Error('There is no user with such userId');
+      throw new Error('There is no user with such id');
     }
 
-    const editorTool = user.extensions?.editorTools?.find(tool => tool.id === editorToolId);
+    const editorTool = user.editorTools?.find(id => id === toolId);
 
-    if (!editorTool) {
-      throw new Error('User has no tool with such editorToolId');
+    if (editorTool === undefined) {
+      throw new Error('User has no tool with such id');
     }
 
     await this.storage.removeUserEditorTool({
       userId,
-      editorTool,
+      toolId: editorTool,
     });
   }
 }

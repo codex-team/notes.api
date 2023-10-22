@@ -13,7 +13,7 @@ export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, Inf
   public declare id: EditorTool['id'];
 
   /**
-   * Custom name that uses in editor initiazliation. e.g. 'code'
+   * Custom name that uses in editor initialization. e.g. 'code'
    */
   public declare name: EditorTool['name'];
 
@@ -112,7 +112,7 @@ export default class UserSequelizeStorage {
     source,
     isDefault,
   }: EditorTool): Promise<EditorTool> {
-    const editorTool = await this.model.create({
+    return await this.model.create({
       id,
       name,
       title,
@@ -120,8 +120,6 @@ export default class UserSequelizeStorage {
       source,
       isDefault,
     });
-
-    return editorTool;
   }
 
   /**
@@ -130,36 +128,30 @@ export default class UserSequelizeStorage {
    * @param editorToolIds - tool ids
    */
   public async getToolsByIds(editorToolIds: EditorTool['id'][]): Promise<EditorTool[]> {
-    const editorTools = await this.model.findAll({
+    return await this.model.findAll({
       where: {
         id: {
           [Op.in]: editorToolIds,
         },
       },
     });
-
-    return editorTools;
   }
 
   /**
    * Get all default tools
    */
   public async getDefaultEditorTools(): Promise<EditorTool[]> {
-    const editorTools = await this.model.findAll({
+    return await this.model.findAll({
       where: {
         isDefault: true,
       },
     });
-
-    return editorTools;
   }
 
   /**
    * Get all available editor tools
    */
   public async getTools(): Promise<EditorTool[]> {
-    const editorTools = await EditorToolModel.findAll();
-
-    return editorTools;
+    return await EditorToolModel.findAll();
   }
 }

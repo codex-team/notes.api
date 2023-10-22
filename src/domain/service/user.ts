@@ -47,15 +47,18 @@ export default class UserService {
   }
 
   /**
-   * Get user extensions that contains only editoTools for now
-   * TODO: Simplify extenisons
+   * Get user editor tools ids
    *
    * @param userId - user unique identifier
    */
-  public async getUserExtensions(userId: User['id']): Promise<User['extensions']> {
+  public async getUserEditorTools(userId: User['id']): Promise<EditorTool['id'][]> {
     const user = await this.getUserById(userId);
 
-    return user?.extensions ?? {};
+    if (user === null) {
+      throw new Error('User not found');
+    }
+
+    return user.editorTools ?? [];
   }
 
   /**
@@ -65,16 +68,14 @@ export default class UserService {
    */
   public async addUserEditorTool({
     userId,
-    editorToolId,
+    toolId,
   }: {
     userId: User['id'],
-    editorToolId: EditorTool['id'],
+    toolId: EditorTool['id'],
   }): Promise<void> {
     return await this.repository.addUserEditorTool({
       userId,
-      tool: {
-        id: editorToolId,
-      },
+      toolId,
     });
   }
 }

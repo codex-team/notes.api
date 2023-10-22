@@ -1,4 +1,4 @@
-import type UserExtensions from '@domain/entities/userExtensions.js';
+import type EditorTool from './editorTools';
 
 /**
  * User entity
@@ -30,8 +30,7 @@ export default interface User {
   photo?: string;
 
   /**
-   * Custom plugins from the marketplace that improve
-   * editor or notes environment
+   * Custom plugins ids from the marketplace that improve editor or notes environment
    */
-  extensions?: UserExtensions;
+  editorTools?: EditorTool['id'][];
 }

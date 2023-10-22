@@ -18,17 +18,17 @@ class UserSessionModel extends Model<InferAttributes<UserSessionModel>, InferCre
   /**
    * User id
    */
-  public declare user_id: number;
+  public declare userId: number;
 
   /**
    * Refresh token
    */
-  public declare refresh_token: string;
+  public declare refreshToken: string;
 
   /**
    * Refresh token expiration date
    */
-  public declare refresh_token_expires_at: Date;
+  public declare refreshTokenExpiresAt: Date;
 }
 
 
@@ -68,7 +68,7 @@ export default class UserSessionSequelizeStorage {
         autoIncrement: true,
         primaryKey: true,
       },
-      user_id: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
@@ -76,12 +76,12 @@ export default class UserSessionSequelizeStorage {
           key: 'id',
         },
       },
-      refresh_token: {
+      refreshToken: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
       },
-      refresh_token_expires_at: {
+      refreshTokenExpiresAt: {
         type: DataTypes.DATE,
         allowNull: false,
       },
@@ -101,18 +101,11 @@ export default class UserSessionSequelizeStorage {
    * @returns { UserSession } created user session
    */
   public async create(userId: number, refreshToken: string, refreshTokenExpiresAt: Date): Promise<UserSession> {
-    const session = await this.model.create({
-      user_id: userId,
-      refresh_token: refreshToken,
-      refresh_token_expires_at: refreshTokenExpiresAt,
+    return await this.model.create({
+      userId: userId,
+      refreshToken: refreshToken,
+      refreshTokenExpiresAt: refreshTokenExpiresAt,
     });
-
-    return {
-      id: session.id,
-      userId: session.user_id,
-      refreshToken: session.refresh_token,
-      refreshTokenExpiresAt: session.refresh_token_expires_at,
-    };
   }
 
   /**
@@ -122,20 +115,9 @@ export default class UserSessionSequelizeStorage {
    * @returns { UserSession | null } found user session
    */
   public async findByToken(token: string): Promise<UserSession | null> {
-    const session = await this.model.findOne({
-      where: { refresh_token: token },
+    return await this.model.findOne({
+      where: { refreshToken: token },
     });
-
-    if (!session) {
-      return null;
-    }
-
-    return {
-      id: session.id,
-      userId: session.user_id,
-      refreshToken: session.refresh_token,
-      refreshTokenExpiresAt: session.refresh_token_expires_at,
-    };
   }
 
   /**
@@ -146,7 +128,9 @@ export default class UserSessionSequelizeStorage {
    */
   public async removeByRefreshToken(refreshToken: string): Promise<void> {
     await this.model.destroy({
-      where: { refresh_token: refreshToken },
+      where: {
+        refreshToken,
+      },
     });
   }
 }
