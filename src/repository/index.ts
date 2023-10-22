@@ -78,8 +78,8 @@ export async function init(orm: Orm): Promise<Repositories> {
    * Create storage instances
    */
   const userStorage = new UserStorage(orm);
-  const noteSettingsStorage = new NoteSettingsStorage(orm);
   const noteStorage = new NoteStorage(orm);
+  const noteSettingsStorage = new NoteSettingsStorage(orm);
   const teamStorage = new TeamStorage(orm);
 
   /**
@@ -102,8 +102,8 @@ export async function init(orm: Orm): Promise<Repositories> {
    */
   await userStorage.model.sync();
   await noteStorage.model.sync();
-  await teamStorage.model.sync();
   await noteSettingsStorage.model.sync();
+  await teamStorage.model.sync();
   await userSessionStorage.model.sync();
   await editorToolsStorage.model.sync();
 

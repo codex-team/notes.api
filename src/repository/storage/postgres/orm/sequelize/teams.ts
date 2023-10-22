@@ -121,7 +121,7 @@ export default class TeamsSequelizeStorage {
      * We can not create team relation without note
      */
     this.model.belongsTo(model, {
-      foreignKey: 'note_id',
+      foreignKey: 'noteId',
       as: this.noteModel.tableName,
     });
   }
@@ -139,7 +139,7 @@ export default class TeamsSequelizeStorage {
      * We can not create team relation without user
      */
     this.model.belongsTo(model, {
-      foreignKey: 'user_id',
+      foreignKey: 'userId',
       as: this.userModel.tableName,
     });
   }

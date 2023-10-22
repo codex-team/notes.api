@@ -14,10 +14,10 @@ describe('Note API', () => {
         'createdAt': '2023-10-16T13:49:19.000Z',
         'updatedAt': '2023-10-16T13:49:19.000Z',
         'noteSettings':  {
-          'custom_hostname': 'codex.so',
-          'enabled': true,
+          'customHostname': 'codex.so',
+          'isPublic': true,
           'id': 1,
-          'note_id': 1,
+          'noteId': 1,
         },
       };
       /* eslint-enable @typescript-eslint/naming-convention */
