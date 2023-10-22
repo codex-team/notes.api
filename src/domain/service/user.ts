@@ -1,7 +1,7 @@
 import type UserRepository from '@repository/user.repository.js';
 import { Provider } from '@repository/user.repository.js';
 import type User from '@domain/entities/user.js';
-import type { UserEditorTool } from '@domain/entities/userExtensions.js';
+import type EditorTool from '@domain/entities/editorTools';
 
 export {
   Provider
@@ -47,13 +47,34 @@ export default class UserService {
   }
 
   /**
-   * Get installed user tools
+   * Get user extensions that contains only editoTools for now
+   * TODO: Simplify extenisons
    *
    * @param userId - user unique identifier
    */
-  public async getUserEditorTools(userId: User['id']): Promise<UserEditorTool[] | undefined> {
+  public async getUserExtensions(userId: User['id']): Promise<User['extensions']> {
     const user = await this.getUserById(userId);
 
-    return user?.extensions?.editorTools;
+    return user?.extensions ?? {};
+  }
+
+  /**
+   * Adds editor tool to user settings by its id
+   *
+   * @param options - user id & editor tool
+   */
+  public async addUserEditorTool({
+    userId,
+    editorToolId,
+  }: {
+    userId: User['id'],
+    editorToolId: EditorTool['id'],
+  }): Promise<void> {
+    return await this.repository.addUserEditorTool({
+      userId,
+      tool: {
+        id: editorToolId,
+      },
+    });
   }
 }

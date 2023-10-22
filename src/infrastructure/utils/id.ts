@@ -9,3 +9,13 @@ import { nanoid } from 'nanoid';
 export function createPublicId(length: number = 10): string {
   return nanoid(length);
 }
+
+/**
+ * Create unique identifier for editor tools
+ * Used in editor tools and user settings
+ *
+ * @param length - id length
+ */
+export function createEditorToolId(length: number = 8): string {
+  return nanoid(length);
+}

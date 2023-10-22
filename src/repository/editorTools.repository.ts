@@ -17,10 +17,21 @@ export default class EditorToolsRepository {
   /**
    * @param editorTool - all editor tool data
    */
-  public async addTools(editorTool: EditorTool): Promise<EditorTool> {
+  public async addTool(editorTool: EditorTool): Promise<EditorTool> {
     const createdEditorTool = await this.storage.addTool(editorTool);
 
     return createdEditorTool;
+  }
+
+  /**
+   * Get bunch of tools by their ids
+   *
+   * @param editorToolIds - unique tool ids
+   */
+  public async getToolsByIds(editorToolIds: EditorTool['id'][]): Promise<EditorTool[]> {
+    const tools = await this.storage.getToolsByIds(editorToolIds);
+
+    return tools;
   }
 
   /**
