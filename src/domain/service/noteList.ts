@@ -27,8 +27,7 @@ export default class NoteListService {
    * Returns note list by creator id
    *
    * @param id - note creator id
-   * @param offset - number of skipped notes
-   * @param limit - number of notes to get
+   * @param page - number of current page
    * @returns { Promise<NoteList> } note
    */
   public async getNoteListByCreatorId(id: number, page: number): Promise<NoteList> {
