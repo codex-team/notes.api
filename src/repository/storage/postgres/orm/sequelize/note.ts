@@ -119,7 +119,7 @@ export default class NoteSequelizeStorage {
      * Create association with note settings, one-to-one
      */
     this.model.hasOne(this.settingsModel, {
-      foreignKey: 'note_id',
+      foreignKey: 'noteId',
       as: 'noteSettings',
     });
   }

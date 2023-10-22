@@ -79,6 +79,7 @@ export async function init(orm: Orm): Promise<Repositories> {
    */
   const userStorage = new UserStorage(orm);
   const noteStorage = new NoteStorage(orm);
+  const userSessionStorage = new UserSessionStorage(orm);
   const noteSettingsStorage = new NoteSettingsStorage(orm);
   const teamStorage = new TeamStorage(orm);
 
@@ -94,7 +95,6 @@ export async function init(orm: Orm): Promise<Repositories> {
   teamStorage.createAssociationWithNoteModel(noteStorage.model);
   teamStorage.createAssociationWithUserModel(userStorage.model);
 
-  const userSessionStorage = new UserSessionStorage(orm);
   const editorToolsStorage = new EditorToolsStorage(orm);
 
   /**

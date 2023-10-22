@@ -155,7 +155,7 @@ export default class NoteSettingsSequelizeStorage {
      * We can not create note settings without note
      */
     this.model.belongsTo(model, {
-      foreignKey: 'note_id',
+      foreignKey: 'noteId',
       as: this.noteModel.tableName,
     });
   }

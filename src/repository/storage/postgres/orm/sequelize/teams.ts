@@ -83,15 +83,15 @@ export default class TeamsSequelizeStorage {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: NoteModel.tableName,
+          model: NoteModel,
           key: 'id',
         },
       },
       userId: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: UserModel.tableName,
+          model: UserModel,
           key: 'id',
         },
       },
