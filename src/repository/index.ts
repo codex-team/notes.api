@@ -125,7 +125,7 @@ export async function init(orm: Orm): Promise<Repositories> {
   const aiRepository = new AIRepository(openaiApiTransport);
   const editorToolsRepository = new EditorToolsRepository(editorToolsStorage);
   const teamRepository = new TeamRepository(teamStorage);
-  const userListRepository = new UserListRepository(userStorage)
+  const userListRepository = new UserListRepository(userStorage);
 
   return {
     noteRepository,
@@ -135,6 +135,6 @@ export async function init(orm: Orm): Promise<Repositories> {
     aiRepository,
     editorToolsRepository,
     teamRepository,
-    userListRepository
+    userListRepository,
   };
 }

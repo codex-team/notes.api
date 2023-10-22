@@ -3,7 +3,7 @@ import type User from '@domain/entities/user';
 
 
 /**
- *
+ * Repository allows accessing data from business-logic (domain) level
  */
 export default class UserListRepository {
   public storage: UserStorage;
@@ -17,9 +17,7 @@ export default class UserListRepository {
   }
 
   /**
-   * Gets note list by creator id
-   *
-   * @returns { Promise<UserList> } user
+   * Get all users
    */
   public async getAllUsers(): Promise<User[]> {
     return await this.storage.getAllUsers();

@@ -16,6 +16,7 @@ interface UsersRouterOptions {
  */
 const AllUsersRouter: FastifyPluginCallback<UsersRouterOptions> = (fastify, opts, done) => {
   const usersService = opts.userListService;
+
   /**
    * Get all users
    */

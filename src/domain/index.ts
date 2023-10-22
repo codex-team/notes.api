@@ -69,7 +69,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
 
   const aiService = new AIService(repositories.aiRepository);
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
-  const userListService = new UserListService(repositories.userListRepository)
+  const userListService = new UserListService(repositories.userListRepository);
 
   return {
     noteService,
@@ -79,6 +79,6 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     authService,
     aiService,
     editorToolsService,
-    userListService
+    userListService,
   };
 }
