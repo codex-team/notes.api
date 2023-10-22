@@ -3,6 +3,7 @@ import { fn, col } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type User from '@domain/entities/user.js';
+import type { UserList } from '@domain/entities/userList.js';
 import type { UserEditorTool } from '@domain/entities/userExtensions.js';
 
 /**
@@ -282,9 +283,9 @@ export default class UserSequelizeStorage {
       extensions: user.extensions,
     };
   }
-  public async getAllUsers(): Promise<User[]> {
+  public async getAllUsers(): Promise<UserList> {
     const userList  = await this.model.findAll({  });
 
-    return userList;
+    return {users: userList} ;
   }
 }

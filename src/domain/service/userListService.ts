@@ -1,5 +1,5 @@
-import type  User from '@domain/entities/user';
 import type UserListRepository from '@repository/userList.repository';
+import type { UserList } from '@domain/entities/userList';
 
 
 /**
@@ -19,7 +19,7 @@ export default class UserListService {
   /**
    * Get all users
    */
-  public async getAllUsers(): Promise<User[]>  {
+  public async getAllUsers(): Promise<UserList>  {
     return await this.repository.getAllUsers();
   }
 }
