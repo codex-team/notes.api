@@ -14,7 +14,8 @@ export default class NoteListService {
    * Number of notes shown in one time
    */
   private readonly portionSize = 30;
-  /**
+
+    /**
    * Note service constructor
    *
    * @param repository - note repository
