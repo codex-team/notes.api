@@ -23,17 +23,32 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
   const noteListService = opts.noteListService;
 
   /**
-   * Get note list by userId
+   * Get note list for one page by userId
    */
-  fastify.get('/', {
+  fastify.get<{
+    Querystring: {
+      page: number;
+    },
+  }>('/', {
     config: {
       policy: [
         'authRequired',
       ],
     },
+    schema: {
+      querystring: {
+        page: {
+          type: 'number',
+          minimum: 1,
+          maximum: 30,
+        },
+      },
+    },
   }, async (request, reply) => {
-    const { userId } = request;
-    const noteList = await noteListService.getNoteListByCreatorId(userId as number);
+    const userId = request.userId as number;
+    const page = request.query.page;
+
+    const noteList = await noteListService.getNoteListByCreatorId(userId, page);
 
     return reply.send(noteList);
   });
