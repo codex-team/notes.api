@@ -31,6 +31,11 @@ export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, Inf
    * Editor tool sources
    */
   public declare source: EditorTool['source'];
+
+  /**
+   * Applies to user editor tools by default
+   */
+  public declare isDefault: EditorTool['isDefault'];
 }
 
 /**
@@ -85,6 +90,10 @@ export default class UserSequelizeStorage {
         type: DataTypes.JSON,
         allowNull: false,
       },
+      isDefault: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
     }, {
       tableName: this.tableName,
       sequelize: this.database,
@@ -101,6 +110,7 @@ export default class UserSequelizeStorage {
     title,
     exportName,
     source,
+    isDefault,
   }: EditorTool): Promise<EditorTool> {
     const editorTool = await this.model.create({
       id,
@@ -108,6 +118,7 @@ export default class UserSequelizeStorage {
       title,
       exportName,
       source,
+      isDefault,
     });
 
     return editorTool;
@@ -124,6 +135,19 @@ export default class UserSequelizeStorage {
         id: {
           [Op.in]: editorToolIds,
         },
+      },
+    });
+
+    return editorTools;
+  }
+
+  /**
+   * Get all default tools
+   */
+  public async getDefaultEditorTools(): Promise<EditorTool[]> {
+    const editorTools = await this.model.findAll({
+      where: {
+        isDefault: true,
       },
     });
 

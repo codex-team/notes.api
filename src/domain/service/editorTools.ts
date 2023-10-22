@@ -32,8 +32,15 @@ export default class EditorToolsService {
    *
    * @param editorToolIds - tool ids
    */
-  public async getToolsByIds(editorToolIds: EditorTool['id'][] ): Promise<EditorTool[] | null> {
+  public async getToolsByIds(editorToolIds: EditorTool['id'][]): Promise<EditorTool[]> {
     return await this.repository.getToolsByIds(editorToolIds);
+  }
+
+  /**
+   * Get all default tools
+   */
+  public async getDefaultEditorTools(): Promise<EditorTool[]> {
+    return await this.repository.getDefaultEditorTools();
   }
 
   /**

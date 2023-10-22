@@ -35,6 +35,13 @@ export default class EditorToolsRepository {
   }
 
   /**
+   * Get all default tools
+   */
+  public async getDefaultEditorTools(): Promise<EditorTool[]> {
+    return await this.storage.getDefaultEditorTools();
+  }
+
+  /**
    * Get all editor tools
    */
   public async getTools(): Promise<EditorTool[]> {

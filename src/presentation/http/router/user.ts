@@ -95,10 +95,17 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
 
     const userExtensions = await userService.getUserExtensions(userId);
     const userEditorToolIds = userExtensions?.editorTools?.map(tools => tools.id) ?? [];
-    const editorTools = await editorToolsService.getToolsByIds(userEditorToolIds) ?? [];
+
+    const defaultEditorTools = await editorToolsService.getDefaultEditorTools();
+    const uniqueDefaultEditorTools = defaultEditorTools.filter(({ id }) => !userEditorToolIds.includes(id));
+    const userEditorTools = await editorToolsService.getToolsByIds(userEditorToolIds) ?? [];
+
+    // Combine user tools and default tools
+    // TODO: load tools in notes service
+    const mergedTools = [...userEditorTools, ...uniqueDefaultEditorTools];
 
     return reply.send({
-      data: editorTools,
+      data: mergedTools,
     });
   });
 
