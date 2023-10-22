@@ -13,11 +13,11 @@ describe('Note API', () => {
         'content': null,
         'createdAt': '2023-10-16T13:49:19.000Z',
         'updatedAt': '2023-10-16T13:49:19.000Z',
-        'notes_settings':  {
-          'custom_hostname': 'codex.so',
-          'enabled': true,
+        'noteSettings':  {
+          'customHostname': 'codex.so',
+          'isPublic': true,
           'id': 1,
-          'note_id': 1,
+          'noteId': 1,
         },
       };
       /* eslint-enable @typescript-eslint/naming-convention */
@@ -34,7 +34,7 @@ describe('Note API', () => {
       expect(body).toStrictEqual(expectedNote);
     });
 
-    test('Rreturns 404 when note not found', async () => {
+    test('Returns 404 when note not found', async () => {
       const expectedStatus = 404;
 
       const response = await global.api?.fakeRequest({

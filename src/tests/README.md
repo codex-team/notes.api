@@ -35,16 +35,20 @@ Also consider using [AAA pattern](https://medium.com/@pjbgf/title-testing-code-o
 See `src/presentation/http/router/note.test.ts` for example
 
 ## Running tests
-
-- Execute all the tests:
-
+- Perform a single tests run without watch mode:
   ```
   yarn test
   ```
 
+- Execute all the tests and enter watch mode to track file changes and re-execute tests:
+
+  ```
+  yarn test:dev
+  ```
+
 - Execute all tests in verbose mode:
   ```
-  yarn test:verbose
+  DEBUG=testcontainers* yarn test
   ```
   Use this command for troubleshooting test DB. It will output all testcontainers logs.
 - Execute specific tests

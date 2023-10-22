@@ -1,5 +1,6 @@
 import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import type EditorTool from '@domain/entities/editorTools.js';
+import { createEditorToolId } from '@infrastructure/utils/id.js';
 
 /**
  * Editor tools service
@@ -27,12 +28,24 @@ export default class EditorToolsService {
   }
 
   /**
+   *  Get bunch of editor tools by their ids
+   *
+   * @param editorToolIds - tool ids
+   */
+  public async getToolsByIds(editorToolIds: EditorTool['id'][] ): Promise<EditorTool[] | null> {
+    return await this.repository.getToolsByIds(editorToolIds);
+  }
+
+  /**
    * Adding custom editor tool
    *
-   * @param tool - all data about the editor plugin
-   * @returns {Promise<EditorTool | null>} editor tool data
+   * @param editorTool - all data about the editor plugin
+   * @returns {Promise<EditorTool>} editor tool data
    */
-  public async addTool(tool: EditorTool): Promise<EditorTool | null> {
-    return await this.repository.addTools(tool);
+  public async addTool(editorTool: Omit<EditorTool, 'id'>): Promise<EditorTool> {
+    return await this.repository.addTool({
+      id: createEditorToolId(),
+      ...editorTool,
+    });
   }
 }

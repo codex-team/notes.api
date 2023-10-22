@@ -127,9 +127,11 @@ export default class UserRepository {
    *
    * @param options - identifiers of user and tool
    */
-  public async addUserEditorTool({ userId, editorTool }: AddUserToolOptions): Promise<void> {
-    await this.storage.addUserEditorTool({ userId,
-      editorTool });
+  public async addUserEditorTool({ userId, tool }: AddUserToolOptions): Promise<void> {
+    await this.storage.addUserEditorTool({
+      userId,
+      tool,
+    });
   }
 
   /**
@@ -150,7 +152,9 @@ export default class UserRepository {
       throw new Error('User has no tool with such editorToolId');
     }
 
-    await this.storage.removeUserEditorTool({ userId,
-      editorTool });
+    await this.storage.removeUserEditorTool({
+      userId,
+      editorTool,
+    });
   }
 }

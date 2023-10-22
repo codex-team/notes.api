@@ -8,9 +8,9 @@ import cors from '@fastify/cors';
 import fastifyOauth2 from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
-import addAuthMiddleware from '@presentation/http/middlewares/auth.js';
+import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
 import cookie from '@fastify/cookie';
-import NotFoundDecorator from './decorators/notFound.js';
+import { notFound, forbidden, unauthorized, notAcceptable } from './decorators/index.js';
 import NoteRouter from '@presentation/http/router/note.js';
 import OauthRouter from '@presentation/http/router/oauth.js';
 import AuthRouter from '@presentation/http/router/auth.js';
@@ -22,6 +22,8 @@ import { NoteSchema } from './schema/Note.js';
 import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
+import NoteListRouter from '@presentation/http/router/noteList.js';
+import { EditorToolSchema } from './schema/EditorTool.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -70,7 +72,7 @@ export default class HttpApi implements Api {
     await this.addOauth2();
     await this.addCORS();
 
-    this.addMiddlewares(domainServices);
+    this.addCommonMiddlewares(domainServices);
 
     this.addSchema();
     this.addDecorators();
@@ -128,8 +130,29 @@ export default class HttpApi implements Api {
           version: '0.1.0',
         },
         servers: [ {
-          url: 'http://localhost',
+          url: 'http://localhost:1337',
+          description: 'Localhost environment',
+        }, {
+          url: 'https://api.notex.so',
+          description: 'Production environment',
         } ],
+        components: {
+          securitySchemes: {
+            oAuthGoogle: {
+              type: 'oauth2',
+              description: 'Provied authorization uses OAuth 2 with Google',
+              flows: {
+                authorizationCode: {
+                  authorizationUrl: 'https://api.notex.so/oauth/google/login',
+                  scopes: {
+                    'notesManagement': 'Create, read, update and delete notes',
+                  },
+                  tokenUrl: 'https://api.notex.so/oauth/google/callback',
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -169,9 +192,15 @@ export default class HttpApi implements Api {
       noteSettingsService: domainServices.noteSettingsService,
     });
 
+    await this.server?.register(NoteListRouter, {
+      prefix: '/notes',
+      noteListService: domainServices.noteListService,
+    });
+
     await this.server?.register(NoteSettingsRouter, {
       prefix: '/note-settings',
       noteSettingsService: domainServices.noteSettingsService,
+      noteService: domainServices.noteService,
     });
 
     await this.server?.register(OauthRouter, {
@@ -189,6 +218,7 @@ export default class HttpApi implements Api {
     await this.server?.register(UserRouter, {
       prefix: '/user',
       userService: domainServices.userService,
+      editorToolsService: domainServices.editorToolsService,
     });
 
     await this.server?.register(AIRouter, {
@@ -237,13 +267,17 @@ export default class HttpApi implements Api {
   private addSchema(): void {
     this.server?.addSchema(UserSchema);
     this.server?.addSchema(NoteSchema);
+    this.server?.addSchema(EditorToolSchema);
   }
 
   /**
    * Add custom decorators
    */
   private addDecorators(): void {
-    this.server?.decorate('notFound', NotFoundDecorator);
+    this.server?.decorateReply('notFound', notFound);
+    this.server?.decorateReply('forbidden', forbidden);
+    this.server?.decorateReply('unauthorized', unauthorized);
+    this.server?.decorateReply('notAcceptable', notAcceptable);
   }
 
   /**
@@ -251,12 +285,12 @@ export default class HttpApi implements Api {
    *
    * @param domainServices - instances of domain services
    */
-  private addMiddlewares(domainServices: DomainServices): void {
+  private addCommonMiddlewares(domainServices: DomainServices): void {
     if (this.server === undefined) {
       throw new Error('Server is not initialized');
     }
 
-    addAuthMiddleware(this.server, domainServices.authService, appServerLogger);
+    addUserIdResolver(this.server, domainServices.authService, appServerLogger);
   }
 
   /**

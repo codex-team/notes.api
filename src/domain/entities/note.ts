@@ -1,3 +1,5 @@
+import type User from '@domain/entities/user.js';
+
 /**
  * Note internal id. Used to query Note by internal API
  */
@@ -28,9 +30,9 @@ export interface Note {
   content: JSON;
 
   /**
-   * Note creator
+   * Note creator id
    */
-  creatorId: number;
+  creatorId: User['id'];
 
   /**
    * When note was created

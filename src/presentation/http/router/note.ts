@@ -1,46 +1,10 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
-import { StatusCodes } from 'http-status-codes';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
-import { GetNoteSchema, NoteEditPayloadSchema } from '../schema/Note.js';
-
-/**
- * Get note by id options
- */
-interface GetNoteByIdOptions {
-  /**
-   * Note id
-   */
-  id: NotePublicId;
-}
-
-/**
- * Add note options
- */
-interface AddNoteOptions {
-  /**
-   * Note content
-   */
-  content: JSON;
-}
-
-/**
- * Payload for update note request
- */
-interface UpdateNoteOptions {
-  /**
-   * Note public id
-   */
-  id: NotePublicId;
-
-  /**
-   * New content
-   */
-  content: JSON;
-}
-
+import useNoteResolver from '../middlewares/note/useNoteResolver.js';
+import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 
 /**
  * Interface for the note router.
@@ -55,13 +19,6 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
-}
-
-interface ResolveHostnameOptions {
-  /**
-   * Custom Hostname
-   */
-  hostname: string;
 }
 
 /**
@@ -79,40 +36,90 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const noteSettingsService = opts.noteSettingsService;
 
   /**
-   * Get note by id with schema JSON (validate request params)
+   * Prepare note id resolver middleware
+   * It should be used in routes that accepts note public id
+   */
+  const { noteResolver } = useNoteResolver(noteService);
+
+  /**
+   * Prepare note settings resolver middleware
+   * It should be used to use note settings in middlewares
+   */
+  const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
+
+  /**
+   * Get note by id
    */
   fastify.get<{
-    Params: GetNoteByIdOptions,
-    Reply: Note | ErrorResponse
-  }>('/:id', {
-    schema: {
-      params: GetNoteSchema,
+    Params: {
+      notePublicId: NotePublicId;
     },
+    Reply: Note | ErrorResponse,
+  }>('/:notePublicId', {
+    config: {
+      policy: [
+        'notePublicOrUserInTeam',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+      noteSettingsResolver,
+    ],
   }, async (request, reply) => {
-    const params = request.params;
-
-    const { id } = params;
-
-    const note = await noteService.getNoteById(id);
+    const { note } = request;
 
     /**
      * Check if note does not exist
      */
     if (note === null) {
-      return fastify.notFound(reply, 'Note not found');
+      return reply.notFound('Note not found');
     }
 
-    const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(note.id);
+    return reply.send(note);
+  });
 
-    if (noteSettings?.enabled === true) {
-      return reply.send(note);
-    }
+  /**
+   * Deletes note by id
+   */
+  fastify.delete<{
+    Params: {
+      notePublicId : NotePublicId;
+    },
+    Reply: {
+      isDeleted : boolean
+    },
+  }>('/:notePublicId', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
+    config: {
+      policy: [
+        'authRequired',
+        'userInTeam',
+      ],
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+    const isDeleted = await noteService.deleteNoteById(noteId);
 
-    return reply
-      .code(StatusCodes.UNAUTHORIZED)
-      .send({
-        message: 'Permission denied',
-      });
+    /**
+     * Check if note does not exist
+     */
+    return reply.send({ isDeleted : isDeleted });
   });
 
   /**
@@ -120,8 +127,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Responses with note public id.
    */
   fastify.post<{
-    Body: AddNoteOptions,
-    Reply: { id: NotePublicId },
+    Body: {
+      content: JSON;
+    },
+    Reply: {
+      id: NotePublicId
+    },
   }>('/', {
     config: {
       policy: [
@@ -151,26 +162,42 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Updates note by id.
    */
   fastify.patch<{
-    Body: UpdateNoteOptions,
+    Params: {
+      notePublicId: NotePublicId,
+    },
+    Body: {
+      content: JSON;
+    },
     Reply: {
       updatedAt: Note['updatedAt'],
     }
-  }>('/', {
+  }>('/:notePublicId', {
     schema: {
-      body: NoteEditPayloadSchema,
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      body: {
+        content: {
+          $ref: 'NoteSchema#/properties/content',
+        },
+      },
     },
     config: {
       policy: [
         'authRequired',
+        'userInTeam',
       ],
     },
+    preHandler: [
+      noteResolver,
+    ],
   }, async (request, reply) => {
-    /**
-     * @todo Check user access right
-     */
-    const { id, content } = request.body;
+    const noteId = request.note?.id as number;
+    const { content } = request.body;
 
-    const note = await noteService.updateNoteContentByPublicId(id, content);
+    const note = await noteService.updateNoteContentById(noteId, content);
 
     return reply.send({
       updatedAt: note.updatedAt,
@@ -182,7 +209,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Get note by custom hostname
    */
   fastify.get<{
-    Params: ResolveHostnameOptions,
+    Params: {
+      /**
+       * Custom Hostname to search note by
+       */
+      hostname: string;
+    },
     Reply: Note
   }>('/resolve-hostname/:hostname', async (request, reply) => {
     const params = request.params;
@@ -193,7 +225,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Check if note does not exist
      */
     if (note === null) {
-      return fastify.notFound(reply, 'Note not found');
+      return reply.notFound('Note not found');
     }
 
     return reply.send(note);

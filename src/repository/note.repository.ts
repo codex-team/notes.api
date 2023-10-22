@@ -1,5 +1,6 @@
-import type { Note, NoteCreationAttributes, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
+import type { NoteList } from '@domain/entities/noteList.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -30,24 +31,33 @@ export default class NoteRepository {
   }
 
   /**
-   * Update note content in a store using note public id
+   * Update note content in a store
    *
-   * @param publicId - note public id
+   * @param id - note internal id
    * @param content - new content
    * @returns Note on success, null on failure
    */
-  public async updateNoteContentByPublicId(publicId: NotePublicId, content: Note['content'] ): Promise<Note | null> {
-    return await this.storage.updateNoteContentByPublicId(publicId, content);
+  public async updateNoteContentById(id: NoteInternalId, content: Note['content'] ): Promise<Note | null> {
+    return await this.storage.updateNoteContentById(id, content);
   }
 
   /**
-   * Gets note by id
+   * Gets note by internal id
    *
    * @param id - note id
    * @returns { Promise<Note | null> } found note
    */
-  public async getNoteById(id: Note['id']): Promise<Note | null> {
+  public async getNoteById(id: NoteInternalId): Promise<Note | null> {
     return await this.storage.getNoteById(id);
+  }
+
+  /**
+   * Deletes note by id
+   *
+   * @param id - note id
+   */
+  public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
+    return await this.storage.deleteNoteById(id);
   }
 
   /**
@@ -61,12 +71,21 @@ export default class NoteRepository {
   }
 
   /**
-   * Get note by public id
+   * Returns note by public id. Null if note does not exist.
    *
    * @param publicId - public id
-   * @returns { Promise<Note | null> } found note
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
     return await this.storage.getNoteByPublicId(publicId);
+  }
+
+  /**
+   * Gets note list by creator id
+   *
+   * @param id - note creator id
+   * @returns { Promise<NoteList> } note
+   */
+  public async getNoteListByCreatorId(id: number): Promise<Note[]> {
+    return await this.storage.getNoteListByCreatorId(id);
   }
 }

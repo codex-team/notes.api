@@ -12,6 +12,12 @@ import API from '@presentation/index.js';
 import { beforeAll, afterAll } from 'vitest';
 import type Api from '@presentation/api.interface';
 
+/**
+ * Tests setup maximum duration.
+ * Added as default 10000 is not enough
+ */
+const TIMEOUT = 200000;
+
 declare global {
   /**
    * Globally exposed variable, containing reference to http server object.
@@ -44,7 +50,7 @@ beforeAll(async () => {
   await insertData(orm);
 
   global.api = api;
-});
+}, TIMEOUT);
 
 afterAll(async () => {
   await postgresContainer?.stop();

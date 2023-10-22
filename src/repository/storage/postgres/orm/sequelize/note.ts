@@ -1,9 +1,8 @@
-import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
-import type { ModelStatic } from 'sequelize';
+import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, Sequelize } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
-import type { NoteCreationAttributes } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { NoteList } from '@domain/entities/noteList.js';
 import type { NoteSettingsModel } from '@repository/storage/postgres/orm/sequelize/noteSettings.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 
@@ -120,8 +119,8 @@ export default class NoteSequelizeStorage {
      * Create association with note settings, one-to-one
      */
     this.model.hasOne(this.settingsModel, {
-      foreignKey: 'note_id',
-      as: this.settingsModel.tableName,
+      foreignKey: 'noteId',
+      as: 'noteSettings',
     });
   }
 
@@ -142,18 +141,18 @@ export default class NoteSequelizeStorage {
   }
 
   /**
-   * Update note content by public id
+   * Update note content by id
    *
-   * @param publicId - note public id
+   * @param id - note internal id
    * @param content - new content
    * @returns Note on success, null on failure
    */
-  public async updateNoteContentByPublicId(publicId: NotePublicId, content: Note['content']): Promise<Note | null> {
+  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note | null> {
     const [affectedRowsCount, affectedRows] = await this.model.update({
       content,
     }, {
       where: {
-        publicId,
+        id,
       },
       returning: true,
     });
@@ -188,6 +187,39 @@ export default class NoteSequelizeStorage {
   }
 
   /**
+   * Deletes note by id
+   *
+   * @param id - internal id
+   */
+  public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
+    const affectedRows = await this.model.destroy({
+      where:{
+        id,
+      },
+    });
+
+    /**
+     * If note not found return false
+     */
+    return affectedRows > 0;
+  }
+
+  /**
+   * Gets note list by creator id
+   *
+   * @param creatorId - note creator id
+   * @returns { Promise<NoteList> } note
+   */
+  public async getNoteListByCreatorId(creatorId: number): Promise<Note[]> {
+    const noteList  = await this.model.findAll({
+      where: {
+        creatorId,
+      },
+    });
+
+    return noteList;
+  }
+  /**
    * Gets note by id
    *
    * @param hostname - custom hostname
@@ -203,11 +235,11 @@ export default class NoteSequelizeStorage {
      */
     return await this.model.findOne({
       where: {
-        '$notes_settings.custom_hostname$': hostname,
+        '$noteSettings.custom_hostname$': hostname,
       },
       include: {
         model: this.settingsModel,
-        as: this.settingsModel.tableName,
+        as: 'noteSettings',
         required: true,
       },
     });

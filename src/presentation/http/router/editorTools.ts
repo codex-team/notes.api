@@ -29,7 +29,27 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   /**
    * Get all avaiable editor tools
    */
-  fastify.get('/all', async (_, reply) => {
+  fastify.get('/all', {
+    schema: {
+      response: {
+        '2xx': {
+          description: 'Editor tool fields',
+          content: {
+            'application/json': {
+              schema: {
+                data: {
+                  type: 'array',
+                  items: {
+                    $ref: 'EditorToolSchema',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  }, async (_, reply) => {
     const tools = await editorToolsService.getTools();
 
     return reply.send({
@@ -40,7 +60,29 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   /**
    * Add editor tool to the library of all tools
    */
-  fastify.post<{ Body: EditorTool }>('/add-tool', async (request, reply) => {
+  fastify.post<{
+    Body: EditorTool
+  }>('/add-tool', {
+    schema: {
+      body: {
+        $ref: 'EditorToolSchema',
+      },
+      response: {
+        '2xx': {
+          description: 'Editor tool fields',
+          content: {
+            'application/json': {
+              schema: {
+                data: {
+                  $ref: 'EditorToolSchema',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
     const editorTool = request.body;
 
     const tool = await editorToolsService.addTool(editorTool);
