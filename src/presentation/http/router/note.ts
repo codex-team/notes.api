@@ -113,9 +113,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       noteResolver,
     ],
   }, async (request, reply) => {
-  /**
-   * @todo Check user access right
-   */
     const noteId = request.note?.id as number;
     const isDeleted = await noteService.deleteNoteById(noteId);
 
