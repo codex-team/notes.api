@@ -34,11 +34,11 @@ export class TeamsModel extends Model<InferAttributes<TeamsModel>, InferCreation
 }
 
 /**
- * Class representing a table storing Note Settings
+ * Class representing a table storing note teams
  */
 export default class TeamsSequelizeStorage {
   /**
-   * Notes settings model in database
+   * Team model in database
    */
   public model: typeof TeamsModel;
 
@@ -58,9 +58,9 @@ export default class TeamsSequelizeStorage {
   private userModel: typeof UserModel | null = null;
 
   /**
-   * Settings table name
+   * Teams table name
    */
-  private readonly tableName = 'teams';
+  private readonly tableName = 'note_teams';
 
   /**
    * Constructor for note storage
@@ -71,7 +71,7 @@ export default class TeamsSequelizeStorage {
     this.database = connection;
 
     /**
-     * Initiate note settings model
+     * Initiate note note teams model
      */
     this.model = TeamsModel.init({
       id: {
