@@ -7,14 +7,13 @@ import type { FastifyReply } from 'fastify';
  * @example
  *
  *  if (note === null) {
- *    return fastify.notFound(reply, 'Note not found');
+ *    return reply.notFound('Note not found');
  *  }
  *
- * @param reply - fastify reply instance
  * @param message - custom message
  */
-export default async function notFound(reply: FastifyReply, message = 'Not found'): Promise<void> {
-  await reply
+export default async function notFound(this: FastifyReply, message = 'Not found'): Promise<void> {
+  await this
     .code(StatusCodes.NOT_FOUND)
     .type('application/json')
     .send({

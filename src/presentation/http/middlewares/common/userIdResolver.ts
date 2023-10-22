@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
 import type Logger from '@infrastructure/logging/index.js';
-import notEmpty from '@infrastructure/utils/notEmpty.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Add middleware for resolve userId from Access Token and add it to request

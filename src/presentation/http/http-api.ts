@@ -10,7 +10,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
 import cookie from '@fastify/cookie';
-import NotFoundDecorator from './decorators/notFound.js';
+import { notFound, forbidden, unauthorized, notAcceptable } from './decorators/index.js';
 import NoteRouter from '@presentation/http/router/note.js';
 import OauthRouter from '@presentation/http/router/oauth.js';
 import AuthRouter from '@presentation/http/router/auth.js';
@@ -23,6 +23,7 @@ import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
 import NoteListRouter from '@presentation/http/router/noteList.js';
+import { EditorToolSchema } from './schema/EditorTool.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -132,8 +133,8 @@ export default class HttpApi implements Api {
           url: 'http://localhost:1337',
           description: 'Localhost environment',
         }, {
-          url: 'https://notex.so',
-          description: 'Stage environment',
+          url: 'https://api.notex.so',
+          description: 'Production environment',
         } ],
         components: {
           securitySchemes: {
@@ -142,12 +143,11 @@ export default class HttpApi implements Api {
               description: 'Provied authorization uses OAuth 2 with Google',
               flows: {
                 authorizationCode: {
-                  authorizationUrl: 'https://notex.so/oauth/google/login',
+                  authorizationUrl: 'https://api.notex.so/oauth/google/login',
                   scopes: {
-                    // eslint-disable-next-line @typescript-eslint/naming-convention
-                    'notes_management': 'Create, read, update and delete notes',
+                    'notesManagement': 'Create, read, update and delete notes',
                   },
-                  tokenUrl: '',
+                  tokenUrl: 'https://api.notex.so/oauth/google/callback',
                 },
               },
             },
@@ -218,6 +218,7 @@ export default class HttpApi implements Api {
     await this.server?.register(UserRouter, {
       prefix: '/user',
       userService: domainServices.userService,
+      editorToolsService: domainServices.editorToolsService,
     });
 
     await this.server?.register(AIRouter, {
@@ -266,13 +267,17 @@ export default class HttpApi implements Api {
   private addSchema(): void {
     this.server?.addSchema(UserSchema);
     this.server?.addSchema(NoteSchema);
+    this.server?.addSchema(EditorToolSchema);
   }
 
   /**
    * Add custom decorators
    */
   private addDecorators(): void {
-    this.server?.decorate('notFound', NotFoundDecorator);
+    this.server?.decorateReply('notFound', notFound);
+    this.server?.decorateReply('forbidden', forbidden);
+    this.server?.decorateReply('unauthorized', unauthorized);
+    this.server?.decorateReply('notAcceptable', notAcceptable);
   }
 
   /**

@@ -1,34 +1,31 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes } from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, Op } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type EditorTool from '@domain/entities/editorTools.js';
-
-
-interface AddToolOptions {
-    id: EditorTool['id'];
-    name: EditorTool['name'];
-    class: EditorTool['class'];
-    source: EditorTool['source'];
-}
 
 /**
  * Class representing an EditorTool model in database
  */
 export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, InferCreationAttributes<EditorToolModel>> {
   /**
-   * Editor tool unique id
+   * Editor tool unique id, Nano-ID
    */
   public declare id: EditorTool['id'];
 
   /**
-   * Editor tool title
+   * Custom name that uses in editor initiazliation. e.g. 'code'
    */
   public declare name: EditorTool['name'];
 
   /**
-   * User tool class name
+   * Editor tool title. e.g. 'Code tool 3000'
    */
-  public declare class: EditorTool['class'];
+  public declare title: EditorTool['title'];
+
+  /**
+   * User tool class name. e.g. 'CodeTool'
+   */
+  public declare exportName: EditorTool['exportName'];
 
   /**
    * Editor tool sources
@@ -76,7 +73,11 @@ export default class UserSequelizeStorage {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      class: {
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      exportName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -97,17 +98,36 @@ export default class UserSequelizeStorage {
   public async addTool({
     id,
     name,
-    class: editorToolClass,
+    title,
+    exportName,
     source,
-  }: AddToolOptions): Promise<EditorTool> {
+  }: EditorTool): Promise<EditorTool> {
     const editorTool = await this.model.create({
       id,
       name,
-      class: editorToolClass,
+      title,
+      exportName,
       source,
     });
 
     return editorTool;
+  }
+
+  /**
+   * Get bunch of tools by their ids
+   *
+   * @param editorToolIds - tool ids
+   */
+  public async getToolsByIds(editorToolIds: EditorTool['id'][]): Promise<EditorTool[]> {
+    const editorTools = await this.model.findAll({
+      where: {
+        id: {
+          [Op.in]: editorToolIds,
+        },
+      },
+    });
+
+    return editorTools;
   }
 
   /**

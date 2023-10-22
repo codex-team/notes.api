@@ -48,11 +48,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
      * Check if session is valid
      */
     if (!userSession) {
-      return reply
-        .code(StatusCodes.UNAUTHORIZED)
-        .send({
-          message: 'Session is not valid',
-        });
+      return await reply.unauthorized('Session is not valid');
     }
 
     const accessToken = opts.authService.signAccessToken({ id: userSession.userId });
