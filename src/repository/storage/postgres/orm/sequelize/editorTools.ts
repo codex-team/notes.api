@@ -140,7 +140,7 @@ export default class UserSequelizeStorage {
   /**
    * Get all default tools
    */
-  public async getDefaultEditorTools(): Promise<EditorTool[]> {
+  public async getDefaultTools(): Promise<EditorTool[]> {
     return await this.model.findAll({
       where: {
         isDefault: true,

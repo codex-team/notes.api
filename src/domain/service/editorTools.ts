@@ -1,11 +1,12 @@
 import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import { createEditorToolId } from '@infrastructure/utils/id.js';
+import type EditorToolsServiceSharedMethods from './shared/editorTools.js';
 
 /**
  * Editor tools service
  */
-export default class EditorToolsService {
+export default class EditorToolsService implements EditorToolsServiceSharedMethods {
   /**
    * User repository instance
    */
@@ -37,10 +38,10 @@ export default class EditorToolsService {
   }
 
   /**
-   * Get all default tools
+   * Return tools that are available at Editor by default
    */
-  public async getDefaultEditorTools(): Promise<EditorTool[]> {
-    return await this.repository.getDefaultEditorTools();
+  public async getDefaultTools(): Promise<EditorTool[]> {
+    return await this.repository.getDefaultTools();
   }
 
   /**
