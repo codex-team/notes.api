@@ -1,0 +1,51 @@
+name: Run tests
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  tests:
+    runs-on: ubuntu-22.04
+    
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: codex
+          POSTGRES_DB: notes
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 127.0.0.1:5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        volumes:
+          - ./database:/var/lib/postgresql/data
+
+    steps:
+      - name: Wait for PostgreSQL
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '20s'
+
+      - name: Set permissions for database directory
+        run: sudo chmod -R 777 database
+
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run tests
+        run: yarn test
+
