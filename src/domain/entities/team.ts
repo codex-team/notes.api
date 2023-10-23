@@ -1,6 +1,7 @@
 import type { NoteInternalId } from './note.js';
 import type User from './user.js';
 
+
 export enum MemberRole {
   /**
    * Team member can read and write notes

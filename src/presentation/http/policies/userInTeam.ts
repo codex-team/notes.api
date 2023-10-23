@@ -13,14 +13,14 @@ export default async function userInTeam(request: FastifyRequest, reply: Fastify
 
   if (isEmpty(userId)) {
     return await reply.unauthorized();
-  };
+  }
 
   /**
    * If note is not resolved, we can't check permissions
    */
   if (isEmpty(request.note)) {
     return await reply.notAcceptable('Note not found');
-  };
+  }
 
   const { creatorId } = request.note;
 
@@ -28,6 +28,15 @@ export default async function userInTeam(request: FastifyRequest, reply: Fastify
    * Check if user can edit note
    */
   if (creatorId !== userId) {
+    return await reply.forbidden();
+  }
+
+  const { teamMemberId } = request;
+
+  /**
+   * Checking if user is part of the team
+   */
+  if (userId !== teamMemberId) {
     return await reply.forbidden();
   }
 }

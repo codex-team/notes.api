@@ -6,6 +6,7 @@ import type Policies from './policies/index.js';
 import type AuthPayload from '@domain/entities/authPayload.js';
 import type { Note } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
+import type { Team, TeamMember } from '@domain/entities/team';
 
 declare module 'fastify' {
   export interface FastifyInstance<
@@ -62,6 +63,11 @@ declare module 'fastify' {
      * This property added by noteSettingsResolver middleware
      */
     noteSettings: NoteSettings | null;
+
+    /**
+     * This property added by teamMemberIdResolver middleware
+     */
+    teamMemberId: TeamMember['id'] | null;
   }
 
   /**
