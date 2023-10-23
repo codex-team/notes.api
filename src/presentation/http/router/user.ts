@@ -30,7 +30,6 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
    * Manage user data
    */
   const userService = opts.userService;
-  const editorToolsService = opts.editorToolsService;
 
   /**
    * Get user by session
@@ -63,7 +62,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   });
 
   /**
-   * Get user extensions
+   * Get user editor tools
    */
   fastify.get('/editor-tools', {
     config: {
@@ -93,12 +92,10 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const userId = request.userId as number;
 
-    const userExtensions = await userService.getUserExtensions(userId);
-    const userEditorToolIds = userExtensions?.editorTools?.map(tools => tools.id) ?? [];
-    const editorTools = await editorToolsService.getToolsByIds(userEditorToolIds) ?? [];
+    const tools = await userService.getUserEditorTools(userId);
 
     return reply.send({
-      data: editorTools,
+      data: tools,
     });
   });
 
@@ -124,16 +121,16 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
       },
     },
   }, async (request, reply) => {
-    const editorToolId = request.body.toolId;
+    const toolId = request.body.toolId;
     const userId = request.userId as number;
 
     await userService.addUserEditorTool({
       userId,
-      editorToolId,
+      toolId,
     });
 
     return reply.send({
-      data: editorToolId,
+      data: toolId,
     });
   });
 

@@ -92,7 +92,6 @@ export default class NoteSettingsSequelizeStorage {
       tableName: this.tableName,
       sequelize: this.database,
       timestamps: false,
-      underscored: true, // use snake_case for fields in db
     });
   }
 

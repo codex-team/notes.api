@@ -103,7 +103,6 @@ export default class NoteSequelizeStorage {
     }, {
       tableName: this.tableName,
       sequelize: this.database,
-      underscored: true, // use snake_case for fields in db
     });
   }
 
@@ -131,13 +130,11 @@ export default class NoteSequelizeStorage {
    * @returns { Note } - created note
    */
   public async createNote(options: NoteCreationAttributes): Promise<Note> {
-    const createdNote = await this.model.create({
+    return await this.model.create({
       publicId: options.publicId,
       content: options.content,
       creatorId: options.creatorId,
     });
-
-    return createdNote;
   }
 
   /**
@@ -170,20 +167,11 @@ export default class NoteSequelizeStorage {
    * @param id - internal id
    */
   public async getNoteById(id: NoteInternalId): Promise<Note | null> {
-    const note = await this.model.findOne({
+    return await this.model.findOne({
       where: {
         id,
       },
     });
-
-    /**
-     * If note not found, return null
-     */
-    if (!note) {
-      return null;
-    }
-
-    return note;
   }
 
   /**
@@ -213,15 +201,13 @@ export default class NoteSequelizeStorage {
    * @returns { Promise<NoteList> } note
    */
   public async getNoteListByCreatorId(creatorId: number, offset: number, limit: number): Promise<Note[]> {
-    const noteList  = await this.model.findAll({
+    return await this.model.findAll({
       offset: offset,
       limit: limit,
       where: {
         creatorId,
       },
     });
-
-    return noteList;
   }
   /**
    * Gets note by id
@@ -256,12 +242,10 @@ export default class NoteSequelizeStorage {
    * @returns { Promise<Note | null> } found note
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
-    const note = await this.model.findOne({
+    return await this.model.findOne({
       where: {
         publicId,
       },
     });
-
-    return note;
   };
 }

@@ -28,6 +28,12 @@ export default class SequelizeOrm {
 
     this.conn = new Sequelize(this.config.dsn, {
       logging: databaseLogger.info.bind(databaseLogger),
+      define: {
+        /**
+         * Use snake_case for fields in db, but camelCase in code
+         */
+        underscored: true,
+      },
     });
   }
 

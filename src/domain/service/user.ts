@@ -2,6 +2,7 @@ import type UserRepository from '@repository/user.repository.js';
 import { Provider } from '@repository/user.repository.js';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools';
+import type { SharedDomainMethods } from './shared/index.js';
 
 export {
   Provider
@@ -20,8 +21,9 @@ export default class UserService {
    * User service constructor
    *
    * @param repository - user repository instance
+   * @param shared - shared domains
    */
-  constructor(repository: UserRepository) {
+  constructor(repository: UserRepository, private readonly shared: SharedDomainMethods) {
     this.repository = repository;
   }
 
@@ -47,15 +49,28 @@ export default class UserService {
   }
 
   /**
-   * Get user extensions that contains only editoTools for now
-   * TODO: Simplify extenisons
+   * Get user editor tools ids
    *
    * @param userId - user unique identifier
    */
-  public async getUserExtensions(userId: User['id']): Promise<User['extensions']> {
+  public async getUserEditorTools(userId: User['id']): Promise<EditorTool[]> {
     const user = await this.getUserById(userId);
 
-    return user?.extensions ?? {};
+    if (user === null) {
+      throw new Error('User not found');
+    }
+
+    const userToolsIds = user.editorTools ?? [];
+    const defaultTools = await this.shared.editorTools.getDefaultTools();
+    const uniqueDefaultEditorTools = defaultTools.filter(({ id }) => !userToolsIds.includes(id));
+    const userTools = await this.shared.editorTools.getToolsByIds(userToolsIds) ?? [];
+
+    /**
+     * Combine user tools and default tools
+     *
+     * @todo load tools in notes service
+     */
+    return [...userTools, ...uniqueDefaultEditorTools];
   }
 
   /**
@@ -65,16 +80,14 @@ export default class UserService {
    */
   public async addUserEditorTool({
     userId,
-    editorToolId,
+    toolId,
   }: {
     userId: User['id'],
-    editorToolId: EditorTool['id'],
+    toolId: EditorTool['id'],
   }): Promise<void> {
     return await this.repository.addUserEditorTool({
       userId,
-      tool: {
-        id: editorToolId,
-      },
+      toolId,
     });
   }
 }

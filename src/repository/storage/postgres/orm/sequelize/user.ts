@@ -3,7 +3,7 @@ import { fn, col } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type User from '@domain/entities/user.js';
-import type { UserEditorTool } from '@domain/entities/userExtensions.js';
+import type EditorTool from '@domain/entities/editorTools';
 
 /**
  * Query options for getting user
@@ -47,9 +47,9 @@ export interface AddUserToolOptions {
   userId: User['id'];
 
   /**
-   * Editor tool data
+   * Editor tool identifier
    */
-  tool: UserEditorTool;
+  toolId: EditorTool['id'];
 }
 
 /**
@@ -62,9 +62,9 @@ interface RemoveUserEditorTool {
   userId: User['id'];
 
   /**
-   * Editor tool
+   * Editor tool identifier
    */
-  editorTool: UserEditorTool;
+  toolId: EditorTool['id'];
 }
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -91,7 +91,7 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
   /**
    * User created at
    */
-  public declare created_at: Date;
+  public declare createdAt: Date;
 
   /**
    * User photo
@@ -99,9 +99,9 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
   public declare photo: CreationOptional<string>;
 
   /**
-   *
+   * List of tools ids installed by user from Marketplace
    */
-  public declare extensions: CreationOptional<User['extensions']>;
+  public declare editorTools: CreationOptional<User['editorTools']>;
 }
 
 /**
@@ -149,15 +149,15 @@ export default class UserSequelizeStorage {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      created_at: {
+      createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
       },
       photo: {
         type: DataTypes.STRING,
       },
-      extensions: {
-        type: DataTypes.JSON,
+      editorTools: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
       },
     }, {
       tableName: this.tableName,
@@ -173,14 +173,14 @@ export default class UserSequelizeStorage {
    */
   public async addUserEditorTool({
     userId,
-    tool: editorTool,
+    toolId,
   }: AddUserToolOptions): Promise<void> {
     await this.model.update({
-      extensions: fn('array_append', col('editorTools'), editorTool),
+      editorTools: fn('array_append', col('editor_tools'), toolId),
     }, {
       where: {
         id: userId,
-        // TODO: Add check to unique editorTool id
+        // @todo Add check to unique editorTool id
       },
     });
   }
@@ -192,10 +192,10 @@ export default class UserSequelizeStorage {
    */
   public async removeUserEditorTool({
     userId,
-    editorTool,
+    toolId,
   }: RemoveUserEditorTool): Promise<void> {
     await this.model.update({
-      extensions: fn('array_remove', col('editorTools'), editorTool),
+      editorTools: fn('array_remove', col('editor_tools'), toolId),
     }, {
       where: {
         id: userId,
@@ -214,20 +214,12 @@ export default class UserSequelizeStorage {
     name,
     photo,
   }: InsertUserOptions): Promise<User> {
-    const user = await this.model.create({
+    return await this.model.create({
       email,
       name,
-      created_at: new Date(),
+      createdAt: new Date(),
       photo,
     });
-
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: user.created_at,
-      photo: user.photo,
-    };
   }
 
   /**
@@ -274,13 +266,6 @@ export default class UserSequelizeStorage {
       return null;
     }
 
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: user.created_at,
-      photo: user.photo,
-      extensions: user.extensions,
-    };
+    return user;
   }
 }
