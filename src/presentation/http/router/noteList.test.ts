@@ -1,4 +1,4 @@
-import userSessions from '@test/test-data/userSessions.json';
+import userSessions from '@tests/test-data/userSessions.json';
 import { describe, test, expect } from 'vitest';
 
 const refresh_token = userSessions[0]['refresh_tocken'];
