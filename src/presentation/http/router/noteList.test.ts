@@ -1,7 +1,7 @@
 import userSessions from '@tests/test-data/userSessions.json';
 import { describe, test, expect } from 'vitest';
 
-const refresh_token = userSessions[0]['refresh_tocken'];
+const refresh_token = userSessions[0]['refresh_token'];
 const access_token = await global.api?.fakeRequest({
   method: 'POST',
   url: `/auth/?token=${refresh_token}`,
