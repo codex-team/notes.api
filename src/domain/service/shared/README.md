@@ -14,7 +14,7 @@ interface DomainASharedMethods {
 }
 
 export type SharedDomainMethods = {
-  editorTools: DomainASharedMethods;
+  domainA: DomainASharedMethods;
 };
 
 
@@ -24,7 +24,7 @@ class DomainA implements DomainASharedMethods {
 
 class DomainB {
   constructor(private readonly shared: SharedDomainMethods) {
-    this.shared.someMethodA(); // here we call method of Domain A, but without direct dependency
+    this.shared.domainA.someMethodA(); // here we call method of Domain A, but without direct dependency
   }
 }
 ```
