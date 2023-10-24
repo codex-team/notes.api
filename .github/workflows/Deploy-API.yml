@@ -1,4 +1,4 @@
-name: Build and push docker image
+name: Deploy API
 
 on:
   push:
@@ -6,6 +6,11 @@ on:
       - '*'
     tags:
       - 'v*'
+      
+  pull_request:
+    types: [opened, edited]
+    branches:
+      - '*'    
 
 env:
   REGISTRY: ghcr.io
