@@ -8,6 +8,7 @@ services:
       - 127.0.0.1:1337:1337
     volumes:
       - ./app-config.yaml:/usr/app/app-config.yaml
+      - ./app-config.local.yaml:/usr/app/app-config.local.yaml # строчка добавлена сюда
     restart: unless-stopped
 
   postgres:
