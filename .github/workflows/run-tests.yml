@@ -1,7 +1,14 @@
 name: Run tests
 
 on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - 'v*'
+      
   pull_request:
+    types: [opened, edited]
     branches:
       - '*'
 
