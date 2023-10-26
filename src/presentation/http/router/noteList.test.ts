@@ -9,9 +9,6 @@ console.log(refresh_token);
 console.log('============================================');
 
 const access_token = await global.api?.fakeRequest({
-  headers : {
-    'Content-Type': 'application/json',
-  },
   method: 'POST',
   url: '/auth',
   body : JSON.stringify({ token : refresh_token }),

@@ -44,7 +44,6 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
 
     console.log('token======================================');
     console.log(token);
-    throw new Error(token);
     console.log('======================================');
 
     const userSession = await opts.authService.verifyRefreshToken(token);
