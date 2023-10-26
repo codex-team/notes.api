@@ -2,10 +2,26 @@ import userSessions from '@tests/test-data/userSessions.json';
 import { describe, test, expect } from 'vitest';
 
 const refresh_token = userSessions[0]['refresh_token'];
+
+
+console.log('ref============================================');
+console.log(refresh_token);
+console.log('============================================');
+
 const access_token = await global.api?.fakeRequest({
+  headers : {
+    'Content-Type': 'application/json',
+  },
   method: 'POST',
-  url: `/auth/?token=${refresh_token}`,
+  url: '/auth',
+  body : JSON.stringify({ token : refresh_token }),
+  // body : refresh_token,
 });
+
+
+console.log('acc============================================');
+console.log(access_token);
+console.log('============================================');
 
 describe('NoteList API', () => {
   describe('GET /notes?page', () => {
@@ -19,7 +35,7 @@ describe('NoteList API', () => {
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: `/notes/&page=${pageNumber}`,
+        url: `/notes&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -39,7 +55,7 @@ describe('NoteList API', () => {
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: `/notes/&page=${pageNumber}`,
+        url: `/notes&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -58,7 +74,7 @@ describe('NoteList API', () => {
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: `/notes/&page=${pageNumber}`,
+        url: `/notes&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -79,7 +95,7 @@ describe('NoteList API', () => {
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: `/notes/&page=${pageNumber}`,
+        url: `/notes&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expextedStatus);
@@ -94,7 +110,7 @@ describe('NoteList API', () => {
         headers: {
           authorization: `Bearer ${access_token}`,
         },
-        url: `/notes/&page=${pageNumber}`,
+        url: `/notes&page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expextedStatus);
