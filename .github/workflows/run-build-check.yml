@@ -1,0 +1,35 @@
+name: Run build check
+
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - 'v*'
+
+  pull_request:
+    types: [opened, edited]
+    branches:
+      - '*'
+
+jobs:
+  build:
+    name: Run yarn build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+    
+    

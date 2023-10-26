@@ -1,9 +1,9 @@
-name: Build and push docker image
+name: Deploy API
 
 on:
   push:
     branches:
-      - '*'
+      - 'main'
     tags:
       - 'v*'
 
@@ -11,25 +11,11 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  eslint:
-    name: Run eslint check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: |
-          yarn install
-
-      - name: Run ESLint
-        run: yarn lint
-
   build:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Get full image name
