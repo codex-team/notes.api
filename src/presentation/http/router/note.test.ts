@@ -50,3 +50,62 @@ describe('Note API', () => {
     });
   });
 });
+
+describe('Note API', () => {
+  describe('GET note/:notePublicId ', () => {
+    test('Returns note by public id', async () => {
+      const expectedStatus = 200;
+      
+      const expectedNote = {
+        'id': 2,
+        'publicId': 'testnote11',
+        'creatorId': 1,
+        'content': null,
+        'createdAt': '2023-10-16T13:49:19.000Z',
+        'updatedAt': '2023-10-16T13:49:19.000Z',
+      };
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: '/note/testnote11',
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+
+      expect(body).toStrictEqual(expectedNote);
+    });
+
+    test('Returns 403 when permission denied', async () => {
+      const expectedStatus = 403;
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: '/note/testnote22',
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+
+      expect(body).toStrictEqual({ message: 'Permission denied' });
+    });
+
+    test('Returns 406 when public id incorrect', async () => {
+      const expectedStatus = 406;
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: '/note/wrong_1_id',
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+
+      expect(body).toStrictEqual({ message: 'Note not found' });
+    });
+
+  });
+}); 
