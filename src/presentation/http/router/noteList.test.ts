@@ -1,28 +1,51 @@
+import type AuthSession from '@domain/entities/authSession';
 import userSessions from '@tests/test-data/userSessions.json';
-import { describe, test, expect } from 'vitest';
-
-const refresh_token = userSessions[0]['refresh_token'];
+import { describe, test, expect, beforeAll } from 'vitest';
 
 
-console.log('ref============================================');
-console.log(refresh_token);
-console.log('============================================');
+/**
+ * Access token that will be used for Auhorization header
+ */
+let accessToken = '';
 
-const access_token = await global.api?.fakeRequest({
-  method: 'POST',
-  url: '/auth',
-  body : JSON.stringify({ token : refresh_token }),
-  // body : refresh_token,
-});
+/**
+ * Util for authorization
+ *
+ * @param refreshToken - refresh token. There should be a user session with this refresh token in database
+ * @todo Move this function to tests/utils
+ */
+async function authorize(refreshToken: string): Promise<string> {
+  const response = await global.api?.fakeRequest({
+    method: 'POST',
+    url: '/auth',
+    headers: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/json',
+    },
+    body : JSON.stringify({ token : refreshToken }),
+  });
 
+  const body: AuthSession = response?.body !== undefined ? JSON.parse(response?.body) : {};
 
-console.log('acc============================================');
-console.log(access_token);
-console.log('============================================');
+  return body.accessToken;
+}
 
 describe('NoteList API', () => {
+  beforeAll(async () => {
+    /**
+     * Authorize using refresh token and POST /auth
+     */
+    const refreshToken = userSessions[0]['refresh_token'];
+
+    try {
+      accessToken = await authorize(refreshToken);
+    } catch (error) {
+      console.log('Test Authorization failed', error);
+    }
+  });
+
   describe('GET /notes?page', () => {
-    test('Returns noteList with specified lenght (not for last page)', async () => {
+    test('Returns noteList with specified length (not for last page)', async () => {
       const expectedStatus = 200;
       const portionSize = 30;
       const pageNumber = 1;
@@ -30,9 +53,9 @@ describe('NoteList API', () => {
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
-          authorization: `Bearer ${access_token}`,
+          authorization: `Bearer ${accessToken}`,
         },
-        url: `/notes&page=${pageNumber}`,
+        url: `/notes?page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -50,9 +73,9 @@ describe('NoteList API', () => {
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
-          authorization: `Bearer ${access_token}`,
+          authorization: `Bearer ${accessToken}`,
         },
-        url: `/notes&page=${pageNumber}`,
+        url: `/notes?page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -66,12 +89,15 @@ describe('NoteList API', () => {
       const expectedStatus = 200;
       const pageNumber = 3;
 
+      console.log('accessToken', accessToken);
+
+
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
-          authorization: `Bearer ${access_token}`,
+          authorization: `Bearer ${accessToken}`,
         },
-        url: `/notes&page=${pageNumber}`,
+        url: `/notes?page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -90,9 +116,9 @@ describe('NoteList API', () => {
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
-          authorization: `Bearer ${access_token}`,
+          authorization: `Bearer ${accessToken}`,
         },
-        url: `/notes&page=${pageNumber}`,
+        url: `/notes?page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expextedStatus);
@@ -105,9 +131,9 @@ describe('NoteList API', () => {
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
-          authorization: `Bearer ${access_token}`,
+          authorization: `Bearer ${accessToken}`,
         },
-        url: `/notes&page=${pageNumber}`,
+        url: `/notes?page=${pageNumber}`,
       });
 
       expect(response?.statusCode).toBe(expextedStatus);

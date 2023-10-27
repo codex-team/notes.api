@@ -17,4 +17,5 @@ export default defineConfig({
       '@tests/': '/src/tests/',
     },
   },
+  console: 'integratedTerminal',
 });
