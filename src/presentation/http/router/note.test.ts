@@ -49,16 +49,14 @@ describe('Note API', () => {
       expect(body).toStrictEqual({ message: 'Note not found' });
     });
   });
-});
 
-describe('Note API', () => {
   describe('GET note/:notePublicId ', () => {
-    test('Returns note by public id', async () => {
+    test('Returns note by public id with 200 status', async () => {
       const expectedStatus = 200;
       
       const expectedNote = {
         'id': 2,
-        'publicId': 'testnote11',
+        'publicId': 'Pq1T9vc23Q',
         'creatorId': 1,
         'content': null,
         'createdAt': '2023-10-16T13:49:19.000Z',
@@ -67,7 +65,7 @@ describe('Note API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: '/note/testnote11',
+        url: '/note/Pq1T9vc23Q',
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -77,12 +75,12 @@ describe('Note API', () => {
       expect(body).toStrictEqual(expectedNote);
     });
 
-    test('Returns 403 when permission denied', async () => {
+    test('Returns 403 when public access is disabled in the note settings', async () => {
       const expectedStatus = 403;
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: '/note/testnote22',
+        url: '/note/73NdxFZ4k7',
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -92,12 +90,12 @@ describe('Note API', () => {
       expect(body).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 406 when public id incorrect', async () => {
+    test('Returns 406 when the id contains incorrect characters', async () => {
       const expectedStatus = 406;
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: '/note/wrong_1_id',
+        url: '/note/PR0B_bmdSy',
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
