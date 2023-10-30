@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 describe('Note API', () => {
-    describe('POST /auth/:', () => {
+    describe('POST /auth:', () => {
         test('Returns 401 when session is not valid', async () => {
             const expectedStatus = 401
 
@@ -15,13 +15,13 @@ describe('Note API', () => {
 
             expect(body).toStrictEqual({ message: "Session is not valid" })
         })
-        test('Returns 200 when session was authed', async () => {
+        test('Returns 200 when session was authorized', async () => {
 
             const expectedStatus = 200
 
             const expectedAuthReply = {
-                accessToken: '',
-                refreshToken: ''
+                accessToken: '123',
+                refreshToken: '4567'
             };
 
             const response = await global.api?.fakeRequest({

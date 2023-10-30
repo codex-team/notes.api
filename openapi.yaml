@@ -40,5 +40,5 @@ components:
     session:
       token:
         type: string
-        example: "123
+        example: 123
 
