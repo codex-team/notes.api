@@ -56,7 +56,7 @@ describe('Note API', () => {
   describe('GET note/:notePublicId ', () => {
     test('Returns note by public id with 200 status', async () => {
       const expectedStatus = 200;
-      
+
       const expectedNote = {
         'id': 2,
         'publicId': 'Pq1T9vc23Q',
@@ -81,33 +81,31 @@ describe('Note API', () => {
     test('Returns 403 when public access is disabled in the note settings', async () => {
       const expectedStatus = 403;
 
-      const notPublicNote = notes.find(note => {
-        const settings = noteSettings.find(ns => ns.note_id === note.id)
-        if(settings != undefined)
-        return settings.is_public === false
-      })
+      const notPublicNote = notes.find(newNote => {
+        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
 
-      if(notPublicNote != undefined) {
-        const response = await global.api?.fakeRequest({
-          method: 'GET',
-          url: `/note/${notPublicNote.public_id}`,
-        });
-  
-        expect(response?.statusCode).toBe(expectedStatus);
-  
-        const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
-  
-        expect(body).toStrictEqual({ message: 'Permission denied' });
-      }
-      
+        return settings!.is_public === false;
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note/${notPublicNote!.public_id}`,
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+
+      expect(body).toStrictEqual({ message: 'Permission denied' });
     });
 
     test('Returns 406 when the id contains incorrect characters', async () => {
       const expectedStatus = 406;
+      const nonexistentId = 'PR0B_bmdSy';
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: '/note/PR0B_bmdSy',
+        url: `/note/${nonexistentId}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -116,6 +114,5 @@ describe('Note API', () => {
 
       expect(body).toStrictEqual({ message: 'Note not found' });
     });
-
   });
-}); 
+});
