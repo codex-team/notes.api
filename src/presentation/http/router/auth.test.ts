@@ -15,7 +15,7 @@ describe('Note API', () => {
 
             expect(body).toStrictEqual({ message: "Session is not valid" })
         })
-        test('Returns 200 when session was authed', async () => {
+        test('Returns 200 when session was authorized', async () => {
 
             const expectedStatus = 200
 
