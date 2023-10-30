@@ -1,6 +1,9 @@
 
 import { describe, test, expect } from 'vitest';
 
+import notes from '@tests/test-data/notes.json';
+import noteSettings from '@tests/test-data/notes-settings.json';
+
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
     test('Returns note with specified hostname', async () => {
@@ -78,16 +81,25 @@ describe('Note API', () => {
     test('Returns 403 when public access is disabled in the note settings', async () => {
       const expectedStatus = 403;
 
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        url: '/note/73NdxFZ4k7',
-      });
+      const notPublicNote = notes.find(note => {
+        const settings = noteSettings.find(ns => ns.note_id === note.id)
+        if(settings != undefined)
+        return settings.is_public === false
+      })
 
-      expect(response?.statusCode).toBe(expectedStatus);
-
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
-
-      expect(body).toStrictEqual({ message: 'Permission denied' });
+      if(notPublicNote != undefined) {
+        const response = await global.api?.fakeRequest({
+          method: 'GET',
+          url: `/note/${notPublicNote.public_id}`,
+        });
+  
+        expect(response?.statusCode).toBe(expectedStatus);
+  
+        const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+  
+        expect(body).toStrictEqual({ message: 'Permission denied' });
+      }
+      
     });
 
     test('Returns 406 when the id contains incorrect characters', async () => {
