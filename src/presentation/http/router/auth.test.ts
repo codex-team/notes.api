@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 describe('Note API', () => {
-    describe('POST /auth:', () => {
+    describe('POST /auth', () => {
         test('Returns 401 when session is not valid', async () => {
             const expectedStatus = 401
 

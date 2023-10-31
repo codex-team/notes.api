@@ -17,8 +17,6 @@ path: /auth
           type: "application/json"
           reply: ErrorResponse
           body:
-            # creatorId: "@presentation/http/types/HttpResponse.js"
-            # StatusCodes: UNAUTHORIZED
             message: 'Session is not valid'
                 
         
@@ -28,10 +26,7 @@ path: /auth
           body:
             accessToken: ''
             refreshToken: ''
-            # creatorId: '@domain/service/auth.js'
-            # signAccessToken :  userSession.userId
-            # removeSessionByRefreshToken: token
-            # signRefreshToken : userSession.userId
+           
 
           
 

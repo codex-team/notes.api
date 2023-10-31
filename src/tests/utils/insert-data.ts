@@ -44,7 +44,7 @@ async function insertNoteSettings(db: SequelizeOrm): Promise<void> {
  */
 async function insertTokens(db:SequelizeOrm): Promise<void> {
   for(const token of tokens){
-    await db.connection.query(`INSERT INTO public.tokens("accessToken","refreshToken") VALUES  (${token.accessToken}, ${token.refreshToken}) `);
+    await db.connection.query(`INSERT INTO public.user_sessions("Id","user_Id,"refresh_token","refresh_token_expires_at") VALUES  (${token.Id}, ${token.user_Id},${token.refreshToken},${token.refresh_token_expires_at}) `)
   }
   
 }
