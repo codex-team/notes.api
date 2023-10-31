@@ -62,12 +62,12 @@ describe('NoteList API', () => {
 
       const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
 
-      expect(body).toHaveLength(portionSize);
+      expect(body.items).toHaveLength(portionSize);
     });
 
     test('Returns noteList with specified lenght (for last page)', async () => {
       const expectedStatus = 200;
-      const portionSize = 20;
+      const portionSize = 19;
       const pageNumber = 2;
 
       const response = await global.api?.fakeRequest({
@@ -82,7 +82,7 @@ describe('NoteList API', () => {
 
       const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
 
-      expect(body).toHaveLength(portionSize);
+      expect(body.items).toHaveLength(portionSize);
     });
 
     test('Returns noteList with no items if it has no notes', async () => {
@@ -104,8 +104,8 @@ describe('NoteList API', () => {
 
       const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
 
-      expect(body).toEqual([]);
-      expect(body).toHaveLength(0);
+      expect(body).toEqual( { items : [] } );
+      expect(body.items).toHaveLength(0);
     });
 
     test('Returns 400 when page < 0', async () => {
