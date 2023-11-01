@@ -6,7 +6,7 @@ describe('Note API', () => {
 
             const response = await global.api?.fakeRequest({
                 method: 'POST',
-                url: '/auth/' // write not authorised data
+                url: '/auth' // write not authorised data
             })
 
             expect(response?.statusCode).toBe(expectedStatus)
@@ -20,13 +20,14 @@ describe('Note API', () => {
             const expectedStatus = 200
 
             const expectedAuthReply = {
-                accessToken: '123',
-                refreshToken: '4567'
+                refreshToken: "pv-jIqfPj1",
+                accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTksImlhdCI6MTY5ODc1NzQyMSwiZXhwIjoxNjk5NjU3NDIxfQ.g0PzlWpGkw4VQrMRulNrnnAFa3KxtF4buCjqxKV-wq4"
+            
             };
 
             const response = await global.api?.fakeRequest({
                 method: 'POST',
-                url: ""//write authorised data
+                url: "/auth"//write authorised data
             })
 
             expect(response?.statusCode).toBe(expectedStatus)

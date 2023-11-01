@@ -7,7 +7,7 @@ path: /auth
     summary: check, access, remove, refresh token
     requestBody:
       required: true
-      content:
+      content
         application/json:
           schema:
             $ref: '#/components/schemas/session'
