@@ -3,14 +3,12 @@ name: Run build check
 on:
   push:
     branches:
-      - '*'
+      - 'main'
     tags:
       - 'v*'
 
   pull_request:
-    types: [opened, edited, synchronize]
-    branches:
-      - '*'
+    types: [opened, synchronize]
 
 jobs:
   build:
