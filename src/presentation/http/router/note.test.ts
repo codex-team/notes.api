@@ -3,6 +3,7 @@ import { describe, test, expect } from 'vitest';
 
 import notes from '@tests/test-data/notes.json';
 import noteSettings from '@tests/test-data/notes-settings.json';
+// import users from '@tests/test-data/notes.json';
 
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
@@ -54,8 +55,13 @@ describe('Note API', () => {
   });
 
   describe('GET note/:notePublicId ', () => {
-    test('Returns note by public id with 200 status', async () => {
+    test('Returns note by public id with 200 status ' +
+    'when note is publicly available', async () => {
       const expectedStatus = 200;
+      const correctID = 'Pq1T9vc23Q';
+
+      // TODO API should not return internal id and "publicId".
+      // It should return only "id" which is public id. Not implemented yet.
 
       const expectedNote = {
         'id': 2,
@@ -68,7 +74,7 @@ describe('Note API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: '/note/Pq1T9vc23Q',
+        url: `/note/${correctID}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -78,7 +84,42 @@ describe('Note API', () => {
       expect(body).toStrictEqual(expectedNote);
     });
 
-    test('Returns 403 when public access is disabled in the note settings', async () => {
+    test('Returns note by public id with 200 status ' +
+    'when access is disabled in the note settings, but user is creator', async () => {
+      const expectedStatus = 200;
+
+      // TODO add authorization or something
+      // else so that the user can be recognized as the author of the note
+
+      const authorsPrivatNote = notes.find(newNote => {
+        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
+
+        return settings!.is_public === false;
+      });
+
+      const authorsExpectedNote = {
+        'id': 3,
+        'publicId': '73NdxFZ4k7',
+        'creatorId': 1,
+        'content': null,
+        'createdAt': '2023-10-16T13:49:19.000Z',
+        'updatedAt': '2023-10-16T13:49:19.000Z',
+      };
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note/${authorsPrivatNote!.public_id}`,
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+
+      expect(body).toStrictEqual(authorsExpectedNote);
+    });
+
+    test('Returns 403 when public access is disabled in the note settings,' +
+    'user is not creator of the note', async () => {
       const expectedStatus = 403;
 
       const notPublicNote = notes.find(newNote => {
