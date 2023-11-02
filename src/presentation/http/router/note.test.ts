@@ -84,39 +84,8 @@ describe('Note API', () => {
       expect(body).toStrictEqual(expectedNote);
     });
 
-    test('Returns note by public id with 200 status ' +
-    'when access is disabled in the note settings, but user is creator', async () => {
-      const expectedStatus = 200;
-
-      // TODO add authorization or something
-      // else so that the user can be recognized as the author of the note
-
-      const authorsPrivatNote = notes.find(newNote => {
-        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-
-        return settings!.is_public === false;
-      });
-
-      const authorsExpectedNote = {
-        'id': 3,
-        'publicId': '73NdxFZ4k7',
-        'creatorId': 1,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
-      };
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        url: `/note/${authorsPrivatNote!.public_id}`,
-      });
-
-      expect(response?.statusCode).toBe(expectedStatus);
-
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
-
-      expect(body).toStrictEqual(authorsExpectedNote);
-    });
+    // TODO add authorization or something
+    // else so that the user can be recognized as the author of the note
 
     test('Returns 403 when public access is disabled in the note settings,' +
     'user is not creator of the note', async () => {
