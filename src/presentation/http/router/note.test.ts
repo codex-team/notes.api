@@ -103,11 +103,25 @@ describe('Note API', () => {
 
     test('Returns 406 when the id  does not exist', async () => {
       const expectedStatus = 406;
-      const nonexistentId = 'PR0BrbmdSy';
+      const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         url: `/note/${nonexistentId}`,
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+    });
+
+    test('Returns 406 when the id contains incorrect characters', async () => {
+      const expectedStatus = 406;
+      const incorrectCharId = 'PR^B{@,&S!';
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note/${incorrectCharId}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
