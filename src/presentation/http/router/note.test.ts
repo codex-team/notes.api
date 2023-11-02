@@ -110,22 +110,31 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
 
-    test('Returns 406 when passed id is incorrect', async () => {
-      const expectedStatus = 406;
-      const incorrectCharId = 'PR^B{@,&S!';
+    test.each([
+      { id: 'mVz3iHuez',
+        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+
+      { id: 'cR8eqF1mFf0',
+        expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+
+      { id: '+=*&*5%&&^&-',
+        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component' },
+    ])
+    ('Returns 400 when id has incorrect characters and length', async ({ id, expectedMessage }) => {
+      const expectedStatus = 400;
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note/${incorrectCharId}`,
+        url: `/note/${id}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+      expect(response?.json().message).toStrictEqual(expectedMessage);
     });
+
+    test.todo('Returns note by public id with 200 status when access is disabled, but user is creator');
+
+    test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
   });
-
-  test.todo('Returns note by public id with 200 status when access is disabled, but user is creator');
-
-  test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 });
