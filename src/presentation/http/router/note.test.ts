@@ -79,7 +79,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+      const body = response?.json();
 
       expect(body).toStrictEqual(expectedNote);
     });
@@ -87,7 +87,7 @@ describe('Note API', () => {
     // TODO add authorization or something
     // else so that the user can be recognized as the author of the note
 
-    test('Returns 403 when public access is disabled in the note settings,' +
+    test('Returns 403 when public access is disabled in the note settings, ' +
     'user is not creator of the note', async () => {
       const expectedStatus = 403;
 
@@ -104,7 +104,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+      const body = response?.json();
 
       expect(body).toStrictEqual({ message: 'Permission denied' });
     });
@@ -120,7 +120,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+      const body = response?.json();
 
       expect(body).toStrictEqual({ message: 'Note not found' });
     });
