@@ -58,8 +58,6 @@ describe('Note API', () => {
       const expectedStatus = 200;
       const correctID = 'Pq1T9vc23Q';
 
-      test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
-
       const expectedNote = {
         'id': 2,
         'publicId': 'Pq1T9vc23Q',
@@ -128,4 +126,6 @@ describe('Note API', () => {
   });
 
   test.todo('Returns note by public id with 200 status when access is disabled, but user is creator');
+
+  test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 });
