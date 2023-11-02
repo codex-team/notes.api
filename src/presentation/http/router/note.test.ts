@@ -58,10 +58,7 @@ describe('Note API', () => {
       const expectedStatus = 200;
       const correctID = 'Pq1T9vc23Q';
 
-      /**
-       * @todo API should not return internal id and "publicId".
-       * It should return only "id" which is public id. Not implemented yet.
-       */
+      test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 
       const expectedNote = {
         'id': 2,
@@ -115,7 +112,7 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
 
-    test('Returns 406 when the id contains incorrect characters', async () => {
+    test('Returns 406 when passed id is incorrect', async () => {
       const expectedStatus = 406;
       const incorrectCharId = 'PR^B{@,&S!';
 
