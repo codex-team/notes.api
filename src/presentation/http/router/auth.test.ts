@@ -4,10 +4,11 @@ describe('Auth API', () => {
     describe('POST /auth', () => {
         test('Returns 401 when session is not valid', async () => {
             const expectedStatus = 401
-
+            const refreshToken = "not-validToken";
             const response = await global.api?.fakeRequest({
                 method: 'POST',
                 url: '/auth', // write not authorized data
+                body: { token: refreshToken }
             })
 
             expect(response?.statusCode).toBe(expectedStatus)
