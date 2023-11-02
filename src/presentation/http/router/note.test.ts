@@ -3,7 +3,6 @@ import { describe, test, expect } from 'vitest';
 
 import notes from '@tests/test-data/notes.json';
 import noteSettings from '@tests/test-data/notes-settings.json';
-// import users from '@tests/test-data/notes.json';
 
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
@@ -55,13 +54,14 @@ describe('Note API', () => {
   });
 
   describe('GET note/:notePublicId ', () => {
-    test('Returns note by public id with 200 status ' +
-    'when note is publicly available', async () => {
+    test('Returns note by public id with 200 status when note is publicly available', async () => {
       const expectedStatus = 200;
       const correctID = 'Pq1T9vc23Q';
 
-      // TODO API should not return internal id and "publicId".
-      // It should return only "id" which is public id. Not implemented yet.
+      /**
+       * @todo API should not return internal id and "publicId".
+       * It should return only "id" which is public id. Not implemented yet.
+       */
 
       const expectedNote = {
         'id': 2,
@@ -79,16 +79,10 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.json();
-
-      expect(body).toStrictEqual(expectedNote);
+      expect(response?.json()).toStrictEqual(expectedNote);
     });
 
-    // TODO add authorization or something
-    // else so that the user can be recognized as the author of the note
-
-    test('Returns 403 when public access is disabled in the note settings, ' +
-    'user is not creator of the note', async () => {
+    test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
       const expectedStatus = 403;
 
       const notPublicNote = notes.find(newNote => {
@@ -104,14 +98,12 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.json();
-
-      expect(body).toStrictEqual({ message: 'Permission denied' });
+      expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 406 when the id contains incorrect characters', async () => {
+    test('Returns 406 when the id  does not exist', async () => {
       const expectedStatus = 406;
-      const nonexistentId = 'PR0B_bmdSy';
+      const nonexistentId = 'PR0BrbmdSy';
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -120,9 +112,9 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.json();
-
-      expect(body).toStrictEqual({ message: 'Note not found' });
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
   });
+
+  test.todo('Returns note by public id with 200 status when access is disabled, but user is creator');
 });
