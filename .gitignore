@@ -141,6 +141,5 @@ dist
 .pnp.*
 
 
-# API test sample
 
-./notes.api.code-workspace
+notes.api.code-workspace
