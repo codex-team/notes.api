@@ -27,7 +27,7 @@ declare global {
   var api: Api | undefined;
 
   /**
-   * Globslly exposed method for creating accessToken using id
+   * Globally exposed method for creating accessToken using id
    * Is accessed as 'global.server' in tests
    *
    * @param id - id for making accessToken
