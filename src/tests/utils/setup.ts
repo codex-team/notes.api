@@ -27,11 +27,13 @@ declare global {
   var api: Api | undefined;
 
   /**
+   * Globslly exposed method for creating accessToken using id
+   * Is accessed as 'global.server' in tests
    *
-   * @param refreshToken - token for finding user session and making accessToken
+   * @param id - id for making accessToken
    * @returns accessToken for authorization
    */
-  function auth(refreshToken: number) : string;
+  function auth(id: number) : string;
 }
 
 /**
@@ -60,24 +62,6 @@ beforeAll(async () => {
   global.auth = (id: number) => {
     return domainServices.authService.signAccessToken({ id : id });
   };
-
-  // global.auth  = (id: string) => {
-  //   return jwt.sign(id, 'JWT_SECRET');
-
-  //
-  // const response = await global.api?.fakeRequest({
-  // method: 'POST',
-  // url: '/auth',
-  // headers: {
-  //     // eslint-disable-next-line @typescript-eslint/naming-convention
-  //     'Content-Type': 'application/json',
-  // },
-  // body : JSON.stringify({ id : id }),
-  // });
-  //
-  // const body: AuthSession = response?.body !== undefined ? JSON.parse(response?.body) : {};
-  //
-  //
 }, TIMEOUT);
 
 afterAll(async () => {

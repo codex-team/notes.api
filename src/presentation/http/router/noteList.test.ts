@@ -2,30 +2,11 @@
 import userSessions from '@tests/test-data/userSessions.json';
 import { describe, test, expect, beforeAll } from 'vitest';
 
-let accessToken = '';
 /**
- * Util for authorization
- *
- * @param refreshToken - refresh token. There should be a user session with this refresh token in database
- * @todo Move this function to tests/utils
+ * Access token that will be used for Auhorization header
  */
-//
-// async function authorize(refreshToken: string): Promise<string> {
-// const response = await global.api?.fakeRequest({
-//     method: 'POST',
-//     url: '/auth',
-//     headers: {
-//       // eslint-disable-next-line @typescript-eslint/naming-convention
-//       'Content-Type': 'application/json',
-//     },
-//     body : JSON.stringify({ token : refreshToken }),
-// });
-//
-// const body: AuthSession = response?.body !== undefined ? JSON.parse(response?.body) : {};
-//
-// return body.accessToken;
-// }
-//
+let accessToken = '';
+
 
 describe('NoteList API', () => {
   beforeAll(async () => {
@@ -34,9 +15,6 @@ describe('NoteList API', () => {
      */
     const id = userSessions[0]['user_id'];
 
-    /**
-     * Access token that will be used for Auhorization header
-     */
     accessToken = global.auth(id);
   });
 
