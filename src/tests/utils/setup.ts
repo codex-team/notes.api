@@ -25,6 +25,15 @@ declare global {
    */
   /* eslint-disable-next-line no-var */
   var api: Api | undefined;
+
+  /**
+   * Globally exposed method for creating accessToken using id
+   * Is accessed as 'global.server' in tests
+   *
+   * @param id - id for making accessToken
+   * @returns accessToken for authorization
+   */
+  function auth(id: number) : string;
 }
 
 /**
@@ -50,6 +59,9 @@ beforeAll(async () => {
   await insertData(orm);
 
   global.api = api;
+  global.auth = (id: number) => {
+    return domainServices.authService.signAccessToken({ id : id });
+  };
 }, TIMEOUT);
 
 afterAll(async () => {
