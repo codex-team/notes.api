@@ -30,10 +30,10 @@ declare global {
    * Globally exposed method for creating accessToken using id
    * Is accessed as 'global.server' in tests
    *
-   * @param id - id for making accessToken
+   * @param userId - id of the user that will be considered the author of the request
    * @returns accessToken for authorization
    */
-  function auth(id: number) : string;
+  function auth(userId: number) : string;
 }
 
 /**
@@ -59,8 +59,8 @@ beforeAll(async () => {
   await insertData(orm);
 
   global.api = api;
-  global.auth = (id: number) => {
-    return domainServices.authService.signAccessToken({ id : id });
+  global.auth = (userId: number) => {
+    return domainServices.authService.signAccessToken({ id : userId });
   };
 }, TIMEOUT);
 

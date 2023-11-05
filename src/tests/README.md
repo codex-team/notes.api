@@ -9,13 +9,13 @@ File `src/tests/utils/setup.ts` does necessary preparations to make in possible 
 Test data lies in `src/tests/test-data/` directory. If you are missing some data for your tests, fill free to modify existing files or add new ones. Just remember to support relations between data that is usually provided by foreign key mechanism.
 
 ## Authorization in test
-Use `global.auth(id)` for getting accessToken, which you can use in:
+Use `global.auth(userId)` for getting accessToken, which you can use in:
 ```
 headers: {
   authorization: `Bearer ${accessToken}`
 }  
 ```
-in your fake rewuests
+in your fake requests
 
 ## Writing tests
 Please, locate a test file near the file that it tests. Make sure test file name is the same as tested file name, but with `.test` suffix.
