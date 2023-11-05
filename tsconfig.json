@@ -15,7 +15,8 @@
       "@presentation/*": ["presentation/*"],
       "@lib/*": ["lib/*"],
       "@domain/*": ["domain/*"],
-      "@repository/*": ["repository/*"]
+      "@repository/*": ["repository/*"],
+      "@tests/*": ["tests/*"]
     },
   },
   "include": [

@@ -4,5 +4,19 @@
     "note_id": 1,
     "custom_hostname": "codex.so",
     "is_public": true
+  },
+
+  {
+    "id": 2,
+    "note_id": 2,
+    "custom_hostname": "codex.so",
+    "is_public": true
+  },
+
+  {
+    "id": 3,
+    "note_id": 3,
+    "custom_hostname": "codex.so",
+    "is_public": false
   }
 ]
