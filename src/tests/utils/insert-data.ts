@@ -42,11 +42,11 @@ async function insertNoteSettings(db: SequelizeOrm): Promise<void> {
  *
  * @param db - SequelizeOrm instance
  */
-async function insertTokens(db:SequelizeOrm): Promise<void> {
-  for (const token of tokens) {
-    await db.connection.query(`INSERT INTO public.user_sessions("id","user_id","refresh_token","refresh_token_expires_at") VALUES (${token.Id}, ${token.user_Id}, '${token.refreshToken}', '${token.refresh_token_expires_at}')`);
-  }
-}
+// async function insertTokens(db:SequelizeOrm): Promise<void> {
+//   for (const token of tokens) {
+//     await db.connection.query(`INSERT INTO public.user_sessions("id","user_id","refresh_token","refresh_token_expires_at") VALUES (${token.Id}, ${token.user_Id}, '${token.refreshToken}', '${token.refresh_token_expires_at}')`);
+//   }
+// }
 
 /**
  * Fills in the database with test data
@@ -57,6 +57,6 @@ export async function insertData(db: SequelizeOrm): Promise<void> {
   await insertUsers(db);
   await insertNotes(db);
   await insertNoteSettings(db);
-  await insertTokens(db);
+  // await insertTokens(db);
 }
 

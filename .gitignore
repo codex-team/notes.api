@@ -142,4 +142,4 @@ dist
 
 
 
-notes.api.code-workspace
+*.code-workspace

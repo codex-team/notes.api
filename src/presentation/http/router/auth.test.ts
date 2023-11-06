@@ -7,7 +7,7 @@ describe('Auth API', () => {
       const refreshToken = 'not-validToken';
       const response = await global.api?.fakeRequest({
         method: 'POST',
-        url: '/auth', // write not authorized data
+        url: '/auth',
         body: { token: refreshToken },
       });
 
@@ -21,19 +21,21 @@ describe('Auth API', () => {
     test('Returns 200 when session was authorized', async () => {
       const expectedStatus = 200;
 
-      // Define the token to include in the request body
+      /** Define the token to include in the request body */
       const refreshToken = 'pv-jIqfPj1';
 
+      const notEmptyString = expect.stringMatching('/^.$/');
+
       const expectedAuthReply = {
-        refreshToken: expect.any(String),
-        accessToken: expect.any(String),
+        refreshToken: notEmptyString,
+        accessToken: notEmptyString,
       };
 
-      // Include the token in the request body
+
       const response = await global.api?.fakeRequest({
         method: 'POST',
-        url: '/auth', // write authorized data
-        body: { token: refreshToken }, // Include the token in the request body
+        url: '/auth',
+        body: { token: refreshToken }, /** Include the token in the request body*/
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -42,5 +44,25 @@ describe('Auth API', () => {
 
       expect(body).toMatchObject(expectedAuthReply);
     });
+
+    test('Returns 401 when expiration day has passed', async () => {
+      const expectedStatus=401;
+      const refreshToken = 'pv-jIqfPj1';
+      /** Set the expiration day to a date in the past */
+      const pastExpirationDay = new Date('Sat, 03 Nov 2022 16:53:36 GMT').toUTCString();
+
+      const response=await global.api?.fakeRequest({
+        method: 'POST',
+        url: '/auth',
+        headers:{ date:pastExpirationDay },
+        body:{ token: refreshToken },
+      });
+
+      expect (response?.statusCode).toBe(expectedStatus);
+      const body = response?.body !== undefined ? JSON.parse(response?.body):{};
+
+      expect(body).toStrictEqual({ message:'Session is not valid' });
+    });
   });
 });
+/** to do give 401 if experation date > now, check, to srtings will not be empty */
