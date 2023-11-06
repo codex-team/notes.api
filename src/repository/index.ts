@@ -15,6 +15,8 @@ import OpenAIApi from './transport/openai-api/index.js';
 import EditorToolsRepository from '@repository/editorTools.repository.js';
 import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
+import UserListRepository from '@repository/userList.repository.js';
+import UserListStorage from './storage/userList.storage.js';
 
 /**
  * Interface for initiated repositories
@@ -39,6 +41,11 @@ export interface Repositories {
    * User repository instance
    */
   userRepository: UserRepository,
+
+  /**
+   * User list repository instance
+   */
+  userListRepository: UserListRepository,
 
   /**
    * AI repository instance
@@ -96,6 +103,7 @@ export async function init(orm: Orm): Promise<Repositories> {
   teamStorage.createAssociationWithUserModel(userStorage.model);
 
   const editorToolsStorage = new EditorToolsStorage(orm);
+  const userListStorage = new UserListStorage(orm);
 
   /**
    * Prepare db structure
@@ -106,6 +114,7 @@ export async function init(orm: Orm): Promise<Repositories> {
   await teamStorage.model.sync();
   await userSessionStorage.model.sync();
   await editorToolsStorage.model.sync();
+  await userListStorage.model.sync();
 
   /**
    * Create transport instances
@@ -123,12 +132,14 @@ export async function init(orm: Orm): Promise<Repositories> {
   const aiRepository = new AIRepository(openaiApiTransport);
   const editorToolsRepository = new EditorToolsRepository(editorToolsStorage);
   const teamRepository = new TeamRepository(teamStorage);
+  const userListRepository = new UserListRepository(userListStorage);
 
   return {
     noteRepository,
     noteSettingsRepository,
     userSessionRepository,
     userRepository,
+    userListRepository,
     aiRepository,
     editorToolsRepository,
     teamRepository,

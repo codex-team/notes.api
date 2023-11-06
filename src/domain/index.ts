@@ -7,6 +7,7 @@ import type { AppConfig } from '@infrastructure/config/index.js';
 import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
+import UserListService from '@domain/service/userList.js';
 
 /**
  * Interface for initiated services
@@ -38,6 +39,11 @@ export interface DomainServices {
   userService: UserService,
 
   /**
+   * User list service instance
+   */
+  userListService: UserListService,
+
+  /**
    * AI service instance
    */
   aiService: AIService
@@ -63,6 +69,8 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     repositories.userSessionRepository
   );
 
+  const userListService = new UserListService(repositories.userListRepository);
+
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
   const userService = new UserService(repositories.userRepository, {
     editorTools: editorToolsService,
@@ -78,6 +86,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     noteSettingsService,
     userService,
     authService,
+    userListService,
     aiService,
     editorToolsService,
   };

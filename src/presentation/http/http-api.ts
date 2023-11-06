@@ -24,6 +24,7 @@ import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
 import NoteListRouter from '@presentation/http/router/noteList.js';
 import { EditorToolSchema } from './schema/EditorTool.js';
+import UserListRouter from '@presentation/http/router/userList.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -219,6 +220,11 @@ export default class HttpApi implements Api {
       prefix: '/user',
       userService: domainServices.userService,
       editorToolsService: domainServices.editorToolsService,
+    });
+
+    await this.server?.register(UserListRouter, {
+      prefix: '/users',
+      userListService: domainServices.userListService,
     });
 
     await this.server?.register(AIRouter, {
