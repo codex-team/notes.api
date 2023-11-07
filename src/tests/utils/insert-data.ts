@@ -32,7 +32,7 @@ async function insertUserSessions(db: SequelizeOrm): Promise<void> {
  */
 async function insertNotes(db: SequelizeOrm): Promise<void> {
   for (const note of notes) {
-    await db.connection.query(`INSERT INTO public.notes (id, "public_id", "creator_id", "created_at", "updated_at") VALUES (${note.id}, '${note.public_id}', '${note.creator_id}', '${note.created_at}', '${note.updated_at}')`);
+    await db.connection.query(`INSERT INTO public.notes (id, "public_id", "creator_id", "created_at", "updated_at") VALUES (${note.id}, '${note.public_id}', '${note.creatorId}', '${note.createdAt}', '${note.updatedAt}')`);
   }
 }
 

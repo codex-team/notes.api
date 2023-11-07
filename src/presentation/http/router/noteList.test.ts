@@ -1,4 +1,3 @@
-import type AuthSession from '@domain/entities/authSession';
 import userSessions from '@tests/test-data/userSessions.json';
 import { describe, test, expect, beforeAll } from 'vitest';
 
@@ -8,40 +7,15 @@ import { describe, test, expect, beforeAll } from 'vitest';
  */
 let accessToken = '';
 
-/**
- * Util for authorization
- *
- * @param refreshToken - refresh token. There should be a user session with this refresh token in database
- * @todo Move this function to tests/utils
- */
-async function authorize(refreshToken: string): Promise<string> {
-  const response = await global.api?.fakeRequest({
-    method: 'POST',
-    url: '/auth',
-    headers: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      'Content-Type': 'application/json',
-    },
-    body : JSON.stringify({ token : refreshToken }),
-  });
-
-  const body: AuthSession = response?.body !== undefined ? JSON.parse(response?.body) : {};
-
-  return body.accessToken;
-}
 
 describe('NoteList API', () => {
   beforeAll(async () => {
     /**
-     * Authorize using refresh token and POST /auth
+     * userId for authorization
      */
-    const refreshToken = userSessions[0]['refresh_token'];
+    const userId = userSessions[0]['user_id'];
 
-    try {
-      accessToken = await authorize(refreshToken);
-    } catch (error) {
-      console.log('Test Authorization failed', error);
-    }
+    accessToken = global.auth(userId);
   });
 
   describe('GET /notes?page', () => {
