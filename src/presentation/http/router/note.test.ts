@@ -2,7 +2,7 @@
 import { describe, test, expect } from 'vitest';
 
 import notes from '@tests/test-data/notes.json';
-import noteSettings from '@tests/test-data/notes-settings.json';
+import noteSettings from '@tests/test-data/notesSettings.json';
 
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
