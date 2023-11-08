@@ -23,8 +23,8 @@ describe('Auth API', () => {
 
       /** Define the token to include in the request body */
       const refreshToken = 'pv-jIqfPj1';
-
-      const notEmptyString = expect.stringMatching('/^.$/');
+      /** Define regular expression to be sure that string is not empty */
+      const notEmptyString = /^.$/;
 
       const expectedAuthReply = {
         refreshToken: notEmptyString,
