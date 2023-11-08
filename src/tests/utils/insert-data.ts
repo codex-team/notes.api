@@ -26,13 +26,13 @@ async function insertUserSessions(db: SequelizeOrm): Promise<void> {
   }
 }
 /**
- * Fills in the database with notes data
+ * Fills in the database with notes datas
  *
  * @param db - SequelizeOrm instance
  */
 async function insertNotes(db: SequelizeOrm): Promise<void> {
   for (const note of notes) {
-    await db.connection.query(`INSERT INTO public.notes (id, "public_id", "creator_id", "created_at", "updated_at") VALUES (${note.id}, '${note.public_id}', '${note.creatorId}', '${note.createdAt}', '${note.updatedAt}')`);
+    await db.connection.query(`INSERT INTO public.notes (id, "public_id", "creator_id", "created_at", "updated_at") VALUES (${note.id}, '${note.public_id}', '${note.creator_id}', '${note.created_at}', '${note.updated_at}')`);
   }
 }
 
