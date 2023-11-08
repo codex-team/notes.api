@@ -1,4 +1,4 @@
-import userSessions from '@tests/test-data/userSessions.json';
+import userSessions from '@tests/test-data/user-sessions.json';
 import { describe, test, expect, beforeAll } from 'vitest';
 
 
@@ -7,9 +7,8 @@ import { describe, test, expect, beforeAll } from 'vitest';
  */
 let accessToken = '';
 
-
 describe('NoteList API', () => {
-  beforeAll(async () => {
+  beforeAll(() => {
     /**
      * userId for authorization
      */
@@ -34,12 +33,12 @@ describe('NoteList API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+      const body = response?.json();
 
       expect(body.items).toHaveLength(portionSize);
     });
 
-    test('Returns noteList with specified lenght (for last page)', async () => {
+    test('Returns noteList with specified length (for last page)', async () => {
       const expectedStatus = 200;
       const portionSize = 19;
       const pageNumber = 2;
@@ -54,7 +53,7 @@ describe('NoteList API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+      const body = response?.json();
 
       expect(body.items).toHaveLength(portionSize);
     });
@@ -62,9 +61,6 @@ describe('NoteList API', () => {
     test('Returns noteList with no items if it has no notes', async () => {
       const expectedStatus = 200;
       const pageNumber = 3;
-
-      console.log('accessToken', accessToken);
-
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -76,7 +72,7 @@ describe('NoteList API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
+      const body = response?.json();
 
       expect(body).toEqual( { items : [] } );
       expect(body.items).toHaveLength(0);
@@ -98,7 +94,7 @@ describe('NoteList API', () => {
       expect(response?.statusCode).toBe(expextedStatus);
     });
 
-    test('Returns 400 when page is too large', async () => {
+    test('Returns 400 when page is too large (maximum page numbrer is 30 by default)', async () => {
       const expextedStatus = 400;
       const pageNumber = 31;
 
