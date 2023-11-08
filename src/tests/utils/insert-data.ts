@@ -1,8 +1,8 @@
 import type SequelizeOrm from '@repository/storage/postgres/orm/index.js';
 import users from '../test-data/users.json';
-import userSessions from '../test-data/userSessions.json';
+import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
-import noteSettings from '../test-data/notesSettings.json';
+import noteSettings from '../test-data/notes-settings.json';
 
 /**
  * Fills in the database with users data
