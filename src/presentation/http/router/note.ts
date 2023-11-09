@@ -5,6 +5,7 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
+import type { NotePublic } from '@domain/entities/notePublic.js';
 
 /**
  * Interface for the note router.
@@ -54,7 +55,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: Note | ErrorResponse,
+    Reply: NotePublic | ErrorResponse,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -82,7 +83,18 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return reply.notFound('Note not found');
     }
 
-    return reply.send(note);
+    /**
+     * Wrap note for public use
+     */
+    const notePublic: NotePublic = {
+      id: note.publicId,
+      content: note.content,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+      creatorId: note.creatorId,
+    };
+
+    return reply.send(notePublic);
   });
 
   /**
@@ -215,7 +227,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
        */
       hostname: string;
     },
-    Reply: Note
+    Reply: NotePublic
   }>('/resolve-hostname/:hostname', async (request, reply) => {
     const params = request.params;
 
@@ -227,8 +239,18 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     if (note === null) {
       return reply.notFound('Note not found');
     }
+    /**
+     * Wrapping Note for public use
+     */
+    const notePublic:NotePublic |null = {
+      id: note.publicId,
+      content: note.content,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+      creatorId: note.creatorId,
+    };
 
-    return reply.send(note);
+    return reply.send(notePublic);
   });
 
   done();
