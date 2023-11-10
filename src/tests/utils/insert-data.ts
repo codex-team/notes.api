@@ -3,7 +3,12 @@ import users from '../test-data/users.json';
 import notes from '../test-data/notes.json';
 import noteSettings from '../test-data/notes-settings.json';
 import userSessions from '../test-data/userSessions.json';
+import {  updateRefreshTokenExpiry } from './insert-tomorrow-expiration-day';
 
+const filePath = 'src/tests/test-data/userSessions.json';
+
+/** set tomorrow expiration day for token */
+updateRefreshTokenExpiry(filePath);
 /**
  * Fills in the database with users data
  *
