@@ -1,9 +1,8 @@
-import type { InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { fn, col } from 'sequelize';
-import { Model } from 'sequelize';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools';
 import type UserModelSequelizeStorage from '@repository/storage/postgres/orm/sequelize/userModel.js';
+import type { UserModel } from '@repository/storage/postgres/orm/sequelize/userModel.js';
 
 /**
  * Query options for getting user
@@ -65,43 +64,6 @@ interface RemoveUserEditorTool {
    * Editor tool identifier
    */
   toolId: EditorTool['id'];
-}
-
-/* eslint-disable @typescript-eslint/naming-convention */
-
-/**
- * Class representing a user model in database
- */
-export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
-  /**
-   * User id
-   */
-  public declare id: CreationOptional<number>;
-
-  /**
-   * User email address
-   */
-  public declare email: string;
-
-  /**
-   * User name
-   */
-  public declare name: string;
-
-  /**
-   * User created at
-   */
-  public declare createdAt: Date;
-
-  /**
-   * User photo
-   */
-  public declare photo: CreationOptional<string>;
-
-  /**
-   * List of tools ids installed by user from Marketplace
-   */
-  public declare editorTools: CreationOptional<User['editorTools']>;
 }
 
 /**

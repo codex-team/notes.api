@@ -86,7 +86,6 @@ export async function init(orm: Orm): Promise<Repositories> {
    * Create storage instances
    */
   const userModelStorage = new UserModelSequelizeStorage(orm);
-
   const userStorage = new UserStorage(userModelStorage);
   const noteStorage = new NoteStorage(orm);
   const userSessionStorage = new UserSessionStorage(orm);
@@ -106,7 +105,6 @@ export async function init(orm: Orm): Promise<Repositories> {
   teamStorage.createAssociationWithUserModel(userStorage.model);
 
   const editorToolsStorage = new EditorToolsStorage(orm);
-
   const userListStorage = new UserListStorage(userModelStorage);
 
   /**

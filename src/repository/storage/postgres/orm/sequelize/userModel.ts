@@ -1,7 +1,45 @@
 import type { Sequelize } from 'sequelize';
 import { DataTypes } from 'sequelize';
-import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
+import type { InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import { Model } from 'sequelize';
+import type User from '@domain/entities/user.js';
+
+
+/**
+ * Class representing a user model in database
+ */
+export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
+  /**
+   * User id
+   */
+  public declare id: CreationOptional<number>;
+
+  /**
+   * User email address
+   */
+  public declare email: string;
+
+  /**
+   * User name
+   */
+  public declare name: string;
+
+  /**
+   * User created at
+   */
+  public declare createdAt: Date;
+
+  /**
+   * User photo
+   */
+  public declare photo: CreationOptional<string>;
+
+  /**
+   * List of tools ids installed by user from Marketplace
+   */
+  public declare editorTools: CreationOptional<User['editorTools']>;
+}
 
 /**
  * Class representing a table storing Users
