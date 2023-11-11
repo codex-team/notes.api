@@ -17,6 +17,7 @@ import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
 import UserListRepository from '@repository/userList.repository.js';
 import UserListStorage from './storage/userList.storage.js';
+import UserModelSequelizeStorage from './storage/postgres/orm/sequelize/userModel.js';
 
 /**
  * Interface for initiated repositories
@@ -84,7 +85,9 @@ export async function init(orm: Orm): Promise<Repositories> {
   /**
    * Create storage instances
    */
-  const userStorage = new UserStorage(orm);
+  const userModelStorage = new UserModelSequelizeStorage(orm);
+
+  const userStorage = new UserStorage(userModelStorage);
   const noteStorage = new NoteStorage(orm);
   const userSessionStorage = new UserSessionStorage(orm);
   const noteSettingsStorage = new NoteSettingsStorage(orm);
@@ -103,7 +106,8 @@ export async function init(orm: Orm): Promise<Repositories> {
   teamStorage.createAssociationWithUserModel(userStorage.model);
 
   const editorToolsStorage = new EditorToolsStorage(orm);
-  const userListStorage = new UserListStorage(orm);
+
+  const userListStorage = new UserListStorage(userModelStorage);
 
   /**
    * Prepare db structure

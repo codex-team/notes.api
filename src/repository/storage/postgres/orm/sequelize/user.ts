@@ -1,9 +1,9 @@
-import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import type { InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { fn, col } from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
-import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
+import { Model } from 'sequelize';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools';
+import type UserModelSequelizeStorage from '@repository/storage/postgres/orm/sequelize/userModel.js';
 
 /**
  * Query options for getting user
@@ -114,56 +114,12 @@ export default class UserSequelizeStorage {
   public model: typeof UserModel;
 
   /**
-   * Database instance
-   */
-  private readonly database: Sequelize;
-
-  /**
-   * Table name
-   */
-  private readonly tableName = 'users';
-
-  /**
-   * Constructor for user storage
+   *  Constructor for user model storage
    *
-   * @param ormInstance - ORM instance
+   * @param root0 - model instance
    */
-  constructor({ connection }: Orm) {
-    this.database = connection;
-
-    /**
-     * Initiate user model
-     */
-    this.model = UserModel.init({
-      id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      email: {
-        type: DataTypes.STRING,
-        unique: true,
-        allowNull: false,
-      },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      photo: {
-        type: DataTypes.STRING,
-      },
-      editorTools: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-      },
-    }, {
-      tableName: this.tableName,
-      sequelize: this.database,
-      timestamps: false,
-    });
+  constructor({ model }: UserModelSequelizeStorage) {
+    this.model = model;
   }
 
   /**
