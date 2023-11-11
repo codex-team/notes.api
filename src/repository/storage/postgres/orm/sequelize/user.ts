@@ -116,7 +116,7 @@ export default class UserSequelizeStorage {
   /**
    *  Constructor for user model storage
    *
-   * @param root0 - model instance
+   * @param model - user model instance
    */
   constructor({ model }: UserModelSequelizeStorage) {
     this.model = model;

@@ -4,7 +4,7 @@ import type { UserModel } from '@repository/storage/postgres/orm/sequelize/user.
 import type UserModelSequelizeStorage from '@repository/storage/postgres/orm/sequelize/userModel.js';
 
 /**
- * Class representing a table storing Users
+ * Class representing a functions of model userList
  */
 export default class UserListSequelizeStorage {
   public model: typeof UserModel;
@@ -12,7 +12,7 @@ export default class UserListSequelizeStorage {
   /**
    *  Constructor for user model storage
    *
-   * @param root0 - model instance
+   * @param model - user model instance
    */
   constructor({ model }: UserModelSequelizeStorage) {
     this.model = model;
