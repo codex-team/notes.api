@@ -3,7 +3,7 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type { Team, TeamMemberCreationAttributes, TeamMember } from '@domain/entities/team.js';
-import { UserModel } from './user.js';
+import { UserModel } from './userModel.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
