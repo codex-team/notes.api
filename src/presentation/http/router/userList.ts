@@ -5,10 +5,10 @@ import type UserListService from '@domain/service/userList.js';
  * Interface for the userList router
  */
 interface UserListRouterOptions {
-    /**
-     * User list service instance
-     */
-    userListService: UserListService,
+  /**
+   * User list service instance
+   */
+  userListService: UserListService,
 
 }
 
