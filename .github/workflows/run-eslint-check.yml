@@ -10,7 +10,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-
 jobs:
   eslint:
     name: Run eslint check
