@@ -110,7 +110,7 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual(expectedNote);
     });
 
-    test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
+    test('Returns 403 when the note is not public, the user is not authorized', async () => {
       const expectedStatus = 403;
 
       const notPublicNote = notes.find(newNote => {
@@ -121,6 +121,30 @@ describe('Note API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
+        url: `/note/${notPublicNote!.public_id}`,
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
+    });
+
+    test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
+      const expectedStatus = 403;
+      const userId = 2;
+      const accessToken = global.auth(userId);
+
+      const notPublicNote = notes.find(newNote => {
+        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
+
+        return settings!.is_public === false && newNote.creator_id != userId;
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
         url: `/note/${notPublicNote!.public_id}`,
       });
 
