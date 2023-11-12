@@ -4,7 +4,7 @@ import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 import type { NoteSettingsModel } from '@repository/storage/postgres/orm/sequelize/noteSettings.js';
-import { UserModel } from '@repository/storage/postgres/orm/sequelize/userModel.js';
+import { UserModel } from '@repository/storage/postgres/orm/sequelize/models/userModel.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 

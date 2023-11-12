@@ -1,8 +1,8 @@
 import { fn, col } from 'sequelize';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools';
-import type UserModelSequelize from '@repository/storage/postgres/orm/sequelize/userModel.js';
-import type { UserModel } from '@repository/storage/postgres/orm/sequelize/userModel.js';
+import type UserModelSequelize from '@repository/storage/postgres/orm/sequelize/models/userModel.js';
+import type { UserModel } from '@repository/storage/postgres/orm/sequelize/models/userModel.js';
 
 /**
  * Query options for getting user

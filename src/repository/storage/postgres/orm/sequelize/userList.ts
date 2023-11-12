@@ -1,7 +1,7 @@
 import type User from '@domain/entities/user.js';
 import type { UserList } from '@domain/entities/userList.js';
-import type { UserModel } from '@repository/storage/postgres/orm/sequelize/userModel.js';
-import type UserModelSequelize from '@repository/storage/postgres/orm/sequelize/userModel.js';
+import type { UserModel } from '@repository/storage/postgres/orm/sequelize/models/userModel.js';
+import type UserModelSequelize from '@repository/storage/postgres/orm/sequelize/models/userModel.js';
 
 /**
  * Class representing a functions of model userList

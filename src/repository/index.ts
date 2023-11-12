@@ -17,7 +17,7 @@ import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
 import UserListRepository from '@repository/userList.repository.js';
 import UserListStorage from './storage/userList.storage.js';
-import UserModelSequelize from './storage/postgres/orm/sequelize/userModel.js';
+import UserModelSequelize from './storage/postgres/orm/sequelize/models/userModel.js';
 
 /**
  * Interface for initiated repositories
