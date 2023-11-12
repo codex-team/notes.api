@@ -14,6 +14,7 @@ export default defineConfig({
       '@lib/': '/src/lib/',
       '@domain/': '/src/domain/',
       '@repository/': '/src/repository/',
+      '@tests/': '/src/tests/',
     },
   },
 });
