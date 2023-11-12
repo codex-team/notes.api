@@ -44,7 +44,7 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
 /**
  * Class representing a table storing Users
  */
-export default class UserModelSequelizeStorage {
+export default class UserModelSequelize {
   /**
    * User model in database
    */

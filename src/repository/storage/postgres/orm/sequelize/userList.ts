@@ -1,7 +1,7 @@
 import type User from '@domain/entities/user.js';
 import type { UserList } from '@domain/entities/userList.js';
 import type { UserModel } from '@repository/storage/postgres/orm/sequelize/userModel.js';
-import type UserModelSequelizeStorage from '@repository/storage/postgres/orm/sequelize/userModel.js';
+import type UserModelSequelize from '@repository/storage/postgres/orm/sequelize/userModel.js';
 
 /**
  * Class representing a functions of model userList
@@ -14,11 +14,11 @@ export default class UserListSequelizeStorage {
    *
    * @param model - user model instance
    */
-  constructor({ model }: UserModelSequelizeStorage) {
+  constructor({ model }: UserModelSequelize) {
     this.model = model;
   }
   /**
-   * Gets all users
+   * Gets a list of all existing users
    *
    * @param offset - number of skipped users
    * @param limit - number of users to get

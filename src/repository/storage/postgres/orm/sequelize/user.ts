@@ -1,7 +1,7 @@
 import { fn, col } from 'sequelize';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools';
-import type UserModelSequelizeStorage from '@repository/storage/postgres/orm/sequelize/userModel.js';
+import type UserModelSequelize from '@repository/storage/postgres/orm/sequelize/userModel.js';
 import type { UserModel } from '@repository/storage/postgres/orm/sequelize/userModel.js';
 
 /**
@@ -80,7 +80,7 @@ export default class UserSequelizeStorage {
    *
    * @param model - user model instance
    */
-  constructor({ model }: UserModelSequelizeStorage) {
+  constructor({ model }: UserModelSequelize) {
     this.model = model;
   }
 

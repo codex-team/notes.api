@@ -20,7 +20,7 @@ export default class UserListRepository {
   }
 
   /**
-   * Gets all users
+   * Gets a list of all existing users
    *
    * @param offset - number of skipped notes
    * @param limit - number of notes to get
