@@ -91,7 +91,7 @@ describe('Note API', () => {
         'updatedAt': '2023-10-16T13:49:19.000Z',
       };
 
-      const notPublicNote = notes.find(newNote => {
+      const privateUserNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
 
         return settings!.is_public === false && newNote.creator_id === userId;
@@ -102,7 +102,7 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${notPublicNote!.public_id}`,
+        url: `/note/${privateUserNote!.public_id}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
