@@ -4,7 +4,7 @@ describe('Auth API', () => {
   describe('POST /auth', () => {
     test('Returns 401 when session is not valid', async () => {
       const expectedStatus = 401;
-      const refreshToken = 'not-validToken';
+      const refreshToken = 'EF1JX65xSZ';
       const response = await global.api?.fakeRequest({
         method: 'POST',
         url: '/auth',
@@ -36,7 +36,8 @@ describe('Auth API', () => {
       const response = await global.api?.fakeRequest({
         method: 'POST',
         url: '/auth',
-        body: { token: refreshToken }, /** Include the token in the request body*/
+        /** Include the token in the request body*/
+        body: { token: refreshToken },
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -56,15 +57,15 @@ describe('Auth API', () => {
     });
 
     test('Returns 401 when expiration day has passed', async () => {
-      const expectedStatus=401;
-      const refreshToken = 'F5tTF24K9Q';
+      const expectedStatus = 401;
+      const outdatedToken = 'F5tTF24K9Q';
 
 
       const response=await global.api?.fakeRequest({
         method: 'POST',
         url: '/auth',
 
-        body:{ token: refreshToken },
+        body:{ token: outdatedToken },
       });
 
       expect (response?.statusCode).toBe(expectedStatus);

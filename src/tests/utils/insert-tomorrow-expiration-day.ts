@@ -13,6 +13,6 @@ export const formattedDate = (): string => {
 export const updateRefreshTokenExpiry = (filePath: string): void => {
   const userSessionData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 
-  userSessionData[0].refresh_token_expires_at = formattedDate();
+  userSessionData[1].refresh_token_expires_at = formattedDate();
   fs.writeFileSync(filePath, JSON.stringify(userSessionData, null, 2), 'utf-8');
 };
