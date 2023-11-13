@@ -22,7 +22,7 @@ describe('Auth API', () => {
       const expectedStatus = 200;
 
       /** Define the token to include in the request body */
-      const refreshToken = 'pv-jIqfPj1';
+      const missingToken = 'pv-jIqfPj1';
       /** Define regular expression to be sure that string is not empty */
       const notEmptyString = /^.+$/;
 
@@ -37,7 +37,7 @@ describe('Auth API', () => {
         method: 'POST',
         url: '/auth',
         /** Include the token in the request body*/
-        body: { token: refreshToken },
+        body: { token: missingToken },
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
