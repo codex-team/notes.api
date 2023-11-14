@@ -3,7 +3,6 @@ import users from '../test-data/users.json';
 import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
 import noteSettings from '../test-data/notes-settings.json';
-// import user_sessions from '../test-data/userSessions.json';
 import {  updateRefreshTokenExpiry } from './insert-tomorrow-expiration-day';
 
 const filePath = 'src/tests/test-data/user-sessions.json';

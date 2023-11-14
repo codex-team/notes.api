@@ -18,20 +18,11 @@ describe('Auth API', () => {
       expect(body).toStrictEqual({ message: 'Session is not valid' });
     });
 
-    test('Returns 200 when refreshToken is in database', async () => {
+    test('Returns 200 when refreshToken is in the database', async () => {
       const expectedStatus = 200;
 
       /** Define the token to include in the request body */
       const missingToken = 'pv-jIqfPj1';
-      /** Define regular expression to be sure that string is not empty */
-      const notEmptyString = /^.+$/;
-
-
-      const expectedAuthReply = {
-        refreshToken: notEmptyString,
-        accessToken: notEmptyString,
-      };
-
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
@@ -44,17 +35,22 @@ describe('Auth API', () => {
 
       const body = await response?.json();
 
-      expect(body.refreshToken).toBeDefined();
-      expect(body.refreshToken).not.toBeNull();
-      expect(body.refreshToken).not.toBe('');
+      expect(typeof body.refreshToken).toBe('string');
+      expect(typeof body.accessToken).toBe('string');
 
+      // Optionally, you can also check if the strings are not empty or null
+      expect(body.refreshToken).toBeDefined();
       expect(body.accessToken).toBeDefined();
+      expect(body.refreshToken).not.toBeNull();
       expect(body.accessToken).not.toBeNull();
+      expect(body.refreshToken).not.toBe('');
       expect(body.accessToken).not.toBe('');
 
-
-      expect(body).toMatchObject(expectedAuthReply);
+      // Check if the response object matches the expected structure
+      expect(body).toHaveProperty('refreshToken');
+      expect(body).toHaveProperty('accessToken');
     });
+
 
     test('Returns 401 when expiration day has passed', async () => {
       const expectedStatus = 401;
