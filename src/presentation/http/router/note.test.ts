@@ -10,17 +10,22 @@ describe('Note API', () => {
       const expectedStatus = 200;
       /* eslint-disable @typescript-eslint/naming-convention */
       const expectedNote = {
-        'id': 1,
-        'publicId': 'note_1',
-        'creatorId': 1,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
-        'noteSettings':  {
-          'customHostname': 'codex.so',
-          'isPublic': true,
+        'note': {
           'id': 1,
-          'noteId': 1,
+          'publicId': 'note_1',
+          'creatorId': 1,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+          'noteSettings':  {
+            'customHostname': 'codex.so',
+            'isPublic': true,
+            'id': 1,
+            'noteId': 1,
+          },
+        },
+        'accessRights': {
+          'canEdit': false,
         },
       };
       /* eslint-enable @typescript-eslint/naming-convention */
@@ -59,12 +64,17 @@ describe('Note API', () => {
       const correctID = 'Pq1T9vc23Q';
 
       const expectedNote = {
-        'id': 2,
-        'publicId': 'Pq1T9vc23Q',
-        'creatorId': 1,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
+        'note': {
+          'id': 2,
+          'publicId': 'Pq1T9vc23Q',
+          'creatorId': 1,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+        },
+        'accessRights': {
+          'canEdit': false,
+        },
       };
 
       const response = await global.api?.fakeRequest({
@@ -83,12 +93,17 @@ describe('Note API', () => {
       const accessToken = global.auth(userId);
 
       const expectedNote = {
-        'id': 3,
-        'publicId': '73NdxFZ4k7',
-        'creatorId': 1,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
+        'note': {
+          'id': 3,
+          'publicId': '73NdxFZ4k7',
+          'creatorId': 1,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+        },
+        'accessRights': {
+          'canEdit': true,
+        },
       };
 
       const privateUserNote = notes.find(newNote => {
