@@ -3,8 +3,6 @@ import users from '../test-data/users.json';
 import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
 import noteSettings from '../test-data/notes-settings.json';
-import { formattedDate } from './insert-tomorrow-expiration-day';
-const date = formattedDate();
 
 
 /**
@@ -26,8 +24,6 @@ async function insertUsers(db: SequelizeOrm): Promise<void> {
 async function insertUserSessions(db: SequelizeOrm): Promise<void> {
   for (const userSession of userSessions) {
     await db.connection.query(`INSERT INTO public.user_sessions (id, "user_id", "refresh_token", "refresh_token_expires_at") VALUES (${userSession.id}, ${userSession.user_id}, '${userSession.refresh_token}', '${userSession.refresh_token_expires_at}')`);
-    await db.connection.query(`UPDATE public.user_sessions SET "refresh_token_expires_at" = '${date}' WHERE id = 5;
-    `);
   }
 }
 /**

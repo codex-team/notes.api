@@ -1,4 +1,28 @@
+import { formattedDate } from '@tests/utils/insert-tomorrow-expiration-day';
 import { describe, test, expect } from 'vitest';
+import type SequelizeOrm from '@repository/storage/postgres/orm/index.js';
+
+
+/**
+ * Fills in the database with user sessions
+ *
+ * @param db - SequelizeOrm instance
+ */
+async function insertUserSessions(db: SequelizeOrm): Promise<void> {
+  const date = formattedDate();
+
+  await db.connection.query(`UPDATE public.user_sessions SET "refresh_token_expires_at" = '${date}' WHERE id = 5;
+      `);
+}
+/**
+ * Fills in the database with test data
+ *
+ * @param db - SequelizeOrm instance
+ */
+export async function insertDataForAuthTest(db: SequelizeOrm): Promise<void> {
+  await insertUserSessions(db);
+}
+
 
 describe('Auth API', () => {
   describe('POST /auth', () => {
@@ -17,6 +41,7 @@ describe('Auth API', () => {
 
       expect(body).toStrictEqual({ message: 'Session is not valid' });
     });
+
 
     test('Returns 200 when refreshToken is in the database', async () => {
       const expectedStatus = 200;

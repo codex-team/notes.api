@@ -2,6 +2,7 @@ import path from 'path';
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
+import { insertDataForAuthTest } from '@presentation/http/router/auth.test';
 import { insertData } from './insert-data';
 import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
@@ -57,7 +58,7 @@ beforeAll(async () => {
 
   await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
   await insertData(orm);
-
+  await insertDataForAuthTest(orm);
   global.api = api;
   global.auth = (userId: number) => {
     return domainServices.authService.signAccessToken({ id : userId });
