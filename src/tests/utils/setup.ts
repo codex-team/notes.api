@@ -2,6 +2,7 @@ import path from 'path';
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
+
 import { insertData } from './insert-data';
 import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
@@ -34,6 +35,17 @@ declare global {
    * @returns accessToken for authorization
    */
   function auth(userId: number) : string;
+
+
+  /**
+   * @param sqlString -request that you want to execute
+   */
+  /* eslint-disable-next-line no-var */
+  var db: {
+    execute: (sqlString: string) => void;
+  };
+
+
 }
 
 /**
@@ -42,6 +54,7 @@ declare global {
 const migrationsPath = path.join(process.cwd(), 'migrations', 'tenant');
 
 let postgresContainer: StartedPostgreSqlContainer | undefined;
+
 
 beforeAll(async () => {
   postgresContainer = await new PostgreSqlContainer()
@@ -57,6 +70,13 @@ beforeAll(async () => {
 
   await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
   await insertData(orm);
+
+
+  global.db = {
+    execute: async (sqlString: string) => {
+      await orm.connection.query(sqlString);
+    },
+  };
 
   global.api = api;
   global.auth = (userId: number) => {
