@@ -175,7 +175,7 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
 
-    test('Returns public note by public id with false canEdit flag, when user is not authorized', async () => {
+    test('Returns public note by public id with status 200 and with false canEdit flag, when user is not authorized', async () => {
       const expectedStatus = 200;
       const publicId = 'Pq1T9vc23Q';
 
@@ -189,7 +189,7 @@ describe('Note API', () => {
       expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
     });
 
-    test('Returns public note by public id with false canEdit flag, when user is authorized, but is not the creator of the note', async () => {
+    test('Returns public note by public id with status 200 and with false canEdit flag, when user is authorized, but is not the creator of the note', async () => {
       const expectedStatus = 200;
       const publicId = 'Pq1T9vc23Q';
       const userId = 4;
@@ -208,7 +208,7 @@ describe('Note API', () => {
       expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
     });
 
-    test('Returns public note by public id with false canEdit flag, when user is authorized and is the creator of the note', async () => {
+    test('Returns public note by public id with status 200 and with false canEdit flag, when user is authorized and is the creator of the note', async () => {
       const expectedStatus = 200;
       const publicId = 'Pq1T9vc23Q';
       const userId = 1;
