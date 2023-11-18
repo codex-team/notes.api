@@ -1,6 +1,7 @@
 import userSessions from '@tests/test-data/user-sessions.json';
 import { describe, test, expect, beforeAll } from 'vitest';
-
+import type User from '@domain/entities/user.js';
+import { assertType } from 'vitest';
 
 /**
  * Access token that will be used for Auhorization header
@@ -39,6 +40,10 @@ describe('UserList API', () => {
       expect(response?.statusCode).toBe(expectedStatus);
 
       expect(response?.json().items).toHaveLength(portionSize);
+
+      const users = response?.json().items;
+
+      assertType<User>(users);
     });
 
     test.each([

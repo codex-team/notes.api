@@ -3,7 +3,8 @@
     "id": 1,
     "email": "a@a.com",
     "name": "Test user 1",
-    "created_at": "2023-10-16T13:49:19.000Z"
+    "created_at": "2023-10-16T13:49:19.000Z",
+    "photo": ""
   },
   {
     "id": 4,
@@ -16,6 +17,7 @@
     "id": 5,
     "email": "eliza@gmail.com",
     "name": "Алиса Марикова",
-    "created_at": "2023-11-11 23:23:40.892+03"
+    "created_at": "2023-11-11 23:23:40.892+03",
+    "photo": ""
   }
 ]
