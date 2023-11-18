@@ -39,9 +39,9 @@ describe('UserList API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      expect(response?.json().items).toHaveLength(portionSize);
-
       const users = response?.json().items;
+
+      expect(users).toHaveLength(portionSize);
 
       assertType<User>(users);
     });
