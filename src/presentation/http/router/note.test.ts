@@ -207,7 +207,7 @@ describe('Note API', () => {
       expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
     });
 
-    test('Returns public note by public id with status 200 and with false canEdit flag, when user is authorized and is the creator of the note', async () => {
+    test('Returns public note by public id with status 200 and with true canEdit flag, when user is authorized and is the creator of the note', async () => {
       const expectedStatus = 200;
       const publicId = 'Pq1T9vc23Q';
       const userId = 1;
