@@ -104,6 +104,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
         'authRequired',
       ],
     },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
     preHandler: [
       noteResolver,
     ],
@@ -132,6 +139,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   });
 
   /**
+   * Get team by note id
    * TODO add policy for this route (check if user is collaborator)
    */
   fastify.get<{
@@ -140,6 +148,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     Reply: Team,
   }>('/:notePublicId/team', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
     preHandler: [
       noteResolver,
     ],
