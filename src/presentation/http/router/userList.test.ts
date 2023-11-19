@@ -1,7 +1,5 @@
 import userSessions from '@tests/test-data/user-sessions.json';
 import { describe, test, expect, beforeAll } from 'vitest';
-import type User from '@domain/entities/user.js';
-import { assertType } from 'vitest';
 
 /**
  * Access token that will be used for Auhorization header
@@ -21,12 +19,37 @@ describe('UserList API', () => {
   describe('GET /users?page', () => {
     test.each([
       { portionSize : 3,
-        pageNumber: 1 },
+        pageNumber: 1,
+        expectedUserList: [ {
+          'id': 1,
+          'email': 'a@a.com',
+          'name': 'Test user 1',
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'photo': '',
+          'editorTools': null,
+        },
+        {
+          'id': 4,
+          'email': 'Egoramurin@gmail.com',
+          'name': 'Егор Амурин',
+          'createdAt': '2023-10-22T16:19:40.892Z',
+          'photo': 'https://lh3.googleusercontent.com/a/ACg8ocL9_uBaC7XMFhosJZfIkDLC8tTm1GhtbvDfSbjf9eI2=s96-c',
+          'editorTools': null,
+        },
+        {
+          'id': 5,
+          'email': 'eliza@gmail.com',
+          'name': 'Алиса Марикова',
+          'createdAt': '2023-11-11T20:23:40.892Z',
+          'photo': '',
+          'editorTools': null,
+        } ] },
 
       { portionSize: 0,
-        pageNumber : 2 },
+        pageNumber : 2,
+        expectedUserList: [] },
     ])
-    ('Returns a userList with specified lengths with status 200', async ({ portionSize, pageNumber }) => {
+    ('Returns a userList with specified lengths with status 200', async ({ portionSize, pageNumber, expectedUserList }) => {
       const expectedStatus = 200;
 
       const response = await global.api?.fakeRequest({
@@ -39,11 +62,11 @@ describe('UserList API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const users = response?.json().items;
+      const usersList = response?.json().items;
 
-      expect(users).toHaveLength(portionSize);
+      expect(usersList).toHaveLength(portionSize);
 
-      assertType<User>(users);
+      expect(usersList).toStrictEqual(expectedUserList);
     });
 
     test.each([
