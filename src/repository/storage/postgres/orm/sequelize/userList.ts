@@ -18,7 +18,7 @@ export default class UserListSequelizeStorage {
     this.model = model;
   }
   /**
-   * Gets a list of all existing users
+   * Gets a list of users for 1 page (30 users is limit)
    *
    * @param offset - number of skipped users
    * @param limit - number of users to get

@@ -25,7 +25,7 @@ export default class UserListService {
   }
 
   /**
-   * Returns a list of all existing users
+   * Returns a list of users for 1 page (30 users is limit)
    *
    * @param page - number of current page
    * @returns { Promise<UserList> } user
