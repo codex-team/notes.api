@@ -10,8 +10,7 @@ describe('Note API', () => {
       const expectedStatus = 200;
       /* eslint-disable @typescript-eslint/naming-convention */
       const expectedNote = {
-        'id': 1,
-        'publicId': 'note_1',
+        'id': 'note_1',
         'creatorId': 1,
         'content': null,
         'createdAt': '2023-10-16T13:49:19.000Z',
@@ -20,7 +19,6 @@ describe('Note API', () => {
           'customHostname': 'codex.so',
           'isPublic': true,
           'id': 1,
-          'noteId': 1,
         },
       };
       /* eslint-enable @typescript-eslint/naming-convention */
@@ -59,12 +57,16 @@ describe('Note API', () => {
       const correctID = 'Pq1T9vc23Q';
 
       const expectedNote = {
-        'id': 2,
-        'publicId': 'Pq1T9vc23Q',
+        'id': 'Pq1T9vc23Q',
         'creatorId': 1,
         'content': null,
         'createdAt': '2023-10-16T13:49:19.000Z',
         'updatedAt': '2023-10-16T13:49:19.000Z',
+        'noteSettings':  {
+          'customHostname': 'codex.so',
+          'isPublic': true,
+          'id': 2,
+        },
       };
 
       const response = await global.api?.fakeRequest({

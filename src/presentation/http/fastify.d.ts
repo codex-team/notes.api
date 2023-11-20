@@ -6,6 +6,7 @@ import type Policies from './policies/index.js';
 import type AuthPayload from '@domain/entities/authPayload.js';
 import type { Note } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
+import { NoteProxy } from '@domain/entities/notePublicProxy.js';
 
 declare module 'fastify' {
   export interface FastifyInstance<
