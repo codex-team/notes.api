@@ -1,10 +1,10 @@
 import { describe, test, expect } from 'vitest';
 
 describe('NoteSettings API', () => {
-  describe('GET note-settings/:notePublicId ', () => {
+  describe('GET /note-settings/:notePublicId ', () => {
     test('Returns note settings by public id with 200 status', async () => {
       const expectedStatus = 200;
-      const existedNotePublicId = 'Pq1T9vc23Q';
+      const existingNotePublicId = 'Pq1T9vc23Q';
 
       const expectedNoteSettings = {
         'customHostname': 'codex.so',
@@ -15,18 +15,16 @@ describe('NoteSettings API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note-settings/${existedNotePublicId}`,
+        url: `/note-settings/${existingNotePublicId}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
-
-      expect(body).toStrictEqual(expectedNoteSettings);
+      expect(response?.json()).toStrictEqual(expectedNoteSettings);
     });
   });
 
-  test('Returns 406 when the id  does not exist', async () => {
+  test('Returns 406 when note settings with specified note public id do not exist', async () => {
     const expectedStatus = 406;
     const nonexistentId = 'ishvm5qH84';
 
