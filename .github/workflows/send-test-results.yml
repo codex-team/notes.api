@@ -27,7 +27,7 @@ jobs:
         uses: lewagon/wait-on-check-action@v1.3.1
         with:
           ref: ${{ env.COMMIT_SHA }}
-          running-workflow-name: npm-publish-and-notify
+          running-workflow-name: send-message
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 3
           allowed-conclusions: success,skipped,cancelled,failure
