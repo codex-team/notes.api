@@ -37,15 +37,17 @@ declare global {
   function auth(userId: number) : string;
 
 
-  /**
-   * @param sqlString -request that you want to execute
-   */
   /* eslint-disable-next-line no-var */
   var db: {
-    execute: (sqlString: string) => void;
+    /**
+     * Executes specified sql query in test DB.
+     * Might be used in tests to perform some specific database operations
+     *
+     * @param sql - string containing sql to executein test DB
+     * @returns
+     */
+    query: (sql: string) => Promise<unknown>;
   };
-
-
 }
 
 /**
@@ -54,7 +56,6 @@ declare global {
 const migrationsPath = path.join(process.cwd(), 'migrations', 'tenant');
 
 let postgresContainer: StartedPostgreSqlContainer | undefined;
-
 
 beforeAll(async () => {
   postgresContainer = await new PostgreSqlContainer()
@@ -71,16 +72,16 @@ beforeAll(async () => {
   await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
   await insertData(orm);
 
-
-  global.db = {
-    execute: async (sqlString: string) => {
-      await orm.connection.query(sqlString);
-    },
-  };
-
   global.api = api;
+
   global.auth = (userId: number) => {
     return domainServices.authService.signAccessToken({ id : userId });
+  };
+
+  global.db = {
+    query: async (sqlString: string) => {
+      return await orm.connection.query(sqlString);
+    },
   };
 }, TIMEOUT);
 
