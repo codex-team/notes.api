@@ -202,7 +202,7 @@ describe('Note API', () => {
 });
 
 describe('Access rights', () => {
-  test('Returns public note by public id with status 200 and with false canEdit flag, when user is not authorized', async () => {
+  test('Returns canEdit=false flag, when user is not authorized', async () => {
     const expectedStatus = 200;
     const publicId = 'Pq1T9vc23Q';
 
@@ -216,7 +216,7 @@ describe('Access rights', () => {
     expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
   });
 
-  test('Returns public note by public id with status 200 and with false canEdit flag, when user is authorized, but is not the creator of the note', async () => {
+  test('Returns canEdit=false when user is authorized, but is not the creator', async () => {
     const expectedStatus = 200;
     const publicId = 'Pq1T9vc23Q';
     const userId = 4;
@@ -235,7 +235,7 @@ describe('Access rights', () => {
     expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
   });
 
-  test('Returns public note by public id with status 200 and with true canEdit flag, when user is authorized and is the creator of the note', async () => {
+  test('Returns canEdit=true, when user is authorized and is the creator of the note', async () => {
     const expectedStatus = 200;
     const publicId = 'Pq1T9vc23Q';
     const userId = 1;
