@@ -53,7 +53,7 @@ jobs:
       - name: Send a message
         uses: codex-team/action-codexbot-notify@v1
         with:
-          webhook: ${{ secrets.CODEX_BOT_NOTIFY_EDITORJS_PUBLIC_CHAT }}
-          message: "Workflows:\n${{ env.ACTIONS_RESULTS }}"
+          webhook: ${{ secrets.CODEX_BOT_NOTIFY_NOTES_CHAT }}
+          message: "${{ env.ACTIONS_RESULTS }}"
           parse_mode: 'markdown'
           disable_web_page_preview: true
