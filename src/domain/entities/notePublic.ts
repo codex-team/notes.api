@@ -1,4 +1,5 @@
 import type User from '@domain/entities/user.js';
+import type NoteSettingsPublic from './noteSettingsPublic';
 
 /**
  * Note entity
@@ -28,6 +29,10 @@ export interface NotePublic {
    * Last time note was updated
    */
   updatedAt: string;
+  /**
+   * Note settings
+   */
+  noteSettings: NoteSettingsPublic | null;
 }
 
 

@@ -1,4 +1,5 @@
 import type User from '@domain/entities/user.js';
+import type NoteSettings from './noteSettings';
 
 /**
  * Note internal id. Used to query Note by internal API
@@ -43,6 +44,10 @@ export interface Note {
    * Last time note was updated
    */
   updatedAt: string;
+  /**
+   * Note settings
+   */
+  noteSettings?: NoteSettings | null;
 }
 
 
