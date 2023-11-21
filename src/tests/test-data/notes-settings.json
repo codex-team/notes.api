@@ -18,5 +18,12 @@
     "note_id": 3,
     "custom_hostname": "codex.so",
     "is_public": false
+  },
+
+  {
+    "id": 53,
+    "note_id": 53,
+    "custom_hostname": "codex.so",
+    "is_public": true
   }
 ]

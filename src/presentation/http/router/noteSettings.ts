@@ -102,6 +102,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     config: {
       policy: [
         'authRequired',
+        'userInTeam',
       ],
     },
     schema: {
@@ -148,6 +149,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     Reply: Team,
   }>('/:notePublicId/team', {
+    config: {
+      policy: [
+        'authRequired',
+        'userInTeam',
+      ],
+    },
     schema: {
       params: {
         notePublicId: {
