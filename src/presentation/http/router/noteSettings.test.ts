@@ -7,10 +7,6 @@ describe('NoteSettings API', () => {
   describe('GET /note-settings/:notePublicId ', () => {
     test('Returns note settings by public id with 200 status', async () => {
       const expectedStatus = 200;
-
-      /**
-       * @todo сделать поиск заметки по ид чтобы тест был визуально понятнее, убрать existingNotePublicId
-       */
       const existingNotePublicId = 'Pq1T9vc23Q';
 
       const expectedNoteSettings = {
