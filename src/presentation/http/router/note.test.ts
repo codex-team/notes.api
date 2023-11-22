@@ -197,60 +197,60 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
+    describe('Access rights', () => {
+      test('Returns canEdit=false flag, when user is not authorized', async () => {
+        const expectedStatus = 200;
+        const publicId = 'Pq1T9vc23Q';
+
+        const response = await global.api?.fakeRequest({
+          method: 'GET',
+          url: `/note/${publicId}`,
+        });
+
+        expect(response?.statusCode).toBe(expectedStatus);
+
+        expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
+      });
+
+      test('Returns canEdit=false when user is authorized, but is not the creator', async () => {
+        const expectedStatus = 200;
+        const publicId = 'Pq1T9vc23Q';
+        const userId = 4;
+        const accessToken = global.auth(userId);
+
+        const response = await global.api?.fakeRequest({
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          url: `/note/${publicId}`,
+        });
+
+        expect(response?.statusCode).toBe(expectedStatus);
+
+        expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
+      });
+
+      test('Returns canEdit=true, when user is authorized and is the creator of the note', async () => {
+        const expectedStatus = 200;
+        const publicId = 'Pq1T9vc23Q';
+        const userId = 1;
+        const accessToken = global.auth(userId);
+
+        const response = await global.api?.fakeRequest({
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          url: `/note/${publicId}`,
+        });
+
+        expect(response?.statusCode).toBe(expectedStatus);
+
+        expect(response?.json().accessRights).toStrictEqual({ canEdit: true });
+      });
+    });
+
     test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
-  });
-});
-
-describe('Access rights', () => {
-  test('Returns canEdit=false flag, when user is not authorized', async () => {
-    const expectedStatus = 200;
-    const publicId = 'Pq1T9vc23Q';
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      url: `/note/${publicId}`,
-    });
-
-    expect(response?.statusCode).toBe(expectedStatus);
-
-    expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
-  });
-
-  test('Returns canEdit=false when user is authorized, but is not the creator', async () => {
-    const expectedStatus = 200;
-    const publicId = 'Pq1T9vc23Q';
-    const userId = 4;
-    const accessToken = global.auth(userId);
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      url: `/note/${publicId}`,
-    });
-
-    expect(response?.statusCode).toBe(expectedStatus);
-
-    expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
-  });
-
-  test('Returns canEdit=true, when user is authorized and is the creator of the note', async () => {
-    const expectedStatus = 200;
-    const publicId = 'Pq1T9vc23Q';
-    const userId = 1;
-    const accessToken = global.auth(userId);
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      url: `/note/${publicId}`,
-    });
-
-    expect(response?.statusCode).toBe(expectedStatus);
-
-    expect(response?.json().accessRights).toStrictEqual({ canEdit: true });
   });
 });
