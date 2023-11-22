@@ -57,7 +57,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NotePublic | ErrorResponse,
+    Reply: {
+      note : NotePublic
+      accessRights: { canEdit: boolean },
+    } | ErrorResponse,
+
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -105,8 +109,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       creatorId: note.creatorId,
       noteSettings: settings,
     };
+    /**
+     * Check if current user is creator of the note
+     */
+    const canEdit = note.creatorId === request.userId;
 
-    return reply.send(notePublic);
+    return reply.send({
+      note: notePublic,
+      accessRights: { canEdit: canEdit },
+    });
   });
 
   /**
@@ -239,10 +250,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
        */
       hostname: string;
     },
-    Reply: NotePublic,
-  }>('/resolve-hostname/:hostname', {
-
-  }, async (request, reply) => {
+    Reply: {
+      note : NotePublic
+      accessRights: { canEdit: boolean },
+    } | ErrorResponse,
+  }>('/resolve-hostname/:hostname', async (request, reply) => {
     const params = request.params;
 
     const note = await noteService.getNoteByHostname(params.hostname);
@@ -259,7 +271,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
 
     let settings: NoteSettingsPublic | null = null;
-
 
     /**
      * Add note settings to note
@@ -282,8 +293,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
 
     };
+    /**
+     * Check if current user is creator of the note
+     */
+    const canEdit = note.creatorId === request.userId;
 
-    return reply.send(notePublic);
+    return reply.send({
+      note: notePublic,
+      accessRights: { canEdit: canEdit },
+    });
   });
 
   done();
