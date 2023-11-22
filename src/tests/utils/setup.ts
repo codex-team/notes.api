@@ -2,7 +2,6 @@ import path from 'path';
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
-
 import { insertData } from './insert-data';
 import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
@@ -35,7 +34,6 @@ declare global {
    * @returns accessToken for authorization
    */
   function auth(userId: number) : string;
-
 
   /* eslint-disable-next-line no-var */
   var db: {
