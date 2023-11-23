@@ -6,11 +6,10 @@ httpApi:
   cookieDomain: 'localhost'
   oauth2:
     google:
-      clientId: '196469247045-f5ss880k9v37d9o6jn3vcasnscei2mj0.apps.googleusercontent.com'
-      clientSecret: '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'
+      clientId: 'client_id'
+      clientSecret: 'client_secret'
       redirectUrl: '/oauth/google/login'
       callbackUrl: 'http://localhost:1337/oauth/google/callback'
-
 
 auth:
   accessSecret: 'secret'
@@ -29,8 +28,7 @@ logging:
   database: info
 
 database:
-  dsn: 'postgres://codex:postgres@localhost:5432/notes'
+  dsn: 'postgres://codex:postgres@postgres:5432/notes'
 
 openai:
   token: 'token'
-
