@@ -4,6 +4,7 @@ import type NoteSettings from '@domain/entities/noteSettings.js';
 import { isEmpty } from '@infrastructure/utils/empty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
+import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type { NotePublicId } from '@domain/entities/note.js';
 import type { Team } from '@domain/entities/team.js';
 
@@ -43,6 +44,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   const { noteResolver } = useNoteResolver(noteService);
 
   /**
+   * Prepare note settings resolver middleware
+   * It should be used to use note settings in middlewares
+   */
+  const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
+
+  /**
    * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware
    */
   fastify.get<{
@@ -51,13 +58,23 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     Reply: NoteSettings
   }>('/:notePublicId', {
+    config: {
+      policy: [
+        'notePublicOrUserInTeam',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
     preHandler: [
       noteResolver,
+      noteSettingsResolver,
     ],
   }, async (request, reply) => {
-    /**
-     * TODO: Validate request params
-     */
     const noteId = request.note?.id as number;
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
@@ -85,7 +102,15 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     config: {
       policy: [
         'authRequired',
+        'userInTeam',
       ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -115,6 +140,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   });
 
   /**
+   * Get team by note id
    * TODO add policy for this route (check if user is collaborator)
    */
   fastify.get<{
@@ -123,6 +149,19 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     Reply: Team,
   }>('/:notePublicId/team', {
+    config: {
+      policy: [
+        'authRequired',
+        'userInTeam',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
     preHandler: [
       noteResolver,
     ],
