@@ -33,7 +33,7 @@ declare global {
    * @param userId - id of the user that will be considered the author of the request
    * @returns accessToken for authorization
    */
-  function auth(userId: number) : string;
+  function auth(userId: number): string;
 
   /* eslint-disable-next-line no-var */
   var db: {
@@ -42,7 +42,6 @@ declare global {
      * Might be used in tests to perform some specific database operations
      *
      * @param sql - string containing sql to executein test DB
-     * @returns
      */
     query: (sql: string) => Promise<unknown>;
   };
