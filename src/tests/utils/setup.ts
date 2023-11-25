@@ -35,6 +35,18 @@ declare global {
    * @returns accessToken for authorization
    */
   function auth(userId: number) : string;
+
+  /* eslint-disable-next-line no-var */
+  var db: {
+    /**
+     * Executes specified sql query in test DB.
+     * Might be used in tests to perform some specific database operations
+     *
+     * @param sql - string containing sql to executein test DB
+     * @returns
+     */
+    query: (sql: string) => Promise<unknown>;
+  };
 }
 
 /**
@@ -60,8 +72,15 @@ beforeAll(async () => {
   await insertData(orm);
   await insertDataForAuthTest(orm);
   global.api = api;
+
   global.auth = (userId: number) => {
     return domainServices.authService.signAccessToken({ id : userId });
+  };
+
+  global.db = {
+    query: async (sqlString: string) => {
+      return await orm.connection.query(sqlString);
+    },
   };
 }, TIMEOUT);
 
