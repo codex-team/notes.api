@@ -1,4 +1,3 @@
-import { getTomorrowDateFormatted } from '@tests/utils/get-tomorrow-date-formatted';
 import { describe, test, expect } from 'vitest';
 
 describe('Auth API', () => {
@@ -25,7 +24,7 @@ describe('Auth API', () => {
       /**
        * Insert session data to the DB with tomorrow expiration date
        */
-      await global.db.query(`INSERT INTO public.user_sessions (id, "user_id", "refresh_token", "refresh_token_expires_at") VALUES (9999, 1, '${refreshToken}', '${getTomorrowDateFormatted()}')`);
+      await global.db.query(`INSERT INTO public.user_sessions (id, "user_id", "refresh_token", "refresh_token_expires_at") VALUES (9999, 1, '${refreshToken}', CURRENT_DATE + INTERVAL '1 day')`);
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
