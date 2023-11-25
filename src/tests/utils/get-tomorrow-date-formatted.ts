@@ -1,8 +1,9 @@
-/** create string of tomorrow  expiration day */
-export const formattedDate = (): string => {
+/**
+ * Returns tomorrow date in DB compatible format
+ */
+export const getTomorrowDateFormatted = (): string => {
   const tomorrow = new Date();
   const border = 19;
-
 
   tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -11,6 +12,4 @@ export const formattedDate = (): string => {
 
   return newExpirationDay;
 };
-// Export the newExpirationDay variable directly
-export const newExpirationDay: string = formattedDate();
 
