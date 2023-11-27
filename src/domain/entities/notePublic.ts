@@ -1,9 +1,7 @@
 import type User from '@domain/entities/user.js';
 import type NoteSettingsPublic from './noteSettingsPublic';
 
-/**
- * Note entity
- */
+
 export interface NotePublic {
   /**
    * Note id
@@ -32,11 +30,6 @@ export interface NotePublic {
   /**
    * Note settings
    */
-  noteSettings: NoteSettingsPublic | null;
+  noteSettings?: NoteSettingsPublic | null;
 }
 
-
-/**
- * Part of note entity used to create new note
- */
-export type NoteCreationAttributes = Pick<NotePublic, 'id' | 'content' | 'creatorId'>;

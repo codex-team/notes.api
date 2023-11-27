@@ -1,4 +1,5 @@
 import type { Note } from '@domain/entities/note.js';
+import type { NotePublic } from '@domain/entities/notePublic';
 
 /**
  * Note list  entity.
@@ -7,3 +8,12 @@ import type { Note } from '@domain/entities/note.js';
 export type NoteList = {
   items: Note[];
 };
+
+/**
+ * Public Note list entity .
+ * An object with list of public notes
+ */
+export type NoteListPublic = {
+  items: NotePublic[];
+};
+

@@ -8,7 +8,6 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import type { NotePublic } from '@domain/entities/notePublic.js';
 import type NoteSettingsPublic from '@domain/entities/noteSettingsPublic.js';
 
-
 /**
  * Interface for the note router.
  */
@@ -22,6 +21,33 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
+}
+
+/**
+ *
+ * @param note - note to change
+ * @returns note with only one id
+ */
+function changeNoteToNotePublic(note: Note): NotePublic {
+  let settings: NoteSettingsPublic | null = null;
+
+  if (note.noteSettings) {
+    settings = {
+      customHostname: note.noteSettings.customHostname,
+      isPublic: note.noteSettings.isPublic,
+    };
+  }
+
+  const notePublic: NotePublic = {
+    id: note.publicId,
+    content: note.content,
+    createdAt: note.createdAt,
+    updatedAt: note.updatedAt,
+    creatorId: note.creatorId,
+    noteSettings: settings,
+  };
+
+  return notePublic;
 }
 
 /**
@@ -88,23 +114,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Wrap note for public use
      */
-    let settings: NoteSettingsPublic | null = null;
-
-    if (request.noteSettings) {
-      settings = {
-        id: request.noteSettings.id,
-        customHostname: request.noteSettings.customHostname,
-        isPublic: request.noteSettings.isPublic,
-      };
-    }
-    const notePublic: NotePublic = {
-      id: note.publicId,
-      content: note.content,
-      createdAt: note.createdAt,
-      updatedAt: note.updatedAt,
-      creatorId: note.creatorId,
-      noteSettings: settings,
-    };
+    const notePublic = changeNoteToNotePublic(note);
 
     return reply.send(notePublic);
   });
@@ -257,31 +267,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Wrapping Note for public use
      */
-
-    let settings: NoteSettingsPublic | null = null;
-
-
-    /**
-     * Add note settings to note
-     */
-    const notesettings = await noteSettingsService.getNoteSettingsByNoteId(note.id);
-
-    settings = {
-      customHostname: notesettings.customHostname,
-      isPublic: notesettings.isPublic,
-      id: notesettings.id,
-    };
-
-    const notePublic:NotePublic |null = {
-      id: note.publicId,
-      content: note.content,
-      createdAt: note.createdAt,
-      updatedAt: note.updatedAt,
-      creatorId: note.creatorId,
-      noteSettings: settings,
-
-
-    };
+    const notePublic = changeNoteToNotePublic(note);
 
     return reply.send(notePublic);
   });
