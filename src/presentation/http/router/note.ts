@@ -83,7 +83,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NotePublic | ErrorResponse,
+    Reply: {
+      note : NotePublic
+      accessRights: { canEdit: boolean },
+    } | ErrorResponse,
+
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -114,9 +118,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Wrap note for public use
      */
+
     const notePublic = changeNoteToNotePublic(note);
 
-    return reply.send(notePublic);
+    return reply.send({
+      note: notePublic,
+      accessRights: { canEdit: canEdit },
+    });
   });
 
   /**
@@ -249,10 +257,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
        */
       hostname: string;
     },
-    Reply: NotePublic,
-  }>('/resolve-hostname/:hostname', {
-
-  }, async (request, reply) => {
+    Reply: {
+      note : NotePublic
+      accessRights: { canEdit: boolean },
+    } | ErrorResponse,
+  }>('/resolve-hostname/:hostname', async (request, reply) => {
     const params = request.params;
 
     const note = await noteService.getNoteByHostname(params.hostname);
@@ -267,9 +276,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Wrapping Note for public use
      */
+
+
+
     const notePublic = changeNoteToNotePublic(note);
 
-    return reply.send(notePublic);
+    return reply.send({
+      note: notePublic,
+      accessRights: { canEdit: canEdit },
+    });
   });
 
   done();

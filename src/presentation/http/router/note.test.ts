@@ -8,20 +8,23 @@ describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
     test('Returns note with specified hostname', async () => {
       const expectedStatus = 200;
-      /* eslint-disable @typescript-eslint/naming-convention */
-      const expectedNote = {
-        'id': 'note_1',
-        'creatorId': 1,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
-        'noteSettings':  {
-          'customHostname': 'codex.so',
-          'isPublic': true,
-          'id': 1,
+      const expectedResponse = {
+        'note': {
+          'id': 'note_1',
+          'creatorId': 1,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+          'noteSettings':  {
+            'customHostname': 'codex.so',
+            'isPublic': true,
+            'id': 1,
+          },
+        },
+        'accessRights': {
+          'canEdit': false,
         },
       };
-      /* eslint-enable @typescript-eslint/naming-convention */
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -30,9 +33,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
-
-      expect(body).toStrictEqual(expectedNote);
+      expect(response?.json()).toStrictEqual(expectedResponse);
     });
 
     test('Returns 404 when note not found', async () => {
@@ -45,9 +46,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      const body = response?.body !== undefined ? JSON.parse(response?.body) : {};
-
-      expect(body).toStrictEqual({ message: 'Note not found' });
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
   });
 
@@ -55,17 +54,21 @@ describe('Note API', () => {
     test('Returns note by public id with 200 status when note is publicly available', async () => {
       const expectedStatus = 200;
       const correctID = 'Pq1T9vc23Q';
-
-      const expectedNote = {
-        'id': 'Pq1T9vc23Q',
-        'creatorId': 1,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
-        'noteSettings':  {
-          'customHostname': 'codex.so',
-          'isPublic': true,
-          'id': 2,
+      const expectedResponse = {
+        'note': {
+          'id': 'Pq1T9vc23Q',
+          'creatorId': 1,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+          'noteSettings':  {
+            'customHostname': 'codex.so',
+            'isPublic': true,
+            'id': 2,
+          },
+        },
+        'accessRights': {
+          'canEdit': false,
         },
       };
 
@@ -76,24 +79,30 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      expect(response?.json()).toStrictEqual(expectedNote);
+      const res = response?.json();
+
+      expect(res).toStrictEqual(expectedResponse);
     });
 
     test('Returns note by public id with 200 status when access is disabled, but user is creator', async () => {
       const expectedStatus = 200;
       const userId = 1;
       const accessToken = global.auth(userId);
-
-      const expectedNote = {
-        'id': '73NdxFZ4k7',
-        'creatorId': 1,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
-        'noteSettings':  {
-          'customHostname': 'codex.so',
-          'isPublic': false,
-          'id': 3,
+      const expectedResponse = {
+        'note': {
+          'id': '73NdxFZ4k7',
+          'creatorId': 1,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+          'noteSettings':  {
+            'customHostname': 'codex.so',
+            'isPublic': false,
+            'id': 3,
+          },
+        },
+        'accessRights': {
+          'canEdit': true,
         },
       };
 
@@ -113,7 +122,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      expect(response?.json()).toStrictEqual(expectedNote);
+      expect(response?.json()).toStrictEqual(expectedResponse);
     });
 
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
@@ -194,6 +203,60 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(expectedStatus);
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
+    });
+
+    describe('Access rights', () => {
+      test('Returns canEdit=false flag, when user is not authorized', async () => {
+        const expectedStatus = 200;
+        const publicId = 'Pq1T9vc23Q';
+
+        const response = await global.api?.fakeRequest({
+          method: 'GET',
+          url: `/note/${publicId}`,
+        });
+
+        expect(response?.statusCode).toBe(expectedStatus);
+
+        expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
+      });
+
+      test('Returns canEdit=false when user is authorized, but is not the creator', async () => {
+        const expectedStatus = 200;
+        const publicId = 'Pq1T9vc23Q';
+        const userId = 4;
+        const accessToken = global.auth(userId);
+
+        const response = await global.api?.fakeRequest({
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          url: `/note/${publicId}`,
+        });
+
+        expect(response?.statusCode).toBe(expectedStatus);
+
+        expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
+      });
+
+      test('Returns canEdit=true, when user is authorized and is the creator of the note', async () => {
+        const expectedStatus = 200;
+        const publicId = 'Pq1T9vc23Q';
+        const userId = 1;
+        const accessToken = global.auth(userId);
+
+        const response = await global.api?.fakeRequest({
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          url: `/note/${publicId}`,
+        });
+
+        expect(response?.statusCode).toBe(expectedStatus);
+
+        expect(response?.json().accessRights).toStrictEqual({ canEdit: true });
+      });
     });
   });
 });
