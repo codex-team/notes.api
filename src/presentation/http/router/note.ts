@@ -120,6 +120,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
 
     const notePublic = changeNoteToNotePublic(note);
+    const canEdit = note.creatorId == request.userId;
 
     return reply.send({
       note: notePublic,
@@ -280,6 +281,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
 
     const notePublic = changeNoteToNotePublic(note);
+    const canEdit = note.creatorId == request.userId;
 
     return reply.send({
       note: notePublic,
