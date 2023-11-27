@@ -18,7 +18,6 @@ describe('Note API', () => {
           'noteSettings':  {
             'customHostname': 'codex.so',
             'isPublic': true,
-            'id': 1,
           },
         },
         'accessRights': {
@@ -64,7 +63,6 @@ describe('Note API', () => {
           'noteSettings':  {
             'customHostname': 'codex.so',
             'isPublic': true,
-            'id': 2,
           },
         },
         'accessRights': {
@@ -98,7 +96,6 @@ describe('Note API', () => {
           'noteSettings':  {
             'customHostname': 'codex.so',
             'isPublic': false,
-            'id': 3,
           },
         },
         'accessRights': {
