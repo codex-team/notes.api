@@ -4,6 +4,7 @@ import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
 import noteSettings from '../test-data/notes-settings.json';
 
+
 /**
  * Fills in the database with users data
  *
@@ -26,7 +27,7 @@ async function insertUserSessions(db: SequelizeOrm): Promise<void> {
   }
 }
 /**
- * Fills in the database with notes datas
+ * Fills in the database with notes data
  *
  * @param db - SequelizeOrm instance
  */
