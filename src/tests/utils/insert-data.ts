@@ -12,7 +12,7 @@ import noteSettings from '../test-data/notes-settings.json';
  */
 async function insertUsers(db: SequelizeOrm): Promise<void> {
   for (const user of users) {
-    await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.name}', '${user.email}', '${user.created_at}')`);
+    await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.email}', '${user.name}', '${user.created_at}')`);
   }
 }
 
