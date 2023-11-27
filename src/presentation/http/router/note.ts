@@ -31,7 +31,7 @@ interface NoteRouterOptions {
 function changeNoteToNotePublic(note: Note): NotePublic {
   let settings: NoteSettingsPublic | null = null;
 
-  if (note.noteSettings) {
+  if (note.noteSettings != null && note.noteSettings != undefined) {
     settings = {
       customHostname: note.noteSettings.customHostname,
       isPublic: note.noteSettings.isPublic,
