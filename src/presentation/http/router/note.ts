@@ -108,17 +108,23 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const { note } = request;
 
+
     /**
      * Check if note does not exist
      */
     if (note === null) {
       return reply.notFound('Note not found');
     }
+    /**
+     * Check if noteSettings Resolver added settings to request
+     */
+    if (request.noteSettings) {
+      note.noteSettings = request.noteSettings;
+    }
 
     /**
      * Wrap note for public use
      */
-
     const notePublic = changeNoteToNotePublic(note);
     const canEdit = note.creatorId == request.userId;
 
@@ -277,9 +283,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Wrapping Note for public use
      */
-
-
-
     const notePublic = changeNoteToNotePublic(note);
     const canEdit = note.creatorId == request.userId;
 
