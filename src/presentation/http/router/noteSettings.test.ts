@@ -27,8 +27,8 @@ describe('NoteSettings API', () => {
     });
   });
 
-  test('Returns 406 when note settings with specified note public id do not exist', async () => {
-    const expectedStatus = 406;
+  test('Returns 404 when note settings with specified note public id do not exist', async () => {
+    const expectedStatus = 404;
     const nonexistentId = 'ishvm5qH84';
 
     const response = await global.api?.fakeRequest({
@@ -142,8 +142,8 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
-    test('Returns status 406 when the public id does not exist', async () => {
-      const expectedStatus = 406;
+    test('Returns status 404 when the public id does not exist', async () => {
+      const expectedStatus = 404;
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
@@ -241,7 +241,7 @@ describe('NoteSettings API', () => {
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
-        method: 'GET',
+        method: 'PATCH',
         url: `/note-settings/${nonexistentId}`,
       });
 
@@ -264,7 +264,7 @@ describe('NoteSettings API', () => {
       const expectedStatus = 400;
 
       const response = await global.api?.fakeRequest({
-        method: 'GET',
+        method: 'PATCH',
         url: `/note-settings/${id}`,
       });
 

@@ -41,6 +41,14 @@ export default function useNoteResolver(noteService: NoteService): {
     noteResolver: async function noteIdResolver(request, reply) {
       let note: Note | undefined;
 
+      let statusCode = StatusCodes.NOT_ACCEPTABLE;
+
+      /**
+       * This status code occurs only when request is get note by id
+       */
+      if (request.method == 'GET') {
+        statusCode = StatusCodes.NOT_FOUND;
+      }
       try {
         /**
          * All methods (GET, POST, PATCH, etc) could have note public id just in route params,
@@ -58,7 +66,7 @@ export default function useNoteResolver(noteService: NoteService): {
         logger.error(error);
 
         await reply
-          .code(StatusCodes.NOT_ACCEPTABLE)
+          .code(statusCode)
           .send({
             message: 'Note not found',
           });

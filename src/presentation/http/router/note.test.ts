@@ -160,8 +160,8 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 406 when the id  does not exist', async () => {
-      const expectedStatus = 406;
+    test('Returns 404 when the id  does not exist', async () => {
+      const expectedStatus = 404;
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
