@@ -31,3 +31,5 @@ ALTER TABLE public.teams DROP CONSTRAINT IF EXISTS note_id_fkey;
 ALTER TABLE public.teams
     ADD CONSTRAINT note_id_fkey FOREIGN KEY (note_id) REFERENCES public.notes(id)
     ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE public.teams OWNER TO codex;
