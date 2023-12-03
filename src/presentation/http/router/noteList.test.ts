@@ -3,7 +3,7 @@ import { describe, test, expect, beforeAll } from 'vitest';
 
 
 /**
- * Access token that will be used for Auhorization header
+ * Access token that will be used for Authorization header
  */
 let accessToken = '';
 
@@ -79,7 +79,7 @@ describe('NoteList API', () => {
     });
 
     test('Returns 400 when page < 0', async () => {
-      const expextedStatus = 400;
+      const expectedStatus = 400;
       const pageNumber = 0;
 
 
@@ -91,11 +91,11 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expextedStatus);
+      expect(response?.statusCode).toBe(expectedStatus);
     });
 
     test('Returns 400 when page is too large (maximum page numbrer is 30 by default)', async () => {
-      const expextedStatus = 400;
+      const expectedStatus = 400;
       const pageNumber = 31;
 
       const response = await global.api?.fakeRequest({
@@ -106,7 +106,7 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expextedStatus);
+      expect(response?.statusCode).toBe(expectedStatus);
     });
   });
 });

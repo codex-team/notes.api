@@ -140,7 +140,7 @@ export default class HttpApi implements Api {
           securitySchemes: {
             oAuthGoogle: {
               type: 'oauth2',
-              description: 'Provied authorization uses OAuth 2 with Google',
+              description: 'Provided authorization uses OAuth 2 with Google',
               flows: {
                 authorizationCode: {
                   authorizationUrl: 'https://api.notex.so/oauth/google/login',
