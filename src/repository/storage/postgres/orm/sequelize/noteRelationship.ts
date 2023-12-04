@@ -1,4 +1,4 @@
-import type { CreationOptional, InferAttributes, InferCreationAttributes, Sequelize } from 'sequelize';
+import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, Sequelize } from 'sequelize';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
@@ -33,6 +33,11 @@ export default class NoteRelationshipSequelizeStorage {
    * Note relationship model in database
    */
   public model: typeof NoteRelationshipModel;
+
+  /**
+   * Note model instance
+   */
+  private noteModel: typeof NoteModel | null = null;
 
   /**
    * Database instance
@@ -98,6 +103,24 @@ export default class NoteRelationshipSequelizeStorage {
     return await this.model.create({
       noteId,
       parentId,
+    });
+  }
+
+  /**
+   * Creates association with note model to make joins
+   *
+   * @param model - initialized note model
+   */
+  public createAssociationWithNoteModel(model: ModelStatic<NoteModel>): void {
+    this.noteModel = model;
+
+    /**
+     * Make one-to-one association with note model
+     * We can not create note relations without note
+     */
+    this.model.belongsTo(model, {
+      foreignKey: 'noteId',
+      as: this.noteModel.tableName,
     });
   }
 }

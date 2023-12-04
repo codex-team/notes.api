@@ -5,6 +5,7 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
+import type NoteRelationshipService from '@domain/service/noteRelationship.js';
 
 /**
  * Interface for the note router.
@@ -19,6 +20,11 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
+
+  /**
+   * Note relationship service instance
+   */
+  noteRelationshipService: NoteRelationshipService,
 }
 
 /**
@@ -34,6 +40,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   const noteService = opts.noteService;
   const noteSettingsService = opts.noteSettingsService;
+  const noteRelationshipService = opts.noteRelationshipService;
 
   /**
    * Prepare note id resolver middleware
@@ -140,6 +147,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.post<{
     Body: {
       content: JSON;
+      parentId?: NotePublicId;
     },
     Reply: {
       id: NotePublicId
@@ -154,10 +162,17 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * TODO: Validate request query
      */
-    const { content } = request.body;
+    const content = request.body.content as JSON;
+    const parentPublicId = request.body.parentId;
     const { userId } = request;
 
     const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
+
+    if (parentPublicId !== undefined) {
+      const parentId = (await noteService.getNoteByPublicId(parentPublicId)).id;
+
+      await noteRelationshipService.addNoteRelation(addedNote.id, parentId);
+    }
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
