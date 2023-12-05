@@ -14,6 +14,7 @@ describe('NoteSettings API', () => {
         'isPublic': true,
         'id': 2,
         'noteId': 2,
+        'invitationHash': 'E2zRXv3cp-',
       };
 
       const response = await global.api?.fakeRequest({
@@ -201,6 +202,7 @@ describe('NoteSettings API', () => {
         'noteId': 53,
         'customHostname': 'codex.so',
         'isPublic': false,
+        'invitationHash': 'FfAwyaR80C',
       };
 
       const response = await global.api?.fakeRequest({
