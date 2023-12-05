@@ -21,6 +21,7 @@ describe('Note API', () => {
             'isPublic': true,
             'id': 1,
             'noteId': 1,
+            'invitationHash': 'Hzh2hy4igf',
           },
         },
         'accessRights': {
