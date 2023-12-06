@@ -25,8 +25,8 @@ export default class NoteRelationshipService {
    * @param noteId - id of the current note
    * @param parentId - id of the parent note
    */
-  public async addNoteRelation(noteId: Note['id'], parentId: Note['id']): Promise<unknown> {
-    return await this.repository.addNoteRelation(
+  public async addNoteRelation(noteId: Note['id'], parentId: Note['id']): Promise<void> {
+    await this.repository.addNoteRelation(
       noteId,
       parentId
     );

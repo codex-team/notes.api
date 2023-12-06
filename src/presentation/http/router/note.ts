@@ -145,9 +145,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Responses with note public id.
    */
   fastify.post<{
+    Params: {
+      parentId?: NotePublicId,
+    },
     Body: {
       content: JSON;
-      parentId?: NotePublicId;
     },
     Reply: {
       id: NotePublicId
@@ -163,7 +165,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * TODO: Validate request query
      */
     const content = request.body.content as JSON;
-    const parentPublicId = request.body.parentId;
+    const parentPublicId = request.params.parentId;
     const { userId } = request;
 
     const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
@@ -190,6 +192,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.patch<{
     Params: {
       notePublicId: NotePublicId,
+      parentId?: NotePublicId,
     },
     Body: {
       content: JSON;
@@ -221,9 +224,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
-    const { content } = request.body;
+    const content = request.body.content as JSON;
+    const parentPublicId = request.params.parentId;
 
     const note = await noteService.updateNoteContentById(noteId, content);
+
+    if (parentPublicId !== undefined) {
+      const parentId = (await noteService.getNoteByPublicId(parentPublicId)).id;
+
+      await noteRelationshipService.addNoteRelation(note.id, parentId);
+    }
 
     return reply.send({
       updatedAt: note.updatedAt,

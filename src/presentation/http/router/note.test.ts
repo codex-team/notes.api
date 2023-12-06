@@ -250,7 +250,64 @@ describe('Note API', () => {
         expect(response?.json().accessRights).toStrictEqual({ canEdit: true });
       });
     });
-
-    test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
   });
+
+  describe('PATCH note/:notePublicId ', () => {
+    test('Returns status 401 when the user is not authorized', async () => {
+      const expectedStatus = 401;
+      const correctID = 'Pq1T9vc23Q';
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        url: `/note/${correctID}`,
+        body: {
+          'isPublic': false,
+        },
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
+    });
+
+    test('Returns status 406 when the public id does not exist', async () => {
+      const expectedStatus = 406;
+      const nonexistentId = 'ishvm5qH84';
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        url: `/note/${nonexistentId}`,
+        body: {},
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+    });
+
+    test.each([
+      { id: 'mVz3iHuez',
+        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+
+      { id: 'cR8eqF1mFf0',
+        expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+
+      { id: '+=*&*5%&&^&-',
+        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component' },
+    ])
+    ('Returns 400 when public id of the note settings has incorrect characters and length', async ({ id, expectedMessage }) => {
+      const expectedStatus = 400;
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        url: `/note/${id}`,
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json().message).toStrictEqual(expectedMessage);
+    });
+  });
+
+  test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 });
