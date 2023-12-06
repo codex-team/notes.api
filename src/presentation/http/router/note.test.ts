@@ -261,9 +261,7 @@ describe('Note API', () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         url: `/note/${correctID}`,
-        body: {
-          'isPublic': false,
-        },
+        body: {},
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -308,7 +306,11 @@ describe('Note API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
+
+    test.todo('Update note by public id with 200 status, user is creator of the note');
   });
+
+  test.todo('Create note with parentId field');
 
   test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 });
