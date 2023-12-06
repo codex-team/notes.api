@@ -44,7 +44,7 @@ async function insertNotes(db: SequelizeOrm): Promise<void> {
  */
 async function insertNoteSettings(db: SequelizeOrm): Promise<void> {
   for (const noteSetting of noteSettings) {
-    await db.connection.query(`INSERT INTO public.note_settings (id, "note_id", "custom_hostname", "is_public") VALUES (${noteSetting.id}, '${noteSetting.note_id}', '${noteSetting.custom_hostname}', ${noteSetting.is_public})`);
+    await db.connection.query(`INSERT INTO public.note_settings (id, "note_id", "custom_hostname", "is_public", "invitation_hash") VALUES (${noteSetting.id}, '${noteSetting.note_id}', '${noteSetting.custom_hostname}', ${noteSetting.is_public}, '${noteSetting.invitation_hash}')`);
   }
 }
 
