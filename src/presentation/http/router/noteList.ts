@@ -71,7 +71,6 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
         creatorId: note.creatorId,
         createdAt: note.createdAt,
         updatedAt: note.updatedAt,
-        noteSettings: note.noteSettings,
       };
 
       return notePublic;

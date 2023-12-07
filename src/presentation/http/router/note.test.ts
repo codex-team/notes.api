@@ -15,13 +15,13 @@ describe('Note API', () => {
           'content': null,
           'createdAt': '2023-10-16T13:49:19.000Z',
           'updatedAt': '2023-10-16T13:49:19.000Z',
-          'noteSettings':  {
-            'customHostname': 'codex.so',
-            'isPublic': true,
-          },
         },
         'accessRights': {
           'canEdit': false,
+        },
+        'noteSettings':  {
+          'customHostname': 'codex.so',
+          'isPublic': true,
         },
       };
 
@@ -60,13 +60,13 @@ describe('Note API', () => {
           'content': null,
           'createdAt': '2023-10-16T13:49:19.000Z',
           'updatedAt': '2023-10-16T13:49:19.000Z',
-          'noteSettings':  {
-            'customHostname': 'codex.so',
-            'isPublic': true,
-          },
         },
         'accessRights': {
           'canEdit': false,
+        },
+        'noteSettings':  {
+          'customHostname': 'codex.so',
+          'isPublic': true,
         },
       };
 
@@ -93,14 +93,15 @@ describe('Note API', () => {
           'content': null,
           'createdAt': '2023-10-16T13:49:19.000Z',
           'updatedAt': '2023-10-16T13:49:19.000Z',
-          'noteSettings':  {
-            'customHostname': 'codex.so',
-            'isPublic': false,
-          },
+        },
+        'noteSettings':  {
+          'customHostname': 'codex.so',
+          'isPublic': false,
         },
         'accessRights': {
           'canEdit': true,
         },
+
       };
 
       const privateUserNote = notes.find(newNote => {

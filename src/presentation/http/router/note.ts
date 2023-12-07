@@ -8,6 +8,7 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import type { NotePublic } from '@domain/entities/notePublic.js';
 import type NoteSettingsPublic from '@domain/entities/noteSettingsPublic.js';
 
+
 /**
  * Interface for the note router.
  */
@@ -29,22 +30,12 @@ interface NoteRouterOptions {
  * @returns note with only one id
  */
 function changeNoteToNotePublic(note: Note): NotePublic {
-  let settings: NoteSettingsPublic | null = null;
-
-  if (note.noteSettings) {
-    settings = {
-      customHostname: note.noteSettings.customHostname,
-      isPublic: note.noteSettings.isPublic,
-    };
-  }
-
   const notePublic: NotePublic = {
     id: note.publicId,
     content: note.content,
     createdAt: note.createdAt,
     updatedAt: note.updatedAt,
     creatorId: note.creatorId,
-    noteSettings: settings,
   };
 
   return notePublic;
@@ -84,7 +75,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId: NotePublicId;
     },
     Reply: {
-      note : NotePublic
+      note : NotePublic,
+      noteSettings: NoteSettingsPublic | null,
       accessRights: { canEdit: boolean },
     } | ErrorResponse,
 
@@ -115,21 +107,28 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     if (note === null) {
       return reply.notFound('Note not found');
     }
-    /**
-     * Check if noteSettings Resolver added settings to request
-     */
-    if (request.noteSettings) {
-      note.noteSettings = request.noteSettings;
-    }
+
 
     /**
      * Wrap note for public use
      */
     const notePublic = changeNoteToNotePublic(note);
+
+    let notePublicSettings:NoteSettingsPublic |null;
+
+    if (request.noteSettings) {
+      notePublicSettings = {
+        isPublic: request.noteSettings.isPublic,
+        customHostname: request.noteSettings.customHostname,
+      };
+    } else {
+      notePublicSettings = null;
+    }
     const canEdit = note.creatorId == request.userId;
 
     return reply.send({
       note: notePublic,
+      noteSettings: notePublicSettings,
       accessRights: { canEdit: canEdit },
     });
   });
@@ -265,7 +264,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       hostname: string;
     },
     Reply: {
-      note : NotePublic
+      note : NotePublic,
+      noteSettings: NoteSettingsPublic
       accessRights: { canEdit: boolean },
     } | ErrorResponse,
   }>('/resolve-hostname/:hostname', async (request, reply) => {
@@ -273,6 +273,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const note = await noteService.getNoteByHostname(params.hostname);
 
+    if (note === null || note === undefined) {
+      return reply.notFound('Note not found');
+    }
+    const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(note.id);
+
+    const noteSettingsPublic:NoteSettingsPublic = {
+      isPublic: noteSettings.isPublic,
+      customHostname: noteSettings.customHostname,
+    };
 
     /**
      * Check if note does not exist
@@ -288,6 +297,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     return reply.send({
       note: notePublic,
+      noteSettings: noteSettingsPublic,
       accessRights: { canEdit: canEdit },
     });
   });
