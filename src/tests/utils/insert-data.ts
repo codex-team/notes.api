@@ -4,6 +4,7 @@ import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
 import noteSettings from '../test-data/notes-settings.json';
 
+
 /**
  * Fills in the database with users data
  *
@@ -11,7 +12,7 @@ import noteSettings from '../test-data/notes-settings.json';
  */
 async function insertUsers(db: SequelizeOrm): Promise<void> {
   for (const user of users) {
-    await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.name}', '${user.email}', '${user.created_at}')`);
+    await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.email}', '${user.name}', '${user.created_at}')`);
   }
 }
 
@@ -26,7 +27,7 @@ async function insertUserSessions(db: SequelizeOrm): Promise<void> {
   }
 }
 /**
- * Fills in the database with notes datas
+ * Fills in the database with notes data
  *
  * @param db - SequelizeOrm instance
  */

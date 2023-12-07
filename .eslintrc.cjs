@@ -10,6 +10,12 @@ module.exports = {
     'tsconfigRootDir': __dirname,
     'sourceType': 'module',
   },
+  'overrides': [{
+    'files': ['*.test.ts'],
+    'rules': {
+      '@typescript-eslint/no-magic-numbers': 'off'
+    }
+  }],
   'rules': {
     '@typescript-eslint/naming-convention': [
       'error',
