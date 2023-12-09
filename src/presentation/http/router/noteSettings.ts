@@ -1,6 +1,8 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
+import type { InvitationHash } from '@domain/entities/noteSettings.js';
+import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { isEmpty } from '@infrastructure/utils/empty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
@@ -171,6 +173,54 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const team = await noteSettingsService.getTeamByNoteId(noteId);
 
     return reply.send(team);
+  });
+
+  /**
+   * Generates a new invitation hash for a specific note
+   */
+  fastify.patch<{
+    Params: {
+      notePublicId: NotePublicId;
+    },
+    Reply: InvitationHash,
+  }>('/:notePublicId/invitation-hash', {
+    config: {
+      policy: [
+        'authRequired',
+        'userInTeam',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+
+    /**
+     * Generates invitation hash
+     */
+    const invitationHash = createInvitationHash();
+
+    /**
+     * TODO: check is user collaborator
+     */
+
+    const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
+      invitationHash,
+    });
+
+    if (updatedNoteSettings === null) {
+      return reply.notFound('Note settings not found');
+    }
+
+    return reply.send(invitationHash);
   });
 
   done();
