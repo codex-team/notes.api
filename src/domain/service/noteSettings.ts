@@ -104,4 +104,21 @@ export default class NoteSettingsService {
   public async createTeamMember(team: TeamMemberCreationAttributes): Promise<TeamMember> {
     return await this.teamRepository.create(team);
   }
+
+  /**
+   * Updates invitation hash in note settings
+   *
+   * @param noteId - note internal id
+   * @returns updated note settings
+   */
+  public async patchNoteSettingsInvitationHash(noteId: NoteInternalId): Promise<NoteSettings | null> {
+    const noteSettings = await this.noteSettingsRepository.getNoteSettingsByNoteId(noteId);
+
+    /**
+     * Generates new invitation hash
+     */
+    const data = { invitationHash: createInvitationHash() };
+
+    return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
+  }
 }
