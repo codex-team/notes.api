@@ -165,16 +165,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * TODO: Validate request query
      */
     const content = request.body.content as JSON;
-    const parentPublicId = request.params.parentId;
     const { userId } = request;
 
     const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
-
-    if (parentPublicId !== undefined) {
-      const parentId = (await noteService.getNoteByPublicId(parentPublicId)).id;
-
-      await noteRelationshipService.addNoteRelation(addedNote.id, parentId);
-    }
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'

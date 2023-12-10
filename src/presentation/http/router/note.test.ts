@@ -10,7 +10,7 @@ describe('Note API', () => {
       const expectedStatus = 200;
       const expectedResponse = {
         'note': {
-          'id': 1,
+          'id': 60,
           'publicId': 'note_1',
           'creatorId': 1,
           'content': null,
@@ -19,8 +19,8 @@ describe('Note API', () => {
           'noteSettings':  {
             'customHostname': 'codex.so',
             'isPublic': true,
-            'id': 1,
-            'noteId': 1,
+            'id': 60,
+            'noteId': 60,
             'invitationHash': 'Hzh2hy4igf',
           },
         },
@@ -254,6 +254,29 @@ describe('Note API', () => {
   });
 
   describe('PATCH note/:notePublicId ', () => {
+    test('Update note by public id with 200 status, user is creator of the note', async () => {
+      const expectedStatus = 200;
+      const userId = 2;
+      const accessToken = global.auth(userId);
+
+      const userNote = notes.find(newNote => {
+        return newNote.creator_id === userId;
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${userNote!.public_id}`,
+        body: {
+          'content': { new: 'content added' },
+        },
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+    });
+
     test('Returns status 401 when the user is not authorized', async () => {
       const expectedStatus = 401;
       const correctID = 'Pq1T9vc23Q';
@@ -308,6 +331,26 @@ describe('Note API', () => {
     });
 
     test.todo('Update note by public id with 200 status, user is creator of the note');
+  });
+
+  describe('POST /note', () => {
+    test('Post a new note', async () => {
+      const expectedStatus = 200;
+      const userId = 2;
+      const accessToken = global.auth(userId);
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note`,
+        body: {
+        },
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+    });
   });
 
   test.todo('Create note with parentId field');
