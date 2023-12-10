@@ -1,18 +1,12 @@
 import { describe, test, expect } from 'vitest';
 
 
-describe('user API', () => {
+describe('User API', () => {
   describe('GET /user/myself', () => {
-    test('returns user with status code 200 if user exists', async () => {
-      const expectedStatus = 200;
+    test('Returns user with status code 200 if user exists', async () => {
       const userId = 1;
       const accessToken = global.auth(userId);
-      const expectedUser =   {
-        'id': '1',
-        'email': 'a@a.com',
-        'name': 'Test user 1',
-        'photo': '',
-      };
+
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
@@ -21,26 +15,29 @@ describe('user API', () => {
         url: '/user/myself',
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
       const body = response?.json();
 
-      expect(body).toStrictEqual(expectedUser);
+      expect(body).toStrictEqual({
+        'id': '1',
+        'email': 'a@a.com',
+        'name': 'Test user 1',
+        'photo': '',
+      });
     });
-    test('returns you must be authorized response if user is not authorized', async () => {
-      const expextedResponse = 'You must be authenticated to access this resource';
-      const expectedStatus = 401;
 
+    test('Returns response with status 401 when user is not authorized', async () => {
       const response = await global.api?.fakeRequest({
         method: 'GET',
         url: '/user/myself',
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(401);
 
       const body = response?.json();
 
-      expect(body.message).toStrictEqual(expextedResponse);
+      expect(body.message).toBe('You must be authenticated to access this resource');
     });
   });
 });
