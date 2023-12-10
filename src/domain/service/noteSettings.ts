@@ -115,7 +115,7 @@ export default class NoteSettingsService {
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByNoteId(noteId);
 
     /**
-     * Generates new invitation hash
+     * Generates a new invitation hash
      */
     const data = { invitationHash: createInvitationHash() };
 
