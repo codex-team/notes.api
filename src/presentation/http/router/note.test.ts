@@ -277,6 +277,31 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(expectedStatus);
     });
 
+    test('Update note by public id with 200 status, user is creator of the note, parentId passed', async () => {
+      const expectedStatus = 200;
+      const userId = 2;
+      const accessToken = global.auth(userId);
+
+      const userNote = notes.find(newNote => {
+        return newNote.creator_id === userId;
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${userNote!.public_id}?parentId=Hu8Gsm0sA1`,
+        body: {
+          'content': { new: 'content added' },
+        },
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json().parentNote).toBe(true);
+    });
+
     test('Returns status 401 when the user is not authorized', async () => {
       const expectedStatus = 401;
       const correctID = 'Pq1T9vc23Q';
@@ -329,27 +354,27 @@ describe('Note API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
-
-    test.todo('Update note by public id with 200 status, user is creator of the note');
   });
 
   describe('POST /note', () => {
     test('Post a new note', async () => {
       const expectedStatus = 200;
-      const userId = 2;
-      const accessToken = global.auth(userId);
+      const accessToken = global.auth(2);
+      const parentId = 'Hu8Gsm0sA1';
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note`,
+        url: `/note?parentId=${parentId}`,
         body: {
         },
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json().parentNote).toBe(true);
     });
   });
 

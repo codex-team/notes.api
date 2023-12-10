@@ -40,7 +40,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   const noteService = opts.noteService;
   const noteSettingsService = opts.noteSettingsService;
-  const noteRelationshipService = opts.noteRelationshipService;
 
   /**
    * Prepare note id resolver middleware
@@ -145,14 +144,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Responses with note public id.
    */
   fastify.post<{
-    Params: {
+    Query: {
       parentId?: NotePublicId,
     },
     Body: {
       content: JSON;
     },
     Reply: {
-      id: NotePublicId
+      id: NotePublicId,
+      parentNote?: boolean
     },
   }>('/', {
     config: {
@@ -166,6 +166,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const content = request.body.content as JSON;
     const { userId } = request;
+    let resp = false;
+
+    const parentNote = request.query;
+
+    if (parentNote !== undefined) {
+      resp = true;
+    }
 
     const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
 
@@ -176,6 +183,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     return reply.send({
       id: addedNote.publicId,
+      parentNote: resp,
     });
   });
 
@@ -183,15 +191,18 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Updates note by id.
    */
   fastify.patch<{
+    Query: {
+      parentId?: NotePublicId,
+    },
     Params: {
       notePublicId: NotePublicId,
-      parentId?: NotePublicId,
     },
     Body: {
       content: JSON;
     },
     Reply: {
       updatedAt: Note['updatedAt'],
+      parentNote: boolean
     }
   }>('/:notePublicId', {
     schema: {
@@ -218,18 +229,19 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content as JSON;
-    const parentPublicId = request.params.parentId;
+    let res = false;
+
+    const parentPublicId = request.query;
+
+    if (parentPublicId !== undefined) {
+      res = true;
+    }
 
     const note = await noteService.updateNoteContentById(noteId, content);
 
-    if (parentPublicId !== undefined) {
-      const parentId = (await noteService.getNoteByPublicId(parentPublicId)).id;
-
-      await noteRelationshipService.addNoteRelation(note.id, parentId);
-    }
-
     return reply.send({
       updatedAt: note.updatedAt,
+      parentNote: res,
     });
   });
 
