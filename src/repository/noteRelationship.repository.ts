@@ -28,4 +28,13 @@ export default class NoteRelationshipRepository {
   public async addNoteRelation(noteId: NoteInternalId, parentId: NoteInternalId): Promise<boolean> {
     return await this.storage.createNoteRelation(noteId, parentId);
   }
+
+  /**
+   * Get parent note id by note id
+   *
+   * @param noteId - id of the current note
+   */
+  public async getParentNoteIdById(noteId: NoteInternalId): Promise<number | null> {
+    return await this.storage.getParentNoteIdById(noteId);
+  }
 }

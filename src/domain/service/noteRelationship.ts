@@ -35,4 +35,13 @@ export default class NoteRelationshipService {
       parentId
     );
   }
+
+  /**
+   * Get parent note id by note id
+   *
+   * @param noteId - id of the current note
+   */
+  public async getParentNoteIdById(noteId: Note['id']): Promise<number | null> {
+    return await this.repository.getParentNoteIdById(noteId);
+  }
 }

@@ -109,6 +109,23 @@ export default class NoteRelationshipSequelizeStorage {
   }
 
   /**
+   * Gets parent note id by note id
+   *
+   * @param parentId - parent note id
+   * @returns { Promise<Note | null> } found note
+   */
+  public async getParentNoteIdById(parentId: NoteInternalId): Promise<number | null> {
+    const finded = await this.model.findOne({
+      where: {
+        parentId,
+      },
+    });
+    const parentNoteId = finded?.parentId;
+
+    return parentNoteId !== undefined ? parentNoteId : null;
+  };
+
+  /**
    * Creates association with note model to make joins
    *
    * @param model - initialized note model

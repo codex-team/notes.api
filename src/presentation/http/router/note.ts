@@ -69,7 +69,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId: NotePublicId;
     },
     Reply: {
-      note : Note
+      note : Note,
+      parentNote?: Note,
       accessRights: { canEdit: boolean },
     } | ErrorResponse,
   }>('/:notePublicId', {
@@ -99,6 +100,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return reply.notFound('Note not found');
     }
 
+    const parentId = await noteRelationspipService.getParentNoteIdById(note.id);
+
+    const parentNote = parentId !== null ? await noteService.getNoteById(parentId) : undefined;
     /**
      * Check if current user is creator of the note
      */
@@ -106,6 +110,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     return reply.send({
       note: note,
+      parentNote: parentNote,
       accessRights: { canEdit: canEdit },
     });
   });
