@@ -202,7 +202,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
 
-    const updatedNoteSettings = await noteSettingsService.patchNoteSettingsInvitationHash(noteId);
+    const updatedNoteSettings = await noteSettingsService.regenerateInvitationHash(noteId);
 
     if (updatedNoteSettings === null) {
       return reply.notFound('Note settings not found');
