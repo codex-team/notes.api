@@ -99,11 +99,13 @@ export default class NoteRelationshipSequelizeStorage {
    * @param noteId - id of the current note
    * @param parentId - id of the parent note
    */
-  public async createNoteRelation(noteId: NoteInternalId, parentId: NoteInternalId): Promise<void> {
-    await this.model.create({
+  public async createNoteRelation(noteId: NoteInternalId, parentId: NoteInternalId): Promise<boolean> {
+    const entryId = await this.model.create({
       noteId,
       parentId,
     });
+
+    return entryId.id !== undefined;
   }
 
   /**
