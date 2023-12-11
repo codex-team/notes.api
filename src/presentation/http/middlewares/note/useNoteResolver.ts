@@ -69,7 +69,7 @@ export default function useNoteResolver(noteService: NoteService): {
 
         if (note) {
           request.note = note;
-        } else {
+        } else if (notEmpty(request.query)) {
           throw new Error('Note not found');
         }
       } catch (error) {

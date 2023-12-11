@@ -357,7 +357,7 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    test('Post a new note', async () => {
+    test('Post a new note with 200 status when the existing parentId passed', async () => {
       const expectedStatus = 200;
       const accessToken = global.auth(2);
       const parentId = 'Hu8Gsm0sA1';
@@ -367,7 +367,7 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note?parentId=${parentId}`,
+        url: `/note/?parentId=${parentId}`,
         body: {
         },
       });
@@ -376,9 +376,27 @@ describe('Note API', () => {
 
       expect(response?.json().hasParentNote).toBe(true);
     });
-  });
 
-  test.todo('Create note with parentId field');
+    test('Returns 406 when the nonexistent parentId passed', async () => {
+      const expectedStatus = 406;
+      const accessToken = global.auth(2);
+      const nonexistentId = 'ishvm5qH84';
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/?parentId=${nonexistentId}`,
+        body: {
+        },
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+    });
+
+    test.todo('Returns 400 when parentId has incorrect characters and lenght');
+  });
 
   test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 });
