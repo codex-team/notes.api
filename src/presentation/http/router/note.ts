@@ -232,16 +232,20 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     preHandler: [
       noteResolver,
+      parentNoteResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content as JSON;
+    const parentInternalId = request.parentNote?.id;
 
     const note = await noteService.updateNoteContentById(noteId, content);
 
+    const hasParentNote = await noteRelationspipService.addNoteRelation(noteId, parentInternalId);
+
     return reply.send({
       updatedAt: note.updatedAt,
-      hasParentNote: true,
+      hasParentNote: hasParentNote,
     });
   });
 

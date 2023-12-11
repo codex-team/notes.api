@@ -332,6 +332,30 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
 
+    test('Returns status 406 when the parent public id does not exist, but the public id of current note exist', async () => {
+      const expectedStatus = 406;
+      const nonexistentParentId = 'ishvm5qH84';
+      const userId = 2;
+      const accessToken = global.auth(userId);
+
+      const userNote = notes.find(newNote => {
+        return newNote.creator_id === userId;
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${userNote!.public_id}?parentId=${nonexistentParentId}`,
+        body: {},
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+    });
+
     test.each([
       { id: 'mVz3iHuez',
         expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
@@ -354,6 +378,8 @@ describe('Note API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
+
+    test.todo('Returns 400 when parentId has incorrect characters and lenght');
   });
 
   describe('POST /note', () => {
