@@ -111,8 +111,7 @@ export default class NoteSettingsService {
    * @param noteId - note internal id
    * @returns updated note settings
    */
-  public async patchNoteSettingsInvitationHash(noteId: NoteInternalId): Promise<NoteSettings | null> {
-
+  public async regenerateInvitationHash(noteId: NoteInternalId): Promise<NoteSettings | null> {
     /**
      * Generates a new invitation hash
      */
