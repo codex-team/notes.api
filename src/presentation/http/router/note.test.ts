@@ -299,7 +299,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      expect(response?.json().parentNote).toBe(true);
+      expect(response?.json().hasParentNote).toBe(true);
     });
 
     test('Returns status 401 when the user is not authorized', async () => {

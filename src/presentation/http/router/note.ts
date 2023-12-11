@@ -6,6 +6,7 @@ import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type NoteRelationshipService from '@domain/service/noteRelationship.js';
+import useParentNoteResolver from '../middlewares/note/useParentNoteResolver.js';
 
 /**
  * Interface for the note router.
@@ -53,6 +54,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * It should be used to use note settings in middlewares
    */
   const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
+
+  /**
+   * Prepare parent note resolver middleware
+   * It should be used to use parent note in middlewares
+   */
+  const { parentNoteResolver } = useParentNoteResolver(noteService);
 
   /**
    * Get note by id
@@ -162,7 +169,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       ],
     },
     preHandler: [
-      noteResolver,
+      parentNoteResolver,
     ],
   }, async (request, reply) => {
     /**
@@ -170,7 +177,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const content = request.body.content as JSON;
     const { userId } = request;
-    const parentInternalId = request.note?.id;
+    const parentInternalId = request.parentNote?.id;
 
     const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
 
@@ -191,7 +198,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Updates note by id.
    */
   fastify.patch<{
-    Query: {
+    Querystring: {
       parentId?: NotePublicId,
     },
     Params: {
@@ -202,7 +209,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Reply: {
       updatedAt: Note['updatedAt'],
-      parentNote: boolean
+      hasParentNote: boolean
     }
   }>('/:notePublicId', {
     schema: {
@@ -229,19 +236,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content as JSON;
-    let res = false;
-
-    const parentPublicId = request.query;
-
-    if (parentPublicId !== undefined) {
-      res = true;
-    }
 
     const note = await noteService.updateNoteContentById(noteId, content);
 
     return reply.send({
       updatedAt: note.updatedAt,
-      parentNote: res,
+      hasParentNote: true,
     });
   });
 
