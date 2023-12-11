@@ -202,10 +202,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
 
-    /**
-     * TODO: check is user collaborator
-     */
-
     const updatedNoteSettings = await noteSettingsService.patchNoteSettingsInvitationHash(noteId);
 
     if (updatedNoteSettings === null) {

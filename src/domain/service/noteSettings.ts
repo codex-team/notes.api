@@ -112,13 +112,12 @@ export default class NoteSettingsService {
    * @returns updated note settings
    */
   public async patchNoteSettingsInvitationHash(noteId: NoteInternalId): Promise<NoteSettings | null> {
-    const noteSettings = await this.noteSettingsRepository.getNoteSettingsByNoteId(noteId);
 
     /**
      * Generates a new invitation hash
      */
     const data = { invitationHash: createInvitationHash() };
 
-    return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
+    return await this.patchNoteSettingsByNoteId(noteId, data);
   }
 }
