@@ -29,9 +29,20 @@ export default function useNoteResolver(noteService: NoteService): {
    *
    * @param requestData - fastify request data. Can be query, params or body
    */
-  async function resolveNoteByPublicId(requestData: FastifyRequest['query'] | FastifyRequest['params'] | FastifyRequest['body']): Promise<Note | undefined> {
-    if (hasProperty(requestData, 'notePublicId') && notEmpty(requestData.notePublicId)) {
-      const publicId = requestData.notePublicId as NotePublicId;
+  async function resolveNoteByPublicId(requestData: FastifyRequest): Promise<Note | undefined> {
+    /**
+     * Request params validation
+     */
+    if (hasProperty(requestData.params, 'notePublicId') && notEmpty(requestData.params.notePublicId)) {
+      const publicId = requestData.params.notePublicId as NotePublicId;
+
+      return await noteService.getNoteByPublicId(publicId);
+    }
+    /**
+     * Query params validation
+     */
+    if (hasProperty(requestData.query, 'parentId') && notEmpty(requestData.query.parentId)) {
+      const publicId = requestData.query.parentId as NotePublicId;
 
       return await noteService.getNoteByPublicId(publicId);
     }
@@ -54,7 +65,7 @@ export default function useNoteResolver(noteService: NoteService): {
          * All methods (GET, POST, PATCH, etc) could have note public id just in route params,
          * so we don't check for query and body at the moment
          */
-        note = await resolveNoteByPublicId(request.params);
+        note = await resolveNoteByPublicId(request);
 
         if (note) {
           request.note = note;

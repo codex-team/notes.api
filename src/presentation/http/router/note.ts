@@ -145,7 +145,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Responses with note public id.
    */
   fastify.post<{
-    Query: {
+    Querystring: {
       parentId?: NotePublicId,
     },
     Body: {
@@ -153,7 +153,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Reply: {
       id: NotePublicId,
-      parentNote: boolean
+      hasParentNote: boolean
     },
   }>('/', {
     config: {
@@ -161,16 +161,20 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         'authRequired',
       ],
     },
+    preHandler: [
+      noteResolver,
+    ],
   }, async (request, reply) => {
     /**
-     * TODO: Validate request query
+     * @todo Validate request query
      */
     const content = request.body.content as JSON;
     const { userId } = request;
+    const parentInternalId = request.note?.id;
 
     const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
 
-    const res = await noteRelationspipService.addNoteRelation(1, 1);
+    const hasParentNote = await noteRelationspipService.addNoteRelation(addedNote.id, parentInternalId);
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
@@ -179,7 +183,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     return reply.send({
       id: addedNote.publicId,
-      parentNote: res,
+      hasParentNote: hasParentNote,
     });
   });
 

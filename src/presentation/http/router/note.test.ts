@@ -374,7 +374,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(expectedStatus);
 
-      expect(response?.json().parentNote).toBe(true);
+      expect(response?.json().hasParentNote).toBe(true);
     });
   });
 
