@@ -28,6 +28,11 @@ export class NoteSettingsModel extends Model<InferAttributes<NoteSettingsModel>,
    * Is note public
    */
   public declare isPublic: CreationOptional<NoteSettings['isPublic']>;
+
+  /**
+   * Invitation hash
+   */
+  public declare invitationHash: NoteSettings['invitationHash'];
 }
 
 /**
@@ -87,6 +92,10 @@ export default class NoteSettingsSequelizeStorage {
         type: DataTypes.BOOLEAN,
         allowNull: false,
         defaultValue: true,
+      },
+      invitationHash: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
     }, {
       tableName: this.tableName,
@@ -169,12 +178,14 @@ export default class NoteSettingsSequelizeStorage {
     noteId,
     customHostname,
     isPublic,
+    invitationHash,
   }: NoteSettingsCreationAttributes
   ): Promise<NoteSettings> {
     const settings = await this.model.create({
       noteId,
       customHostname,
       isPublic,
+      invitationHash,
     });
 
     return settings;

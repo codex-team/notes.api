@@ -3,27 +3,31 @@
     "id": 1,
     "note_id": 1,
     "custom_hostname": "codex.so",
-    "is_public": true
+    "is_public": true,
+    "invitation_hash": "Hzh2hy4igf"
   },
 
   {
     "id": 2,
     "note_id": 2,
     "custom_hostname": "codex.so",
-    "is_public": true
+    "is_public": true,
+    "invitation_hash": "E2zRXv3cp-"
   },
 
   {
     "id": 3,
     "note_id": 3,
     "custom_hostname": "codex.so",
-    "is_public": false
+    "is_public": false,
+    "invitation_hash": "Lw5kIwwo4_"
   },
 
   {
     "id": 53,
     "note_id": 53,
     "custom_hostname": "codex.so",
-    "is_public": true
+    "is_public": true,
+    "invitation_hash": "FfAwyaR80C"
   }
 ]
