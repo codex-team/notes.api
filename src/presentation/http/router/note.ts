@@ -116,7 +116,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     let notePublicSettings:NoteSettingsPublic |null;
 
-    if (request.noteSettings) {
+    if (request.noteSettings && !request.noteSettings.isPublic) {
       notePublicSettings = {
         isPublic: request.noteSettings.isPublic,
         customHostname: request.noteSettings.customHostname,
@@ -265,7 +265,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Reply: {
       note : NotePublic,
-      noteSettings: NoteSettingsPublic
       accessRights: { canEdit: boolean },
     } | ErrorResponse,
   }>('/resolve-hostname/:hostname', async (request, reply) => {
@@ -276,12 +275,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     if (note === null || note === undefined) {
       return reply.notFound('Note not found');
     }
-    const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(note.id);
-
-    const noteSettingsPublic:NoteSettingsPublic = {
-      isPublic: noteSettings.isPublic,
-      customHostname: noteSettings.customHostname,
-    };
 
     /**
      * Check if note does not exist
@@ -297,7 +290,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     return reply.send({
       note: notePublic,
-      noteSettings: noteSettingsPublic,
       accessRights: { canEdit: canEdit },
     });
   });

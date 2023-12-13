@@ -19,10 +19,6 @@ describe('Note API', () => {
         'accessRights': {
           'canEdit': false,
         },
-        'noteSettings':  {
-          'customHostname': 'codex.so',
-          'isPublic': true,
-        },
       };
 
       const response = await global.api?.fakeRequest({
@@ -61,13 +57,11 @@ describe('Note API', () => {
           'createdAt': '2023-10-16T13:49:19.000Z',
           'updatedAt': '2023-10-16T13:49:19.000Z',
         },
+        'noteSettings': null,
         'accessRights': {
           'canEdit': false,
         },
-        'noteSettings':  {
-          'customHostname': 'codex.so',
-          'isPublic': true,
-        },
+
       };
 
       const response = await global.api?.fakeRequest({
