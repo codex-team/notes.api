@@ -4,6 +4,7 @@ import type NoteSettingsRepository from '@repository/noteSettings.repository.js'
 import type TeamRepository from '@repository/team.repository.js';
 import type { MemberRole, Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
+import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 
 /**
  * Service responsible for Note Settings
@@ -47,6 +48,7 @@ export default class NoteSettingsService {
     return await this.noteSettingsRepository.addNoteSettings({
       noteId: noteId,
       isPublic: isPublic,
+      invitationHash: createInvitationHash(),
     });
   }
 

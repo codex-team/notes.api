@@ -116,6 +116,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     let notePublicSettings:NoteSettingsPublic |null;
 
+    /**
+     * If note is not public
+     */
     if (request.noteSettings && !request.noteSettings.isPublic) {
       notePublicSettings = {
         isPublic: request.noteSettings.isPublic,
