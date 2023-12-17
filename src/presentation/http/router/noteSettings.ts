@@ -181,7 +181,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: InvitationHash,
+    Reply: {
+      invitationHash: InvitationHash;
+    },
   }>('/:notePublicId/invitation-hash', {
     config: {
       policy: [
@@ -195,6 +197,17 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      response: {
+        '2xx': {
+          type: 'object',
+          description: 'New invitation hash',
+          properties: {
+            invitationHash: {
+              $ref: 'NoteSettingsSchema#/properties/invitationHash',
+            },
+          },
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -204,11 +217,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const updatedNoteSettings = await noteSettingsService.regenerateInvitationHash(noteId);
 
-    if (updatedNoteSettings === null) {
-      return reply.notFound('Note settings not found');
-    }
-
-    return reply.send(updatedNoteSettings.invitationHash);
+    return reply.send({
+      invitationHash: updatedNoteSettings.invitationHash,
+    });
   });
 
   done();

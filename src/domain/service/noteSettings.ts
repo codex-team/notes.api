@@ -59,10 +59,16 @@ export default class NoteSettingsService {
    * @param data - note settings data with new values
    * @returns updated note settings
    */
-  public async patchNoteSettingsByNoteId(noteId: NoteInternalId, data: Partial<NoteSettings>): Promise<NoteSettings | null> {
+  public async patchNoteSettingsByNoteId(noteId: NoteInternalId, data: Partial<NoteSettings>): Promise<NoteSettings> {
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByNoteId(noteId);
 
-    return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
+    const updatedNoteSettings = await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
+
+    if (updatedNoteSettings === null) {
+      throw new Error(`Note settings with id ${noteSettings.id} was not updated`);
+    }
+
+    return updatedNoteSettings;
   }
 
   /**
@@ -111,7 +117,7 @@ export default class NoteSettingsService {
    * @param noteId - note internal id
    * @returns updated note settings
    */
-  public async regenerateInvitationHash(noteId: NoteInternalId): Promise<NoteSettings | null> {
+  public async regenerateInvitationHash(noteId: NoteInternalId): Promise<NoteSettings> {
     /**
      * Generates a new invitation hash
      */
