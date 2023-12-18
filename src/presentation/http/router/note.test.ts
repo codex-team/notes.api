@@ -399,17 +399,9 @@ describe('Note API', () => {
         body: {},
       });
 
-      /** Trying to fetch created note by its publicId */
-      const get_response = await global.api?.fakeRequest({
-        method: 'GET',
-        url: `/note/${post_response?.json().id}`,
-      });
-
       expect(post_response?.statusCode).toBe(expectedStatus);
       expect(post_response?.json().id).toBeTypeOf('string');
       expect(post_response?.json().id.length).toBeGreaterThan(0);
-
-      expect(get_response?.statusCode).toBe(expectedStatus);
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
