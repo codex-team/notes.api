@@ -1,10 +1,6 @@
 import { describe, test, expect } from 'vitest';
 
-import notes from '@tests/test-data/notes.json';
-import noteSettings from '@tests/test-data/notes-settings.json';
-
 describe('Note API', () => {
-
 
   describe('POST /note', () => {
 
