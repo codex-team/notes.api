@@ -284,7 +284,6 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/invitation-hash ', () => {
     test('Returns status 401 when the user is not authorized', async () => {
-      const expectedStatus = 401;
       const correctID = 'Pq1T9vc23Q';
 
       const response = await global.api?.fakeRequest({
@@ -292,16 +291,14 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${correctID}/invitation-hash`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(401);
 
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
     test('Generate invitation hash by public id with 200 status, user is creator of the note', async () => {
-      const expectedStatus = 200;
       const userId = 2;
       const accessToken = global.auth(userId);
-      const oldInvitationHash = 'FfAwyaR80C';
 
       const userNote = notes.find(newNote => {
         return newNote.creator_id === userId;
@@ -315,15 +312,14 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${userNote!.public_id}/invitation-hash`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
-      expect(response?.json().invitationHash).not.toEqual(oldInvitationHash);
+      expect(response?.json().invitationHash).not.toEqual('FfAwyaR80C');
 
       expect(response?.json().invitationHash).toHaveLength(10);
     });
 
     test('Returns status 406 when the public id does not exist', async () => {
-      const expectedStatus = 406;
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
@@ -331,7 +327,7 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${nonexistentId}/invitation-hash`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(406);
 
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
@@ -347,14 +343,12 @@ describe('NoteSettings API', () => {
         expectedMessage: '\'/note-settings/+=*&*5%&&^&-/invitation-hash\' is not a valid url component' },
     ])
     ('Returns 400 when public id of the note has incorrect characters and length', async ({ id, expectedMessage }) => {
-      const expectedStatus = 400;
-
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         url: `/note-settings/${id}/invitation-hash`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
