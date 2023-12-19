@@ -128,6 +128,20 @@ export default class NoteSettingsSequelizeStorage {
   }
 
   /**
+   * Get note settings by invitation hash
+   *
+   * @param invitationHash - hash for inviting to the note team
+   * @returns { Promise<NoteSettings | null> } - found note settings
+   */
+  public async getNoteSettingsByInvitationHash(invitationHash: NoteSettings['invitationHash']): Promise<NoteSettings | null> {
+    return await this.model.findOne({
+      where: {
+        invitationHash,
+      },
+    });
+  }
+
+  /**
    * Get note settings
    *
    * @param noteId - note id

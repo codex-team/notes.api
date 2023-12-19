@@ -153,6 +153,22 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
+   * Get team by user id and note id
+   *
+   * @param userId - team member id
+   * @param noteId - note id
+   * @returns { Promise<TeamMember | null> } found team relation
+   */
+  public async getTeamByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<TeamMember | null> {
+    return await this.model.findOne({
+      where: {
+        noteId,
+        userId,
+      },
+    });
+  }
+
+  /**
    * Get user role by user id and note id
    * If user is not a member of note, return null
    *

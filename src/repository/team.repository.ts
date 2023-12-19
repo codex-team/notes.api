@@ -32,6 +32,17 @@ export default class TeamRepository {
   }
 
   /**
+   * Get team by user id and note id
+   *
+   * @param userId - team member id
+   * @param noteId - note id
+   * @returns { Promise<TeamMember | null> } found team relation
+   */
+  public async getTeamByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<TeamMember | null> {
+    return await this.storage.getTeamByUserIdAndNoteId(userId, noteId);
+  }
+
+  /**
    * Get user role in note by user id and note id
    * If user is not a member of note, return null
    *

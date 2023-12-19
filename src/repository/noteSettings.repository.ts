@@ -32,6 +32,16 @@ export default class NoteSettingsRepository {
   }
 
   /**
+   * Get note settings by invitation hash
+   *
+   * @param invitationHash - hash for inviting to the note team
+   * @returns { Promise<NoteSettings | null> } - found note settings
+   */
+  public async getNoteSettingsByInvitationHash(invitationHash: NoteSettings['invitationHash']): Promise<NoteSettings | null> {
+    return await this.storage.getNoteSettingsByInvitationHash(invitationHash);
+  }
+
+  /**
    * Get note settings by note id
    *
    * @param id - note id

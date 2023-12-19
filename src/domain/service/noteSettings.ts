@@ -1,8 +1,10 @@
 import type { NoteInternalId } from '@domain/entities/note.js';
+import type { InvitationHash } from '@domain/entities/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsRepository from '@repository/noteSettings.repository.js';
 import type TeamRepository from '@repository/team.repository.js';
-import type { MemberRole, Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
+import type { Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
+import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 
@@ -26,6 +28,39 @@ export default class NoteSettingsService {
   constructor(noteSettingsrepository: NoteSettingsRepository, teamRepository: TeamRepository) {
     this.noteSettingsRepository = noteSettingsrepository;
     this.teamRepository = teamRepository;
+  }
+
+  /**
+   * Add user to the team by invitation hash
+   *
+   * @param invitationHash - hash for joining to the team
+   * @param userId - user to add
+   */
+  public async addUserToTeamByInvitationHash(invitationHash: InvitationHash, userId: User['id']): Promise<TeamMember | null> {
+    const defaultUserRole = MemberRole.read;
+    const noteSettings = await this.noteSettingsRepository.getNoteSettingsByInvitationHash(invitationHash);
+
+    /**
+     * Check does invitation hash is valid
+     */
+    if (noteSettings === null) {
+      throw new Error(`Note with invitation ${invitationHash} does not exists`);
+    }
+
+    /**
+     * Check if user not already in team
+     */
+    const team = await this.teamRepository.getTeamByUserIdAndNoteId(userId, noteSettings.noteId);
+
+    if (team !== null) {
+      throw new Error(`Team with user ${team.userId} and note ${team.noteId} already exists`);
+    }
+
+    return await this.teamRepository.create({
+      noteId: noteSettings.noteId,
+      userId,
+      role: defaultUserRole,
+    });
   }
 
   /**
