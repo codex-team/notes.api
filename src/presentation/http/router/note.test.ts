@@ -386,35 +386,15 @@ describe('Note API', () => {
     test('Post a new note with 200 status when the existing parentId passed', async () => {
       const expectedStatus = 200;
       const accessToken = global.auth(2);
-      const parentId = 'Hu8Gsm0sA1';
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/?parentId=${parentId}`,
+        url: `/note`,
         body: {
-        },
-      });
-
-      expect(response?.statusCode).toBe(expectedStatus);
-
-      expect(response?.json().hasParentNote).toBe(true);
-    });
-
-    test('Returns 406 when the nonexistent parentId passed', async () => {
-      const expectedStatus = 406;
-      const accessToken = global.auth(2);
-      const nonexistentId = 'ishvm5qH84';
-
-      const response = await global.api?.fakeRequest({
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/?parentId=${nonexistentId}`,
-        body: {
+          parentId: 'Hu8Gsm0sA1',
         },
       });
 

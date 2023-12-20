@@ -1,6 +1,7 @@
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
+import type NoteRelationshipService from './noteRelationship';
 
 /**
  * Note service
@@ -11,13 +12,17 @@ export default class NoteService {
    */
   public repository: NoteRepository;
 
+  public noteRelationService: NoteRelationshipService;
+
   /**
    * Note service constructor
    *
    * @param repository - note repository
+   * @param noteRelationService - note relationship service
    */
-  constructor(repository: NoteRepository) {
+  constructor(repository: NoteRepository, noteRelationService: NoteRelationshipService) {
     this.repository = repository;
+    this.noteRelationService = noteRelationService;
   }
 
   /**
@@ -25,14 +30,25 @@ export default class NoteService {
    *
    * @param content - note content
    * @param creatorId - note creator
+   * @param parentPublicId - parent note if exist
    * @returns { Note } added note object
    */
-  public async addNote(content: JSON, creatorId: Note['creatorId']): Promise<Note> {
-    return await this.repository.addNote({
+  public async addNote(content: JSON, creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
+    const note = await this.repository.addNote({
       publicId: createPublicId(),
       content,
       creatorId,
     });
+
+    if (parentPublicId !== undefined) {
+      const parentNote = await this.getNoteByPublicId(parentPublicId);
+
+      if (parentNote !== null) {
+        await this.noteRelationService.addNoteRelation(note.id, parentNote.id);
+      }
+    }
+
+    return note;
   }
 
   /**
