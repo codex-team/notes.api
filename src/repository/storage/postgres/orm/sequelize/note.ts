@@ -231,6 +231,7 @@ export default class NoteSequelizeStorage {
         model: this.settingsModel,
         as: 'noteSettings',
         required: true,
+        attributes: [],
       },
     });
   }
