@@ -277,31 +277,6 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(expectedStatus);
     });
 
-    test('Update note by public id with 200 status, user is creator of the note, parentId passed', async () => {
-      const expectedStatus = 200;
-      const userId = 2;
-      const accessToken = global.auth(userId);
-
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
-      });
-
-      const response = await global.api?.fakeRequest({
-        method: 'PATCH',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/${userNote!.public_id}?parentId=Hu8Gsm0sA1`,
-        body: {
-          'content': { new: 'content added' },
-        },
-      });
-
-      expect(response?.statusCode).toBe(expectedStatus);
-
-      expect(response?.json().hasParentNote).toBe(true);
-    });
-
     test('Returns status 401 when the user is not authorized', async () => {
       const expectedStatus = 401;
       const correctID = 'Pq1T9vc23Q';
@@ -324,30 +299,6 @@ describe('Note API', () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         url: `/note/${nonexistentId}`,
-        body: {},
-      });
-
-      expect(response?.statusCode).toBe(expectedStatus);
-
-      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
-    });
-
-    test('Returns status 406 when the parent public id does not exist, but the public id of current note exist', async () => {
-      const expectedStatus = 406;
-      const nonexistentParentId = 'ishvm5qH84';
-      const userId = 2;
-      const accessToken = global.auth(userId);
-
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
-      });
-
-      const response = await global.api?.fakeRequest({
-        method: 'PATCH',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/${userNote!.public_id}?parentId=${nonexistentParentId}`,
         body: {},
       });
 

@@ -6,7 +6,6 @@ import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type NoteRelationshipService from '@domain/service/noteRelationship.js';
-import useParentNoteResolver from '../middlewares/note/useParentNoteResolver.js';
 
 /**
  * Interface for the note router.
@@ -54,12 +53,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * It should be used to use note settings in middlewares
    */
   const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
-
-  /**
-   * Prepare parent note resolver middleware
-   * It should be used to use parent note in middlewares
-   */
-  const { parentNoteResolver } = useParentNoteResolver(noteService);
 
   /**
    * Get note by id
@@ -194,18 +187,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Updates note by id.
    */
   fastify.patch<{
-    Querystring: {
-      parentId?: NotePublicId,
-    },
     Params: {
       notePublicId: NotePublicId,
     },
     Body: {
       content: JSON;
+      parentId?: NotePublicId;
     },
     Reply: {
       updatedAt: Note['updatedAt'],
-      hasParentNote: boolean
     }
   }>('/:notePublicId', {
     schema: {
@@ -228,20 +218,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     preHandler: [
       noteResolver,
-      parentNoteResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content as JSON;
-    const parentInternalId = request.parentNote?.id;
 
     const note = await noteService.updateNoteContentById(noteId, content);
 
-    const hasParentNote = await noteRelationspipService.addNoteRelation(noteId, parentInternalId);
-
     return reply.send({
       updatedAt: note.updatedAt,
-      hasParentNote: hasParentNote,
     });
   });
 
