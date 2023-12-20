@@ -93,7 +93,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return reply.notFound('Note not found');
     }
 
-    const parentId = await noteRelationspipService.getParentNoteIdById(note.id);
+    const parentId = await noteRelationspipService.getParentNoteByNoteId(note.id);
 
     const parentNote = parentId !== null ? await noteService.getNoteById(parentId) : undefined;
     /**

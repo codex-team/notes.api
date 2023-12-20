@@ -90,10 +90,6 @@ export default class NoteRelationshipSequelizeStorage {
   }
 
   /**
-   * @todo create a functions for add note relation, update note relation and return parent note
-   */
-
-  /**
    * Insert note relation to database
    *
    * @param noteId - id of the current note
@@ -114,7 +110,7 @@ export default class NoteRelationshipSequelizeStorage {
    * @param parentId - parent note id
    * @returns { Promise<Note | null> } found note
    */
-  public async getParentNoteIdById(parentId: NoteInternalId): Promise<number | null> {
+  public async getParentNoteByNoteId(parentId: NoteInternalId): Promise<number | null> {
     const finded = await this.model.findOne({
       where: {
         parentId,
