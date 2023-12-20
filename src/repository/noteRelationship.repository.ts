@@ -30,6 +30,16 @@ export default class NoteRelationshipRepository {
   }
 
   /**
+   * Add note relation
+   *
+   * @param noteId - id of the current note
+   * @param parentId - id of the parent note
+   */
+  public async updateNoteRelationById(noteId: NoteInternalId, parentId: NoteInternalId): Promise<boolean> {
+    return await this.storage.updateNoteRelationById(noteId, parentId);
+  }
+
+  /**
    * Get parent note id by note id
    *
    * @param noteId - id of the current note

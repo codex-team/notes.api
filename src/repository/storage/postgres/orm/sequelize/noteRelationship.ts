@@ -126,6 +126,26 @@ export default class NoteRelationshipSequelizeStorage {
   };
 
   /**
+   * Update note content by id
+   *
+   * @param noteId - id of the current note
+   * @param parentId - parent note id
+   * @returns Note on success, null on failure
+   */
+  public async updateNoteRelationById(noteId: NoteInternalId, parentId: NoteInternalId): Promise<boolean> {
+    const [ affectedRowsCount ] = await this.model.update({
+      parentId,
+    }, {
+      where: {
+        noteId,
+      },
+      returning: true,
+    });
+
+    return affectedRowsCount === 1;
+  }
+
+  /**
    * Creates association with note model to make joins
    *
    * @param model - initialized note model

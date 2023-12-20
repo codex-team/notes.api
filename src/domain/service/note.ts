@@ -65,12 +65,21 @@ export default class NoteService {
    *
    * @param id - note internal id
    * @param content - new content
+   * @param parentPublicId - parent note if exist
    */
-  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note> {
+  public async updateNoteContentById(id: NoteInternalId, content: Note['content'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
     const updatedNote = await this.repository.updateNoteContentById(id, content);
 
     if (updatedNote === null) {
       throw new Error(`Note with id ${id} was not updated`);
+    }
+
+    if (parentPublicId !== undefined) {
+      const parentNote = await this.getNoteByPublicId(parentPublicId);
+
+      if (parentNote !== null) {
+        await this.noteRelationService.updateNoteRelationById(updatedNote.id, parentNote.id);
+      }
     }
 
     return updatedNote;
