@@ -7,7 +7,6 @@ import type { AppConfig } from '@infrastructure/config/index.js';
 import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
-import NoteRelationshipService from './service/noteRelationship.js';
 
 /**
  * Interface for initiated services
@@ -27,11 +26,6 @@ export interface DomainServices {
    * Note settings service instance
    */
   noteSettingsService: NoteSettingsService,
-
-  /**
-   * Note relationship service instance
-   */
-  noteRelationshipService: NoteRelationshipService,
 
   /**
    * Auth service instance
@@ -59,8 +53,8 @@ export interface DomainServices {
 export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
   const noteService = new NoteService(repositories.noteRepository);
   const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository);
+
   const noteListService = new NoteListService(repositories.noteRepository);
-  const noteRelationshipService = new NoteRelationshipService(repositories.noteRelationshipRepository);
 
   const authService = new AuthService(
     appConfig.auth.accessSecret,
@@ -82,7 +76,6 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     noteService,
     noteListService,
     noteSettingsService,
-    noteRelationshipService,
     userService,
     authService,
     aiService,

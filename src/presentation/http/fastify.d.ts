@@ -62,11 +62,6 @@ declare module 'fastify' {
      * This property added by noteSettingsResolver middleware
      */
     noteSettings: NoteSettings | null;
-
-    /**
-     * This property added by noteRelationshipResolver middleware
-     */
-    parentNote: Note | null;
   }
 
   /**

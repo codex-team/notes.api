@@ -1,7 +1,6 @@
 import type { DatabaseConfig } from '@infrastructure/config/index.js';
 import NoteStorage from './storage/note.storage.js';
 import NoteSettingsStorage from './storage/noteSettings.storage.js';
-import NoteRelationshipStorage from './storage/noteRelationshp.storage.js';
 import NoteRepository from './note.repository.js';
 import NoteSettingsRepository from './noteSettings.repository.js';
 import Orm from './storage/postgres/orm/index.js';
@@ -16,7 +15,6 @@ import OpenAIApi from './transport/openai-api/index.js';
 import EditorToolsRepository from '@repository/editorTools.repository.js';
 import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
-import NoteRelationshipRepository from '@repository/noteRelationship.repository.js';
 
 /**
  * Interface for initiated repositories
@@ -31,11 +29,6 @@ export interface Repositories {
    * Note settings repository instance
    */
   noteSettingsRepository: NoteSettingsRepository,
-
-  /**
-   * Note relationship repository instance
-   */
-  noteRelationshipRepository: NoteRelationshipRepository,
 
   /**
    * User session repository instance
@@ -88,7 +81,6 @@ export async function init(orm: Orm): Promise<Repositories> {
   const noteStorage = new NoteStorage(orm);
   const userSessionStorage = new UserSessionStorage(orm);
   const noteSettingsStorage = new NoteSettingsStorage(orm);
-  const noteRelationshipStorage = new NoteRelationshipStorage(orm);
   const teamStorage = new TeamStorage(orm);
 
   /**
@@ -103,11 +95,6 @@ export async function init(orm: Orm): Promise<Repositories> {
   teamStorage.createAssociationWithNoteModel(noteStorage.model);
   teamStorage.createAssociationWithUserModel(userStorage.model);
 
-  /**
-   * Create associations between note and relations table
-   */
-  noteRelationshipStorage.createAssociationWithNoteModel(noteStorage.model);
-
   const editorToolsStorage = new EditorToolsStorage(orm);
 
   /**
@@ -119,7 +106,6 @@ export async function init(orm: Orm): Promise<Repositories> {
   await teamStorage.model.sync();
   await userSessionStorage.model.sync();
   await editorToolsStorage.model.sync();
-  await noteRelationshipStorage.model.sync();
 
   /**
    * Create transport instances
@@ -132,7 +118,6 @@ export async function init(orm: Orm): Promise<Repositories> {
    */
   const noteRepository = new NoteRepository(noteStorage);
   const noteSettingsRepository = new NoteSettingsRepository(noteSettingsStorage);
-  const noteRelationshipRepository = new NoteRelationshipRepository(noteRelationshipStorage);
   const userSessionRepository = new UserSessionRepository(userSessionStorage);
   const userRepository = new UserRepository(userStorage, googleApiTransport);
   const aiRepository = new AIRepository(openaiApiTransport);
@@ -142,7 +127,6 @@ export async function init(orm: Orm): Promise<Repositories> {
   return {
     noteRepository,
     noteSettingsRepository,
-    noteRelationshipRepository,
     userSessionRepository,
     userRepository,
     aiRepository,
