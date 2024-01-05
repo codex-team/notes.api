@@ -334,23 +334,44 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    test('Post a new note', async () => {
+
+    test('Post a new note without parentId passed', async () => {
       const expectedStatus = 200;
       const userId = 2;
       const accessToken = global.auth(userId);
 
+      /**
+       * POST fakeRequest sends back a NotePublicId typeof string
+       */
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
         url: `/note`,
-        body: {
-        },
+        body: {},
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.json().id).toBeTypeOf('string');
+      expect(response?.json().id.length).toBeGreaterThan(0);
     });
+
+    test('Returns status 401 when the user is not authorized', async () => {
+      const expectedStatus = 401;
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        url: `/note`,
+        body: {},
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
+    });
+
+
+    test.todo('Returns 400 when parentId has incorrect characters and lenght');
   });
 
   test.todo('Create note with parentId field');
