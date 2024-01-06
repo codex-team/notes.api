@@ -63,7 +63,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Reply: {
       note : Note,
-      parentNote?: Note,
+      parentNote?: Note | undefined,
       accessRights: { canEdit: boolean },
     } | ErrorResponse,
   }>('/:notePublicId', {
