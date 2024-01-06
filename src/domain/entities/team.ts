@@ -5,12 +5,12 @@ export enum MemberRole {
   /**
    * Team member can read and write notes
    */
-  read = 'read',
+  read = 0,
 
   /**
    * Team member can only read notes
    */
-  write = 'write',
+  write = 1,
 }
 
 /**
@@ -36,7 +36,7 @@ export interface TeamMember {
   /**
    * Team member role, show what user can do with note
    */
-  role:  MemberRole;
+  role: MemberRole;
 }
 
 export type Team = TeamMember[];

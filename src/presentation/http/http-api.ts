@@ -24,6 +24,7 @@ import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
 import NoteListRouter from '@presentation/http/router/noteList.js';
 import { EditorToolSchema } from './schema/EditorTool.js';
+import JoinRouter from '@presentation/http/router/join.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -195,6 +196,11 @@ export default class HttpApi implements Api {
     await this.server?.register(NoteListRouter, {
       prefix: '/notes',
       noteListService: domainServices.noteListService,
+    });
+
+    await this.server?.register(JoinRouter, {
+      prefix: '/join',
+      noteSettings: domainServices.noteSettingsService,
     });
 
     await this.server?.register(NoteSettingsRouter, {

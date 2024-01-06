@@ -39,8 +39,10 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
 
     try {
       result = await noteSettingsService.addUserToTeamByInvitationHash(hash, userId as number);
-    } catch (error) {
-      return reply.send({ error });
+    } catch (error: unknown) {
+      const causedError = error as Error;
+
+      return reply.send({ error: causedError.message });
     }
 
     return reply.send({ result });

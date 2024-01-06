@@ -96,7 +96,7 @@ export default class TeamsSequelizeStorage {
         },
       },
       role: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: MemberRole.read,
       },
@@ -149,7 +149,11 @@ export default class TeamsSequelizeStorage {
    * @param data - team member data
    */
   public async insert(data: TeamMemberCreationAttributes): Promise<TeamMember> {
-    return await this.model.create(data);
+    return await this.model.create({
+      noteId: data.noteId,
+      userId: data.userId,
+      role: data.role,
+    });
   }
 
   /**

@@ -13,11 +13,6 @@ export default interface EditorTool {
   name: string;
 
   /**
-   * User-friendly plugin title
-   */
-  title: string;
-
-  /**
    * Name of the tool class. Since it's imported globally,
    * we need the class name to properly connect the tool to the editor
    */

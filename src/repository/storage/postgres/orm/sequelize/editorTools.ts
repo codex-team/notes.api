@@ -18,11 +18,6 @@ export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, Inf
   public declare name: EditorTool['name'];
 
   /**
-   * Editor tool title. e.g. 'Code tool 3000'
-   */
-  public declare title: EditorTool['title'];
-
-  /**
    * User tool class name. e.g. 'CodeTool'
    */
   public declare exportName: EditorTool['exportName'];
@@ -78,10 +73,6 @@ export default class UserSequelizeStorage {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       exportName: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -107,7 +98,6 @@ export default class UserSequelizeStorage {
   public async addTool({
     id,
     name,
-    title,
     exportName,
     source,
     isDefault,
@@ -115,7 +105,6 @@ export default class UserSequelizeStorage {
     return await this.model.create({
       id,
       name,
-      title,
       exportName,
       source,
       isDefault,
