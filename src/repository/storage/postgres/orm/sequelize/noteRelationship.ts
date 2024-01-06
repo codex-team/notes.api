@@ -96,27 +96,26 @@ export default class NoteRelationshipSequelizeStorage {
    * @param parentId - id of the parent note
    */
   public async createNoteRelation(noteId: NoteInternalId, parentId: NoteInternalId): Promise<boolean> {
-    const entryId = await this.model.create({
+    const newRelation = await this.model.create({
       noteId,
       parentId,
     });
 
-    return entryId.id !== undefined;
+    return newRelation.id !== undefined;
   }
 
   /**
    * Gets parent note id by note id
    *
    * @param parentId - parent note id
-   * @returns { Promise<Note | null> } found note
    */
   public async getParentNoteByNoteId(parentId: NoteInternalId): Promise<number | null> {
-    const finded = await this.model.findOne({
+    const found = await this.model.findOne({
       where: {
         parentId,
       },
     });
-    const parentNoteId = finded?.parentId;
+    const parentNoteId = found?.parentId;
 
     return parentNoteId !== undefined ? parentNoteId : null;
   };

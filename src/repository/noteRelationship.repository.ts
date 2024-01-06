@@ -20,7 +20,7 @@ export default class NoteRelationshipRepository {
   }
 
   /**
-   * Add note relation
+   * Create new child-parent note relation
    *
    * @param noteId - id of the current note
    * @param parentId - id of the parent note
