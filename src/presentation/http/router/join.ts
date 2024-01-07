@@ -42,7 +42,10 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
     } catch (error: unknown) {
       const causedError = error as Error;
 
-      return reply.send({ error: causedError.message });
+      /**
+       * TODO use different replies for different errors
+       */
+      return reply.notAcceptable(causedError.message);
     }
 
     return reply.send({ result });

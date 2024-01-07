@@ -22,11 +22,11 @@ export default class NoteSettingsService {
   /**
    * Note Settings service constructor
    *
-   * @param noteSettingsrepository - note settings repository
+   * @param noteSettingsRepository - note settings repository
    * @param teamRepository - team repository
    */
-  constructor(noteSettingsrepository: NoteSettingsRepository, teamRepository: TeamRepository) {
-    this.noteSettingsRepository = noteSettingsrepository;
+  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository) {
+    this.noteSettingsRepository = noteSettingsRepository;
     this.teamRepository = teamRepository;
   }
 
