@@ -8,6 +8,10 @@ describe('Join API', () => {
       const userId = 2;
       const accessToken = global.auth(userId);
 
+      const expectedResponse = {
+        message: 'Team with user specified user and note already exists',
+      };
+
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
@@ -17,6 +21,7 @@ describe('Join API', () => {
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
+      expect(await response?.json()).toStrictEqual(expectedResponse);
     });
     test('Returns 406 when invitation hash is not valid', async () => {
       const expectedStatus = 406;
@@ -24,6 +29,10 @@ describe('Join API', () => {
       const userId = 4;
       const accessToken = global.auth(userId);
 
+      const expectedResponse = {
+        message: `Note with invitation ${hash} does not exists`,
+      };
+
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
@@ -33,6 +42,7 @@ describe('Join API', () => {
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
+      expect(await response?.json()).toStrictEqual(expectedResponse);
     });
     test('Returns 200 when user is added to the team', async () => {
       const userId = 1;
