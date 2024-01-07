@@ -44,7 +44,7 @@ export default class NoteRelationshipRepository {
    *
    * @param noteId - id of the current note
    */
-  public async getParentNoteByNoteId(noteId: NoteInternalId): Promise<number | null> {
-    return await this.storage.getParentNoteByNoteId(noteId);
+  public async getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<number | null> {
+    return await this.storage.getParentNoteIdByNoteId(noteId);
   }
 }

@@ -109,7 +109,7 @@ export default class NoteRelationshipSequelizeStorage {
    *
    * @param parentId - parent note id
    */
-  public async getParentNoteByNoteId(parentId: NoteInternalId): Promise<number | null> {
+  public async getParentNoteIdByNoteId(parentId: NoteInternalId): Promise<number | null> {
     const found = await this.model.findOne({
       where: {
         parentId,
