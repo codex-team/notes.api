@@ -59,6 +59,14 @@ describe('Note API', () => {
           'createdAt': '2023-10-16T13:49:19.000Z',
           'updatedAt': '2023-10-16T13:49:19.000Z',
         },
+        'parentNote': {
+          'id': 4,
+          'publicId': '73NdxFZ4k7',
+          'creatorId': 1,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+        },
         'accessRights': {
           'canEdit': false,
         },
