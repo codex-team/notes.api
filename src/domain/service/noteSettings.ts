@@ -53,7 +53,7 @@ export default class NoteSettingsService {
     const team = await this.teamRepository.getTeamByUserIdAndNoteId(userId, noteSettings.noteId);
 
     if (team !== null) {
-      throw new Error(`Team with user ${team.userId} and note ${team.noteId} already exists`);
+      throw new Error(`Team with user specified user and note already exists`);
     }
 
     return await this.teamRepository.create({
