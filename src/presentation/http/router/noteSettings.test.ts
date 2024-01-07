@@ -12,8 +12,8 @@ describe('NoteSettings API', () => {
       const expectedNoteSettings = {
         'customHostname': 'codex.so',
         'isPublic': true,
-        'id': 2,
-        'noteId': 2,
+        'id': 3,
+        'noteId': 3,
         'invitationHash': 'E2zRXv3cp-',
       };
 
@@ -26,86 +26,86 @@ describe('NoteSettings API', () => {
 
       expect(response?.json()).toStrictEqual(expectedNoteSettings);
     });
-  });
 
-  test('Returns 404 when note settings with specified note public id do not exist', async () => {
-    const expectedStatus = 404;
-    const nonexistentId = 'ishvm5qH84';
+    test('Returns 404 when note settings with specified note public id do not exist', async () => {
+      const expectedStatus = 404;
+      const nonexistentId = 'ishvm5qH84';
 
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      url: `/note-settings/${nonexistentId}`,
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note-settings/${nonexistentId}`,
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
 
-    expect(response?.statusCode).toBe(expectedStatus);
+    test.each([
+      { id: 'mVz3iHuez',
+        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
 
-    expect(response?.json()).toStrictEqual({ message: 'Note not found' });
-  });
+      { id: 'cR8eqF1mFf0',
+        expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
 
-  test.each([
-    { id: 'mVz3iHuez',
-      expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+      { id: '+=*&*5%&&^&-',
+        expectedMessage: '\'/note-settings/+=*&*5%&&^&-\' is not a valid url component' },
+    ])
+    ('Returns 400 when public id of the note settings has incorrect characters and length', async ({ id, expectedMessage }) => {
+      const expectedStatus = 400;
 
-    { id: 'cR8eqF1mFf0',
-      expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note-settings/${id}`,
+      });
 
-    { id: '+=*&*5%&&^&-',
-      expectedMessage: '\'/note-settings/+=*&*5%&&^&-\' is not a valid url component' },
-  ])
-  ('Returns 400 when public id of the note settings has incorrect characters and length', async ({ id, expectedMessage }) => {
-    const expectedStatus = 400;
+      expect(response?.statusCode).toBe(expectedStatus);
 
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      url: `/note-settings/${id}`,
+      expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    expect(response?.statusCode).toBe(expectedStatus);
+    test('Returns 403 when the note is not public, the user is not authorized', async () => {
+      const expectedStatus = 403;
 
-    expect(response?.json().message).toStrictEqual(expectedMessage);
-  });
+      const notPublicNote = notes.find(newNote => {
+        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
 
-  test('Returns 403 when the note is not public, the user is not authorized', async () => {
-    const expectedStatus = 403;
+        return settings!.is_public === false;
+      });
 
-    const notPublicNote = notes.find(newNote => {
-      const settings = noteSettings.find(ns => ns.note_id === newNote.id);
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note-settings/${notPublicNote!.public_id}`,
+      });
 
-      return settings!.is_public === false;
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      url: `/note-settings/${notPublicNote!.public_id}`,
+    test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
+      const expectedStatus = 403;
+      const userId = 2;
+      const accessToken = global.auth(userId);
+
+      const notPublicNote = notes.find(newNote => {
+        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
+
+        return settings!.is_public === false && newNote.creator_id != userId;
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${notPublicNote!.public_id}`,
+      });
+
+      expect(response?.statusCode).toBe(expectedStatus);
+
+      expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
-
-    expect(response?.statusCode).toBe(expectedStatus);
-
-    expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
-  });
-
-  test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
-    const expectedStatus = 403;
-    const userId = 2;
-    const accessToken = global.auth(userId);
-
-    const notPublicNote = notes.find(newNote => {
-      const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-
-      return settings!.is_public === false && newNote.creator_id != userId;
-    });
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      url: `/note-settings/${notPublicNote!.public_id}`,
-    });
-
-    expect(response?.statusCode).toBe(expectedStatus);
-
-    expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
   });
 
   describe('GET /note-settings/:notePublicId/team ', () => {
@@ -198,8 +198,8 @@ describe('NoteSettings API', () => {
       });
 
       const updatedNoteSettings = {
-        'id': 53,
-        'noteId': 53,
+        'id': 54,
+        'noteId': 54,
         'customHostname': 'codex.so',
         'isPublic': false,
         'invitationHash': 'FfAwyaR80C',

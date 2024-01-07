@@ -10,8 +10,8 @@ describe('Note API', () => {
       const expectedStatus = 200;
       const expectedResponse = {
         'note': {
-          'id': 60,
-          'publicId': 'note_1',
+          'id': 2,
+          'publicId': 'TJmEb89e0l',
           'creatorId': 1,
           'content': null,
           'createdAt': '2023-10-16T13:49:19.000Z',
@@ -52,7 +52,7 @@ describe('Note API', () => {
       const correctID = 'Pq1T9vc23Q';
       const expectedResponse = {
         'note': {
-          'id': 2,
+          'id': 3,
           'publicId': 'Pq1T9vc23Q',
           'creatorId': 1,
           'content': null,
@@ -78,15 +78,7 @@ describe('Note API', () => {
       const expectedStatus = 200;
       const expectedResponse = {
         'note': {
-          'id': 3,
-          'publicId': '73NdxFZ4k7',
-          'creatorId': 1,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
-        'parentNote': {
-          'id': 3,
+          'id': 4,
           'publicId': '73NdxFZ4k7',
           'creatorId': 1,
           'content': null,
