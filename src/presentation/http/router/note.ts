@@ -138,9 +138,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Responses with note public id.
    */
   fastify.post<{
-    Params: {
-      parentId?: NotePublicId,
-    },
     Body: {
       content: JSON;
     },
@@ -178,7 +175,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.patch<{
     Params: {
       notePublicId: NotePublicId,
-      parentId?: NotePublicId,
     },
     Body: {
       content: JSON;
