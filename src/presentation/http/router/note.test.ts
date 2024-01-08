@@ -70,7 +70,6 @@ describe('Note API', () => {
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
-
       expect(response?.json()).toStrictEqual(expectedResponse);
     });
 
@@ -327,7 +326,6 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-
     test('Post a new note without parentId passed', async () => {
       const expectedStatus = 200;
       const userId = 2;
@@ -362,7 +360,6 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(expectedStatus);
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
-
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
   });
