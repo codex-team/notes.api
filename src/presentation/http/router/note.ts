@@ -5,7 +5,6 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import type NoteRelationshipService from '@domain/service/noteRelationship.js';
 
 /**
  * Interface for the note router.
@@ -20,11 +19,6 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
-
-  /**
-   * Note relationship service instance
-   */
-  noteRelationshipService: NoteRelationshipService,
 }
 
 /**
@@ -40,7 +34,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   const noteService = opts.noteService;
   const noteSettingsService = opts.noteSettingsService;
-  const noteRelationshipService = opts.noteRelationshipService;
 
   /**
    * Prepare note id resolver middleware
@@ -218,16 +211,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content as JSON;
-    const parentPublicId = request.params.parentId;
 
     const note = await noteService.updateNoteContentById(noteId, content);
-
-    if (parentPublicId !== undefined) {
-      const parentId = (await noteService.getNoteByPublicId(parentPublicId)).id;
-
-      await noteRelationshipService.addNoteRelation(note.id, parentId);
-    }
-
     return reply.send({
       updatedAt: note.updatedAt,
     });
