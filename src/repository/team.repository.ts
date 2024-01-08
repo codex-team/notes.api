@@ -71,4 +71,13 @@ export default class TeamRepository {
   public async removeMemberById(id: TeamMember['id']): Promise<boolean> {
     return await this.storage.removeTeamMemberById(id);
   }
+  /**
+   *
+   * @param id - id of team member
+   * @param noteId - note internal id
+   * @param role - team member new role
+   */
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRole): Promise<TeamMember['role'] | null> {
+    return await this.storage.patchMemberRoleById(id, noteId, role);
+  }
 }

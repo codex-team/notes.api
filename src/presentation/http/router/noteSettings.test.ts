@@ -281,4 +281,23 @@ describe('NoteSettings API', () => {
 
     test.todo('Return 403 when user authorized, but not member of the team');
   });
+
+  describe('PATCH /note-teams/:NotePublicId,userId', () => {
+    test('returns something', async () => {
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${global.auth(1)}`,
+        },
+        url: '/note-settings/new-role/write',
+        body: {
+          'userId': 3,
+          'noteId': 2,
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+      expect(response?.body).toBe('write');
+    });
+  });
 });
