@@ -5,8 +5,9 @@ import { isEmpty } from '@infrastructure/utils/empty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import type { NotePublicId } from '@domain/entities/note.js';
-import type { Team } from '@domain/entities/team.js';
+import type { NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { Team, TeamMember } from '@domain/entities/team.js';
+import type User from '@domain/entities/user.js';
 
 /**
  * Interface for the note settings router.
@@ -87,6 +88,34 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     }
 
     return reply.send(noteSettings);
+  });
+
+  /**
+   * patch team member role by user and note id
+   */
+  fastify.patch<{
+    Body: {
+      userId: User['id'];
+      noteId: NoteInternalId,
+    }
+    Params: {
+      newRole: TeamMember['role'],
+      },
+    Reply: TeamMember['role'],
+  }>('/new-role/:newRole', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+  }, async (request, reply) => {
+    const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, request.body.noteId, request.params.newRole);
+
+    if (newRole === null) {
+      return reply.notFound('user in team not found');
+    }
+
+    return reply.send(newRole);
   });
 
   /**

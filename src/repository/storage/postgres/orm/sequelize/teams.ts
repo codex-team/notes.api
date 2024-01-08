@@ -198,4 +198,24 @@ export default class TeamsSequelizeStorage {
 
     return affectedRows > 0;
   }
+
+  /**
+   *
+   * @param userId - id of team member
+   * @param noteId - note internal id
+   * @param role - new team member role
+   */
+  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role : MemberRole): Promise<TeamMember['role'] | null> {
+    const affectedRows = await this.model.update({
+      role: role,
+    }, {
+      where: {
+        userId,
+        noteId,
+      },
+    });
+
+    // if counter of affected rows is more than 0, then we return new role
+    return affectedRows[0] ? role : null;
+  }
 }
