@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       context: .
     ports:
-      - 127.0.0.1:1330:1337
+      - 127.0.0.1:1337:1337
     volumes:
       - ./app-config.yaml:/usr/app/app-config.yaml
     restart: unless-stopped
@@ -17,6 +17,6 @@ services:
       POSTGRES_DB: notes
       POSTGRES_PASSWORD: postgres
     ports:
-      - 127.0.0.1:5430:5432
+      - 127.0.0.1:5432:5432
     volumes:
       - ./database:/var/lib/postgresql/data
