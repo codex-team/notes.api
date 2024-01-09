@@ -7,7 +7,6 @@ import noteSettings from '@tests/test-data/notes-settings.json';
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
     test('Returns note with specified hostname', async () => {
-      const expectedStatus = 200;
       const expectedResponse = {
         'note': {
           'id': 2,
@@ -27,20 +26,18 @@ describe('Note API', () => {
         url: '/note/resolve-hostname/codex.so',
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toStrictEqual(expectedResponse);
     });
 
     test('Returns 404 when note not found', async () => {
-      const expectedStatus = 404;
-
       const response = await global.api?.fakeRequest({
         method: 'GET',
         url: '/note/resolve-hostname/incorrect_hostname',
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(404);
 
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
@@ -48,7 +45,6 @@ describe('Note API', () => {
 
   describe('GET note/:notePublicId ', () => {
     test('Returns note by public id with 200 status when note is publicly available', async () => {
-      const expectedStatus = 200;
       const correctID = 'Pq1T9vc23Q';
       const expectedResponse = {
         'note': {
@@ -77,13 +73,12 @@ describe('Note API', () => {
         url: `/note/${correctID}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toStrictEqual(expectedResponse);
     });
 
     test('Returns note by public id with 200 status when access is disabled, but user is creator', async () => {
-      const expectedStatus = 200;
       const expectedResponse = {
         'note': {
           'id': 4,
@@ -114,14 +109,12 @@ describe('Note API', () => {
         url: `/note/${privateUserNote!.public_id}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toStrictEqual(expectedResponse);
     });
 
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
-      const expectedStatus = 403;
-
       const notPublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
 
@@ -133,13 +126,12 @@ describe('Note API', () => {
         url: `/note/${notPublicNote!.public_id}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(403);
 
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
     test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
-      const expectedStatus = 403;
       const userId = 2;
       const accessToken = global.auth(userId);
 
@@ -157,13 +149,12 @@ describe('Note API', () => {
         url: `/note/${notPublicNote!.public_id}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(403);
 
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
     test('Returns 404 when the id  does not exist', async () => {
-      const expectedStatus = 404;
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
@@ -171,7 +162,7 @@ describe('Note API', () => {
         url: `/note/${nonexistentId}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(404);
 
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
@@ -187,21 +178,18 @@ describe('Note API', () => {
         expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component' },
     ])
     ('Returns 400 when id has incorrect characters and length', async ({ id, expectedMessage }) => {
-      const expectedStatus = 400;
-
       const response = await global.api?.fakeRequest({
         method: 'GET',
         url: `/note/${id}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
     describe('Access rights', () => {
       test('Returns canEdit=false flag, when user is not authorized', async () => {
-        const expectedStatus = 200;
         const publicId = 'Pq1T9vc23Q';
 
         const response = await global.api?.fakeRequest({
@@ -209,13 +197,12 @@ describe('Note API', () => {
           url: `/note/${publicId}`,
         });
 
-        expect(response?.statusCode).toBe(expectedStatus);
+        expect(response?.statusCode).toBe(200);
 
         expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
       });
 
       test('Returns canEdit=false when user is authorized, but is not the creator', async () => {
-        const expectedStatus = 200;
         const publicId = 'Pq1T9vc23Q';
         const userId = 4;
         const accessToken = global.auth(userId);
@@ -228,13 +215,12 @@ describe('Note API', () => {
           url: `/note/${publicId}`,
         });
 
-        expect(response?.statusCode).toBe(expectedStatus);
+        expect(response?.statusCode).toBe(200);
 
         expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
       });
 
       test('Returns canEdit=true, when user is authorized and is the creator of the note', async () => {
-        const expectedStatus = 200;
         const publicId = 'Pq1T9vc23Q';
         const userId = 1;
         const accessToken = global.auth(userId);
@@ -247,7 +233,7 @@ describe('Note API', () => {
           url: `/note/${publicId}`,
         });
 
-        expect(response?.statusCode).toBe(expectedStatus);
+        expect(response?.statusCode).toBe(200);
 
         expect(response?.json().accessRights).toStrictEqual({ canEdit: true });
       });
@@ -256,7 +242,6 @@ describe('Note API', () => {
 
   describe('PATCH note/:notePublicId ', () => {
     test('Update note by public id with 200 status, user is creator of the note', async () => {
-      const expectedStatus = 200;
       const userId = 2;
       const accessToken = global.auth(userId);
 
@@ -275,11 +260,10 @@ describe('Note API', () => {
         },
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      const expectedStatus = 401;
       const correctID = 'Pq1T9vc23Q';
 
       const response = await global.api?.fakeRequest({
@@ -288,13 +272,12 @@ describe('Note API', () => {
         body: {},
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(401);
 
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
     test('Returns status 406 when the public id does not exist', async () => {
-      const expectedStatus = 406;
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
@@ -303,7 +286,7 @@ describe('Note API', () => {
         body: {},
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(406);
 
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
@@ -319,14 +302,12 @@ describe('Note API', () => {
         expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component' },
     ])
     ('Returns 400 when public id of the note settings has incorrect characters and length', async ({ id, expectedMessage }) => {
-      const expectedStatus = 400;
-
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         url: `/note/${id}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
@@ -336,7 +317,6 @@ describe('Note API', () => {
 
   describe('POST /note', () => {
     test('Post a new note with 200 status when the existing parentId passed', async () => {
-      const expectedStatus = 200;
       const accessToken = global.auth(2);
 
       const response = await global.api?.fakeRequest({
@@ -350,7 +330,7 @@ describe('Note API', () => {
         },
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
