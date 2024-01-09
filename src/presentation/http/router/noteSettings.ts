@@ -112,7 +112,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, request.body.noteId, request.params.newRole);
 
     if (newRole === null) {
-      return reply.notFound('user in team not found');
+      return reply.notFound('User in team not found');
     }
 
     return reply.send(newRole);
