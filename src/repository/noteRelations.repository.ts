@@ -1,10 +1,10 @@
 import type { NoteInternalId } from '@domain/entities/note.js';
-import type NoteRelationshipStorage from '@repository/storage/noteRelationshp.storage.js';
+import type NoteRelationshipStorage from '@repository/storage/noteRelations.storage.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
  */
-export default class NoteRelationshipRepository {
+export default class NoteRelationsRepository {
   /**
    * Note relationship storage instance
    */

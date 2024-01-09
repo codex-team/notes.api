@@ -1,7 +1,7 @@
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
-import type NoteRelationshipService from './noteRelationship';
+import type NoteRelationsService from './noteRelations';
 
 /**
  * Note service
@@ -12,7 +12,7 @@ export default class NoteService {
    */
   public repository: NoteRepository;
 
-  public noteRelationService: NoteRelationshipService;
+  public noteRelationService: NoteRelationsService;
 
   /**
    * Note service constructor
@@ -20,7 +20,7 @@ export default class NoteService {
    * @param repository - note repository
    * @param noteRelationService - note relationship service
    */
-  constructor(repository: NoteRepository, noteRelationService: NoteRelationshipService) {
+  constructor(repository: NoteRepository, noteRelationService: NoteRelationsService) {
     this.repository = repository;
     this.noteRelationService = noteRelationService;
   }

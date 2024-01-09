@@ -1,21 +1,21 @@
 import type { Note } from '@domain/entities/note.js';
-import type NoteRelationshipRepository from '@repository/noteRelationship.repository.js';
+import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
 
 /**
  * Note relationship service
  */
-export default class NoteRelationshipService {
+export default class NoteRelationsService {
   /**
    * Note relationship repository
    */
-  public repository: NoteRelationshipRepository;
+  public repository: NoteRelationsRepository;
 
   /**
    * Note relationship service constructor
    *
    * @param repository - note relationship repository
    */
-  constructor(repository: NoteRelationshipRepository) {
+  constructor(repository: NoteRelationsRepository) {
     this.repository = repository;
   }
 

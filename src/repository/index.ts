@@ -1,7 +1,7 @@
 import type { DatabaseConfig } from '@infrastructure/config/index.js';
 import NoteStorage from './storage/note.storage.js';
 import NoteSettingsStorage from './storage/noteSettings.storage.js';
-import NoteRelationshipStorage from './storage/noteRelationshp.storage.js';
+import NoteRelationshipStorage from './storage/noteRelations.storage.js';
 import NoteRepository from './note.repository.js';
 import NoteSettingsRepository from './noteSettings.repository.js';
 import Orm from './storage/postgres/orm/index.js';
@@ -16,7 +16,7 @@ import OpenAIApi from './transport/openai-api/index.js';
 import EditorToolsRepository from '@repository/editorTools.repository.js';
 import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
-import NoteRelationshipRepository from '@repository/noteRelationship.repository.js';
+import NoteRelationsRepository from '@repository/noteRelations.repository.js';
 
 /**
  * Interface for initiated repositories
@@ -35,7 +35,7 @@ export interface Repositories {
   /**
    * Note relationship repository instance
    */
-  noteRelationshipRepository: NoteRelationshipRepository,
+  noteRelationshipRepository: NoteRelationsRepository,
 
   /**
    * User session repository instance
@@ -132,7 +132,7 @@ export async function init(orm: Orm): Promise<Repositories> {
    */
   const noteRepository = new NoteRepository(noteStorage);
   const noteSettingsRepository = new NoteSettingsRepository(noteSettingsStorage);
-  const noteRelationshipRepository = new NoteRelationshipRepository(noteRelationshipStorage);
+  const noteRelationshipRepository = new NoteRelationsRepository(noteRelationshipStorage);
   const userSessionRepository = new UserSessionRepository(userSessionStorage);
   const userRepository = new UserRepository(userStorage, googleApiTransport);
   const aiRepository = new AIRepository(openaiApiTransport);

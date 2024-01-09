@@ -8,7 +8,7 @@ import { Model, DataTypes } from 'sequelize';
 /**
  * Class representing a note relations in database
  */
-export class NoteRelationshipModel extends Model<InferAttributes<NoteRelationshipModel>, InferCreationAttributes<NoteRelationshipModel>> {
+export class NoteRelationsModel extends Model<InferAttributes<NoteRelationsModel>, InferCreationAttributes<NoteRelationsModel>> {
   /**
    * Relation id
    */
@@ -28,11 +28,11 @@ export class NoteRelationshipModel extends Model<InferAttributes<NoteRelationshi
 /**
  * Class representing a table storing of Note relationship
  */
-export default class NoteRelationshipSequelizeStorage {
+export default class NoteRelationsSequelizeStorage {
   /**
    * Note relationship model in database
    */
-  public model: typeof NoteRelationshipModel;
+  public model: typeof NoteRelationsModel;
 
   /**
    * Note model instance
@@ -60,7 +60,7 @@ export default class NoteRelationshipSequelizeStorage {
     /**
      * Initiate note relationship model
      */
-    this.model = NoteRelationshipModel.init({
+    this.model = NoteRelationsModel.init({
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
