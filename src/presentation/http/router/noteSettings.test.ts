@@ -282,8 +282,41 @@ describe('NoteSettings API', () => {
     test.todo('Return 403 when user authorized, but not member of the team');
   });
 
-  describe('PATCH /note-teams/:NotePublicId,userId', () => {
-    test('returns something', async () => {
+  describe('PATCH /note-teams/new-role/:newRole', () => {
+    test('if we want write role, in database it will be stored as 1', async () => {
+      await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${global.auth(1)}`,
+        },
+        url: '/note-settings/new-role/write',
+        body: {
+          'userId': 3,
+          'noteId': 2,
+        },
+      });
+
+      const team = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${global.auth(1)}`,
+        },
+        url: '/note-settings/Pq1T9vc23Q/team',
+      });
+
+      if (team?.json() !== undefined) {
+        expect(team?.json()).toStrictEqual([
+          {
+            'id': 1,
+            'noteId': 2,
+            'userId': 3,
+            'role': 1,
+          },
+        ]);
+      }
+    });
+
+    test('returns status code 200 and new role if it was patched', async () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -298,6 +331,23 @@ describe('NoteSettings API', () => {
 
       expect(response?.statusCode).toBe(200);
       expect(response?.body).toBe('write');
+    });
+
+    test('returns 404 and User in team not found message if no such a note exists', async () => {
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${global.auth(1)}`,
+        },
+        url: '/note-settings/new-role/write',
+        body: {
+          'userId': 15,
+          'noteId': 0,
+        },
+      });
+
+      expect(response?.statusCode).toBe(404);
+      expect(response?.json().message).toBe('User in team not found');
     });
   });
 });
