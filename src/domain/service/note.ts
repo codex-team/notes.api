@@ -43,9 +43,11 @@ export default class NoteService {
     if (parentPublicId !== undefined) {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
-      if (parentNote !== null) {
-        await this.noteRelationService.addNoteRelation(note.id, parentNote.id);
+      if (parentNote === null) {
+        throw new Error(`Note with id ${parentPublicId} was not found`);
       }
+
+      await this.noteRelationService.addNoteRelation(note.id, parentNote.id);
     }
 
     return note;
@@ -77,9 +79,13 @@ export default class NoteService {
     if (parentPublicId !== undefined) {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
-      if (parentNote !== null) {
-        await this.noteRelationService.updateNoteRelationById(updatedNote.id, parentNote.id);
+      if (parentNote === null) {
+        if (parentNote === null) {
+          throw new Error(`Note with id ${parentPublicId} was not found`);
+        }
       }
+
+      await this.noteRelationService.updateNoteRelationById(updatedNote.id, parentNote.id);
     }
 
     return updatedNote;
