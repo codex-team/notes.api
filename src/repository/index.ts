@@ -35,7 +35,7 @@ export interface Repositories {
   /**
    * Note relationship repository instance
    */
-  noteRelationshipRepository: NoteRelationsRepository,
+  noteRelationsRepository: NoteRelationsRepository,
 
   /**
    * User session repository instance
@@ -142,7 +142,7 @@ export async function init(orm: Orm): Promise<Repositories> {
   return {
     noteRepository,
     noteSettingsRepository,
-    noteRelationshipRepository,
+    noteRelationsRepository: noteRelationshipRepository,
     userSessionRepository,
     userRepository,
     aiRepository,

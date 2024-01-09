@@ -1,7 +1,7 @@
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
-import type NoteRelationsService from './noteRelations';
+import type NoteRelationsRepository from '@repository/noteRelations.repository';
 
 /**
  * Note service
@@ -12,17 +12,17 @@ export default class NoteService {
    */
   public repository: NoteRepository;
 
-  public noteRelationService: NoteRelationsService;
+  public noteRelationsRepository: NoteRelationsRepository;
 
   /**
    * Note service constructor
    *
    * @param repository - note repository
-   * @param noteRelationService - note relationship service
+   * @param noteRelationsRepository - note relationship service
    */
-  constructor(repository: NoteRepository, noteRelationService: NoteRelationsService) {
+  constructor(repository: NoteRepository, noteRelationsRepository: NoteRelationsRepository) {
     this.repository = repository;
-    this.noteRelationService = noteRelationService;
+    this.noteRelationsRepository = noteRelationsRepository;
   }
 
   /**
@@ -47,7 +47,7 @@ export default class NoteService {
         throw new Error(`Note with id ${parentPublicId} was not found`);
       }
 
-      await this.noteRelationService.addNoteRelation(note.id, parentNote.id);
+      await this.noteRelationsRepository.addNoteRelation(note.id, parentNote.id);
     }
 
     return note;
@@ -85,7 +85,7 @@ export default class NoteService {
         }
       }
 
-      await this.noteRelationService.updateNoteRelationById(updatedNote.id, parentNote.id);
+      await this.noteRelationsRepository.updateNoteRelationById(updatedNote.id, parentNote.id);
     }
 
     return updatedNote;
