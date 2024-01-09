@@ -190,7 +190,7 @@ export default class HttpApi implements Api {
       prefix: '/note',
       noteService: domainServices.noteService,
       noteSettingsService: domainServices.noteSettingsService,
-      noteRelationsService: domainServices.noteRelationshipService,
+      noteRelationsService: domainServices.noteRelationsService,
     });
 
     await this.server?.register(NoteListRouter, {

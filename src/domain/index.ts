@@ -31,7 +31,7 @@ export interface DomainServices {
   /**
    * Note relationship service instance
    */
-  noteRelationshipService: NoteRelationsService,
+  noteRelationsService: NoteRelationsService,
 
   /**
    * Auth service instance
@@ -82,7 +82,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     noteService,
     noteListService,
     noteSettingsService,
-    noteRelationshipService: noteRelationsService,
+    noteRelationsService: noteRelationsService,
     userService,
     authService,
     aiService,
