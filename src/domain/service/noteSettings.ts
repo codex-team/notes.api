@@ -44,19 +44,19 @@ export default class NoteSettingsService {
      * Check does invitation hash is valid
      */
     if (noteSettings === null) {
-      throw new Error(`Note with invitation ${invitationHash} does not exists`);
+      throw new Error(`Wrong invitation`);
     }
 
     /**
      * Check if user not already in team
      */
-    const team = await this.teamRepository.getTeamByUserIdAndNoteId(userId, noteSettings.noteId);
+    const isUserTeamMember = await this.teamRepository.isUserInTeam(userId, noteSettings.noteId);
 
-    if (team !== null) {
-      throw new Error(`Team with user specified user and note already exists`);
+    if (isUserTeamMember) {
+      throw new Error(`User already in team`);
     }
 
-    return await this.teamRepository.create({
+    return await this.teamRepository.createTeamMembership({
       noteId: noteSettings.noteId,
       userId,
       role: defaultUserRole,
@@ -137,6 +137,6 @@ export default class NoteSettingsService {
    * @returns created team member
    */
   public async createTeamMember(team: TeamMemberCreationAttributes): Promise<TeamMember> {
-    return await this.teamRepository.create(team);
+    return await this.teamRepository.createTeamMembership(team);
   }
 }

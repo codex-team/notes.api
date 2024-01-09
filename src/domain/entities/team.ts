@@ -3,12 +3,12 @@ import type User from './user.js';
 
 export enum MemberRole {
   /**
-   * Team member can read and write notes
+   * Team member can only read notes
    */
   read = 0,
 
   /**
-   * Team member can only read notes
+   * Team member can read and write notes
    */
   write = 1,
 }

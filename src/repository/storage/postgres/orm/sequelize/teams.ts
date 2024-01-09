@@ -144,11 +144,11 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
-   * Create new team member
+   * Create new team member membership
    *
-   * @param data - team member data
+   * @param data - team membership data
    */
-  public async insert(data: TeamMemberCreationAttributes): Promise<TeamMember> {
+  public async createTeamMembership(data: TeamMemberCreationAttributes): Promise<TeamMember> {
     return await this.model.create({
       noteId: data.noteId,
       userId: data.userId,
@@ -157,19 +157,21 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
-   * Get team by user id and note id
+   * Check if user is note team member
    *
-   * @param userId - team member id
-   * @param noteId - note id
-   * @returns { Promise<TeamMember | null> } found team relation
+   * @param userId - user id to check
+   * @param noteId - note id to identify team
+   * @returns { Promise<boolean> } returns true if user is team member
    */
-  public async getTeamByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<TeamMember | null> {
-    return await this.model.findOne({
+  public async isUserInTeam(userId: User['id'], noteId: NoteInternalId): Promise<boolean> {
+    const teamMemberShip = await this.model.findOne({
       where: {
         noteId,
         userId,
       },
     });
+
+    return teamMemberShip !== null;
   }
 
   /**
