@@ -3,7 +3,6 @@ import { describe, test, expect } from 'vitest';
 describe('Join API', () => {
   describe('POST /join/:hash', () => {
     test('Returns 406 when user is already in the team', async () => {
-      const expectedStatus = 406;
       const hash = 'Hzh2hy4igf';
       const userId = 2;
       const accessToken = global.auth(userId);
@@ -45,7 +44,6 @@ describe('Join API', () => {
     test('Returns 200 when user is added to the team', async () => {
       const userId = 1;
       const noteId = 1;
-      const expectedStatus = 200;
       const hash = 'Hzh2hy4igf';
       const accessToken = global.auth(userId);
 
