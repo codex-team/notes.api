@@ -96,7 +96,7 @@ export default class TeamsSequelizeStorage {
         },
       },
       role: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: MemberRole.read,
       },
