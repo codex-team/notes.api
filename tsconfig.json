@@ -23,7 +23,7 @@
     "src/**/*.ts",
     "vitest.config.js",
     ".eslintrc.cjs",
-    "fastify.d.ts", "migrations/scripts/index.ts", "migrations/scripts/migrate.ts",
+    "fastify.d.ts",
   ],
   "ts-node": {
     // Tell ts-node CLI to install the --loader automatically
