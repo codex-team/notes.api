@@ -30,6 +30,7 @@ declare global {
    * Globally exposed method for creating accessToken using id
    * Is accessed as 'global.server' in tests
    *
+<<<<<<< HEAD
    * @param userId - id of the user that will be considered the author of the request
    * @returns accessToken for authorization
    */
@@ -45,6 +46,12 @@ declare global {
      */
     query: (sql: string) => Promise<unknown>;
   };
+=======
+   * @param id - id for making accessToken
+   * @returns accessToken for authorization
+   */
+  function auth(id: number) : string;
+>>>>>>> 023a509cd58ac661142c392596df8e9a10c65342
 }
 
 /**
@@ -70,6 +77,7 @@ beforeAll(async () => {
   await insertData(orm);
 
   global.api = api;
+<<<<<<< HEAD
 
   global.auth = (userId: number) => {
     return domainServices.authService.signAccessToken({ id : userId });
@@ -79,6 +87,10 @@ beforeAll(async () => {
     query: async (sqlString: string) => {
       return await orm.connection.query(sqlString);
     },
+=======
+  global.auth = (id: number) => {
+    return domainServices.authService.signAccessToken({ id : id });
+>>>>>>> 023a509cd58ac661142c392596df8e9a10c65342
   };
 }, TIMEOUT);
 
