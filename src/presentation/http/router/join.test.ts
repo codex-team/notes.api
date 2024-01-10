@@ -18,7 +18,7 @@ describe('Join API', () => {
       expect(response?.statusCode).toBe(406);
 
       expect(await response?.json()).toStrictEqual({
-        message: 'Team with user specified user and note already exists',
+        message: 'User already in team',
       });
     });
     test('Returns 406 when invitation hash is not valid', async () => {
@@ -37,7 +37,7 @@ describe('Join API', () => {
       expect(response?.statusCode).toBe(406);
 
       expect(await response?.json()).toStrictEqual({
-        message: `Note with invitation ${hash} does not exists`,
+        message: `Wrong invitation`,
       });
     });
 
