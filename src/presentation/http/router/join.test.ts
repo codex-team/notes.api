@@ -42,9 +42,8 @@ describe('Join API', () => {
     });
 
     test('Returns 200 when user is added to the team', async () => {
-      const userId = 1;
-      const noteId = 1;
       const hash = 'Hzh2hy4igf';
+      const userId = 1;
       const accessToken = global.auth(userId);
 
       const response = await global.api?.fakeRequest({
@@ -57,11 +56,11 @@ describe('Join API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(await response?.json()).toStrictEqual({
+      expect(response?.json()).toStrictEqual({
         result: {
           id: 2,
-          noteId,
           userId,
+          noteId: 1,
           role: 0,
         },
       });
