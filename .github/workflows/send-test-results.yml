@@ -59,7 +59,7 @@ jobs:
       - name: Send a message
         uses: codex-team/action-codexbot-notify@v1
         with:
-          webhook: ${{ secrets.CODEX_BOT_NOTIFY_NOTES_CHAT }}
+          webhook: https://notify.bot.codex.so/u/IJBC1JPEBK5P
           message: "${{ env.ACTIONS_RESULTS }}"
           parse_mode: 'markdown'
           disable_web_page_preview: true
