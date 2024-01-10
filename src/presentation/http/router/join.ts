@@ -27,6 +27,25 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
       hash: string
     }
   }>('/:hash', {
+    schema: {
+      params: {
+        hash: {
+          $ref: 'JoinSchema#/properties/hash',
+        },
+      },
+      response: {
+        '2xx': {
+          description: 'Team member',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: 'TeamMemberSchema',
+              },
+            },
+          },
+        },
+      },
+    },
     config: {
       policy: [
         'authRequired',
