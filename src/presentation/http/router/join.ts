@@ -31,7 +31,7 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
     schema: {
       params: {
         hash: {
-          $ref: 'JoinSchema#/properties/hash',
+          $ref: 'JoinSchemaParams#/properties/hash',
         },
       },
       response: {
@@ -40,7 +40,7 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
           content: {
             'application/json': {
               schema: {
-                $ref: 'TeamMemberSchema',
+                $ref: 'JoinSchemaResponse#/properties',
               },
             },
           },
