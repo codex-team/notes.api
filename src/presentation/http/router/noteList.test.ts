@@ -94,7 +94,7 @@ describe('NoteList API', () => {
       expect(response?.statusCode).toBe(expectedStatus);
     });
 
-    test('Returns 400 when page is too large (maximum page numbrer is 30 by default)', async () => {
+    test('Returns 400 when page is too large (maximum page number is 30 by default)', async () => {
       const expectedStatus = 400;
       const pageNumber = 31;
 

@@ -41,7 +41,7 @@ declare global {
      * Executes specified sql query in test DB.
      * Might be used in tests to perform some specific database operations
      *
-     * @param sql - string containing sql to executein test DB
+     * @param sql - string containing sql to execute in test DB
      */
     query: (sql: string) => Promise<unknown>;
   };
