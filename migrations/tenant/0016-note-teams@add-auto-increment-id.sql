@@ -10,4 +10,5 @@ ALTER TABLE public.note_teams_id_seq OWNER TO codex;
 
 ALTER SEQUENCE public.note_teams_id_seq OWNED BY public.note_teams.id;
 
+-- Make identifier default value incrementing
 ALTER TABLE ONLY public.note_teams ALTER COLUMN id SET DEFAULT nextval('public.note_teams_id_seq'::regclass);
