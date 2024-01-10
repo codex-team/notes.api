@@ -17,11 +17,11 @@ export default class NoteService {
   /**
    * Note service constructor
    *
-   * @param repository - note repository
+   * @param noteRepository - note repository
    * @param noteRelationsRepository - note relationship service
    */
-  constructor(repository: NoteRepository, noteRelationsRepository: NoteRelationsRepository) {
-    this.repository = repository;
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository) {
+    this.repository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
   }
 
@@ -80,9 +80,7 @@ export default class NoteService {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
       if (parentNote === null) {
-        if (parentNote === null) {
-          throw new Error(`Note with id ${parentPublicId} was not found`);
-        }
+        throw new Error(`Note with id ${parentPublicId} was not found`);
       }
 
       await this.noteRelationsRepository.updateNoteRelationById(updatedNote.id, parentNote.id);
