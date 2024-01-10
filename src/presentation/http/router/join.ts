@@ -15,6 +15,7 @@ interface JoinRouterOptions {
 /**
  * Join Router plugin
  *
+ * @todo use different replies for different errors in post route
  * @param fastify - fastify instance
  * @param opts - router options
  * @param done - done callback
@@ -61,9 +62,6 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
     } catch (error: unknown) {
       const causedError = error as Error;
 
-      /**
-       * TODO use different replies for different errors
-       */
       return reply.notAcceptable(causedError.message);
     }
 
