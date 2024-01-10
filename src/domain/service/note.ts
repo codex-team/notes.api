@@ -12,13 +12,16 @@ export default class NoteService {
    */
   public noteRepository: NoteRepository;
 
+  /**
+   * Note relationship repository
+   */
   public noteRelationsRepository: NoteRelationsRepository;
 
   /**
    * Note service constructor
    *
    * @param noteRepository - note repository
-   * @param noteRelationsRepository - note relationship service
+   * @param noteRelationsRepository - note relationship repository
    */
   constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository) {
     this.noteRepository = noteRepository;
