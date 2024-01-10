@@ -62,7 +62,7 @@ describe('Join API', () => {
           id: 2,
           noteId,
           userId,
-          role: 0,
+          role: 'read',
         },
       });
     });
