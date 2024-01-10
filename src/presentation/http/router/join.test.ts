@@ -17,7 +17,7 @@ describe('Join API', () => {
 
       expect(response?.statusCode).toBe(406);
 
-      expect(await response?.json()).toStrictEqual({
+      expect(response?.json()).toStrictEqual({
         message: 'User already in team',
       });
     });
@@ -36,7 +36,7 @@ describe('Join API', () => {
 
       expect(response?.statusCode).toBe(406);
 
-      expect(await response?.json()).toStrictEqual({
+      expect(response?.json()).toStrictEqual({
         message: `Wrong invitation`,
       });
     });
