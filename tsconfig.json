@@ -24,6 +24,7 @@
     "vitest.config.js",
     ".eslintrc.cjs",
     "fastify.d.ts",
+    "migrations/scripts/*.ts",
   ],
   "ts-node": {
     // Tell ts-node CLI to install the --loader automatically

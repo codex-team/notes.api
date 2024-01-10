@@ -1,6 +1,6 @@
 import pg, { type ClientConfig } from 'pg';
 import { migrate } from 'postgres-migrations';
-import logger from './../../../../infrastructure/logging/index.js';
+import logger from '@infrastructure/logging/index.js';
 
 
 /**
