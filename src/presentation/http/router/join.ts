@@ -16,6 +16,7 @@ interface JoinRouterOptions {
  * Join Router plugin
  *
  * @todo use different replies for different errors in post route
+ * @todo add check for write permission in route
  * @param fastify - fastify instance
  * @param opts - router options
  * @param done - done callback
