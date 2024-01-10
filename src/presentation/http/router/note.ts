@@ -253,6 +253,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     });
   });
 
+  fastify.setErrorHandler(function (error, request, reply) {
+    this.log.error(error);
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    void reply.status(409).send({ ok: false });
+  });
+
   done();
 };
 
