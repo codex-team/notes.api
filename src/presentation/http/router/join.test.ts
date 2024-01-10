@@ -66,7 +66,7 @@ describe('Join API', () => {
           userId,
           role: 0,
         },
-      };);
+      });
     });
   });
 });
