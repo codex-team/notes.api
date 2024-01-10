@@ -41,7 +41,7 @@ export default class NoteSettingsService {
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByInvitationHash(invitationHash);
 
     /**
-     * Check does invitation hash is valid
+     * Check if invitation hash is valid
      */
     if (noteSettings === null) {
       throw new Error(`Wrong invitation`);

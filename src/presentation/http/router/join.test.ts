@@ -41,6 +41,7 @@ describe('Join API', () => {
         message: `Note with invitation ${hash} does not exists`,
       });
     });
+
     test('Returns 200 when user is added to the team', async () => {
       const userId = 1;
       const noteId = 1;
