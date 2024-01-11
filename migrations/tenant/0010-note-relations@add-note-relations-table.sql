@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.note_relations (
 --
 -- Name: note_relations relation_id; Type: PK CONSTRAINT; Schema: public; Owner: codex
 --
-ALTER TABLE public.note_relations DROP CONSTRAINT IF EXISTS relation_id_pkey;
+ALTER TABLE public.note_relations DROP CONSTRAINT IF EXISTS relation_id;
 ALTER TABLE public.note_relations 
     ADD CONSTRAINT relation_id PRIMARY KEY (id);
 
