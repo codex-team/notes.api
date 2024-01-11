@@ -77,7 +77,7 @@ export default class TeamRepository {
    * @param noteId - note internal id
    * @param role - team member new role
    */
-  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRole): Promise<TeamMember['role'] | null> {
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : keyof typeof MemberRole): Promise<keyof typeof MemberRole | null> {
     return await this.storage.patchMemberRoleById(id, noteId, role);
   }
 }

@@ -291,7 +291,7 @@ describe('NoteSettings API', () => {
         },
         url: '/note-settings/new-role/write',
         body: {
-          'userId': 3,
+          'userId': 1,
           'noteId': 2,
         },
       });
@@ -307,9 +307,9 @@ describe('NoteSettings API', () => {
       if (team?.json() !== undefined) {
         expect(team?.json()).toStrictEqual([
           {
-            'id': 1,
+            'id': 2,
             'noteId': 2,
-            'userId': 3,
+            'userId': 1,
             'role': 1,
           },
         ]);
@@ -324,7 +324,7 @@ describe('NoteSettings API', () => {
         },
         url: '/note-settings/new-role/write',
         body: {
-          'userId': 3,
+          'userId': 1,
           'noteId': 2,
         },
       });
@@ -333,7 +333,7 @@ describe('NoteSettings API', () => {
       expect(response?.body).toBe('write');
     });
 
-    test('returns 404 and User in team not found message if no such a note exists', async () => {
+    test('returns 404 and User in team is not found message if no such a note exists', async () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {

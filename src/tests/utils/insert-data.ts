@@ -60,17 +60,6 @@ async function insertNoteSettings(db: SequelizeOrm): Promise<void> {
   }
 }
 
-/**
- * Fills in the database with note teams data
- *
- * @param db - SequelizeOrm instance
- */
-async function insertNoteTeams(db: SequelizeOrm): Promise<void> {
-  for (const noteTeam of noteTeams) {
-    await db.connection.query(`INSERT INTO public.note_teams ("note_id", "user_id", "role") VALUES (${noteTeam.note_id}, ${noteTeam.user_id}, '${noteTeam.role}')`);
-  }
-}
-
 
 /**
  * Fills in the database with test data

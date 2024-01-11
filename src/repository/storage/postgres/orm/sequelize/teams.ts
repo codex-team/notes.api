@@ -227,7 +227,10 @@ export default class TeamsSequelizeStorage {
    * @param noteId - note internal id
    * @param role - new team member role
    */
-  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<TeamMember['role'] | null> {
+  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role: keyof typeof MemberRole): Promise<keyof typeof MemberRole | null> {
+    console.log('======================');
+    console.log(typeof role);
+    console.log('======================');
     const affectedRows = await this.model.update({
       role: MemberRole[role],
     }, {
