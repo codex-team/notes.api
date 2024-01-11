@@ -125,5 +125,20 @@ declare module 'fastify' {
      * @param message - Optional message to send. If not specified, default message will be sent
      */
     notAcceptable: (message?: string) => Promise<void>;
+
+    /**
+     * Custom method for sending 500 error
+     *
+     * Send this error when a domain-level error is thrown
+     *
+     * @example
+     *
+     *  if (note.creatorId !== userId) {
+     *    return reply.domainError('Note with id ${id} was not updated');
+     *  }
+     *
+     * @param message - Optional message to send. If not specified, default message will be sent
+     */
+    domainError: (message?: string) => Promise<void>;
   }
 }

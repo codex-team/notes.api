@@ -10,7 +10,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
 import cookie from '@fastify/cookie';
-import { notFound, forbidden, unauthorized, notAcceptable } from './decorators/index.js';
+import { notFound, forbidden, unauthorized, notAcceptable, domainError } from './decorators/index.js';
 import NoteRouter from '@presentation/http/router/note.js';
 import OauthRouter from '@presentation/http/router/oauth.js';
 import AuthRouter from '@presentation/http/router/auth.js';
@@ -81,6 +81,8 @@ export default class HttpApi implements Api {
     this.addPoliciesCheckHook();
 
     await this.addApiRoutes(domainServices);
+
+    this.domainErrorHandler();
   }
 
 
@@ -287,6 +289,7 @@ export default class HttpApi implements Api {
     this.server?.decorateReply('forbidden', forbidden);
     this.server?.decorateReply('unauthorized', unauthorized);
     this.server?.decorateReply('notAcceptable', notAcceptable);
+    this.server?.decorateReply('domainError', domainError);
   }
 
   /**
@@ -327,6 +330,21 @@ export default class HttpApi implements Api {
           await Policies[policy](request, reply);
         }
       });
+    });
+  }
+
+  /**
+   * Domain error handler
+   */
+  private domainErrorHandler(): void {
+    this.server?.setErrorHandler(function (error, request, reply) {
+      const statusCode = error.statusCode;
+
+      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+      if (statusCode === 500) {
+        this.log.error(error);
+        void reply.domainError(error.message);
+      }
     });
   }
 }
