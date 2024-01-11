@@ -6,7 +6,7 @@ import { insertData } from './insert-data';
 import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import config from '@infrastructure/config/index.js';
-import { runTenantMigrations } from '../../../migrations/scripts/migrate.js';
+import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate';
 import API from '@presentation/index.js';
 
 import { beforeAll, afterAll } from 'vitest';

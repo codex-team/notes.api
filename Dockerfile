@@ -16,14 +16,12 @@ FROM node:20-alpine AS runner
 WORKDIR /usr/app
 
 COPY --from=builder /app/dist ./dist
-COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
+COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn/releases ./.yarn/releases
 RUN yarn install
 COPY ./app-config.yaml .
 COPY ./migrations ./migrations
 COPY ./init.sh .
-COPY ./src/infrastructure/config/index.ts ./src/infrastructure/config/
-COPY ./src/infrastructure/logging/index.ts ./src/infrastructure/logging/
 
 USER node
 ENV NODE_ENV="production"
