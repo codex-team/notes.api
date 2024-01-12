@@ -6,8 +6,6 @@ CREATE SEQUENCE IF NOT EXISTS public.note_teams_id_seq
     NO MAXVALUE
     CACHE 1;
 
--- ALTER TABLE public.note_teams_id_seq OWNER TO codex;
-
 ALTER SEQUENCE public.note_teams_id_seq OWNED BY public.note_teams.id;
 
 -- Make identifier default value incrementing
