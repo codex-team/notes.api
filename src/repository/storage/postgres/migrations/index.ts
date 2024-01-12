@@ -1,5 +1,5 @@
 import path from 'path';
-import config from '@infrastructure/config/index.js';
+import config from './../../../../infrastructure/config/index.js';
 import { runTenantMigrations } from './migrate.js';
 
 /**
