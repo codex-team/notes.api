@@ -283,7 +283,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-teams/new-role/:newRole', () => {
-    test('if we want write role, in database it will be stored as 1', async () => {
+    test('If we want to change role to "write", in database it will be stored as number : 1', async () => {
       await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -316,7 +316,7 @@ describe('NoteSettings API', () => {
       }
     });
 
-    test('returns status code 200 and new role if it was patched', async () => {
+    test('Returns status code 200 and new role if it was patched', async () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -333,7 +333,7 @@ describe('NoteSettings API', () => {
       expect(response?.body).toBe('write');
     });
 
-    test('returns 404 and User in team is not found message if no such a note exists', async () => {
+    test('Returns status code 404 and "User in team is not found" message if no such a note exists', async () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
