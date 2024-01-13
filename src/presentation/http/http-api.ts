@@ -24,6 +24,8 @@ import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
 import NoteListRouter from '@presentation/http/router/noteList.js';
 import { EditorToolSchema } from './schema/EditorTool.js';
+import JoinRouter from '@presentation/http/router/join.js';
+import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -198,6 +200,11 @@ export default class HttpApi implements Api {
       noteListService: domainServices.noteListService,
     });
 
+    await this.server?.register(JoinRouter, {
+      prefix: '/join',
+      noteSettings: domainServices.noteSettingsService,
+    });
+
     await this.server?.register(NoteSettingsRouter, {
       prefix: '/note-settings',
       noteSettingsService: domainServices.noteSettingsService,
@@ -269,6 +276,8 @@ export default class HttpApi implements Api {
     this.server?.addSchema(UserSchema);
     this.server?.addSchema(NoteSchema);
     this.server?.addSchema(EditorToolSchema);
+    this.server?.addSchema(JoinSchemaParams);
+    this.server?.addSchema(JoinSchemaResponse);
   }
 
   /**

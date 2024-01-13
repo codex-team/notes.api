@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.note_relations (
 --
 ALTER TABLE public.note_relations DROP CONSTRAINT IF EXISTS note_relations_pkey;
 ALTER TABLE public.note_relations 
-    ADD CONSTRAINT relation_id PRIMARY KEY (id);
+    ADD CONSTRAINT note_relations_pkey PRIMARY KEY (id);
 
 --
 -- Name: note_relations child_note_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: codex

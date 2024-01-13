@@ -1,8 +1,10 @@
 import type { NoteInternalId } from '@domain/entities/note.js';
+import type { InvitationHash } from '@domain/entities/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsRepository from '@repository/noteSettings.repository.js';
 import type TeamRepository from '@repository/team.repository.js';
-import type { MemberRole, Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
+import type { Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
+import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 
@@ -20,12 +22,45 @@ export default class NoteSettingsService {
   /**
    * Note Settings service constructor
    *
-   * @param noteSettingsrepository - note settings repository
+   * @param noteSettingsRepository - note settings repository
    * @param teamRepository - team repository
    */
-  constructor(noteSettingsrepository: NoteSettingsRepository, teamRepository: TeamRepository) {
-    this.noteSettingsRepository = noteSettingsrepository;
+  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository) {
+    this.noteSettingsRepository = noteSettingsRepository;
     this.teamRepository = teamRepository;
+  }
+
+  /**
+   * Add user to the team by invitation hash
+   *
+   * @param invitationHash - hash for joining to the team
+   * @param userId - user to add
+   */
+  public async addUserToTeamByInvitationHash(invitationHash: InvitationHash, userId: User['id']): Promise<TeamMember | null> {
+    const defaultUserRole = MemberRole.read;
+    const noteSettings = await this.noteSettingsRepository.getNoteSettingsByInvitationHash(invitationHash);
+
+    /**
+     * Check if invitation hash is valid
+     */
+    if (noteSettings === null) {
+      throw new Error(`Wrong invitation`);
+    }
+
+    /**
+     * Check if user not already in team
+     */
+    const isUserTeamMember = await this.teamRepository.isUserInTeam(userId, noteSettings.noteId);
+
+    if (isUserTeamMember) {
+      throw new Error(`User already in team`);
+    }
+
+    return await this.teamRepository.createTeamMembership({
+      noteId: noteSettings.noteId,
+      userId,
+      role: defaultUserRole,
+    });
   }
 
   /**
@@ -102,6 +137,6 @@ export default class NoteSettingsService {
    * @returns created team member
    */
   public async createTeamMember(team: TeamMemberCreationAttributes): Promise<TeamMember> {
-    return await this.teamRepository.create(team);
+    return await this.teamRepository.createTeamMembership(team);
   }
 }
