@@ -26,6 +26,7 @@ import NoteListRouter from '@presentation/http/router/noteList.js';
 import { EditorToolSchema } from './schema/EditorTool.js';
 import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
+import { DomainError } from '@domain/entities/domainError.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -338,10 +339,10 @@ export default class HttpApi implements Api {
    */
   private domainErrorHandler(): void {
     this.server?.setErrorHandler(function (error, request, reply) {
-      const statusCode = error.statusCode;
-
-      // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-      if (statusCode === 500) {
+      /**
+       * If we have an error that occurs in the domain-level we reply it with special format
+       */
+      if (error instanceof DomainError) {
         this.log.error(error);
         void reply.domainError(error.message);
       }
