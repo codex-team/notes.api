@@ -16,7 +16,7 @@ import type { FastifyReply } from 'fastify';
  */
 export default async function domainError(this: FastifyReply, message = 'Domain level error'): Promise<void> {
   await this
-    .code(StatusCodes.INTERNAL_SERVER_ERROR)
+    .code(StatusCodes.BAD_REQUEST)
     .type('application/json')
     .send({
       message,

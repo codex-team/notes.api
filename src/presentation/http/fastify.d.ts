@@ -127,15 +127,18 @@ declare module 'fastify' {
     notAcceptable: (message?: string) => Promise<void>;
 
     /**
-     * Custom method for sending 500 error
+     * Custom method for sending 400 error
      *
      * Send this error when a domain-level error is thrown
      *
      * @example
      *
-     *  if (note.creatorId !== userId) {
-     *    return reply.domainError('Note with id ${id} was not updated');
-     *  }
+     *  try {
+     *    if (updatedNote === null) {
+     *      throw new DomainError(`Note with id ${id} was not updated`);
+     *  } catch (error: DomainError) {
+     *      reply.domainError(error.message);
+     * }
      *
      * @param message - Optional message to send. If not specified, default message will be sent
      */

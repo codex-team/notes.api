@@ -26,7 +26,7 @@ import NoteListRouter from '@presentation/http/router/noteList.js';
 import { EditorToolSchema } from './schema/EditorTool.js';
 import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
-import { DomainError } from '@domain/entities/domainError.js';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 
 const appServerLogger = getLogger('appServer');
