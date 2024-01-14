@@ -1,5 +1,5 @@
 /**
- * DomainError entity
+ * DomainError entity — manually thrown exception provided by business logic
  */
 export class DomainError extends Error {
   /**
