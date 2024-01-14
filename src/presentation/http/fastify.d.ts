@@ -134,11 +134,14 @@ declare module 'fastify' {
      * @example
      *
      *  try {
-     *    if (updatedNote === null) {
-     *      throw new DomainError(`Note with id ${id} was not updated`);
-     *  } catch (error: DomainError) {
+     *    service.someAction()
+     *  } catch (error: Error) {
+     *    if (error instanceof DomainError) {
      *      reply.domainError(error.message);
-     * }
+     *      return;
+     *    }
+     *    throw error;
+     *  }
      *
      * @param message - Optional message to send. If not specified, default message will be sent
      */
