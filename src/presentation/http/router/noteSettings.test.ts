@@ -283,17 +283,13 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-teams/new-role/:newRole', () => {
-    test('If we want to change role to "write", in database it will be stored as number : 1', async () => {
+    test('Update team member role by user id and note id', async () => {
       await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/write',
-        body: {
-          'userId': 1,
-          'noteId': 2,
-        },
+        url: '/note-settings/new-role/Pq1T9vc23Q/1/write',
       });
 
       const team = await global.api?.fakeRequest({
@@ -316,17 +312,13 @@ describe('NoteSettings API', () => {
       }
     });
 
-    test('Returns status code 200 and new role if it was patched', async () => {
+    test('Returns status code 200 and new role if it was patched even if user already has a passing role', async () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/write',
-        body: {
-          'userId': 1,
-          'noteId': 2,
-        },
+        url: '/note-settings/new-role/Pq1T9vc23Q/1/write',
       });
 
       expect(response?.statusCode).toBe(200);
@@ -339,15 +331,11 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/write',
-        body: {
-          'userId': 15,
-          'noteId': 0,
-        },
+        url: '/note-settings/new-role/73NdxFZ4k7/15/write',
       });
 
       expect(response?.statusCode).toBe(404);
-      expect(response?.json().message).toBe('User in team not found');
+      expect(response?.json().message).toBe('User does not belong to Note\'s team');
     });
   });
 });

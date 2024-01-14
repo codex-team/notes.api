@@ -5,7 +5,7 @@ import { isEmpty } from '@infrastructure/utils/empty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import type { NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { NotePublicId } from '@domain/entities/note.js';
 import type { Team, MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 
@@ -94,25 +94,34 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * patch team member role by user and note id
    */
   fastify.patch<{
-    Body: {
-      userId: User['id'];
-      noteId: NoteInternalId,
-    }
     Params: {
+      notePublicId: NotePublicId,
+      userId: User['id'];
       newRole: keyof typeof MemberRole,
       },
     Reply: keyof typeof MemberRole,
-  }>('/new-role/:newRole', {
+  }>('/new-role/:notePublicId/:userId/:newRole', {
     config: {
       policy: [
         'authRequired',
       ],
     },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
   }, async (request, reply) => {
-    const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, request.body.noteId, request.params.newRole);
+    const noteId = request.note?.id as number;
+    const newRole = await noteSettingsService.patchMemberRoleByUserId(request.params.userId, noteId, request.params.newRole);
 
     if (newRole === null) {
-      return reply.notFound('User in team not found');
+      return reply.notFound('User does not belong to Note\'s team ');
     }
 
     return reply.send(newRole);
