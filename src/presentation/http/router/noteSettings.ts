@@ -92,6 +92,8 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
   /**
    * patch team member role by user and note id
+   *
+   * TODO add policy for this route to check id user have 'write' role if this team to patch someone's else role
    */
   fastify.patch<{
     Params: {
@@ -121,7 +123,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const newRole = await noteSettingsService.patchMemberRoleByUserId(request.params.userId, noteId, request.params.newRole);
 
     if (newRole === null) {
-      return reply.notFound('User does not belong to Note\'s team ');
+      return reply.notFound('User does not belong to Note\'s team');
     }
 
     return reply.send(newRole);
