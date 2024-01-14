@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import userSessions from '@tests/test-data/user-sessions.json';
-=======
 // import type AuthSession from '@domain/entities/authSession';
-import userSessions from '@tests/test-data/userSessions.json';
->>>>>>> 023a509cd58ac661142c392596df8e9a10c65342
+import userSessions from '@tests/test-data/user-sessions.json';
 import { describe, test, expect, beforeAll } from 'vitest';
 
 /**
@@ -11,24 +7,14 @@ import { describe, test, expect, beforeAll } from 'vitest';
  */
 let accessToken = '';
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 023a509cd58ac661142c392596df8e9a10c65342
 describe('NoteList API', () => {
   beforeAll(() => {
     /**
      * userId for authorization
      */
-<<<<<<< HEAD
-    const userId = userSessions[0]['user_id'];
-
-    accessToken = global.auth(userId);
-=======
     const id = userSessions[0]['user_id'];
 
     accessToken = global.auth(id);
->>>>>>> 023a509cd58ac661142c392596df8e9a10c65342
   });
 
   describe('GET /notes?page', () => {
