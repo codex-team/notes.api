@@ -7,6 +7,7 @@ import type { Team, TeamMember, TeamMemberCreationAttributes } from '@domain/ent
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
+import { DomainError } from '@domain/entities/DomainError';
 
 /**
  * Service responsible for Note Settings
@@ -44,7 +45,7 @@ export default class NoteSettingsService {
      * Check if invitation hash is valid
      */
     if (noteSettings === null) {
-      throw new Error(`Wrong invitation`);
+      throw new DomainError(`Wrong invitation`);
     }
 
     /**
@@ -53,7 +54,7 @@ export default class NoteSettingsService {
     const isUserTeamMember = await this.teamRepository.isUserInTeam(userId, noteSettings.noteId);
 
     if (isUserTeamMember) {
-      throw new Error(`User already in team`);
+      throw new DomainError(`User already in team`);
     }
 
     return await this.teamRepository.createTeamMembership({

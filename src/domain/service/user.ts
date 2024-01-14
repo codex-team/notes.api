@@ -3,6 +3,7 @@ import { Provider } from '@repository/user.repository.js';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools';
 import type { SharedDomainMethods } from './shared/index.js';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 export {
   Provider
@@ -57,7 +58,7 @@ export default class UserService {
     const user = await this.getUserById(userId);
 
     if (user === null) {
-      throw new Error('User not found');
+      throw new DomainError('User not found');
     }
 
     const userToolsIds = user.editorTools ?? [];
