@@ -60,7 +60,7 @@ describe('Join API', () => {
         result: {
           id: 2,
           userId,
-          noteId: 1,
+          noteId: 2,
           role: 0,
         },
       });
