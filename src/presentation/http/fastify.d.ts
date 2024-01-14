@@ -127,7 +127,7 @@ declare module 'fastify' {
     notAcceptable: (message?: string) => Promise<void>;
 
     /**
-     * Custom method for sending 400 error
+     * Custom method for replying with information that business logic dismissed the request for some reason
      *
      * Send this error when a domain-level error is thrown
      *
