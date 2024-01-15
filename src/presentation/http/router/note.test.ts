@@ -283,6 +283,25 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
+    test('Return 406 when trying to update not existing note', async () => {
+      const userId = 2;
+      const accessToken = global.auth(userId);
+      const notExistingPublicId = 'Pq1T9vc234';
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${notExistingPublicId}`,
+        body: {
+          'content': { new: 'content added' },
+        },
+      });
+
+      expect(response?.statusCode).toBe(406);
+    });
+
     test('Returns status 406 when the public id does not exist', async () => {
       const expectedStatus = 406;
       const nonexistentId = 'ishvm5qH84';
@@ -319,25 +338,6 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(expectedStatus);
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
-    });
-
-    test('Return 406 when trying to update not existing note', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
-      const notExistingPublicId = 'Pq1T9vc234';
-
-      const response = await global.api?.fakeRequest({
-        method: 'PATCH',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/${notExistingPublicId}`,
-        body: {
-          'content': { new: 'content added' },
-        },
-      });
-
-      expect(response?.statusCode).toBe(406);
     });
   });
 
