@@ -2,11 +2,12 @@ import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptio
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
-import type { Team, TeamMemberCreationAttributes, TeamMember } from '@domain/entities/team.js';
+import type { Team, TeamMemberCreationAttributes, TeamMember, MemberRoleKeys } from '@domain/entities/team.js';
 import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
+
 
 /**
  * Class representing a teams model in database
@@ -181,7 +182,7 @@ export default class TeamsSequelizeStorage {
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRoleKeys | null> {
     const res = await this.model.findOne({
       where: {
         userId,
@@ -189,7 +190,11 @@ export default class TeamsSequelizeStorage {
       },
     });
 
-    return res?.role ?? null;
+    if (res?.role !== null) {
+      return MemberRole[res?.role as number] as MemberRoleKeys;
+    }
+
+    return null;
   }
 
   /**
@@ -227,7 +232,7 @@ export default class TeamsSequelizeStorage {
    * @param noteId - note internal id
    * @param role - new team member role
    */
-  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role: keyof typeof MemberRole): Promise<keyof typeof MemberRole | null> {
+  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role: MemberRoleKeys): Promise<MemberRoleKeys | null> {
     const affectedRows = await this.model.update({
       role: MemberRole[role],
     }, {

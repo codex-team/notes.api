@@ -1,5 +1,5 @@
 import type TeamStorage from '@repository/storage/team.storage.js';
-import type { MemberRole, Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
+import type { MemberRoleKeys, Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
 import type { NoteInternalId } from '@domain/entities/note';
 import type User from '@domain/entities/user';
 
@@ -49,7 +49,7 @@ export default class TeamRepository {
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRoleKeys | null> {
     return await this.storage.getUserRoleByUserIdAndNoteId(userId, noteId);
   }
 
@@ -77,7 +77,7 @@ export default class TeamRepository {
    * @param noteId - note internal id
    * @param role - team member new role
    */
-  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : keyof typeof MemberRole): Promise<keyof typeof MemberRole | null> {
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRoleKeys): Promise<MemberRoleKeys | null> {
     return await this.storage.patchMemberRoleById(id, noteId, role);
   }
 }

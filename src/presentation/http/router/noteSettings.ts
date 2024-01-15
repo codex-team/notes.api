@@ -181,7 +181,8 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
   /**
    * Get team by note id
-   * TODO add policy for this route (check if user is collaborator)
+   *
+   * @todo add policy for this route (check if user is collaborator)
    */
   fastify.get<{
     Params: {

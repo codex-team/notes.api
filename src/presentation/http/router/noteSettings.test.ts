@@ -283,14 +283,16 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-teams/new-role/:newRole', () => {
-    test('Update team member role by user id and note id', async () => {
-      await global.api?.fakeRequest({
+    test('Update team member role by user id and note id, with status code 200', async () => {
+      const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
         url: '/note-settings/new-role/Pq1T9vc23Q/1/write',
       });
+
+      expect(response?.statusCode).toBe(200);
 
       const team = await global.api?.fakeRequest({
         method: 'GET',
@@ -300,19 +302,17 @@ describe('NoteSettings API', () => {
         url: '/note-settings/Pq1T9vc23Q/team',
       });
 
-      if (team?.json() !== undefined) {
-        expect(team?.json()).toStrictEqual([
-          {
-            'id': 2,
-            'noteId': 2,
-            'userId': 1,
-            'role': 1,
-          },
-        ]);
-      }
+      expect(team?.json()).toStrictEqual([
+        {
+          'id': 2,
+          'noteId': 2,
+          'userId': 1,
+          'role': 1,
+        },
+      ]);
     });
 
-    test('Returns status code 200 and new role if it was patched even if user already has a passing role', async () => {
+    test('Returns status code 200 and new role, if role was patched (if the user already had passing a role, then behavior is the same)', async () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -325,7 +325,7 @@ describe('NoteSettings API', () => {
       expect(response?.body).toBe('write');
     });
 
-    test('Returns status code 404 and "User in team is not found" message if no such a note exists', async () => {
+    test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
