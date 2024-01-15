@@ -7,7 +7,6 @@ import noteSettings from '@tests/test-data/notes-settings.json';
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
     test('Returns note with specified hostname', async () => {
-      const expectedStatus = 200;
       const expectedResponse = {
         'note': {
           'id': 60,
@@ -27,7 +26,7 @@ describe('Note API', () => {
         url: '/note/resolve-hostname/codex.so',
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toStrictEqual(expectedResponse);
     });
@@ -321,19 +320,13 @@ describe('Note API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
-
-    test.todo('Update note by public id with 200 status, user is creator of the note');
   });
 
   describe('POST /note', () => {
     test('Post a new note without parentId passed', async () => {
-      const expectedStatus = 200;
       const userId = 2;
       const accessToken = global.auth(userId);
 
-      /**
-       * POST fakeRequest sends back a NotePublicId typeof string
-       */
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
@@ -343,25 +336,23 @@ describe('Note API', () => {
         body: {},
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
       expect(response?.json().id).toBeTypeOf('string');
       expect(response?.json().id.length).toBeGreaterThan(0);
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      const expectedStatus = 401;
-
       const response = await global.api?.fakeRequest({
         method: 'POST',
         url: `/note`,
         body: {},
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(401);
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
-    test.todo('Returns 400 when parentId has incorrect characters and lenght');
+    test.todo('Returns 400 when parentId has incorrect characters and length');
   });
 
   test.todo('Create note with parentId field');
