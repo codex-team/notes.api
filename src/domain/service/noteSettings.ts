@@ -70,7 +70,13 @@ export default class NoteSettingsService {
    * @param id - note internal id
    */
   public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings> {
-    return await this.noteSettingsRepository.getNoteSettingsByNoteId(id);
+    const settings = await this.noteSettingsRepository.getNoteSettingsByNoteId(id);
+
+    if (settings === null) {
+      throw new DomainError(`Note settings not found`);
+    }
+
+    return settings;
   }
 
   /**
@@ -97,6 +103,10 @@ export default class NoteSettingsService {
    */
   public async patchNoteSettingsByNoteId(noteId: NoteInternalId, data: Partial<NoteSettings>): Promise<NoteSettings | null> {
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByNoteId(noteId);
+
+    if (noteSettings === null) {
+      throw new DomainError(`Note settings not found`);
+    }
 
     return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
   }
