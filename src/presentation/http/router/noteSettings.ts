@@ -93,7 +93,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   /**
    * patch team member role by user and note id
    *
-   * TODO add policy for this route to check id user have 'write' role if this team to patch someone's else role
+   * @todo add policy for this route to check id user have 'write' role if this team to patch someone's else role
    */
   fastify.patch<{
     Params: {
