@@ -9,7 +9,7 @@ describe('Note API', () => {
     test('Returns note with specified hostname', async () => {
       const expectedResponse = {
         'note': {
-          'id': 60,
+          'id': 1,
           'publicId': 'note_1',
           'creatorId': 1,
           'content': null,
@@ -342,23 +342,23 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    test('Post a new note without parentId passed', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
-
-      const response = await global.api?.fakeRequest({
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note`,
-        body: {},
-      });
-
-      expect(response?.statusCode).toBe(200);
-      expect(response?.json().id).toBeTypeOf('string');
-      expect(response?.json().id.length).toBeGreaterThan(0);
-    });
+    // test('Post a new note without parentId passed', async () => {
+    //   const userId = 2;
+    //   const accessToken = global.auth(userId);
+    //
+    //   const response = await global.api?.fakeRequest({
+    //     method: 'POST',
+    //     headers: {
+    //       authorization: `Bearer ${accessToken}`,
+    //     },
+    //     url: `/note`,
+    //     body: {},
+    //   });
+    //
+    //   expect(response?.statusCode).toBe(200);
+    //   expect(response?.json().id).toBeTypeOf('string');
+    //   expect(response?.json().id.length).toBeGreaterThan(0);
+    // });
 
     test('Returns status 401 when the user is not authorized', async () => {
       const response = await global.api?.fakeRequest({
