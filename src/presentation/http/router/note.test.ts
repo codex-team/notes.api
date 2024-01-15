@@ -320,6 +320,25 @@ describe('Note API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
+
+    test('Return 406 when trying to update not existing note', async () => {
+      const userId = 2;
+      const accessToken = global.auth(userId);
+      const notExistingPublicId = 'Pq1T9vc234';
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${notExistingPublicId}`,
+        body: {
+          'content': { new: 'content added' },
+        },
+      });
+
+      expect(response?.statusCode).toBe(406);
+    });
   });
 
   describe('POST /note', () => {
