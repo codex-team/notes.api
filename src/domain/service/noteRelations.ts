@@ -20,46 +20,6 @@ export default class NoteRelationsService {
   }
 
   /**
-   * Adds note relationship
-   *
-   * @param noteId - id of the current note
-   * @param parentId - id of the parent note, may be undefined if not passed
-   */
-  public async addNoteRelation(noteId: Note['id'], parentId: Note['id'] | undefined): Promise<boolean> {
-    /**
-     * If parent id not passed returned false - in this case the current note will not have a parent note field
-     */
-    if (parentId === undefined) {
-      return false;
-    }
-
-    return await this.repository.addNoteRelation(
-      noteId,
-      parentId
-    );
-  }
-
-  /**
-   * Adds note relationship
-   *
-   * @param noteId - id of the current note
-   * @param parentId - id of the parent note, may be undefined if not passed
-   */
-  public async updateNoteRelationById(noteId: Note['id'], parentId: Note['id'] | undefined): Promise<boolean> {
-    /**
-     * If parent id not passed returned false
-     */
-    if (parentId === undefined) {
-      return false;
-    }
-
-    return await this.repository.updateNoteRelationById(
-      noteId,
-      parentId
-    );
-  }
-
-  /**
    * Get parent note id by note id
    *
    * @param noteId - id of the current note
