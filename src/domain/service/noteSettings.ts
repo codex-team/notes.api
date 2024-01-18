@@ -146,7 +146,7 @@ export default class NoteSettingsService {
    * @param noteId - note internal id
    * @param role - new team member role
    */
-  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRoleKeys): Promise<MemberRoleKeys | null> {
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role: MemberRoleKeys): Promise<MemberRoleKeys | null> {
     return await this.teamRepository.patchMemberRoleByUserId(id, noteId, role);
   }
 }

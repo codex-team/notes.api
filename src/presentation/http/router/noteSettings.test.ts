@@ -284,6 +284,7 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-teams/new-role/:newRole', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
+      // patch member role of existing team member
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -294,6 +295,7 @@ describe('NoteSettings API', () => {
 
       expect(response?.statusCode).toBe(200);
 
+      // check if we changed role correctly
       const team = await global.api?.fakeRequest({
         method: 'GET',
         headers: {

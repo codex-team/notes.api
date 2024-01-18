@@ -6,7 +6,7 @@ import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type { NotePublicId } from '@domain/entities/note.js';
-import type { Team, MemberRole } from '@domain/entities/team.js';
+import type { Team, MemberRoleKeys } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 
 /**
@@ -91,7 +91,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   });
 
   /**
-   * patch team member role by user and note id
+   * Patch team member role by user and note id
    *
    * @todo add policy for this route to check id user have 'write' role if this team to patch someone's else role
    */
@@ -99,9 +99,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId,
       userId: User['id'];
-      newRole: keyof typeof MemberRole,
+      newRole: MemberRoleKeys,
       },
-    Reply: keyof typeof MemberRole,
+    Reply: MemberRoleKeys,
   }>('/new-role/:notePublicId/:userId/:newRole', {
     config: {
       policy: [
