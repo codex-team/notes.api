@@ -176,6 +176,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
   /**
    * Generates a new invitation hash for a specific note
+   * TODO add policy for this route (check if user's role is write)
    */
   fastify.patch<{
     Params: {

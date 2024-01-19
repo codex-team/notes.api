@@ -351,6 +351,10 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
+
+      test.todo('Return 403 when user in team and have Member Role = read');
+
+      test.todo('Return 403 when user authorized, but not member of the team');
     });
   });
 });
