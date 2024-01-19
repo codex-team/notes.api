@@ -218,6 +218,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const updatedNoteSettings = await noteSettingsService.regenerateInvitationHash(noteId);
 
+    /**
+     * Check if note does not exist
+     */
+    if (isEmpty(updatedNoteSettings)) {
+      return reply.notFound('Note settings not found');
+    }
+
     return reply.send({
       invitationHash: updatedNoteSettings.invitationHash,
     });

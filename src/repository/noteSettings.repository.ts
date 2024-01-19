@@ -47,7 +47,7 @@ export default class NoteSettingsRepository {
    * @param id - note id
    * @returns found note settings
    */
-  public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings> {
+  public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings | null> {
     return await this.storage.getNoteSettingsByNoteId(id);
   }
 

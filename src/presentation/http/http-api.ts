@@ -10,7 +10,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
 import cookie from '@fastify/cookie';
-import { notFound, forbidden, unauthorized, notAcceptable } from './decorators/index.js';
+import { notFound, forbidden, unauthorized, notAcceptable, domainError } from './decorators/index.js';
 import NoteRouter from '@presentation/http/router/note.js';
 import OauthRouter from '@presentation/http/router/oauth.js';
 import AuthRouter from '@presentation/http/router/auth.js';
@@ -27,6 +27,7 @@ import NoteListRouter from '@presentation/http/router/noteList.js';
 import { EditorToolSchema } from './schema/EditorTool.js';
 import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -82,6 +83,8 @@ export default class HttpApi implements Api {
     this.addPoliciesCheckHook();
 
     await this.addApiRoutes(domainServices);
+
+    this.domainErrorHandler();
   }
 
 
@@ -289,6 +292,7 @@ export default class HttpApi implements Api {
     this.server?.decorateReply('forbidden', forbidden);
     this.server?.decorateReply('unauthorized', unauthorized);
     this.server?.decorateReply('notAcceptable', notAcceptable);
+    this.server?.decorateReply('domainError', domainError);
   }
 
   /**
@@ -329,6 +333,21 @@ export default class HttpApi implements Api {
           await Policies[policy](request, reply);
         }
       });
+    });
+  }
+
+  /**
+   * Domain error handler
+   */
+  private domainErrorHandler(): void {
+    this.server?.setErrorHandler(function (error, request, reply) {
+      /**
+       * If we have an error that occurs in the domain-level we reply it with special format
+       */
+      if (error instanceof DomainError) {
+        this.log.error(error);
+        void reply.domainError(error.message);
+      }
     });
   }
 }

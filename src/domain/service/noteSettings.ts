@@ -7,6 +7,7 @@ import type { Team, TeamMember, TeamMemberCreationAttributes } from '@domain/ent
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
+import { DomainError } from '@domain/entities/DomainError';
 
 /**
  * Service responsible for Note Settings
@@ -44,7 +45,7 @@ export default class NoteSettingsService {
      * Check if invitation hash is valid
      */
     if (noteSettings === null) {
-      throw new Error(`Wrong invitation`);
+      throw new DomainError(`Wrong invitation`);
     }
 
     /**
@@ -53,7 +54,7 @@ export default class NoteSettingsService {
     const isUserTeamMember = await this.teamRepository.isUserInTeam(userId, noteSettings.noteId);
 
     if (isUserTeamMember) {
-      throw new Error(`User already in team`);
+      throw new DomainError(`User already in team`);
     }
 
     return await this.teamRepository.createTeamMembership({
@@ -69,7 +70,13 @@ export default class NoteSettingsService {
    * @param id - note internal id
    */
   public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings> {
-    return await this.noteSettingsRepository.getNoteSettingsByNoteId(id);
+    const settings = await this.noteSettingsRepository.getNoteSettingsByNoteId(id);
+
+    if (settings === null) {
+      throw new DomainError(`Note settings not found`);
+    }
+
+    return settings;
   }
 
   /**
@@ -94,16 +101,14 @@ export default class NoteSettingsService {
    * @param data - note settings data with new values
    * @returns updated note settings
    */
-  public async patchNoteSettingsByNoteId(noteId: NoteInternalId, data: Partial<NoteSettings>): Promise<NoteSettings> {
+  public async patchNoteSettingsByNoteId(noteId: NoteInternalId, data: Partial<NoteSettings>): Promise<NoteSettings | null> {
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByNoteId(noteId);
 
-    const updatedNoteSettings = await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
-
-    if (updatedNoteSettings === null) {
-      throw new Error(`Note settings with id ${noteSettings.id} was not updated`);
+    if (noteSettings === null) {
+      throw new DomainError(`Note settings not found`);
     }
 
-    return updatedNoteSettings;
+    return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
   }
 
   /**
@@ -152,7 +157,7 @@ export default class NoteSettingsService {
    * @param noteId - note internal id
    * @returns updated note settings
    */
-  public async regenerateInvitationHash(noteId: NoteInternalId): Promise<NoteSettings> {
+  public async regenerateInvitationHash(noteId: NoteInternalId): Promise<NoteSettings | null> {
     /**
      * Generates a new invitation hash
      */
