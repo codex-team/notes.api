@@ -3,7 +3,7 @@ import type { InvitationHash } from '@domain/entities/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsRepository from '@repository/noteSettings.repository.js';
 import type TeamRepository from '@repository/team.repository.js';
-import type { Team, TeamMember, TeamMemberCreationAttributes, MemberRoleKeys } from '@domain/entities/team.js';
+import type { Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
@@ -107,7 +107,7 @@ export default class NoteSettingsService {
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRoleKeys | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
     return await this.teamRepository.getUserRoleByUserIdAndNoteId(userId, noteId);
   }
 
@@ -146,7 +146,7 @@ export default class NoteSettingsService {
    * @param noteId - note internal id
    * @param role - new team member role
    */
-  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role: MemberRoleKeys): Promise<MemberRoleKeys | null> {
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | null> {
     return await this.teamRepository.patchMemberRoleByUserId(id, noteId, role);
   }
 }

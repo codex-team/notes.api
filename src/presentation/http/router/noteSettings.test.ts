@@ -290,7 +290,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/Pq1T9vc23Q/1/write',
+        url: '/note-settings/new-role/Pq1T9vc23Q/1/1',
       });
 
       expect(response?.statusCode).toBe(200);
@@ -320,11 +320,11 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/Pq1T9vc23Q/1/write',
+        url: '/note-settings/new-role/Pq1T9vc23Q/1/1',
       });
 
       expect(response?.statusCode).toBe(200);
-      expect(response?.body).toBe('write');
+      expect(response?.body).toBe('1');
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
@@ -333,7 +333,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/73NdxFZ4k7/15/write',
+        url: '/note-settings/new-role/73NdxFZ4k7/15/1',
       });
 
       expect(response?.statusCode).toBe(404);
