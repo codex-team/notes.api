@@ -1,6 +1,7 @@
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
+import { DomainError } from '@domain/entities/DomainError';
 
 /**
  * Note service
@@ -54,7 +55,7 @@ export default class NoteService {
     const updatedNote = await this.repository.updateNoteContentById(id, content);
 
     if (updatedNote === null) {
-      throw new Error(`Note with id ${id} was not updated`);
+      throw new DomainError(`Note with id ${id} was not updated`);
     }
 
     return updatedNote;
@@ -69,7 +70,7 @@ export default class NoteService {
     const note = await this.repository.getNoteById(id);
 
     if (note === null) {
-      throw new Error(`Note with id ${id} was not found`);
+      throw new DomainError(`Note with id ${id} was not found`);
     }
 
     return note;
@@ -84,7 +85,7 @@ export default class NoteService {
     const note = await this.repository.getNoteByPublicId(publicId);
 
     if (note === null) {
-      throw new Error(`Note with public id ${publicId} was not found`);
+      throw new DomainError(`Note with public id ${publicId} was not found`);
     }
 
     return note;
