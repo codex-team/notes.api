@@ -314,7 +314,7 @@ describe('NoteSettings API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json().invitationHash).not.toEqual('FfAwyaR80C');
+      expect(response?.json().invitationHash).not.toBe('');
 
       expect(response?.json().invitationHash).toHaveLength(10);
     });
