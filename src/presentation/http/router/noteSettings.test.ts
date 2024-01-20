@@ -290,9 +290,10 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/Pq1T9vc23Q/member/1',
-        body : {
-          newRole : 1,
+        url: '/note-settings/Pq1T9vc23Q/team',
+        body: {
+          userId: 1,
+          newRole: 1,
         },
       });
 
@@ -323,9 +324,10 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/Pq1T9vc23Q/member/1',
-        body : {
-          newRole : 1,
+        url: '/note-settings/Pq1T9vc23Q/team',
+        body: {
+          userId: 1,
+          newRole: 1,
         },
       });
 
@@ -339,9 +341,10 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/73NdxFZ4k7/member/15',
-        body : {
-          newRole : 1,
+        url: '/note-settings/73NdxFZ4k7/team',
+        body: {
+          userId: 15,
+          newRole: 1,
         },
       });
 

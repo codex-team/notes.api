@@ -98,13 +98,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   fastify.patch<{
     Params: {
       notePublicId: NotePublicId,
-      userId: User['id'],
       },
     Body: {
-      newRole: MemberRole
+      userId: User['id'],
+      newRole: MemberRole,
       },
     Reply: MemberRole,
-  }>('/:notePublicId/member/:userId', {
+  }>('/:notePublicId/team', {
     config: {
       policy: [
         'authRequired',
@@ -122,7 +122,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
-    const newRole = await noteSettingsService.patchMemberRoleByUserId(request.params.userId, noteId, request.body.newRole);
+    const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, noteId, request.body.newRole);
 
     if (newRole === null) {
       return reply.notFound('User does not belong to Note\'s team');
