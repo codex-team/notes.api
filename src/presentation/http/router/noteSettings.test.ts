@@ -282,7 +282,7 @@ describe('NoteSettings API', () => {
     test.todo('Return 403 when user authorized, but not member of the team');
   });
 
-  describe('PATCH /note-teams/new-role/:newRole', () => {
+  describe('PATCH /note-settings/:notePublicId/team', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
       // patch member role of existing team member
       const response = await global.api?.fakeRequest({
