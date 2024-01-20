@@ -290,7 +290,10 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/Pq1T9vc23Q/1/1',
+        url: '/note-settings/Pq1T9vc23Q/member/1',
+        body : {
+          newRole : 1,
+        },
       });
 
       expect(response?.statusCode).toBe(200);
@@ -320,7 +323,10 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/Pq1T9vc23Q/1/1',
+        url: '/note-settings/Pq1T9vc23Q/member/1',
+        body : {
+          newRole : 1,
+        },
       });
 
       expect(response?.statusCode).toBe(200);
@@ -333,7 +339,10 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${global.auth(1)}`,
         },
-        url: '/note-settings/new-role/73NdxFZ4k7/15/1',
+        url: '/note-settings/73NdxFZ4k7/member/15',
+        body : {
+          newRole : 1,
+        },
       });
 
       expect(response?.statusCode).toBe(404);
