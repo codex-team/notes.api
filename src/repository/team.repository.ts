@@ -76,6 +76,7 @@ export default class TeamRepository {
    * @param id - id of team member
    * @param noteId - note internal id
    * @param role - team member new role
+   * @returns returns 1 if the role has been changed and 0 otherwise
    */
   public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRole): Promise<MemberRole | null> {
     return await this.storage.patchMemberRoleById(id, noteId, role);
