@@ -2,6 +2,7 @@ import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.j
 import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository';
+import { DomainError } from '@domain/entities/DomainError';
 
 /**
  * Note service
@@ -47,7 +48,7 @@ export default class NoteService {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
       if (parentNote === null) {
-        throw new Error(`Note with id ${parentPublicId} was not found`);
+        throw new DomainError(`Note with id ${parentPublicId} was not found`);
       }
 
       await this.noteRelationsRepository.addNoteRelation(note.id, parentNote.id);
@@ -76,14 +77,14 @@ export default class NoteService {
     const updatedNote = await this.noteRepository.updateNoteContentById(id, content);
 
     if (updatedNote === null) {
-      throw new Error(`Note with id ${id} was not updated`);
+      throw new DomainError(`Note with id ${id} was not updated`);
     }
 
     if (parentPublicId !== undefined) {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
       if (parentNote === null) {
-        throw new Error(`Note with id ${parentPublicId} was not found`);
+        throw new DomainError(`Note with id ${parentPublicId} was not found`);
       }
 
       await this.noteRelationsRepository.updateNoteRelationById(updatedNote.id, parentNote.id);
@@ -101,7 +102,7 @@ export default class NoteService {
     const note = await this.noteRepository.getNoteById(id);
 
     if (note === null) {
-      throw new Error(`Note with id ${id} was not found`);
+      throw new DomainError(`Note with id ${id} was not found`);
     }
 
     return note;
@@ -116,7 +117,7 @@ export default class NoteService {
     const note = await this.noteRepository.getNoteByPublicId(publicId);
 
     if (note === null) {
-      throw new Error(`Note with public id ${publicId} was not found`);
+      throw new DomainError(`Note with public id ${publicId} was not found`);
     }
 
     return note;

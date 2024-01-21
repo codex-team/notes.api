@@ -130,5 +130,26 @@ declare module 'fastify' {
      * @param message - Optional message to send. If not specified, default message will be sent
      */
     notAcceptable: (message?: string) => Promise<void>;
+
+    /**
+     * Custom method for replying with information that business logic dismissed the request for some reason
+     *
+     * Send this error when a domain-level error is thrown
+     *
+     * @example
+     *
+     *  try {
+     *    service.someAction()
+     *  } catch (error: Error) {
+     *    if (error instanceof DomainError) {
+     *      reply.domainError(error.message);
+     *      return;
+     *    }
+     *    throw error;
+     *  }
+     *
+     * @param message - Optional message to send. If not specified, default message will be sent
+     */
+    domainError: (message?: string) => Promise<void>;
   }
 }
