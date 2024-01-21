@@ -22,13 +22,24 @@ export default class TeamRepository {
   }
 
   /**
-   * Creates team member
+   * Creates team member membership
    *
-   * @param team - data for team creation
-   * @returns created team
+   * @param teamMembershipData - data for team membership creation
+   * @returns created team membership
    */
-  public async create(team: TeamMemberCreationAttributes): Promise<TeamMember> {
-    return await this.storage.insert(team);
+  public async createTeamMembership(teamMembershipData: TeamMemberCreationAttributes): Promise<TeamMember> {
+    return await this.storage.createTeamMembership(teamMembershipData);
+  }
+
+  /**
+   * Check if user is note team member
+   *
+   * @param userId - user id to check
+   * @param noteId - note id to identify team
+   * @returns { Promise<boolean> } returns true if user is team member
+   */
+  public async isUserInTeam(userId: User['id'], noteId: NoteInternalId): Promise<boolean> {
+    return await this.storage.isUserInTeam(userId, noteId);
   }
 
   /**

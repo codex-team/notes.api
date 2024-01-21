@@ -3,7 +3,7 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
-import type { NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';
+import type { InvitationHash, NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';
 
 /**
  * Class representing a notes settings model in database
@@ -128,12 +128,26 @@ export default class NoteSettingsSequelizeStorage {
   }
 
   /**
+   * Get note settings by invitation hash
+   *
+   * @param invitationHash - hash for inviting to the note team
+   * @returns { Promise<NoteSettings | null> } - found note settings
+   */
+  public async getNoteSettingsByInvitationHash(invitationHash: InvitationHash): Promise<NoteSettings | null> {
+    return await this.model.findOne({
+      where: {
+        invitationHash,
+      },
+    });
+  }
+
+  /**
    * Get note settings
    *
    * @param noteId - note id
    * @returns { Promise<NoteSettings | null> } - note settings
    */
-  public async getNoteSettingsByNoteId(noteId: NoteSettings['noteId']): Promise<NoteSettings> {
+  public async getNoteSettingsByNoteId(noteId: NoteSettings['noteId']): Promise<NoteSettings | null> {
     const settings = await this.model.findOne({
       where: {
         noteId: noteId,
@@ -141,10 +155,7 @@ export default class NoteSettingsSequelizeStorage {
     });
 
     if (!settings) {
-      /**
-       * TODO: improve exceptions
-       */
-      throw new Error('Note settings not found');
+      return null;
     }
 
     return settings;

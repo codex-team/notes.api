@@ -1,7 +1,7 @@
 import type { NoteInternalId } from '@domain/entities/note.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsStorage from '@repository/storage/noteSettings.storage.js';
-import type { NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';
+import type { InvitationHash, NoteSettingsCreationAttributes } from '@domain/entities/noteSettings.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
@@ -32,12 +32,22 @@ export default class NoteSettingsRepository {
   }
 
   /**
+   * Get note settings by invitation hash
+   *
+   * @param invitationHash - hash for inviting to the note team
+   * @returns { Promise<NoteSettings | null> } - found note settings
+   */
+  public async getNoteSettingsByInvitationHash(invitationHash: InvitationHash): Promise<NoteSettings | null> {
+    return await this.storage.getNoteSettingsByInvitationHash(invitationHash);
+  }
+
+  /**
    * Get note settings by note id
    *
    * @param id - note id
    * @returns found note settings
    */
-  public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings> {
+  public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings | null> {
     return await this.storage.getNoteSettingsByNoteId(id);
   }
 
