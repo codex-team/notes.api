@@ -157,12 +157,18 @@ export default class NoteSettingsService {
    * @param noteId - note internal id
    * @returns updated note settings
    */
-  public async regenerateInvitationHash(noteId: NoteInternalId): Promise<NoteSettings | null> {
+  public async regenerateInvitationHash(noteId: NoteInternalId): Promise<NoteSettings> {
     /**
      * Generates a new invitation hash
      */
     const data = { invitationHash: createInvitationHash() };
 
-    return await this.patchNoteSettingsByNoteId(noteId, data);
+    const updatedNoteSettings = await this.patchNoteSettingsByNoteId(noteId, data);
+
+    if (updatedNoteSettings === null) {
+      throw new DomainError(`Note settings was not updated`);
+    }
+
+    return updatedNoteSettings;
   }
 }
