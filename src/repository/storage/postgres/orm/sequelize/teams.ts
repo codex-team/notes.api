@@ -207,6 +207,29 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
+   * Get all team members by note id with info about users
+   *
+   * @param noteId - note id to get all team members
+   * @returns team with additional info
+   */
+  public async getMembersWithUsersInfoById(noteId: NoteInternalId): Promise<Team> {
+    if (!this.userModel) {
+      throw new Error('User model not initialized');
+    }
+
+    return await this.model.findAll({
+      where: { noteId },
+      attributes: ['id', 'role'],
+      include: {
+        model: this.userModel,
+        as: 'users',
+        required: true,
+        attributes: ['id', 'name', 'email', 'photo'],
+      },
+    });
+  }
+
+  /**
    * Remove team member by id
    *
    * @param id - team member id

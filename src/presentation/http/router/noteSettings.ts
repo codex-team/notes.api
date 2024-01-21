@@ -56,7 +56,10 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings
+    Reply: {
+      noteSettings: NoteSettings,
+      team: Team,
+    }
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -79,6 +82,8 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
+    const team = await noteSettingsService.getTeamWithUsersInfoByNoteId(noteId);
+
     /**
      * Check if note does not exist
      */
@@ -86,7 +91,10 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('Note settings not found');
     }
 
-    return reply.send(noteSettings);
+    return reply.send({
+      noteSettings: noteSettings,
+      team: team,
+    });
   });
 
   /**

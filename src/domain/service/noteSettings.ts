@@ -133,6 +133,16 @@ export default class NoteSettingsService {
   }
 
   /**
+   * Get all team members by note id with info about users
+   *
+   * @param noteId - note id to get all team members
+   * @returns team with additional info
+   */
+  public async getTeamWithUsersInfoByNoteId(noteId: NoteInternalId): Promise<Team> {
+    return await this.teamRepository.getMembersWithUsersInfoByNoteId(noteId);
+  }
+
+  /**
    * Remove team member by id
    *
    * @param id - team member id
