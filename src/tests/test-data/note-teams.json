@@ -4,5 +4,11 @@
     "note_id": 1,
     "user_id": 2,
     "role": 0
+  },
+  {
+    "id": 2,
+    "note_id": 2,
+    "user_id": 4,
+    "role": 1
   }
 ]
