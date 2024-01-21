@@ -10,11 +10,25 @@ describe('NoteSettings API', () => {
       const existingNotePublicId = 'Pq1T9vc23Q';
 
       const expectedNoteSettings = {
-        'customHostname': 'codex.so',
-        'isPublic': true,
-        'id': 2,
-        'noteId': 2,
-        'invitationHash': 'E2zRXv3cp-',
+        'noteSettings':  {
+          'customHostname': 'codex.so',
+          'id': 2,
+          'invitationHash': 'E2zRXv3cp-',
+          'isPublic': true,
+          'noteId': 2,
+        },
+        'team':  [
+          {
+            'id': 2,
+            'role': 1,
+            'users':  {
+              'email': 'Egoramurin@gmail.com',
+              'id': 4,
+              'name': 'Егор Амурин',
+              'photo': null,
+            },
+          },
+        ],
       };
 
       const response = await global.api?.fakeRequest({
