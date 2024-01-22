@@ -7,7 +7,7 @@ import type { Team, TeamMember, TeamMemberCreationAttributes } from '@domain/ent
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
-import { DomainError } from '@domain/entities/DomainError';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 /**
  * Service responsible for Note Settings
