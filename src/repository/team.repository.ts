@@ -72,6 +72,7 @@ export default class TeamRepository {
     return await this.storage.removeTeamMemberById(id);
   }
   /**
+   * Patch team member role by user and note id
    *
    * @param id - id of team member
    * @param noteId - note internal id

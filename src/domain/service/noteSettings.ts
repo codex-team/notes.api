@@ -141,6 +141,7 @@ export default class NoteSettingsService {
   }
 
   /**
+   * Patch team member role by user and note id
    *
    * @param id - userId of team member
    * @param noteId - note internal id

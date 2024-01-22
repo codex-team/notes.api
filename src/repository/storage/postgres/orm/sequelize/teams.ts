@@ -223,6 +223,7 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
+   * Patch team member role by user and note id
    *
    * @param userId - id of team member
    * @param noteId - note internal id
