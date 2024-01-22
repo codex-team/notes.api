@@ -150,4 +150,16 @@ export default class NoteSettingsService {
   public async createTeamMember(team: TeamMemberCreationAttributes): Promise<TeamMember> {
     return await this.teamRepository.createTeamMembership(team);
   }
+
+  /**
+   * Patch team member role by user and note id
+   *
+   * @param id - userId of team member
+   * @param noteId - note internal id
+   * @param role - new team member role
+   * @returns returns 1 if the role has been changed and 0 otherwise
+   */
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | null> {
+    return await this.teamRepository.patchMemberRoleByUserId(id, noteId, role);
+  }
 }

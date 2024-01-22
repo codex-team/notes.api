@@ -6,7 +6,8 @@ import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type { NotePublicId } from '@domain/entities/note.js';
-import type { Team } from '@domain/entities/team.js';
+import type { Team, MemberRole } from '@domain/entities/team.js';
+import type User from '@domain/entities/user.js';
 
 /**
  * Interface for the note settings router.
@@ -90,6 +91,47 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   });
 
   /**
+   * Patch team member role by user and note id
+   *
+   * @todo add policy for this route to check id user have 'write' role if this team to patch someone's else role
+   */
+  fastify.patch<{
+    Params: {
+      notePublicId: NotePublicId,
+      },
+    Body: {
+      userId: User['id'],
+      newRole: MemberRole,
+      },
+    Reply: MemberRole,
+  }>('/:notePublicId/team', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+    const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, noteId, request.body.newRole);
+
+    if (newRole === null) {
+      return reply.notFound('User does not belong to Note\'s team');
+    }
+
+    return reply.send(newRole);
+  });
+
+  /**
    * Patch noteSettings by note id
    */
   fastify.patch<{
@@ -141,7 +183,8 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
   /**
    * Get team by note id
-   * TODO add policy for this route (check if user is collaborator)
+   *
+   * @todo add policy for this route (check if user is collaborator)
    */
   fastify.get<{
     Params: {
