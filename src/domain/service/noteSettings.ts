@@ -152,6 +152,27 @@ export default class NoteSettingsService {
   }
 
   /**
+   * Updates invitation hash in note settings
+   *
+   * @param noteId - note internal id
+   * @returns updated note settings
+   */
+  public async regenerateInvitationHash(noteId: NoteInternalId): Promise<NoteSettings> {
+    /**
+     * Generates a new invitation hash
+     */
+    const data = { invitationHash: createInvitationHash() };
+
+    const updatedNoteSettings = await this.patchNoteSettingsByNoteId(noteId, data);
+
+    if (updatedNoteSettings === null) {
+      throw new DomainError(`Note settings was not updated`);
+    }
+
+    return updatedNoteSettings;
+  }
+
+  /**
    * Patch team member role by user and note id
    *
    * @param id - userId of team member
