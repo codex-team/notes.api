@@ -357,4 +357,76 @@ describe('NoteSettings API', () => {
       test.todo('Return 403 when user authorized, but not member of the team');
     });
   });
+
+  describe('PATCH /note-settings/:notePublicId/team', () => {
+    test('Update team member role by user id and note id, with status code 200', async () => {
+      // patch member role of existing team member
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${global.auth(1)}`,
+        },
+        url: '/note-settings/Pq1T9vc23Q/team',
+        body: {
+          userId: 1,
+          newRole: 1,
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      // check if we changed role correctly
+      const team = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${global.auth(1)}`,
+        },
+        url: '/note-settings/Pq1T9vc23Q/team',
+      });
+
+      expect(team?.json()).toStrictEqual([
+        {
+          'id': 2,
+          'noteId': 2,
+          'userId': 1,
+          'role': 1,
+        },
+      ]);
+    });
+
+    test('Returns status code 200 and new role, if role was patched (if the user already had passing a role, then behavior is the same)', async () => {
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${global.auth(1)}`,
+        },
+        url: '/note-settings/Pq1T9vc23Q/team',
+        body: {
+          userId: 1,
+          newRole: 1,
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+      expect(response?.body).toBe('1');
+    });
+
+    test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${global.auth(1)}`,
+        },
+        url: '/note-settings/73NdxFZ4k7/team',
+        body: {
+          userId: 15,
+          newRole: 1,
+        },
+      });
+
+      expect(response?.statusCode).toBe(404);
+      expect(response?.json().message).toBe('User does not belong to Note\'s team');
+    });
+  });
 });
+

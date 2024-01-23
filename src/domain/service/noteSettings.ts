@@ -7,7 +7,7 @@ import type { Team, TeamMember, TeamMemberCreationAttributes } from '@domain/ent
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
-import { DomainError } from '@domain/entities/DomainError';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 /**
  * Service responsible for Note Settings
@@ -170,5 +170,17 @@ export default class NoteSettingsService {
     }
 
     return updatedNoteSettings;
+  }
+
+  /**
+   * Patch team member role by user and note id
+   *
+   * @param id - userId of team member
+   * @param noteId - note internal id
+   * @param role - new team member role
+   * @returns returns 1 if the role has been changed and 0 otherwise
+   */
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | null> {
+    return await this.teamRepository.patchMemberRoleByUserId(id, noteId, role);
   }
 }

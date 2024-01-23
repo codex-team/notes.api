@@ -1,7 +1,7 @@
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
-import { DomainError } from '@domain/entities/DomainError';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 /**
  * Note service
