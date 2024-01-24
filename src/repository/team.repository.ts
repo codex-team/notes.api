@@ -1,5 +1,5 @@
 import type TeamStorage from '@repository/storage/team.storage.js';
-import type { MemberRole, Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
+import type { Team, TeamMember, TeamMemberCreationAttributes, MemberRole } from '@domain/entities/team.js';
 import type { NoteInternalId } from '@domain/entities/note';
 import type User from '@domain/entities/user';
 
@@ -80,5 +80,16 @@ export default class TeamRepository {
    */
   public async removeMemberById(id: TeamMember['id']): Promise<boolean> {
     return await this.storage.removeTeamMemberById(id);
+  }
+  /**
+   * Patch team member role by user and note id
+   *
+   * @param id - id of team member
+   * @param noteId - note internal id
+   * @param role - team member new role
+   * @returns returns 1 if the role has been changed and 0 otherwise
+   */
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRole): Promise<MemberRole | null> {
+    return await this.storage.patchMemberRoleById(id, noteId, role);
   }
 }

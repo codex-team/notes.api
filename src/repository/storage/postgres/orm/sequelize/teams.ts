@@ -8,6 +8,7 @@ import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
 
+
 /**
  * Class representing a teams model in database
  */
@@ -242,5 +243,27 @@ export default class TeamsSequelizeStorage {
     });
 
     return affectedRows > 0;
+  }
+
+  /**
+   * Patch team member role by user and note id
+   *
+   * @param userId - id of team member
+   * @param noteId - note internal id
+   * @param role - new team member role
+   * @returns returns 1 if the role has been changed and 0 otherwise
+   */
+  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | null> {
+    const affectedRows = await this.model.update({
+      role: role,
+    }, {
+      where: {
+        userId,
+        noteId,
+      },
+    });
+
+    // if counter of affected rows is more than 0, then we return new role
+    return affectedRows[0] ? role : null;
   }
 }
