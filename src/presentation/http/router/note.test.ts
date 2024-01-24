@@ -57,7 +57,6 @@ describe('Note API', () => {
           'createdAt': '2023-10-16T13:49:19.000Z',
           'updatedAt': '2023-10-16T13:49:19.000Z',
         },
-        'noteSettings': null,
         'accessRights': {
           'canEdit': false,
         },
@@ -87,10 +86,6 @@ describe('Note API', () => {
           'content': null,
           'createdAt': '2023-10-16T13:49:19.000Z',
           'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
-        'noteSettings':  {
-          'customHostname': 'codex.so',
-          'isPublic': false,
         },
         'accessRights': {
           'canEdit': true,

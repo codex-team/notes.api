@@ -5,8 +5,7 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import type { NotePublic } from '@domain/entities/notePublic.js';
-import type NoteSettingsPublic from '@domain/entities/noteSettingsPublic.js';
+import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
 
 
 /**
@@ -29,17 +28,7 @@ interface NoteRouterOptions {
  * @param note - note to change
  * @returns note with only one id
  */
-function changeNoteToNotePublic(note: Note): NotePublic {
-  const notePublic: NotePublic = {
-    id: note.publicId,
-    content: note.content,
-    createdAt: note.createdAt,
-    updatedAt: note.updatedAt,
-    creatorId: note.creatorId,
-  };
 
-  return notePublic;
-}
 
 /**
  * Note router plugin
@@ -76,7 +65,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Reply: {
       note : NotePublic,
-      noteSettings: NoteSettingsPublic | null,
       accessRights: { canEdit: boolean },
     } | ErrorResponse,
 
@@ -112,26 +100,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Wrap note for public use
      */
-    const notePublic = changeNoteToNotePublic(note);
+    const notePublic = definePublicNote(note);
 
-    let notePublicSettings:NoteSettingsPublic |null;
-
-    /**
-     * If note is not public
-     */
-    if (request.noteSettings && !request.noteSettings.isPublic) {
-      notePublicSettings = {
-        isPublic: request.noteSettings.isPublic,
-        customHostname: request.noteSettings.customHostname,
-      };
-    } else {
-      notePublicSettings = null;
-    }
     const canEdit = note.creatorId == request.userId;
 
     return reply.send({
       note: notePublic,
-      noteSettings: notePublicSettings,
       accessRights: { canEdit: canEdit },
     });
   });
@@ -280,15 +254,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     }
 
     /**
-     * Check if note does not exist
-     */
-    if (note === null) {
-      return reply.notFound('Note not found');
-    }
-    /**
      * Wrapping Note for public use
      */
-    const notePublic = changeNoteToNotePublic(note);
+    const notePublic = definePublicNote(note);
     const canEdit = note.creatorId == request.userId;
 
     return reply.send({

@@ -10,3 +10,20 @@ export interface NotePublic extends Pick<Note, NotePublicProperties> {
   id: string;
 }
 
+/**
+ *Change Note to NotePublic
+ *
+ * @param note - Note to change
+ */
+export function definePublicNote(note: Note): NotePublic {
+  const notePublic: NotePublic = {
+    id: note.publicId,
+    content: note.content,
+    createdAt: note.createdAt,
+    updatedAt: note.updatedAt,
+    creatorId: note.creatorId,
+  };
+
+  return notePublic;
+}
+
