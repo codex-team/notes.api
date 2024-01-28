@@ -2,12 +2,11 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type { InvitationHash } from '@domain/entities/noteSettings.js';
-import { isEmpty } from '@infrastructure/utils/empty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type { NotePublicId } from '@domain/entities/note.js';
-import type { Team, MemberRole } from '@domain/entities/team.js';
+import type { Team, MemberRole, TeamMember } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 
 /**
@@ -58,10 +57,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: {
-      noteSettings: NoteSettings,
-      team: Team,
-    }
+    Reply: NoteSettings & {team: { id: TeamMember['id'], user?: User, role: MemberRole }[]},
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -84,19 +80,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
-    const team = await noteSettingsService.getTeamWithUsersInfoByNoteId(noteId);
-
-    /**
-     * Check if note does not exist
-     */
-    if (isEmpty(noteSettings)) {
-      return reply.notFound('Note settings not found');
-    }
-
-    return reply.send({
-      noteSettings: noteSettings,
-      team: team,
-    });
+    return reply.send(noteSettings);
   });
 
   /**

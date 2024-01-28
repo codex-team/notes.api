@@ -69,9 +69,15 @@ export default class TeamRepository {
    * @param noteId - note id to get all team members
    * @returns team with additional info
    */
-  public async getMembersWithUsersInfoByNoteId(noteId: NoteInternalId): Promise<Team> {
-    return await this.storage.getMembersWithUsersInfoById(noteId);
-  }
+  public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<{ id: TeamMember['id'], user?: User, role: MemberRole }[]> {
+    const team = await this.storage.getTeamMembersByNoteId(noteId);
+
+    return team.map((
+      { users, id, role }) =>
+      ({ id: id,
+        user: users,
+        role: role }));
+  };
 
   /**
    * Remove team member by id
