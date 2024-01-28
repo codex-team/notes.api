@@ -24,7 +24,7 @@ describe('Auth API', () => {
       /**
        * Insert session data to the DB with tomorrow expiration date
        */
-      await global.db.query(`INSERT INTO public.user_sessions (id, "user_id", "refresh_token", "refresh_token_expires_at") VALUES (9999, 1, '${refreshToken}', CURRENT_DATE + INTERVAL '1 day')`);
+      await global.db.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_token_expires_at") VALUES (1, '${refreshToken}', CURRENT_DATE + INTERVAL '1 day')`);
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
@@ -56,7 +56,7 @@ describe('Auth API', () => {
         body:{ token: outdatedToken },
       });
 
-      expect (response?.statusCode).toBe(401);
+      expect(response?.statusCode).toBe(401);
 
       const body = await response?.json();
 
