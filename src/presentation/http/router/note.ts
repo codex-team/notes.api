@@ -249,7 +249,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const note = await noteService.getNoteByHostname(params.hostname);
 
-    if (note === null || note === undefined) {
+    if (note === null) {
       return reply.notFound('Note not found');
     }
 

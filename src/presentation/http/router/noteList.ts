@@ -1,6 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteListService from '@domain/service/noteList.js';
-import type { NotePublic } from '@domain/entities/notePublic';
+import { definePublicNote, type NotePublic } from '@domain/entities/notePublic';
 import type { NoteListPublic } from '@domain/entities/noteList';
 
 
@@ -56,22 +56,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
      * Wrapping Notelist for public use
      */
     const noteListItemsPublic: NotePublic[] = noteList.items.map((note) => {
-      // let settings: NoteSettingsPublic | null = null;
-
-      // if (request.noteSettings) {
-      //   settings = {
-      //     customHostname: request.noteSettings.customHostname,
-      //     isPublic: request.noteSettings.isPublic,
-
-      //   };
-      // }
-      const notePublic: NotePublic = {
-        id: note.publicId,
-        content: note.content,
-        creatorId: note.creatorId,
-        createdAt: note.createdAt,
-        updatedAt: note.updatedAt,
-      };
+      const notePublic = definePublicNote(note);
 
       return notePublic;
     });
