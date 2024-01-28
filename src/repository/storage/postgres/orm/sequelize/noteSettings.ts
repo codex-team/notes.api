@@ -152,6 +152,7 @@ export default class NoteSettingsSequelizeStorage {
       where: {
         noteId: noteId,
       },
+      raw: true,
     });
 
     if (!settings) {

@@ -7,6 +7,14 @@ import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
+import { DomainError } from '@domain/entities/DomainError.js';
+
+interface TeamMemberWithUserInfo extends TeamMember {
+  /**
+   * Information about user
+   */
+  users?: User;
+}
 
 
 /**
@@ -213,9 +221,9 @@ export default class TeamsSequelizeStorage {
    * @param noteId - note id to get all team members
    * @returns team with additional info
    */
-  public async getMembersWithUsersInfoById(noteId: NoteInternalId): Promise<Team> {
+  public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<TeamMemberWithUserInfo[]> {
     if (!this.userModel) {
-      throw new Error('User model not initialized');
+      throw new DomainError('User model not initialized');
     }
 
     return await this.model.findAll({
@@ -227,7 +235,7 @@ export default class TeamsSequelizeStorage {
         required: true,
         attributes: ['id', 'name', 'email', 'photo'],
       },
-    });
+    }) as TeamMemberWithUserInfo[];
   }
 
   /**
