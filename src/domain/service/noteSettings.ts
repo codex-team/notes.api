@@ -69,19 +69,16 @@ export default class NoteSettingsService {
    *
    * @param id - note internal id
    */
-  public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings & {team: { id: TeamMember['id'], user?: User, role: MemberRole }[]}> {
+  public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings> {
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByNoteId(id);
 
     if (noteSettings === null) {
       throw new DomainError(`Note settings not found`);
     }
 
-    const team = await this.teamRepository.getTeamMembersByNoteId(id);
+    noteSettings.team = await this.teamRepository.getTeamMembersByNoteId(id);
 
-    return {
-      ...noteSettings,
-      team,
-    };
+    return noteSettings;
   }
 
   /**

@@ -6,7 +6,7 @@ import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type { NotePublicId } from '@domain/entities/note.js';
-import type { Team, MemberRole, TeamMember } from '@domain/entities/team.js';
+import type { Team, MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 
 /**
@@ -57,7 +57,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings & {team: { id: TeamMember['id'], user?: User, role: MemberRole }[]},
+    Reply: NoteSettings,
   }>('/:notePublicId', {
     config: {
       policy: [
