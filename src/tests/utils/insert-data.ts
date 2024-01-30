@@ -1,4 +1,5 @@
 import type SequelizeOrm from '@repository/storage/postgres/orm/index.js';
+import noteRelations from '../test-data/notes-relations.json';
 import users from '../test-data/users.json';
 import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
@@ -60,6 +61,17 @@ async function insertNoteSettings(db: SequelizeOrm): Promise<void> {
   }
 }
 
+/**
+ * Fills in the database with notes relationship data
+ *
+ * @param db - SequelizeOrm instance
+ */
+async function insertNoteRelatons(db: SequelizeOrm): Promise<void> {
+  for (const noteRelation of noteRelations) {
+    await db.connection.query(`INSERT INTO public.note_relations (id, "note_id", "parent_id") VALUES (${noteRelation.id}, '${noteRelation.note_id}', '${noteRelation.parent_id}')`);
+  }
+}
+
 
 /**
  * Fills in the database with test data
@@ -72,5 +84,6 @@ export async function insertData(db: SequelizeOrm): Promise<void> {
   await insertNotes(db);
   await insertNoteSettings(db);
   await insertNoteTeams(db);
+  await insertNoteRelatons(db);
 }
 

@@ -2,6 +2,7 @@ import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.j
 import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
 
 /**
  * Note service
@@ -10,15 +11,22 @@ export default class NoteService {
   /**
    * Note repository
    */
-  public repository: NoteRepository;
+  public noteRepository: NoteRepository;
+
+  /**
+   * Note relationship repository
+   */
+  public noteRelationsRepository: NoteRelationsRepository;
 
   /**
    * Note service constructor
    *
-   * @param repository - note repository
+   * @param noteRepository - note repository
+   * @param noteRelationsRepository - note relationship repository
    */
-  constructor(repository: NoteRepository) {
-    this.repository = repository;
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository) {
+    this.noteRepository = noteRepository;
+    this.noteRelationsRepository = noteRelationsRepository;
   }
 
   /**
@@ -26,14 +34,27 @@ export default class NoteService {
    *
    * @param content - note content
    * @param creatorId - note creator
+   * @param parentPublicId - parent note if exist
    * @returns { Note } added note object
    */
-  public async addNote(content: JSON, creatorId: Note['creatorId']): Promise<Note> {
-    return await this.repository.addNote({
+  public async addNote(content: JSON, creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
+    const note = await this.noteRepository.addNote({
       publicId: createPublicId(),
       content,
       creatorId,
     });
+
+    if (parentPublicId !== undefined) {
+      const parentNote = await this.getNoteByPublicId(parentPublicId);
+
+      if (parentNote === null) {
+        throw new DomainError(`Incorrect parent note`);
+      }
+
+      await this.noteRelationsRepository.addNoteRelation(note.id, parentNote.id);
+    }
+
+    return note;
   }
 
   /**
@@ -42,7 +63,7 @@ export default class NoteService {
    * @param id - note internal id
    */
   public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
-    return await this.repository.deleteNoteById(id);
+    return await this.noteRepository.deleteNoteById(id);
   }
 
   /**
@@ -50,12 +71,23 @@ export default class NoteService {
    *
    * @param id - note internal id
    * @param content - new content
+   * @param parentPublicId - parent note if exist
    */
-  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note> {
-    const updatedNote = await this.repository.updateNoteContentById(id, content);
+  public async updateNoteContentById(id: NoteInternalId, content: Note['content'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
+    const updatedNote = await this.noteRepository.updateNoteContentById(id, content);
 
     if (updatedNote === null) {
       throw new DomainError(`Note with id ${id} was not updated`);
+    }
+
+    if (parentPublicId !== undefined) {
+      const parentNote = await this.getNoteByPublicId(parentPublicId);
+
+      if (parentNote === null) {
+        throw new DomainError(`Incorrect parent note`);
+      }
+
+      await this.noteRelationsRepository.updateNoteRelationById(updatedNote.id, parentNote.id);
     }
 
     return updatedNote;
@@ -67,7 +99,7 @@ export default class NoteService {
    * @param id - note internal id
    */
   public async getNoteById(id: NoteInternalId): Promise<Note> {
-    const note = await this.repository.getNoteById(id);
+    const note = await this.noteRepository.getNoteById(id);
 
     if (note === null) {
       throw new DomainError(`Note with id ${id} was not found`);
@@ -82,7 +114,7 @@ export default class NoteService {
    * @param publicId - note public id
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note> {
-    const note = await this.repository.getNoteByPublicId(publicId);
+    const note = await this.noteRepository.getNoteByPublicId(publicId);
 
     if (note === null) {
       throw new DomainError(`Note with public id ${publicId} was not found`);
@@ -98,6 +130,15 @@ export default class NoteService {
    * @returns { Promise<Note | null> } note
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
-    return await this.repository.getNoteByHostname(hostname);
+    return await this.noteRepository.getNoteByHostname(hostname);
+  }
+
+  /**
+   * Get parent note id by note id
+   *
+   * @param noteId - id of the current note
+   */
+  public async getParentNoteIdByNoteId(noteId: Note['id']): Promise<number | null> {
+    return await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
   }
 }

@@ -19,7 +19,6 @@ describe('NoteList API', () => {
 
   describe('GET /notes?page', () => {
     test('Returns noteList with specified length (not for last page)', async () => {
-      const expectedStatus = 200;
       const portionSize = 30;
       const pageNumber = 1;
 
@@ -31,7 +30,7 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
       const body = response?.json();
 
@@ -39,7 +38,6 @@ describe('NoteList API', () => {
     });
 
     test('Returns noteList with specified length (for last page)', async () => {
-      const expectedStatus = 200;
       const portionSize = 19;
       const pageNumber = 2;
 
@@ -51,7 +49,7 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
       const body = response?.json();
 
@@ -59,7 +57,6 @@ describe('NoteList API', () => {
     });
 
     test('Returns noteList with no items if it has no notes', async () => {
-      const expectedStatus = 200;
       const pageNumber = 3;
 
       const response = await global.api?.fakeRequest({
@@ -70,7 +67,7 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
       const body = response?.json();
 
@@ -79,9 +76,7 @@ describe('NoteList API', () => {
     });
 
     test('Returns 400 when page < 0', async () => {
-      const expextedStatus = 400;
       const pageNumber = 0;
-
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -91,11 +86,10 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expextedStatus);
+      expect(response?.statusCode).toBe(400);
     });
 
     test('Returns 400 when page is too large (maximum page numbrer is 30 by default)', async () => {
-      const expextedStatus = 400;
       const pageNumber = 31;
 
       const response = await global.api?.fakeRequest({
@@ -106,7 +100,7 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expextedStatus);
+      expect(response?.statusCode).toBe(400);
     });
   });
 });
