@@ -316,7 +316,7 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    test('Post a new note with 200 status when the existing parentId passed', async () => {
+    test('Returns 200 status, existing parentId passed in the body', async () => {
       const accessToken = global.auth(2);
 
       const response = await global.api?.fakeRequest({
@@ -331,6 +331,13 @@ describe('Note API', () => {
       });
 
       expect(response?.statusCode).toBe(200);
+
+      const body = await response?.json();
+
+      expect(typeof body.id).toBe('string');
+      expect(body.id).toBeDefined();
+      expect(body.id).not.toBeNull();
+      expect(body.id).not.toBe('');
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
