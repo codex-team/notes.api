@@ -132,4 +132,13 @@ export default class NoteService {
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
     return await this.noteRepository.getNoteByHostname(hostname);
   }
+
+  /**
+   * Get parent note id by note id
+   *
+   * @param noteId - id of the current note
+   */
+  public async getParentNoteIdByNoteId(noteId: Note['id']): Promise<number | null> {
+    return await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
+  }
 }

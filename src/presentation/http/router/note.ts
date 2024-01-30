@@ -5,7 +5,6 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import type NoteRelationsService from '@domain/service/noteRelations.js';
 
 /**
  * Interface for the note router.
@@ -20,11 +19,6 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
-
-  /**
-   * Note relationship service instance
-   */
-  noteRelationsService: NoteRelationsService,
 }
 
 /**
@@ -40,7 +34,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   const noteService = opts.noteService;
   const noteSettingsService = opts.noteSettingsService;
-  const noteRelationsService = opts.noteRelationsService;
 
   /**
    * Prepare note id resolver middleware
@@ -93,7 +86,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return reply.notFound('Note not found');
     }
 
-    const parentId = await noteRelationsService.getParentNoteIdByNoteId(note.id);
+    const parentId = await noteService.getParentNoteIdByNoteId(note.id);
 
     const parentNote = parentId !== null ? await noteService.getNoteById(parentId) : undefined;
     /**
