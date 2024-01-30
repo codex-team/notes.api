@@ -345,7 +345,7 @@ describe('Note API', () => {
     test('Returns 200 status, existing parentId passed in the body', async () => {
       const accessToken = global.auth(2);
 
-      const response = await global.api?.fakeRequest({
+      let response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
           authorization: `Bearer ${accessToken}`,
@@ -358,12 +358,28 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      const body = await response?.json();
+      let body = await response?.json();
 
-      expect(typeof body.id).toBe('string');
-      expect(body.id).toBeDefined();
-      expect(body.id).not.toBeNull();
-      expect(body.id).not.toBe('');
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${body.id}`,
+      });
+
+      body = await response?.json();
+
+      const expectedParentNote = {
+        'id': 55,
+        'publicId': 'Hu8Gsm0sA1',
+        'creatorId': 2,
+        'content': null,
+        'createdAt': '2023-10-16T13:49:19.000Z',
+        'updatedAt': '2023-10-16T13:49:19.000Z',
+      };
+
+      expect(body.parentNote).toStrictEqual(expectedParentNote);
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
