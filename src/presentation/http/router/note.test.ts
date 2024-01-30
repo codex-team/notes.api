@@ -343,5 +343,7 @@ describe('Note API', () => {
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
   });
 
+  test.todo('Tests with access rights');
+
   test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 });
