@@ -36,7 +36,7 @@ async function insertNoteTeams(db: SequelizeOrm): Promise<void> {
  */
 async function insertUserSessions(db: SequelizeOrm): Promise<void> {
   for (const userSession of userSessions) {
-    await db.connection.query(`INSERT INTO public.user_sessions (id, "user_id", "refresh_token", "refresh_token_expires_at") VALUES (${userSession.id}, ${userSession.user_id}, '${userSession.refresh_token}', '${userSession.refresh_token_expires_at}')`);
+    await db.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_token_expires_at") VALUES (${userSession.user_id}, '${userSession.refresh_token}', '${userSession.refresh_token_expires_at}')`);
   }
 }
 /**

@@ -265,6 +265,82 @@ describe('NoteSettings API', () => {
     test.todo('Return 403 when user authorized, but not member of the team');
   });
 
+  describe('PATCH /note-settings/:notePublicId/invitation-hash ', () => {
+    test('Returns status 401 when the user is not authorized', async () => {
+      const correctID = 'Pq1T9vc23Q';
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        url: `/note-settings/${correctID}/invitation-hash`,
+      });
+
+      expect(response?.statusCode).toBe(401);
+
+      expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
+    });
+
+    test('Generate invitation hash by public id with 200 status, user is creator of the note', async () => {
+      const userId = 2;
+      const accessToken = global.auth(userId);
+
+      const userNote = notes.find(newNote => {
+        return newNote.creator_id === userId;
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${userNote!.public_id}/invitation-hash`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().invitationHash).not.toBe('');
+
+      expect(response?.json().invitationHash).toHaveLength(10);
+    });
+
+    test('Returns status 406 when the public id does not exist', async () => {
+      const nonexistentId = 'ishvm5qH84';
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        url: `/note-settings/${nonexistentId}/invitation-hash`,
+      });
+
+      expect(response?.statusCode).toBe(406);
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+    });
+
+    test.each([
+      { id: 'mVz3iHuez',
+        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+
+      { id: 'cR8eqF1mFf0',
+        expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+
+      { id: '+=*&*5%&&^&-',
+        expectedMessage: '\'/note-settings/+=*&*5%&&^&-/invitation-hash\' is not a valid url component' },
+    ])
+    ('Returns 400 when public id of the note has incorrect characters and length', async ({ id, expectedMessage }) => {
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        url: `/note-settings/${id}/invitation-hash`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual(expectedMessage);
+
+      test.todo('Return 403 when user in team and have Member Role = read');
+
+      test.todo('Return 403 when user authorized, but not member of the team');
+    });
+  });
+
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
       // patch member role of existing team member
@@ -336,3 +412,4 @@ describe('NoteSettings API', () => {
     });
   });
 });
+
