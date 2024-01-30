@@ -132,7 +132,7 @@ export async function init(orm: Orm): Promise<Repositories> {
    */
   const noteRepository = new NoteRepository(noteStorage);
   const noteSettingsRepository = new NoteSettingsRepository(noteSettingsStorage);
-  const noteRelationshipRepository = new NoteRelationsRepository(noteRelationshipStorage);
+  const noteRelationsRepository = new NoteRelationsRepository(noteRelationshipStorage);
   const userSessionRepository = new UserSessionRepository(userSessionStorage);
   const userRepository = new UserRepository(userStorage, googleApiTransport);
   const aiRepository = new AIRepository(openaiApiTransport);
@@ -142,7 +142,7 @@ export async function init(orm: Orm): Promise<Repositories> {
   return {
     noteRepository,
     noteSettingsRepository,
-    noteRelationsRepository: noteRelationshipRepository,
+    noteRelationsRepository,
     userSessionRepository,
     userRepository,
     aiRepository,
