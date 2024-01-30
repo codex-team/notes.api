@@ -55,14 +55,6 @@ describe('Note API', () => {
           'createdAt': '2023-10-16T13:49:19.000Z',
           'updatedAt': '2023-10-16T13:49:19.000Z',
         },
-        'parentNote': {
-          'id': 4,
-          'publicId': '73NdxFZ4k7',
-          'creatorId': 1,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
         'accessRights': {
           'canEdit': false,
         },
@@ -107,6 +99,40 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         url: `/note/${privateUserNote!.public_id}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toStrictEqual(expectedResponse);
+    });
+
+    test('Returns note and parent note by note public id with 200 status', async () => {
+      const correctID = 'f43NU75weU';
+      const expectedResponse = {
+        'note': {
+          'id': 54,
+          'publicId': 'f43NU75weU',
+          'creatorId': 2,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+        },
+        'parentNote': {
+          'id': 55,
+          'publicId': 'Hu8Gsm0sA1',
+          'creatorId': 2,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+        },
+        'accessRights': {
+          'canEdit': false,
+        },
+      };
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note/${correctID}`,
       });
 
       expect(response?.statusCode).toBe(200);

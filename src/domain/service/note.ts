@@ -48,7 +48,7 @@ export default class NoteService {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
       if (parentNote === null) {
-        throw new DomainError(`Note with id ${parentPublicId} was not found`);
+        throw new DomainError(`Incorrect parent note`);
       }
 
       await this.noteRelationsRepository.addNoteRelation(note.id, parentNote.id);
@@ -84,7 +84,7 @@ export default class NoteService {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
       if (parentNote === null) {
-        throw new DomainError(`Note with id ${parentPublicId} was not found`);
+        throw new DomainError(`Incorrect parent note`);
       }
 
       await this.noteRelationsRepository.updateNoteRelationById(updatedNote.id, parentNote.id);
