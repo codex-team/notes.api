@@ -154,7 +154,7 @@ export default class NoteRelationsSequelizeStorage {
      */
     this.model.belongsTo(model, {
       foreignKey: 'noteId',
-      as: this.noteModel.tableName,
+      as: 'note',
     });
   }
 }
