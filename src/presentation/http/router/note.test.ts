@@ -342,7 +342,7 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    test('Returns 200 status, existing parentId passed in the body', async () => {
+    test('Should correctly save relation to parent note if parentId passed', async () => {
       const accessToken = global.auth(2);
 
       let response = await global.api?.fakeRequest({
