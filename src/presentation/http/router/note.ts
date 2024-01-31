@@ -55,7 +55,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId: NotePublicId;
     },
     Reply: {
-      note : Note
+      note : Note,
+      parentNote?: Note | undefined,
       accessRights: { canEdit: boolean },
     } | ErrorResponse,
   }>('/:notePublicId', {
@@ -85,6 +86,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       return reply.notFound('Note not found');
     }
 
+    const parentId = await noteService.getParentNoteIdByNoteId(note.id);
+
+    const parentNote = parentId !== null ? await noteService.getNoteById(parentId) : undefined;
     /**
      * Check if current user is creator of the note
      */
@@ -92,6 +96,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     return reply.send({
       note: note,
+      parentNote: parentNote,
       accessRights: { canEdit: canEdit },
     });
   });
@@ -140,9 +145,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.post<{
     Body: {
       content: JSON;
+      parentId?: NotePublicId;
     },
     Reply: {
-      id: NotePublicId
+      id: NotePublicId,
     },
   }>('/', {
     config: {
@@ -152,12 +158,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
   }, async (request, reply) => {
     /**
-     * TODO: Validate request query
+     * @todo Validate request query
      */
-    const { content } = request.body;
+    const content = request.body.content as JSON;
     const { userId } = request;
+    const parentId = request.body.parentId;
 
-    const addedNote = await noteService.addNote(content, userId as number); // "authRequired" policy ensures that userId is not null
+    const addedNote = await noteService.addNote(content, userId as number, parentId); // "authRequired" policy ensures that userId is not null
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
@@ -178,6 +185,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Body: {
       content: JSON;
+      parentId?: NotePublicId;
     },
     Reply: {
       updatedAt: Note['updatedAt'],
@@ -206,9 +214,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
-    const { content } = request.body;
+    const content = request.body.content as JSON;
+    const parentId = request.body.parentId;
 
-    const note = await noteService.updateNoteContentById(noteId, content);
+    const note = await noteService.updateNoteContentById(noteId, content, parentId);
 
     return reply.send({
       updatedAt: note.updatedAt,
