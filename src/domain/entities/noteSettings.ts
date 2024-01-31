@@ -36,7 +36,7 @@ export default interface NoteSettings {
   invitationHash: InvitationHash;
 
   /**
-   * Team members
+   * Team members. Team is empty by default because note creator is not stored in team
    */
   team?: Team;
 }
