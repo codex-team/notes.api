@@ -6,26 +6,15 @@ import noteSettings from '@tests/test-data/notes-settings.json';
 describe('NoteSettings API', () => {
   describe('GET /note-settings/:notePublicId ', () => {
     test('Returns note settings by public id with 200 status', async () => {
-      const existingNotePublicId = 'Pq1T9vc23Q';
+      const existingNotePublicId = 'f43NU75weU';
 
       const expectedNoteSettings = {
         'customHostname': 'codex.so',
-        'id': 3,
-        'invitationHash': 'E2zRXv3cp-',
+        'id': 54,
+        'invitationHash': 'FfAwyaR80C',
         'isPublic': true,
-        'noteId': 3,
-        'team':  [
-          {
-            'id': 2,
-            'role': 0,
-            'user':  {
-              'email': 'a@a.com',
-              'id': 1,
-              'name': 'Test user 1',
-              'photo': null,
-            },
-          },
-        ],
+        'noteId': 54,
+        'team':  [],
       };
 
       const response = await global.api?.fakeRequest({
@@ -36,6 +25,32 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toStrictEqual(expectedNoteSettings);
+    });
+
+    test('Returns team with note settings by public id with 200 status', async () => {
+      const existingNotePublicId = 'Pq1T9vc23Q';
+
+      const expectedTeam = [
+        {
+          'id': 2,
+          'role': 0,
+          'user': {
+            'email': 'a@a.com',
+            'id': 1,
+            'name': 'Test user 1',
+            'photo': null,
+          },
+        },
+      ];
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note-settings/${existingNotePublicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().team).toStrictEqual(expectedTeam);
     });
 
     test('Returns 404 when note settings with specified note public id do not exist', async () => {
