@@ -141,6 +141,24 @@ export default class NoteRelationsSequelizeStorage {
   }
 
   /**
+   * Delete all note ralations contains noteId
+   *
+   * @param noteId - id of the current note
+   */
+  public async deleteNoteRelationsByNoteId(noteId: NoteInternalId): Promise<boolean> {
+    const affectedRows = await this.model.destroy({
+      where:{
+        noteId,
+      },
+    });
+
+    /**
+     * If note not found return false
+     */
+    return affectedRows > 0;
+  }
+
+  /**
    * Creates association with note model to make joins
    *
    * @param model - initialized note model

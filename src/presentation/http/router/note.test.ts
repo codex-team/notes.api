@@ -385,6 +385,33 @@ describe('Note API', () => {
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
   });
 
+  describe('DELETE /note/:notePublicId', () => {
+    test('Should remove all note relations contains note id', async () => {
+      const accessToken = global.auth(2);
+      const correctID = 'f43NU75weU';
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+    });
+  });
+
   test.todo('Tests with access rights');
 
   test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
