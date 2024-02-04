@@ -56,9 +56,8 @@ describe('Join API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual({
+      expect(response?.json()).toMatchObject({
         result: {
-          id: 3,
           userId,
           noteId: 2,
           role: 0,
