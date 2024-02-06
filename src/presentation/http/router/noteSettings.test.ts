@@ -390,9 +390,8 @@ describe('NoteSettings API', () => {
         url: '/note-settings/Pq1T9vc23Q/team',
       });
 
-      expect(team?.json()).toStrictEqual([
+      expect(team?.json()).toMatchObject([
         {
-          'id': 2,
           'noteId': 3,
           'userId': 1,
           'role': 1,

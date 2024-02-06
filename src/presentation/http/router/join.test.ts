@@ -7,7 +7,19 @@ describe('Join API', () => {
       const userId = 2;
       const accessToken = global.auth(userId);
 
-      const response = await global.api?.fakeRequest({
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/join/${hash}`,
+      });
+
+      // check if we added user to team
+      expect(response?.statusCode).toBe(200);
+
+      // add same user to the same note team
+      response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
           authorization: `Bearer ${accessToken}`,
