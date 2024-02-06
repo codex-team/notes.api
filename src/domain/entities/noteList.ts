@@ -1,5 +1,6 @@
 import type { Note } from '@domain/entities/note.js';
-import type { NotePublic } from '@domain/entities/notePublic';
+import type { NotePublic } from '@domain/entities/notePublic.js';
+
 
 /**
  * Note list  entity.

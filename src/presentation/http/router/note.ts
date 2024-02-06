@@ -5,8 +5,8 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
-
+import { definePublicNote } from '@domain/entities/notePublic.js';
+import type { NoteResponse } from '../schema/ResponseSchema.js';
 
 /**
  * Interface for the note router.
@@ -22,13 +22,6 @@ interface NoteRouterOptions {
    */
   noteSettingsService: NoteSettingsService,
 }
-
-/**
- *
- * @param note - note to change
- * @returns note with only one id
- */
-
 
 /**
  * Note router plugin
@@ -63,11 +56,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: {
-      note : NotePublic,
-      accessRights: { canEdit: boolean },
-    } | ErrorResponse,
-
+    Reply: NoteResponse| ErrorResponse,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -90,19 +79,22 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
 
     /**
-     * Check if note does not exist
+     * Check if note exists
      */
     if (note === null) {
       return reply.notFound('Note not found');
     }
-
 
     /**
      * Wrap note for public use
      */
     const notePublic = definePublicNote(note);
 
+    /**
+     * Check if current user is creator of the note
+     */
     const canEdit = note.creatorId == request.userId;
+
 
     return reply.send({
       note: notePublic,
@@ -240,15 +232,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
        */
       hostname: string;
     },
-    Reply: {
-      note : NotePublic,
-      accessRights: { canEdit: boolean },
-    } | ErrorResponse,
+    Reply: NoteResponse| ErrorResponse,
   }>('/resolve-hostname/:hostname', async (request, reply) => {
     const params = request.params;
 
     const note = await noteService.getNoteByHostname(params.hostname);
 
+    /**
+     * Check if note exists
+     */
     if (note === null) {
       return reply.notFound('Note not found');
     }
@@ -257,6 +249,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Wrapping Note for public use
      */
     const notePublic = definePublicNote(note);
+
+    /**
+     *  Check if current user is creator of the note
+     */
     const canEdit = note.creatorId == request.userId;
 
     return reply.send({
