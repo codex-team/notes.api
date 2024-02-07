@@ -366,6 +366,23 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
+      // truncate tables which are needed
+      await global.db.query(`TRUNCATE public.notes, public.users, public.note_teams CASCADE`);
+
+      // restart autoincrement sequences for data to start with id 1
+      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
+      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
+      await global.db.query(`ALTER sequence note_teams_id_seq RESTART WITH 1`);
+
+      // create test user (id 1)
+      await global.db.query(`INSERT INTO public.users ("email", "name", "created_at") VALUES ('testemal@CodeXmail.com', 'CodeX', CURRENT_DATE)`);
+
+      // create test note (id 1) for test user
+      await global.db.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "public_id") VALUES ('{}', 1, CURRENT_DATE, 'Pq1T9vc23Q')`);
+
+      // create test team member (userId 1) for created note
+      await global.db.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (1, 1, 0)`);
+
       // patch member role of existing team member
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -392,7 +409,7 @@ describe('NoteSettings API', () => {
 
       expect(team?.json()).toMatchObject([
         {
-          'noteId': 3,
+          'noteId': 1,
           'userId': 1,
           'role': 1,
         },
@@ -400,6 +417,7 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 200 and new role, if role was patched (if the user already had passing a role, then behavior is the same)', async () => {
+      // in note_teams there already is this user with this role
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -417,6 +435,24 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
+      // truncate tables which are needed
+      await global.db.query(`TRUNCATE public.notes, public.note_teams, public.users CASCADE`);
+
+      // restart autoincrement sequences for data to start with id 1
+      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
+      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
+      await global.db.query(`ALTER sequence note_teams_id_seq RESTART WITH 1`);
+
+      // create test user (id 1)
+      await global.db.query(`INSERT INTO public.users ("email", "name", "created_at") VALUES ('testemal@CodeXmail.com', 'CodeX', CURRENT_DATE)`);
+
+      // create test note (id 1) for test user
+      await global.db.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "public_id") VALUES ('{}', 1, CURRENT_DATE, '73NdxFZ4k7')`);
+
+      // create test team member (userId 1) for created note
+      await global.db.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (1, 1, 0)`);
+
+
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
