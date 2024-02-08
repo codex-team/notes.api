@@ -9,7 +9,7 @@ import config from '@infrastructure/config/index.js';
 import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate';
 import API from '@presentation/index.js';
 
-import { beforeAll, afterAll } from 'vitest';
+import { beforeAll, afterAll, beforeEach } from 'vitest';
 import type Api from '@presentation/api.interface';
 
 /**
@@ -81,6 +81,25 @@ beforeAll(async () => {
     },
   };
 }, TIMEOUT);
+
+beforeEach(async () => {
+  await global.db.query(`
+  DO $$
+  DECLARE 
+    tbl RECORD;
+  BEGIN
+    -- truncate all tables in database
+    FOR tbl IN 
+      SELECT * FROM information_schema.tables
+      WHERE table_name!= 'migrations'
+      AND table_schema='public'
+      AND table_type= 'BASE TABLE'
+    LOOP
+      EXECUTE format('TRUNCATE public.%s CASCADE', tbl.table_name);
+    END LOOP;
+  END $$ LANGUAGE plpgsql;   
+  `);
+});
 
 afterAll(async () => {
   await postgresContainer?.stop();

@@ -366,9 +366,6 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
-      // truncate tables which are needed
-      await global.db.query(`TRUNCATE public.notes, public.users, public.note_teams CASCADE`);
-
       // restart autoincrement sequences for data to start with id 1
       await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
       await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
@@ -435,9 +432,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
-      // truncate tables which are needed
-      await global.db.query(`TRUNCATE public.notes, public.note_teams, public.users CASCADE`);
-
       // restart autoincrement sequences for data to start with id 1
       await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
       await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
