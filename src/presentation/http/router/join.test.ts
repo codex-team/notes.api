@@ -7,14 +7,6 @@ describe('Join API', () => {
       const userId = 1;
       const accessToken = global.auth(userId);
 
-      // truncate all tables, which are needed (i guess we should do it afterAll in each test or beforeAll)
-      await global.db.query(`TRUNCATE public.users, public.notes, public.note_settings CASCADE`);
-
-      // restart autoincrement sequences for data to start with id 1
-      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
-
       // create test user (id 1)
       await global.db.query(`INSERT INTO public.users ("email", "name", "created_at") VALUES ('testemal@CodeXmail.com', 'CodeX', CURRENT_DATE)`);
 
@@ -80,14 +72,6 @@ describe('Join API', () => {
       const hash = 'Hzh2hy4igf';
       const userId = 1;
       const accessToken = global.auth(userId);
-
-      // truncate all tables, which are needed
-      await global.db.query(`TRUNCATE public.users, public.notes, public.note_settings, public.note_teams CASCADE`);
-
-      // restart autoincrement sequences for data to start with id 1
-      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
 
       // create test user (id 1)
       await global.db.query(`INSERT INTO public.users ("email", "name", "created_at") VALUES ('testemal@CodeXmail.com', 'CodeX', CURRENT_DATE)`);

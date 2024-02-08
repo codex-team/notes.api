@@ -366,11 +366,6 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
-      // restart autoincrement sequences for data to start with id 1
-      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence note_teams_id_seq RESTART WITH 1`);
-
       // create test user (id 1)
       await global.db.query(`INSERT INTO public.users ("email", "name", "created_at") VALUES ('testemal@CodeXmail.com', 'CodeX', CURRENT_DATE)`);
 
@@ -432,11 +427,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
-      // restart autoincrement sequences for data to start with id 1
-      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence note_teams_id_seq RESTART WITH 1`);
-
       // create test user (id 1)
       await global.db.query(`INSERT INTO public.users ("email", "name", "created_at") VALUES ('testemal@CodeXmail.com', 'CodeX', CURRENT_DATE)`);
 

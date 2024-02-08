@@ -87,6 +87,7 @@ beforeEach(async () => {
   DO $$
   DECLARE 
     tbl RECORD;
+    seq RECORD;
   BEGIN
     -- truncate all tables in database
     FOR tbl IN 
@@ -96,6 +97,14 @@ beforeEach(async () => {
       AND table_type= 'BASE TABLE'
     LOOP
       EXECUTE format('TRUNCATE public.%s CASCADE', tbl.table_name);
+    END LOOP;
+
+    -- restart all sequences
+    FOR seq IN 
+      SELECT * FROM information_schema.sequences
+      WHERE sequence_schema= 'public'
+    LOOP
+      EXECUTE format('ALTER sequence %s RESTART WITH 1', seq.sequence_name);
     END LOOP;
   END $$ LANGUAGE plpgsql;   
   `);
