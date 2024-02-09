@@ -69,6 +69,24 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            note: {
+              $ref: 'NoteSchema#/properties/id',
+            },
+            accessRights: {
+              type: 'object',
+              properties: {
+                canEdit: {
+                  type: 'boolean',
+                },
+              },
+            },
+          },
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -76,7 +94,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     ],
   }, async (request, reply) => {
     const { note } = request;
-
 
     /**
      * Check if note exists
@@ -233,7 +250,29 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       hostname: string;
     },
     Reply: NoteResponse| ErrorResponse,
-  }>('/resolve-hostname/:hostname', async (request, reply) => {
+  }>('/resolve-hostname/:hostname', {
+    schema: {
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            note: {
+              $ref: 'NoteSchema',
+            },
+            accessRights: {
+              type: 'object',
+              properties: {
+                canEdit: {
+                  type: 'boolean',
+                },
+              },
+            },
+          },
+
+        },
+      },
+    },
+  }, async (request, reply) => {
     const params = request.params;
 
     const note = await noteService.getNoteByHostname(params.hostname);
