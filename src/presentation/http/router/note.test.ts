@@ -390,7 +390,7 @@ describe('Note API', () => {
       const accessToken = global.auth(1);
       const correctID = 'Pq1T9vc23Q';
 
-      const response = await global.api?.fakeRequest({
+      let response = await global.api?.fakeRequest({
         method: 'DELETE',
         headers: {
           authorization: `Bearer ${accessToken}`,
@@ -401,6 +401,18 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toStrictEqual({ isDeleted: true });
+
+      response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.statusCode).toBe(406);
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
 
     test('Returns 403 when user is not creator of the note', async () => {
@@ -436,23 +448,6 @@ describe('Note API', () => {
     test('Returns 406 when the id does not exist', async () => {
       const nonexistentId = 'ishvm5qH84';
       const accessToken = global.auth(2);
-
-      const response = await global.api?.fakeRequest({
-        method: 'DELETE',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/${nonexistentId}`,
-      });
-
-      expect(response?.statusCode).toBe(406);
-
-      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
-    });
-
-    test('Returns 406 if the note has already been removed', async () => {
-      const nonexistentId = 'Pq1T9vc23Q';
-      const accessToken = global.auth(1);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
