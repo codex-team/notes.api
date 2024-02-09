@@ -386,6 +386,31 @@ describe('Note API', () => {
   });
 
   describe('DELETE /note/:notePublicId', () => {
+    test('Remove note', async () => {
+      const accessToken = global.auth(2);
+      const correctID = 'Hu8Gsm0sA1';
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+    });
+
     test('Should remove all note relations contains note id', async () => {
       const accessToken = global.auth(2);
       const correctID = 'f43NU75weU';
