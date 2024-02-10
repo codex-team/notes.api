@@ -55,11 +55,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     /**
      * Wrapping Notelist for public use
      */
-    const noteListItemsPublic: NotePublic[] = noteList.items.map((note) => {
-      const notePublic = definePublicNote(note);
-
-      return notePublic;
-    });
+    const noteListItemsPublic: NotePublic[] = noteList.items.map(definePublicNote);
 
     const noteListPublic: NoteListPublic = {
       items: noteListItemsPublic,

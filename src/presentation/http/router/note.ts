@@ -5,8 +5,7 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import { definePublicNote } from '@domain/entities/notePublic.js';
-import type { NoteResponse } from '../schema/ResponseSchema.js';
+import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
 
 /**
  * Interface for the note router.
@@ -56,7 +55,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteResponse| ErrorResponse,
+    Reply: {
+      note: NotePublic,
+      accessRights: {
+        canEdit: boolean,
+      },
+    }| ErrorResponse,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -74,7 +78,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           type: 'object',
           properties: {
             note: {
-              $ref: 'NoteSchema#/properties/id',
+              $ref: 'NoteSchema',
             },
             accessRights: {
               type: 'object',
@@ -133,7 +137,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     schema: {
       params: {
         notePublicId: {
-          $ref: 'NoteSchema#/properties/id',
+          $ref: 'NoteSchema',
         },
       },
     },
@@ -249,7 +253,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
        */
       hostname: string;
     },
-    Reply: NoteResponse| ErrorResponse,
+    Reply: {
+      note: NotePublic,
+      accessRights: {
+        canEdit: boolean,
+      },
+    }| ErrorResponse,
   }>('/resolve-hostname/:hostname', {
     schema: {
       response: {
