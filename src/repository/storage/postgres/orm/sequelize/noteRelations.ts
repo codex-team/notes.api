@@ -153,7 +153,7 @@ export default class NoteRelationsSequelizeStorage {
     });
 
     /**
-     * If note not found return false
+     * If the relation was not found return false
      */
     return affectedRows > 0;
   }
