@@ -63,19 +63,23 @@ export default class NoteService {
    * @param id - note internal id
    */
   public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
-    const isDeleted = await this.noteRepository.deleteNoteById(id);
+    const isRelated = await this.noteRelationsRepository.isRelated(id);
 
-    if (isDeleted === false) {
+    if (isRelated) {
+      const isNoteRelationsDeleted = await this.noteRelationsRepository.deleteNoteRelationsByNoteId(id);
+
+      if (isNoteRelationsDeleted === false) {
+        throw new DomainError(`Note relations with id ${id} was not deleted`);
+      }
+    }
+
+    const isNoteDeleted = await this.noteRepository.deleteNoteById(id);
+
+    if (isNoteDeleted === false) {
       throw new DomainError(`Note with id ${id} was not deleted`);
     }
 
-    /**
-     * @todo check for the existence of relationships between notes
-     */
-
-    await this.noteRelationsRepository.deleteNoteRelationsByNoteId(id);
-
-    return isDeleted;
+    return isNoteDeleted;
   }
 
   /**

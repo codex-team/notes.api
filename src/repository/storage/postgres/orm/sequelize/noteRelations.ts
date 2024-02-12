@@ -175,4 +175,19 @@ export default class NoteRelationsSequelizeStorage {
       as: 'note',
     });
   }
+
+  /**
+   * Checks if the note has any relation
+   *
+   * @param noteId - id of the current note
+   */
+  public async isRelated(noteId: NoteInternalId): Promise<boolean> {
+    const found = await this.model.findOne({
+      where: {
+        noteId,
+      },
+    });
+
+    return found !== undefined ? true : false;
+  };
 }
