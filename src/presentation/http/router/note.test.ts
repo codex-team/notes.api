@@ -400,6 +400,9 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
+      /**
+       * Checks if the note itself has been deleted
+       */
       response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
@@ -409,6 +412,35 @@ describe('Note API', () => {
       });
 
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+
+      const childNote = 'Uyd8TgkdA0';
+
+      /**
+       * Checks if the note saved as a parent has been deleted
+       */
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote}`,
+      });
+
+      const expectedResponse = {
+        'note': {
+          'id': 56,
+          'publicId': 'Uyd8TgkdA0',
+          'creatorId': 2,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+        },
+        'accessRights': {
+          'canEdit': true,
+        },
+      };
+
+      expect(response?.json()).toStrictEqual(expectedResponse);
     });
   });
 
