@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 DO $$
 BEGIN
   -- Add data for Header tool
