@@ -403,14 +403,14 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ isDeleted: true });
 
       response = await global.api?.fakeRequest({
-        method: 'DELETE',
+        method: 'GET',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
         url: `/note/${correctID}`,
       });
 
-      expect(response?.statusCode).toBe(406);
+      expect(response?.statusCode).toBe(404);
 
       expect(response?.json()).toStrictEqual({ message: 'Note not found' });
     });
