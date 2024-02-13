@@ -65,7 +65,7 @@ declare global {
      *
      * @param user - user object which contain all info about user (some info is optional)
      *
-     * if no editorTools passed, then editor_tools would be null in database
+     * if no editorTools passed, then editor_tools would be []] in database
      */
     insertUser: (user: {email: string, name: string, editorTools?: [string]}) => Promise<unknown>;
 
@@ -108,7 +108,7 @@ declare global {
      *
      * @param editorTool object which contain all info about editorTool (some info is optional)
      *
-     * if no isDefault passed, then is_default would be 0 in database
+     * if no isDefault passed, then is_default would be false in database
      */
     insertEditorTool: (editorTool: {name: string, title: string, exportName: string, source: JSON, isDefault?: boolean}) => Promise<unknown>;
   };
@@ -150,16 +150,16 @@ beforeAll(async () => {
     },
 
     insertNote: async (note: {creatorId: number, content?: JSON, publicId: string}) => {
-      const content = note.content ?? {};
+      const content = note.content ?? '{}';
 
       return await orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}')`);
     },
 
     insertUser: async (user: {email: string, name: string, editorTools?: [string]}) => {
       // editor tools could be `undefined` because they are optional, but db needs `null` property in this case
-      const editorTools = user.editorTools ?? null;
+      const editorTools = user.editorTools ?? '[]';
 
-      return await orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") VALUES ('${user.email}', '${user.name}', CURRENT_DATE, '${editorTools}')`);
+      return await orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])`);
     },
 
     insertUserSession: async (userSession: {userId: number, refreshToker: string, refreshTokenExpiresAt?: string}) => {
@@ -177,18 +177,18 @@ beforeAll(async () => {
     },
 
     insertNoteTeam: async (noteTeam: {userId: number, noteId: number, role: number}) => {
-      return await orm.connection.query(`INSERT INTO public.note_teams ('user_id', 'note_id', 'role') VALUES (${noteTeam.userId}, ${noteTeam.noteId}, ${noteTeam.role})`);
+      return await orm.connection.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (${noteTeam.userId}, ${noteTeam.noteId}, ${noteTeam.role})`);
     },
 
     insertNoteRelation: async (noteRelation: {noteId: number, parentId: number}) => {
-      return await orm.connection.query(`INSERT INTO public.note_relations ('note_id', 'parent_id') VALUES (${noteRelation.noteId}, ${noteRelation.parentId})`);
+      return await orm.connection.query(`INSERT INTO public.note_relations ("note_id", "parent_id") VALUES (${noteRelation.noteId}, ${noteRelation.parentId})`);
     },
 
     insertEditorTool: async (editorTool: {name: string, title: string, exportName: string, source: JSON, isDefault?: boolean }) => {
       // custom hostname could be `undefined` because it is optional, but db needs `null` property in this case
       const isDefault = editorTool.isDefault ?? null;
 
-      return await orm.connection.query(`INSERT INTO public.editor_tools ('name', 'title', 'export_name', 'sourse', 'is_default') VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
+      return await orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
     },
   };
 }, TIMEOUT);

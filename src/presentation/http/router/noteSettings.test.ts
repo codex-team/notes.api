@@ -366,14 +366,33 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
-      // create test user (id 1)
-      await global.db.query(`INSERT INTO public.users ("email", "name", "created_at") VALUES ('testemal@CodeXmail.com', 'CodeX', CURRENT_DATE)`);
+      test.todo('get rid of restarting database data in tests (use restart-database-data script in beforeEach)');
+      // truncate all tables, which are needed
+      await global.db.query(`TRUNCATE public.users, public.notes, public.note_settings, public.note_teams CASCADE`);
 
-      // create test note (id 1) for test user
-      await global.db.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "public_id") VALUES ('{}', 1, CURRENT_DATE, 'Pq1T9vc23Q')`);
+      // restart autoincrement sequences for data to start with id 1
+      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
+      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
+      await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
+
+      // create test user (id 1)
+      await global.db.insertUser({
+        email: 'testemal@CodeXmail.com',
+        name: 'CodeX',
+      });
+
+      // create test note (id 1) for created user
+      await global.db.insertNote({
+        creatorId: 1,
+        publicId: 'Pq1T9vc23Q',
+      });
 
       // create test team member (userId 1) for created note
-      await global.db.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (1, 1, 0)`);
+      await global.db.insertNoteTeam({
+        userId: 1,
+        noteId: 1,
+        role: 0,
+      });
 
       // patch member role of existing team member
       const response = await global.api?.fakeRequest({
@@ -427,15 +446,33 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
-      // create test user (id 1)
-      await global.db.query(`INSERT INTO public.users ("email", "name", "created_at") VALUES ('testemal@CodeXmail.com', 'CodeX', CURRENT_DATE)`);
+      test.todo('get rid of restarting database data in tests (use restart-database-data script in beforeEach)');
+      // truncate all tables, which are needed
+      await global.db.query(`TRUNCATE public.users, public.notes, public.note_settings, public.note_teams CASCADE`);
 
-      // create test note (id 1) for test user
-      await global.db.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "public_id") VALUES ('{}', 1, CURRENT_DATE, '73NdxFZ4k7')`);
+      // restart autoincrement sequences for data to start with id 1
+      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
+      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
+      await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
+
+      // create test user (id 1)
+      await global.db.insertUser({
+        email: 'testemal@CodeXmail.com',
+        name: 'CodeX',
+      });
+
+      // create test note (id 1) for created user
+      await global.db.insertNote({
+        creatorId: 1,
+        publicId: '73NdxFZ4k7',
+      });
 
       // create test team member (userId 1) for created note
-      await global.db.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (1, 1, 0)`);
-
+      await global.db.insertNoteTeam({
+        userId: 1,
+        noteId: 1,
+        role: 0,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
