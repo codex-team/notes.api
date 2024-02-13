@@ -386,7 +386,7 @@ describe('Note API', () => {
   });
 
   describe('DELETE /note/:notePublicId', () => {
-    test('Should remove all note relations contains note id', async () => {
+    test('Should remove all note relations containing note id', async () => {
       const accessToken = global.auth(2);
       const correctID = 'f43NU75weU';
 

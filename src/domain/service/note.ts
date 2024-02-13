@@ -63,7 +63,7 @@ export default class NoteService {
    * @param id - note internal id
    */
   public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
-    const isRelated = await this.noteRelationsRepository.isRelated(id);
+    const isRelated = await this.noteRelationsRepository.hasRelations(id);
 
     if (isRelated) {
       const isNoteRelationsDeleted = await this.noteRelationsRepository.deleteNoteRelationsByNoteId(id);

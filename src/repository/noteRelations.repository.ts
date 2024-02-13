@@ -62,7 +62,7 @@ export default class NoteRelationsRepository {
    *
    * @param noteId - id of the current note
    */
-  public async isRelated(noteId: NoteInternalId): Promise<boolean> {
+  public async hasRelations(noteId: NoteInternalId): Promise<boolean> {
     return await this.storage.isRelated(noteId);
   }
 }
