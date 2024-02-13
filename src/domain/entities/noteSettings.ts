@@ -1,3 +1,6 @@
+import type { Team } from './team.js';
+
+
 /**
  * Invitation hash. It's used to invite users to team
  */
@@ -31,6 +34,11 @@ export default interface NoteSettings {
    * Invitation hash
    */
   invitationHash: InvitationHash;
+
+  /**
+   * Team members. Team is empty by default because note creator is not stored in team
+   */
+  team?: Team;
 }
 
 /**

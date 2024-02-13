@@ -24,5 +24,25 @@ export const NoteSettingsSchema = {
       maxLength: 10,
       minLength: 10,
     },
+    team: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'number',
+          },
+          noteId: {
+            type: 'number',
+          },
+          userId: {
+            type: 'number',
+          },
+          role: {
+            type: 'number',
+          },
+        },
+      },
+    },
   },
 };

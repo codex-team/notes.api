@@ -2,7 +2,6 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type { InvitationHash } from '@domain/entities/noteSettings.js';
-import { isEmpty } from '@infrastructure/utils/empty.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
@@ -58,7 +57,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings
+    Reply: NoteSettings,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -80,13 +79,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const noteId = request.note?.id as number;
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
-
-    /**
-     * Check if note does not exist
-     */
-    if (isEmpty(noteSettings)) {
-      return reply.notFound('Note settings not found');
-    }
 
     return reply.send(noteSettings);
   });
