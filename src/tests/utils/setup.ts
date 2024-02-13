@@ -9,7 +9,7 @@ import config from '@infrastructure/config/index.js';
 import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate';
 import API from '@presentation/index.js';
 
-import { beforeAll, afterAll, beforeEach } from 'vitest';
+import { beforeAll, afterAll} from 'vitest';
 import type Api from '@presentation/api.interface';
 
 // import { readFileSync } from 'fs';
