@@ -30,7 +30,14 @@ describe('NoteSettings API', () => {
     test('Returns team with note settings by public id with 200 status', async () => {
       const existingNotePublicId = 'Pq1T9vc23Q';
 
-      const expectedTeam = [
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note-settings/${existingNotePublicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().team).toStrictEqual([
         {
           'id': 2,
           'role': 0,
@@ -41,16 +48,7 @@ describe('NoteSettings API', () => {
             'photo': null,
           },
         },
-      ];
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        url: `/note-settings/${existingNotePublicId}`,
-      });
-
-      expect(response?.statusCode).toBe(200);
-
-      expect(response?.json().team).toStrictEqual(expectedTeam);
+      ]);
     });
 
     test('Returns 404 when note settings with specified note public id do not exist', async () => {
