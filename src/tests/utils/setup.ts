@@ -9,7 +9,7 @@ import config from '@infrastructure/config/index.js';
 import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate';
 import API from '@presentation/index.js';
 
-import { beforeAll, afterAll} from 'vitest';
+import { beforeAll, afterAll } from 'vitest';
 import type Api from '@presentation/api.interface';
 
 // import { readFileSync } from 'fs';
@@ -59,19 +59,19 @@ declare global {
      * @param creatorId - id of creator user
      * @param content - optional content of the note
      */
-    insertNote: (creatorId: number, content?: JSON) => Promise<unknown>;
+    insertNote: (note: {creatorId: number, content?: JSON, publicId: string}) => Promise<unknown>;
 
-    insertUser: () => Promise<unknown>;
+    insertUser: (user: {email: string, name: string, editorTools?: [string]}) => Promise<unknown>;
 
-    insertNoteSetting: () => Promise<unknown>;
+    insertUserSession: (userSession: {userId: number, refreshToker: string, refreshTokenExpiresAt?: string}) => Promise<unknown>;
+
+    insertNoteSetting: (noteSettings: {noteId: number, customHostname?: string, isPublic: boolean, invitationHash: string}) => Promise<unknown>;
 
     insertEditorTool: () => Promise<unknown>;
 
     insertNoteRelation: () => Promise<unknown>;
 
     insertNoteTeam: () => Promise<unknown>;
-
-    insertUserSession: () => Promise<unknown>;
   };
 }
 
@@ -110,26 +110,41 @@ beforeAll(async () => {
       return await orm.connection.query(sqlString);
     },
 
-    insertNote: async (creatorId: number, content?: JSON) => {
-      return await orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at") VALUES ('${content}', ${creatorId} CURRENT_DATE)`);
+    insertNote: async (note: {creatorId: number, content?: JSON, publicId: string}) => {
+      return await orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") VALUES ('${note.content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}')`);
     },
 
-    insertUser: async () => {
+    insertUser: async (user: {email: string, name: string, editorTools?: [string]}) => {
+      // editor tools could be `undefined` because they are optional, but db needs `null` property in this case
+      const editorTools = user.editorTools ?? null;
+
+      return await orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") VALUES ('${user.email}', '${user.name}', CURRENT_DATE, '${editorTools}')`);
     },
 
-    insertUserSession: async () => {
+    insertUserSession: async (userSession: {userId: number, refreshToker: string, refreshTokenExpiresAt?: string}) => {
+      // refreshTokerExpiresAt is optional so it would be 'CURRENT_DATE + INTERVAL(1 DAY)' by default
+      const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? 'CURRENT_DATE + INTERVAL(1 DAY)';
+
+      return await orm.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_toker_expires_at") VALUES (${userSession.userId}, '${userSession.refreshToker}, '${refreshTokerExpiresAt}')`);
     },
 
-    insertNoteSetting: async () => {
+    insertNoteSetting: async (noteSettings: {noteId: number, customHostname?: string, isPublic: boolean, invitationHash: string}) => {
+      // custom hostname could be `undefined` because it is optional, but db needs `null` property in this case
+      const customHostname = noteSettings.customHostname ?? null;
+
+      return await orm.connection.query(`INSERT INTO public.note_settings ("note_id", "custom_hostname", "is_public", "invitation_hash") VALUES (${noteSettings.noteId}, '${customHostname}')`);
     },
 
     insertNoteTeam: async () => {
+      return await orm.connection.query(``);
     },
 
     insertNoteRelation: async () => {
+      return await orm.connection.query(``);
     },
 
     insertEditorTool: async () => {
+      return await orm.connection.query(``);
     },
   };
 }, TIMEOUT);
