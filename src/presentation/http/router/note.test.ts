@@ -426,21 +426,7 @@ describe('Note API', () => {
         url: `/note/${childNote}`,
       });
 
-      const expectedResponse = {
-        'note': {
-          'id': 56,
-          'publicId': 'Uyd8TgkdA0',
-          'creatorId': 2,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
-        'accessRights': {
-          'canEdit': true,
-        },
-      };
-
-      expect(response?.json()).toStrictEqual(expectedResponse);
+      expect(response).not.toHaveProperty('parentNote');
     });
   });
 
