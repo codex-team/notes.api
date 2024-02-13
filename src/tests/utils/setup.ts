@@ -12,6 +12,8 @@ import API from '@presentation/index.js';
 import { beforeAll, afterAll, beforeEach } from 'vitest';
 import type Api from '@presentation/api.interface';
 
+// import { readFileSync } from 'fs';
+
 /**
  * Tests setup maximum duration.
  * Added as default 10000 is not enough
@@ -19,6 +21,12 @@ import type Api from '@presentation/api.interface';
 const TIMEOUT = 200000;
 
 declare global {
+  /**
+   *
+   */
+  /* eslint-disable-next-line no-var */
+  // var truncateTableScript: string;
+
   /**
    * Globally exposed variable, containing reference to http server object.
    * Is accessed as 'global.server' in tests
@@ -44,6 +52,26 @@ declare global {
      * @param sql - string containing sql to executein test DB
      */
     query: (sql: string) => Promise<unknown>;
+
+    /**
+     * Execute sql query, that creates new note in database with specified data
+     *
+     * @param creatorId - id of creator user
+     * @param content - optional content of the note
+     */
+    insertNote: (creatorId: number, content?: JSON) => Promise<unknown>;
+
+    insertUser: () => Promise<unknown>;
+
+    insertNoteSetting: () => Promise<unknown>;
+
+    insertEditorTool: () => Promise<unknown>;
+
+    insertNoteRelation: () => Promise<unknown>;
+
+    insertNoteTeam: () => Promise<unknown>;
+
+    insertUserSession: () => Promise<unknown>;
   };
 }
 
@@ -55,6 +83,8 @@ const migrationsPath = path.join(process.cwd(), 'migrations', 'tenant');
 let postgresContainer: StartedPostgreSqlContainer | undefined;
 
 beforeAll(async () => {
+  // global.truncateTableScript = readFileSync('../sql-tools/restart-database-data.txt', 'utf-8');
+
   postgresContainer = await new PostgreSqlContainer()
     .withUsername('postgres')
     .start();
@@ -79,36 +109,38 @@ beforeAll(async () => {
     query: async (sqlString: string) => {
       return await orm.connection.query(sqlString);
     },
+
+    insertNote: async (creatorId: number, content?: JSON) => {
+      return await orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at") VALUES ('${content}', ${creatorId} CURRENT_DATE)`);
+    },
+
+    insertUser: async () => {
+    },
+
+    insertUserSession: async () => {
+    },
+
+    insertNoteSetting: async () => {
+    },
+
+    insertNoteTeam: async () => {
+    },
+
+    insertNoteRelation: async () => {
+    },
+
+    insertEditorTool: async () => {
+    },
   };
 }, TIMEOUT);
 
-beforeEach(async () => {
-  await global.db.query(`
-  DO $$
-  DECLARE 
-    tbl RECORD;
-    seq RECORD;
-  BEGIN
-    -- truncate all tables in database
-    FOR tbl IN 
-      SELECT * FROM information_schema.tables
-      WHERE table_name!= 'migrations'
-      AND table_schema='public'
-      AND table_type= 'BASE TABLE'
-    LOOP
-      EXECUTE format('TRUNCATE public.%s CASCADE', tbl.table_name);
-    END LOOP;
-
-    -- restart all sequences
-    FOR seq IN 
-      SELECT * FROM information_schema.sequences
-      WHERE sequence_schema= 'public'
-    LOOP
-      EXECUTE format('ALTER sequence %s RESTART WITH 1', seq.sequence_name);
-    END LOOP;
-  END $$ LANGUAGE plpgsql;   
-  `);
-});
+//
+// beforeEach(async () => {
+// // script to truncate all tables and restart all sequences for inserted data to start with id
+//
+// await global.db.query(global.truncateTableScript);
+// });
+//
 
 afterAll(async () => {
   await postgresContainer?.stop();
