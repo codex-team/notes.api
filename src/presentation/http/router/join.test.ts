@@ -16,13 +16,13 @@ describe('Join API', () => {
       await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
       await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
 
-      // create test user (id 1)
+      // create test user
       await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
-      // create test note (id 1) for created user
+      // create test note for created user
       await global.db.insertNote({
         creatorId: 1,
         publicId: 'TJmEb89e0l',
@@ -101,14 +101,14 @@ describe('Join API', () => {
       await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
       await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
 
-      // create test user (id 1)
+      // create test user
       await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
 
-      // create test note (id 1) for created user
+      // create test note for created user
       await global.db.insertNote({
         creatorId: 1,
         publicId: 'TJmEb89e0l',

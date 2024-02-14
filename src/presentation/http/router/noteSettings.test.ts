@@ -375,19 +375,19 @@ describe('NoteSettings API', () => {
       await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
       await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
 
-      // create test user (id 1)
+      // create test user
       await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
-      // create test note (id 1) for created user
+      // create test note for created user
       await global.db.insertNote({
         creatorId: 1,
         publicId: 'Pq1T9vc23Q',
       });
 
-      // create test team member (userId 1) for created note
+      // create test team member for created note
       await global.db.insertNoteTeam({
         userId: 1,
         noteId: 1,
