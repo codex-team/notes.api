@@ -82,7 +82,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     preHandler: [
       noteResolver,
       noteSettingsResolver,
-      memberRoleResolver
+      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const { note } = request;
@@ -261,7 +261,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     if (note === null) {
       return reply.notFound('Note not found');
     }
-    
+
     /**
      * By default, unauthorized user can not edit the note
      */
