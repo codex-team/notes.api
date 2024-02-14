@@ -42,11 +42,10 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
         logger.error('Can not resolve Member role by note and user');
         logger.error(error);
 
-        // todo: че это???
         await reply
           .code(StatusCodes.NOT_ACCEPTABLE)
           .send({
-            message: 'Note settings not found',
+            message: 'Team member not found',
           });
       }
     },
