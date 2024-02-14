@@ -28,7 +28,7 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
 
       try {
         if (!request.note) {
-          throw new Error('Note did not resolved');
+          throw new Error('Note was not resolved');
         }
 
         noteSettings = await noteSettingsService.getNoteSettingsByNoteId(request.note.id);
