@@ -33,10 +33,9 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
         }
 
         // If user is not authenticated, we can't resolve Member role
-        if (!request.userId) {
+        if (request.userId === null) {
           request.memberRole = null;
-        }
-        else {
+        } else {
           memberRole = await noteSettingsService.getUserRoleByUserIdAndNoteId(request.userId, request.note.id);
           request.memberRole = memberRole;
         }
