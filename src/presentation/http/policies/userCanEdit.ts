@@ -11,15 +11,11 @@ export default async function userCanEdit(request: FastifyRequest, reply: Fastif
   const { userId } = request;
 
   /**
-   * If note or memberRole is not resolved, we can't check permissions
+   * If note is not resolved, we can't check permissions
    */
-  if (isEmpty(request.note) || isEmpty(request.memberRole)) {
+  if (isEmpty(request.note)) {
     return await reply.notAcceptable('Note not found');
   };
-
-  if (isEmpty(request.memberRole)) {
-    return await reply.notAcceptable('Team member not found');
-  }
 
   const { creatorId } = request.note;
   const { memberRole } = request;

@@ -9,6 +9,7 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import type { NotePublicId } from '@domain/entities/note.js';
 import type { Team, MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
+import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 
 /**
  * Interface for the note settings router.
@@ -50,6 +51,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * It should be used to use note settings in middlewares
    */
   const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
+
+  /**
+   * Prepare user role resolver middleware
+   * It should be used to use user role in middlewares
+   */
+  const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService);
 
   /**
    * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware
@@ -119,6 +126,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     preHandler: [
       noteResolver,
+      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
@@ -156,6 +164,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     preHandler: [
       noteResolver,
+      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
@@ -248,6 +257,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     preHandler: [
       noteResolver,
+      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;

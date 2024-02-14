@@ -101,7 +101,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if current user can edit the note
      */
-    const canEdit = memberRole === 1;
+    const canEdit = memberRole === 1 || note.creatorId === request.userId;
 
     return reply.send({
       note: note,
@@ -276,7 +276,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       /**
        * Check if current user can edit the note
        */
-      canEdit = memberRole === 1;
+      canEdit = memberRole === 1 || note.creatorId === request.userId;
     }
 
     return reply.send({
