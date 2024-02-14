@@ -24,6 +24,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
 
   return {
     memberRoleResolver: async function memberRoleResolver(request, reply) {
+      // if MemberRole equals null, it means that user is not in the team
       let memberRole: MemberRole | null;
 
       try {
