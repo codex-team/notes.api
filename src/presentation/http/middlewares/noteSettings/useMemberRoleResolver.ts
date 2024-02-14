@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { getLogger } from '@infrastructure/logging/index.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type { MemberRole } from '@domain/entities/team';
+import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Add middleware to resolve Member's role in a team by user id and note id and add it to request
@@ -28,7 +29,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
       let memberRole: MemberRole | null;
 
       try {
-        if (!request.note) {
+        if (isEmpty(request.note)) {
           throw new Error('Note was not resolved');
         }
 
