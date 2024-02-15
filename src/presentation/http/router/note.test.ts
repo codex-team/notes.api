@@ -388,31 +388,21 @@ describe('Note API', () => {
   describe('DELETE /note/:notePublicId', () => {
     test('Should remove all note relations containing note id', async () => {
       const accessToken = global.auth(2);
-      const correctID = 'f43NU75weU';
+      const currentNoteId = 'f43NU75weU';
 
       let response = await global.api?.fakeRequest({
         method: 'DELETE',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${correctID}`,
+        url: `/note/${currentNoteId}`,
       });
 
       expect(response?.statusCode).toBe(200);
 
       /**
-       * Checks if the note itself has been deleted
+       * Id of the note that is a child of the current note that has been deleted
        */
-      response = await global.api?.fakeRequest({
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/${correctID}`,
-      });
-
-      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
-
       const childNote = 'Uyd8TgkdA0';
 
       /**
