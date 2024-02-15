@@ -181,7 +181,7 @@ export default class NoteRelationsSequelizeStorage {
    *
    * @param noteId - id of the current note
    */
-  public async isRelated(noteId: NoteInternalId): Promise<boolean> {
+  public async hasRelation(noteId: NoteInternalId): Promise<boolean> {
     const found = await this.model.findOne({
       where: {
         noteId,
