@@ -180,7 +180,7 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 404 when the id  does not exist', async () => {
+    test('Returns 404 when the id does not exist', async () => {
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
@@ -383,6 +383,105 @@ describe('Note API', () => {
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
+  });
+
+  describe('DELETE /note/:notePublicId', () => {
+    test('Returns 200 status and "true" if note was removed successfully', async () => {
+      const accessToken = global.auth(1);
+      const correctID = 'Pq1T9vc23Q';
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toStrictEqual({ isDeleted: true });
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.statusCode).toBe(404);
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+    });
+
+    test('Returns 403 when user is not creator of the note', async () => {
+      const accessToken = global.auth(2);
+      const correctID = 'TJmEb89e0l';
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
+    });
+
+    test('Returns 401 when the user is not authorized', async () => {
+      const correctID = '73NdxFZ4k7';
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        url: `/note/${correctID}`,
+      });
+
+      expect(response?.statusCode).toBe(401);
+
+      expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
+    });
+
+    test('Returns 406 when the id does not exist', async () => {
+      const nonexistentId = 'ishvm5qH84';
+      const accessToken = global.auth(2);
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${nonexistentId}`,
+      });
+
+      expect(response?.statusCode).toBe(406);
+
+      expect(response?.json()).toStrictEqual({ message: 'Note not found' });
+    });
+
+    test.each([
+      { id: 'mVz3iHuez',
+        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+
+      { id: 'cR8eqF1mFf0',
+        expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+
+      { id: '+=*&*5%&&^&-',
+        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component' },
+    ])
+    ('Returns 400 when id has incorrect characters and length', async ({ id, expectedMessage }) => {
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        url: `/note/${id}`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual(expectedMessage);
+    });
   });
 
   test.todo('Tests with access rights');
