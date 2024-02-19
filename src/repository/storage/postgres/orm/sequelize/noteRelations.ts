@@ -141,7 +141,7 @@ export default class NoteRelationsSequelizeStorage {
   }
 
   /**
-   * Delete all note ralations contains noteId
+   * Delete all note relations containing noteId
    *
    * @param noteId - id of the current note
    */
