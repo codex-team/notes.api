@@ -40,12 +40,14 @@ describe('NoteSettings API', () => {
       /** create test user */
       await global.db.insertUser({
         email: 'a@a.com',
-        name: 'Test user 1' });
+        name: 'Test user 1',
+      });
 
       /** create test note for created user */
       await global.db.insertNote({
         creatorId: 1,
-        publicId: 'Pq1T9vc23Q' });
+        publicId: 'Pq1T9vc23Q',
+      });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
