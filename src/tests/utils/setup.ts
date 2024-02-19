@@ -37,6 +37,9 @@ declare global {
    */
   function auth(userId: number): string;
 
+  /**
+   * dbHelpers class that contains methods for work with database
+   */
   /* eslint-disable-next-line no-var */
   var db: dbHelpers;
 }
