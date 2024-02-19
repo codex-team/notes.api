@@ -103,4 +103,36 @@ export default class dbHelpers {
 
     return await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
   }
+
+  /**
+   * Truncates all tables and restarts all autoincrement sequences
+   */
+  public async truncateTables(): Promise<unknown> {
+    return await this.orm.connection.query(`DO $$
+    DECLARE 
+      -- table iterator
+      tbl RECORD;
+      -- sequence iterator
+      seq RECORD;
+    BEGIN
+      -- truncate all tables (except migrations) in database
+      FOR tbl IN 
+        SELECT * FROM information_schema.tables
+        WHERE table_name!= 'migrations'
+        AND table_schema= 'public'
+        AND table_type= 'BASE TABLE'
+      LOOP
+        EXECUTE format('TRUNCATE public.%s CASCADE', tbl.table_name);
+      END LOOP;
+    
+      -- restart all sequences 
+      -- (autoincrement should start with 1 when test-data is truncated)
+      FOR seq IN 
+        SELECT * FROM information_schema.sequences
+        WHERE sequence_schema= 'public'
+      LOOP
+        EXECUTE format('ALTER sequence %s RESTART WITH 1', seq.sequence_name);
+      END LOOP;
+    END $$ LANGUAGE plpgsql;`);
+  }
 };

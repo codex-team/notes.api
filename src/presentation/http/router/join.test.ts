@@ -8,27 +8,27 @@ describe('Join API', () => {
       const accessToken = global.auth(userId);
 
       test.todo('get rid of restarting database data in tests (use restart-database-data script in beforeEach)');
-      // truncate all tables, which are needed
-      await global.db.query(`TRUNCATE public.users, public.notes, public.note_settings CASCADE`);
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       */
+      await global.db.truncateTables();
 
-      // restart autoincrement sequences for data to start with id 1
-      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
-
-      // create test user
+      /** create test user */
       await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
-      // create test note for created user
+      /** create test note for created user */
       await global.db.insertNote({
         creatorId: 1,
         publicId: 'TJmEb89e0l',
       });
 
-      // create test note-settings for created note
+      /** create test note-settings for created note */
       await global.db.insertNoteSetting({
         noteId: 1,
         isPublic: true,
@@ -43,7 +43,7 @@ describe('Join API', () => {
         url: `/join/${invitationHash}`,
       });
 
-      // check if we added user to team
+      /** check if we added user to team */
       expect(response?.json()).toMatchObject({
         result: {
           userId,
@@ -52,7 +52,7 @@ describe('Join API', () => {
         },
       });
 
-      // add same user to the same note team
+      /** add same user to the same note team */
       response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
@@ -92,29 +92,28 @@ describe('Join API', () => {
       const userId = 1;
       const accessToken = global.auth(userId);
 
-      test.todo('get rid of restarting database data in tests (use restart-database-data script in beforeEach)');
-      // truncate all tables, which are needed
-      await global.db.query(`TRUNCATE public.users, public.notes, public.note_settings, public.note_teams CASCADE`);
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       */
+      await global.db.truncateTables();
 
-      // restart autoincrement sequences for data to start with id 1
-      await global.db.query(`ALTER sequence users_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence notes_id_seq RESTART WITH 1`);
-      await global.db.query(`ALTER sequence note_settings_id_seq RESTART WITH 1`);
-
-      // create test user
+      /** create test user */
       await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
 
-      // create test note for created user
+      /** create test note for created user */
       await global.db.insertNote({
         creatorId: 1,
         publicId: 'TJmEb89e0l',
       });
 
-      // create test note-settings for created note
+      /** create test note-settings for created note */
       await global.db.insertNoteSetting({
         noteId: 1,
         isPublic: true,
