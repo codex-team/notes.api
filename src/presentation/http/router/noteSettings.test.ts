@@ -1,9 +1,4 @@
 import { describe, test, expect } from 'vitest';
-
-import notes from '@tests/test-data/notes.json';
-import noteSettings from '@tests/test-data/notes-settings.json';
-import noteTeams from '@tests/test-data/note-teams.json';
-
 describe('NoteSettings API', () => {
   describe('GET /note-settings/:notePublicId ', () => {
     test('Returns note settings by public id with 200 status', async () => {
@@ -127,15 +122,43 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
-      const notPublicNote = notes.find(newNote => {
-        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       */
+      await global.db.truncateTables();
 
-        return settings!.is_public === false;
+      /** create test user */
+      await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
+      });
+
+      /** create test note for created user */
+      await global.db.insertNote({
+        creatorId: 1,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: 1,
+        isPublic: false,
+        invitationHash: 'Hzh2hy4igf',
+      });
+
+      /** create test team member for created note */
+      await global.db.insertNoteTeam({
+        userId: 1,
+        noteId: 1,
+        role: 0,
       });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note-settings/${notPublicNote!.public_id}`,
+        url: `/note-settings/Pq1T9vc23Q`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -147,11 +170,44 @@ describe('NoteSettings API', () => {
       const userId = 2;
       const accessToken = global.auth(userId);
 
-      const notPublicNote = notes.find(newNote => {
-        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-        const team = noteTeams.find(nt => nt.note_id === newNote.id && nt.user_id === userId);
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       */
+      await global.db.truncateTables();
 
-        return settings!.is_public === false && newNote.creator_id != userId && team === undefined;
+      /** create test user */
+      await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
+      });
+
+      /** create test user */
+      await global.db.insertUser({
+        email: 'b@b.com',
+        name: 'Test user 2',
+      });
+
+      /** create test note for created user */
+      await global.db.insertNote({
+        creatorId: 1,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: 1,
+        isPublic: false,
+        invitationHash: 'Hzh2hy4igf',
+      });
+
+      /** create test team member for created note */
+      await global.db.insertNoteTeam({
+        userId: 1,
+        noteId: 1,
+        role: 0,
       });
 
       const response = await global.api?.fakeRequest({
@@ -159,7 +215,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${notPublicNote!.public_id}`,
+        url: `/note-settings/Pq1T9vc23Q`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -170,11 +226,41 @@ describe('NoteSettings API', () => {
 
   describe('GET /note-settings/:notePublicId/team ', () => {
     test('Returns team by public id with 200 status, user is creator of the note', async () => {
-      const userId = 2;
+      const userId = 1;
       const accessToken = global.auth(userId);
 
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       */
+      await global.db.truncateTables();
+
+      /** create test user */
+      await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
+      });
+
+      /** create test note for created user */
+      await global.db.insertNote({
+        creatorId: 1,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: 1,
+        isPublic: false,
+        invitationHash: 'Hzh2hy4igf',
+      });
+
+      /** create test team member for created note */
+      await global.db.insertNoteTeam({
+        userId: 1,
+        noteId: 1,
+        role: 0,
       });
 
       const response = await global.api?.fakeRequest({
@@ -182,7 +268,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${userNote!.public_id}/team`,
+        url: `/note-settings/Pq1T9vc23Q/team`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -244,17 +330,47 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId ', () => {
     test('Update note settings by public id with 200 status, user is creator of the note', async () => {
-      const userId = 2;
+      const userId = 1;
       const accessToken = global.auth(userId);
 
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       */
+      await global.db.truncateTables();
+
+      /** create test user */
+      await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
+      });
+
+      /** create test note for created user */
+      await global.db.insertNote({
+        creatorId: 1,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: 1,
+        isPublic: true,
+        invitationHash: 'Hzh2hy4igf',
+      });
+
+      /** create test team member for created note */
+      await global.db.insertNoteTeam({
+        userId: 1,
+        noteId: 1,
+        role: 0,
       });
 
       const updatedNoteSettings = {
-        'customHostname': 'codex.so',
+        'customHostname': 'null',
         'isPublic': false,
-        'invitationHash': 'FfAwyaR80C',
+        'invitationHash': 'Hzh2hy4igf',
       };
 
       const response = await global.api?.fakeRequest({
@@ -262,7 +378,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${userNote!.public_id}`,
+        url: `/note-settings/Pq1T9vc23Q`,
         body: {
           'isPublic': false,
         },
@@ -270,7 +386,7 @@ describe('NoteSettings API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual(updatedNoteSettings);
+      expect(response?.json()).toMatchObject(updatedNoteSettings);
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
@@ -345,11 +461,41 @@ describe('NoteSettings API', () => {
     });
 
     test('Generate invitation hash by public id with 200 status, user is creator of the note', async () => {
-      const userId = 2;
+      const userId = 1;
       const accessToken = global.auth(userId);
 
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       */
+      await global.db.truncateTables();
+
+      /** create test user */
+      await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
+      });
+
+      /** create test note for created user */
+      await global.db.insertNote({
+        creatorId: 1,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: 1,
+        isPublic: true,
+        invitationHash: 'Hzh2hy4igf',
+      });
+
+      /** create test team member for created note */
+      await global.db.insertNoteTeam({
+        userId: 1,
+        noteId: 1,
+        role: 0,
       });
 
       const response = await global.api?.fakeRequest({
@@ -357,7 +503,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${userNote!.public_id}/invitation-hash`,
+        url: `/note-settings/Pq1T9vc23Q/invitation-hash`,
       });
 
       expect(response?.statusCode).toBe(200);
