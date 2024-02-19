@@ -7,7 +7,6 @@ describe('Join API', () => {
       const userId = 1;
       const accessToken = global.auth(userId);
 
-      test.todo('get rid of restarting database data in tests (use restart-database-data script in beforeEach)');
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1

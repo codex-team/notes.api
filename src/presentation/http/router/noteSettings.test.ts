@@ -49,6 +49,13 @@ describe('NoteSettings API', () => {
         publicId: 'Pq1T9vc23Q',
       });
 
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: 1,
+        isPublic: true,
+        invitationHash: 'Hzh2hy4igf',
+      });
+
       /** create test team member for created note */
       await global.db.insertNoteTeam({
         userId: 1,
@@ -79,6 +86,14 @@ describe('NoteSettings API', () => {
 
     test('Returns 404 when note settings with specified note public id do not exist', async () => {
       const nonexistentId = 'ishvm5qH84';
+
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       */
+      await global.db.truncateTables();
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
