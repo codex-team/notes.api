@@ -41,7 +41,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
 
         request.memberRole = memberRole;
       } catch (error) {
-        logger.error('Can not resolve Member role by note [id = {${request.note.id}}] and user [id = ${request.userId}]');
+        logger.error('Can not resolve Member role by note [id = ${request.note.id}] and user [id = ${request.userId}]');
         logger.error(error);
 
         await reply.notAcceptable('Team member not found'); // ???
