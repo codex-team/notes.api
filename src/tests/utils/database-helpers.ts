@@ -1,7 +1,72 @@
 /**
+ * default type for note
+ */
+type note = {
+  creatorId: number,
+  content?: JSON,
+  publicId: string,
+};
+
+/**
+ * default type for user
+ */
+type user = {
+  email: string,
+  name: string,
+  editorTools?: [string],
+};
+
+/**
+ * default type for userSession
+ */
+type userSession = {
+  userId: number,
+  refreshToker: string,
+  refreshTokenExpiresAt?: string,
+};
+
+/**
+ * default type for note settings
+ */
+type noteSettings = {
+  noteId: number,
+  customHostname?: string,
+  isPublic: boolean,
+  invitationHash: string,
+};
+
+/**
+ * default type for note team
+ */
+type noteTeam = {
+  userId: number,
+  noteId: number,
+  role: number,
+};
+
+/**
+ * default type for note relation
+ */
+type noteRelation = {
+  noteId: number,
+  parentId: number,
+};
+
+/**
+ * default type for editor tool
+ */
+type editorTool = {
+  name: string,
+  title: string,
+  exportName: string,
+  source: JSON,
+  isDefault: boolean,
+};
+
+/**
  * class of db helpers
  */
-export default class dbHelpers {
+export default class DatabaseHelpers {
   public orm;
   /**
    *
@@ -26,10 +91,12 @@ export default class dbHelpers {
    *
    * @param note - note object which contain all info about note (some info is optional)
    */
-  public async insertNote(note: {creatorId: number, content?: JSON, publicId: string}): Promise<unknown> {
+  public async insertNote(note: note): Promise<note> {
     const content = note.content ?? '{}';
 
-    return await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}')`);
+    await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}')`);
+
+    return note;
   }
 
   /**
@@ -39,10 +106,12 @@ export default class dbHelpers {
    *
    * if no editorTools passed, then editor_tools would be []] in database
    */
-  public async insertUser(user: {email: string, name: string, editorTools?: [string]}): Promise<unknown> {
+  public async insertUser(user: user): Promise<user> {
     const editorTools = user.editorTools ?? '[]';
 
-    return await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])`);
+    await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])`);
+
+    return user;
   }
 
   /**
@@ -54,10 +123,12 @@ export default class dbHelpers {
    *
    * if no refreshTokenExpiresAt passed, then it would be `CURRENT_DATE + INTERVAL '1 day'`
    */
-  public async insertUserSession(userSession: {userId: number, refreshToker: string, refreshTokenExpiresAt?: string}): Promise<unknown> {
+  public async insertUserSession(userSession: userSession): Promise<userSession> {
     const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? `CURRENT_DATE + INTERVAL '1 day')`;
 
-    return await this.orm.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_toker_expires_at") VALUES (${userSession.userId}, '${userSession.refreshToker}, '${refreshTokerExpiresAt}')`);
+    await this.orm.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_toker_expires_at") VALUES (${userSession.userId}, '${userSession.refreshToker}, '${refreshTokerExpiresAt}')`);
+
+    return userSession;
   }
 
   /**
@@ -67,10 +138,12 @@ export default class dbHelpers {
    *
    * if no custoHostname passed, then custom_hostname would be null in database
    */
-  public async insertNoteSetting(noteSettings: {noteId: number, customHostname?: string, isPublic: boolean, invitationHash: string}): Promise<unknown> {
+  public async insertNoteSetting(noteSettings: noteSettings): Promise<noteSettings> {
     const customHostname = noteSettings.customHostname ?? null;
 
-    return await this.orm.connection.query(`INSERT INTO public.note_settings ("note_id", "custom_hostname", "is_public", "invitation_hash") VALUES (${noteSettings.noteId}, '${customHostname}', ${noteSettings.isPublic}, '${noteSettings.invitationHash}')`);
+    await this.orm.connection.query(`INSERT INTO public.note_settings ("note_id", "custom_hostname", "is_public", "invitation_hash") VALUES (${noteSettings.noteId}, '${customHostname}', ${noteSettings.isPublic}, '${noteSettings.invitationHash}')`);
+
+    return noteSettings;
   }
 
   /**
@@ -78,8 +151,10 @@ export default class dbHelpers {
    *
    * @param noteTeam - noteTam object which contain all info about noteTeam
    */
-  public async insertNoteTeam(noteTeam: {userId: number, noteId: number, role: number}): Promise<unknown> {
-    return await this.orm.connection.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (${noteTeam.userId}, ${noteTeam.noteId}, ${noteTeam.role})`);
+  public async insertNoteTeam(noteTeam: noteTeam): Promise<noteTeam> {
+    await this.orm.connection.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (${noteTeam.userId}, ${noteTeam.noteId}, ${noteTeam.role})`);
+
+    return noteTeam;
   }
 
   /**
@@ -87,8 +162,10 @@ export default class dbHelpers {
    *
    * @param noteRelation object which contain all info about noteRelation
    */
-  public async insertNoteRelation(noteRelation: {noteId: number, parentId: number}): Promise<unknown> {
-    return await this.orm.connection.query(`INSERT INTO public.note_relations ("note_id", "parent_id") VALUES (${noteRelation.noteId}, ${noteRelation.parentId})`);
+  public async insertNoteRelation(noteRelation: noteRelation): Promise<noteRelation> {
+    await this.orm.connection.query(`INSERT INTO public.note_relations ("note_id", "parent_id") VALUES (${noteRelation.noteId}, ${noteRelation.parentId})`);
+
+    return noteRelation;
   }
 
   /**
@@ -98,10 +175,12 @@ export default class dbHelpers {
    *
    * if no isDefault passed, then is_default would be false in database
    */
-  public async insertEditorTool(editorTool: {name: string, title: string, exportName: string, source: JSON, isDefault: boolean}): Promise<unknown> {
+  public async insertEditorTool(editorTool: editorTool): Promise<editorTool> {
     const isDefault = editorTool.isDefault ?? null;
 
-    return await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
+    await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
+
+    return editorTool;
   }
 
   /**

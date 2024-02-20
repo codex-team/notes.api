@@ -12,7 +12,7 @@ import API from '@presentation/index.js';
 import { beforeAll, afterAll } from 'vitest';
 import type Api from '@presentation/api.interface';
 
-import dbHelpers from './database-helpers.js';
+import DatabaseHelpers from './database-helpers.js';
 
 /**
  * Tests setup maximum duration.
@@ -41,7 +41,7 @@ declare global {
    * dbHelpers class that contains methods for work with database
    */
   /* eslint-disable-next-line no-var */
-  var db: dbHelpers;
+  var db: DatabaseHelpers;
 }
 
 /**
@@ -72,7 +72,7 @@ beforeAll(async () => {
     return domainServices.authService.signAccessToken({ id : userId });
   };
 
-  global.db = new dbHelpers(orm);
+  global.db = new DatabaseHelpers(orm);
 }, TIMEOUT);
 
 

@@ -11,7 +11,7 @@ describe('Join API', () => {
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
        *
-       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       * TODO get rid of restarting database data in tests (move to beforeEach)
        */
       await global.db.truncateTables();
 
@@ -95,7 +95,7 @@ describe('Join API', () => {
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
        *
-       * TODO get rid of restarting database data in tests (use restart-database-data script in beforeEach)
+       * TODO get rid of restarting database data in tests (move to beforeEach)
        */
       await global.db.truncateTables();
 
