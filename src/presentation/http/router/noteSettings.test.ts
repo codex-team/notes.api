@@ -41,7 +41,7 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.userId,
-        publicId: 'Pq1T9vc23Q',
+        publicId: existingNotePublicId,
       });
 
       /** create test note settings for created note */
@@ -70,10 +70,10 @@ describe('NoteSettings API', () => {
           'id': 1,
           'role': 0,
           'user': {
-            'email': 'a@a.com',
-            'id': 1,
-            'name': 'Test user 1',
-            'photo': '',
+            'email': user.email,
+            'id': user.userId,
+            'name': user.name,
+            'photo': null,
           },
         },
       ]);
@@ -166,10 +166,7 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 403 when public access is disabled, user is not creator of the note and is not in the team', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
-
+    test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -185,7 +182,7 @@ describe('NoteSettings API', () => {
       });
 
       /** create test user */
-      await global.db.insertUser({
+      const user2 = await global.db.insertUser({
         email: 'b@b.com',
         name: 'Test user 2',
       });
@@ -210,6 +207,8 @@ describe('NoteSettings API', () => {
         role: 0,
       });
 
+      const accessToken = global.auth(user2.userId);
+
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
@@ -226,9 +225,6 @@ describe('NoteSettings API', () => {
 
   describe('GET /note-settings/:notePublicId/team ', () => {
     test('Returns team by public id with 200 status, user is creator of the note', async () => {
-      const userId = 1;
-      const accessToken = global.auth(userId);
-
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -262,6 +258,8 @@ describe('NoteSettings API', () => {
         noteId: note.noteId,
         role: 0,
       });
+
+      const accessToken = global.auth(user.userId);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -330,9 +328,6 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId ', () => {
     test('Update note settings by public id with 200 status, user is creator of the note', async () => {
-      const userId = 1;
-      const accessToken = global.auth(userId);
-
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -367,11 +362,7 @@ describe('NoteSettings API', () => {
         role: 0,
       });
 
-      const updatedNoteSettings = {
-        'customHostname': 'null',
-        'isPublic': false,
-        'invitationHash': 'Hzh2hy4igf',
-      };
+      const accessToken = global.auth(user.userId);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -386,7 +377,11 @@ describe('NoteSettings API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toMatchObject(updatedNoteSettings);
+      expect(response?.json()).toMatchObject({
+        'noteId': note.noteId,
+        'isPublic': false,
+        'invitationHash': 'Hzh2hy4igf',
+      });
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
@@ -461,9 +456,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Generate invitation hash by public id with 200 status, user is creator of the note', async () => {
-      const userId = 1;
-      const accessToken = global.auth(userId);
-
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -497,6 +489,8 @@ describe('NoteSettings API', () => {
         noteId: note.noteId,
         role: 0,
       });
+
+      const accessToken = global.auth(user.userId);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -581,11 +575,13 @@ describe('NoteSettings API', () => {
         role: 0,
       });
 
+      const accessToken = await global.auth(user.userId);
+
       /** patch member role of existing team member */
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
-          authorization: `Bearer ${global.auth(1)}`,
+          authorization: `Bearer ${accessToken}`,
         },
         url: '/note-settings/Pq1T9vc23Q/team',
         body: {
@@ -660,10 +656,12 @@ describe('NoteSettings API', () => {
         role: 0,
       });
 
+      const accessToken = await global.auth(user.userId);
+
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
-          authorization: `Bearer ${global.auth(1)}`,
+          authorization: `Bearer ${accessToken}`,
         },
         url: '/note-settings/73NdxFZ4k7/team',
         body: {

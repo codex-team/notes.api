@@ -27,7 +27,7 @@ const note = await global.db.insertNote({
 
 - Prepare access tokens
 ```
-const accessToken = global.auth(userId);
+const accessToken = global.auth(user.userId);
 ```
 
 ## Act
@@ -66,7 +66,7 @@ expect(response?.json()).toStrictEqual({
         'team':  [],
       });
 ```
-**Do not use expectedResponse, expectedNote etc variables to store expected data** 
+**Do not use variables (expectedResponse, expectedNote, etc) to store expected data** 
 
 - Expect status code of the response to be equal to expected one
 ```

@@ -4,8 +4,6 @@ describe('Join API', () => {
   describe('POST /join/:hash', () => {
     test('Returns 406 when user is already in the team', async () => {
       const invitationHash = 'Hzh2hy4igf';
-      const userId = 1;
-      const accessToken = global.auth(userId);
 
       /**
        * truncate all tables, which are needed
@@ -34,6 +32,8 @@ describe('Join API', () => {
         invitationHash,
       });
 
+      const accessToken = global.auth(user.userId);
+
       let response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
@@ -45,8 +45,8 @@ describe('Join API', () => {
       /** check if we added user to team */
       expect(response?.json()).toMatchObject({
         result: {
-          userId,
-          noteId: 1,
+          userId: user.userId,
+          noteId: note.noteId,
           role: 0,
         },
       });
@@ -88,8 +88,6 @@ describe('Join API', () => {
 
     test('Returns 200 when user is added to the team', async () => {
       const invitationHash = 'Hzh2hy4igf';
-      const userId = 1;
-      const accessToken = global.auth(userId);
 
       /**
        * truncate all tables, which are needed
@@ -119,20 +117,22 @@ describe('Join API', () => {
         invitationHash,
       });
 
+      const accessToken = global.auth(user.userId);
+
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/join/${invitationHash}`,
+        url: `/join/Hzh2hy4igf`,
       });
 
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
         result: {
-          userId,
-          noteId: 1,
+          userId: user.userId,
+          noteId: note.noteId,
           role: 0,
         },
       });
