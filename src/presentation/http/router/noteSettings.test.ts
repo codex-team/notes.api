@@ -33,28 +33,28 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: 1,
+        noteId: note.noteId,
         isPublic: true,
         invitationHash: 'Hzh2hy4igf',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: 1,
-        noteId: 1,
+        userId: user.userId,
+        noteId: note.noteId,
         role: 0,
       });
 
@@ -131,28 +131,28 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: 1,
+        noteId: note.noteId,
         isPublic: false,
         invitationHash: 'Hzh2hy4igf',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: 1,
-        noteId: 1,
+        userId: user.userId,
+        noteId: note.noteId,
         role: 0,
       });
 
@@ -179,7 +179,7 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user1 = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
@@ -191,22 +191,22 @@ describe('NoteSettings API', () => {
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user1.userId,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: 1,
+        noteId: note.noteId,
         isPublic: false,
         invitationHash: 'Hzh2hy4igf',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: 1,
-        noteId: 1,
+        userId: user1.userId,
+        noteId: note.noteId,
         role: 0,
       });
 
@@ -238,28 +238,28 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: 1,
+        noteId: note.noteId,
         isPublic: false,
         invitationHash: 'Hzh2hy4igf',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: 1,
-        noteId: 1,
+        userId: user.userId,
+        noteId: note.noteId,
         role: 0,
       });
 
@@ -342,28 +342,28 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: 1,
+        noteId: note.noteId,
         isPublic: true,
         invitationHash: 'Hzh2hy4igf',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: 1,
-        noteId: 1,
+        userId: user.userId,
+        noteId: note.noteId,
         role: 0,
       });
 
@@ -473,28 +473,28 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: 1,
+        noteId: note.noteId,
         isPublic: true,
         invitationHash: 'Hzh2hy4igf',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: 1,
-        noteId: 1,
+        userId: user.userId,
+        noteId: note.noteId,
         role: 0,
       });
 
@@ -563,21 +563,21 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: 1,
-        noteId: 1,
+        userId: user.userId,
+        noteId: note.noteId,
         role: 0,
       });
 
@@ -589,7 +589,7 @@ describe('NoteSettings API', () => {
         },
         url: '/note-settings/Pq1T9vc23Q/team',
         body: {
-          userId: 1,
+          userId: user.userId,
           newRole: 1,
         },
       });
@@ -607,8 +607,8 @@ describe('NoteSettings API', () => {
 
       expect(team?.json()).toMatchObject([
         {
-          'noteId': 1,
-          'userId': 1,
+          'noteId': note.noteId,
+          'userId': user.userId,
           'role': 1,
         },
       ]);
@@ -642,21 +642,21 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: '73NdxFZ4k7',
       });
 
       /** create test team member (userId 1) for created note */
       await global.db.insertNoteTeam({
-        userId: 1,
-        noteId: 1,
+        userId: user.userId,
+        noteId: note.noteId,
         role: 0,
       });
 

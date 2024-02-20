@@ -7,6 +7,10 @@ type note = {
   publicId: string,
 };
 
+interface createdNote extends note {
+  noteId: number,
+};
+
 /**
  * default type for user
  */
@@ -15,6 +19,10 @@ type user = {
   name: string,
   editorTools?: [string],
 };
+
+interface createdUser extends user {
+  userId: number,
+}
 
 /**
  * default type for userSession
@@ -67,7 +75,9 @@ type editorTool = {
  * class of db helpers
  */
 export default class DatabaseHelpers {
-  public orm;
+  private orm;
+  private noteId: number;
+  private userId: number;
   /**
    *
    * @param orm - sequelizeOrm instance
@@ -75,6 +85,10 @@ export default class DatabaseHelpers {
   /* eslint-disable-next-line */
   constructor(orm: any) {
     this.orm = orm;
+
+    /** analog of autoincrement sequence */
+    this.noteId = 1;
+    this.userId = 1;
   }
   /**
    * Executes specified sql query in test DB.
@@ -91,12 +105,20 @@ export default class DatabaseHelpers {
    *
    * @param note - note object which contain all info about note (some info is optional)
    */
-  public async insertNote(note: note): Promise<note> {
+  public async insertNote(note: note): Promise<createdNote> {
     const content = note.content ?? '{}';
 
     await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}')`);
 
-    return note;
+    const createdNote = {
+      ...note,
+      ...{ noteId: this.noteId },
+    };
+
+    /** increment noteId for the following notes */
+    this.noteId++;
+
+    return createdNote;
   }
 
   /**
@@ -106,12 +128,19 @@ export default class DatabaseHelpers {
    *
    * if no editorTools passed, then editor_tools would be []] in database
    */
-  public async insertUser(user: user): Promise<user> {
+  public async insertUser(user: user): Promise<createdUser> {
     const editorTools = user.editorTools ?? '[]';
 
     await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])`);
+    const createdUser = {
+      ...user,
+      ...{ userId: this.userId },
+    };
 
-    return user;
+    /** increment userId for the following users */
+    this.userId++;
+
+    return createdUser;
   }
 
   /**
@@ -187,6 +216,9 @@ export default class DatabaseHelpers {
    * Truncates all tables and restarts all autoincrement sequences
    */
   public async truncateTables(): Promise<unknown> {
+    this.userId = 1;
+    this.noteId = 1;
+
     return await this.orm.connection.query(`DO $$
     DECLARE 
       -- table iterator

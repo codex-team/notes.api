@@ -16,20 +16,20 @@ describe('Join API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: 'TJmEb89e0l',
       });
 
       /** create test note-settings for created note */
       await global.db.insertNoteSetting({
-        noteId: 1,
+        noteId: note.noteId,
         isPublic: true,
         invitationHash,
       });
@@ -100,24 +100,25 @@ describe('Join API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      await global.db.insertUser({
+      const user = await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
 
       /** create test note for created user */
-      await global.db.insertNote({
-        creatorId: 1,
+      const note = await global.db.insertNote({
+        creatorId: user.userId,
         publicId: 'TJmEb89e0l',
       });
 
       /** create test note-settings for created note */
       await global.db.insertNoteSetting({
-        noteId: 1,
+        noteId: note.noteId,
         isPublic: true,
         invitationHash,
       });
+
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
