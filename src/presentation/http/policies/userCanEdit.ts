@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { isEmpty } from '@infrastructure/utils/empty.js';
+import { MemberRole } from '@domain/entities/team';
 
 /**
  * Policy to check whether a user has permission to edit the note
@@ -9,6 +10,13 @@ import { isEmpty } from '@infrastructure/utils/empty.js';
  */
 export default async function userCanEdit(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const { userId } = request;
+
+  /**
+   * If user is not authorized, we can't check his permissions
+   */
+  if (isEmpty(userId)) {
+    return await reply.unauthorized();
+  };
 
   /**
    * If note is not resolved, we can't check permissions
@@ -22,10 +30,10 @@ export default async function userCanEdit(request: FastifyRequest, reply: Fastif
 
   /**
    * If user is not a creator of the note and
-   * user has a Reader Role (0) or is not in team at all,
+   * user has a Read Role or is not in team at all,
    * he doesn't have permission to edit the note
    */
-  if (creatorId !== userId && memberRole !== 1) {
+  if (creatorId !== userId && memberRole === MemberRole.write) {
     return await reply.forbidden();
   }
 }
