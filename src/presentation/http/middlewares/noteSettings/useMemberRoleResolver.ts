@@ -1,5 +1,4 @@
 import type { preHandlerHookHandler } from 'fastify';
-import { StatusCodes } from 'http-status-codes';
 import { getLogger } from '@infrastructure/logging/index.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type { MemberRole } from '@domain/entities/team';
@@ -25,7 +24,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
 
   return {
     memberRoleResolver: async function memberRoleResolver(request, reply) {
-      // if MemberRole equals null, it means that user is not in the team
+      /** If MemberRole equals null, it means that user is not in the team or is not authenticated */
       let memberRole: MemberRole | null;
 
       try {
@@ -33,22 +32,19 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
           throw new Error('Note was not resolved');
         }
 
-        // If user is not authenticated, we can't resolve Member role
-        if (request.userId === null) {
-          request.memberRole = null;
+        /** If user is not authenticated, we can't resolve his role */
+        if (isEmpty(request.userId)) {
+          memberRole = null;
         } else {
           memberRole = await noteSettingsService.getUserRoleByUserIdAndNoteId(request.userId, request.note.id);
-          request.memberRole = memberRole;
         }
+
+        request.memberRole = memberRole;
       } catch (error) {
-        logger.error('Can not resolve Member role by note and user');
+        logger.error('Can not resolve Member role by note [id = {${request.note.id}}] and user [id = ${request.userId}]');
         logger.error(error);
 
-        await reply
-          .code(StatusCodes.NOT_ACCEPTABLE)
-          .send({
-            message: 'Team member not found',
-          });
+        await reply.notAcceptable('Team member not found'); // ???
       }
     },
   };
