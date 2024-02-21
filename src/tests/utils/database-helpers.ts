@@ -1,3 +1,5 @@
+import { createInvitationHash } from '@infrastructure/utils/invitationHash';
+
 /**
  * default type for note
  */
@@ -8,7 +10,7 @@ type note = {
 };
 
 interface createdNote extends note {
-  noteId: number,
+  id: number,
 };
 
 /**
@@ -21,7 +23,7 @@ type user = {
 };
 
 interface createdUser extends user {
-  userId: number,
+  id: number,
 }
 
 /**
@@ -40,7 +42,7 @@ type noteSettings = {
   noteId: number,
   customHostname?: string,
   isPublic: boolean,
-  invitationHash: string,
+  invitationHash?: string,
 };
 
 /**
@@ -112,7 +114,7 @@ export default class DatabaseHelpers {
 
     const createdNote = {
       ...note,
-      ...{ noteId: this.noteId },
+      ...{ id: this.noteId },
     };
 
     /** increment noteId for the following notes */
@@ -134,7 +136,7 @@ export default class DatabaseHelpers {
     await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])`);
     const createdUser = {
       ...user,
-      ...{ userId: this.userId },
+      ...{ id: this.userId },
     };
 
     /** increment userId for the following users */
@@ -169,8 +171,11 @@ export default class DatabaseHelpers {
    */
   public async insertNoteSetting(noteSettings: noteSettings): Promise<noteSettings> {
     const customHostname = noteSettings.customHostname ?? null;
+    const invitationHash = noteSettings.invitationHash ?? createInvitationHash();
 
-    await this.orm.connection.query(`INSERT INTO public.note_settings ("note_id", "custom_hostname", "is_public", "invitation_hash") VALUES (${noteSettings.noteId}, '${customHostname}', ${noteSettings.isPublic}, '${noteSettings.invitationHash}')`);
+    noteSettings.invitationHash = invitationHash;
+
+    await this.orm.connection.query(`INSERT INTO public.note_settings ("note_id", "custom_hostname", "is_public", "invitation_hash") VALUES (${noteSettings.noteId}, '${customHostname}', ${noteSettings.isPublic}, '${invitationHash}')`);
 
     return noteSettings;
   }

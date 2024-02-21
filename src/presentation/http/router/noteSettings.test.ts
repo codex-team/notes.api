@@ -21,7 +21,7 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual(expectedNoteSettings);
     });
 
-    test('Returns team with note settings by public id with 200 status', async () => {
+    test('Returns "team" along with the note settings if the note contains a team', async () => {
       const existingNotePublicId = 'Pq1T9vc23Q';
 
       /**
@@ -40,21 +40,20 @@ describe('NoteSettings API', () => {
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: user.id,
         publicId: existingNotePublicId,
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: note.noteId,
+        noteId: note.id,
         isPublic: true,
-        invitationHash: 'Hzh2hy4igf',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: user.userId,
-        noteId: note.noteId,
+        userId: user.id,
+        noteId: note.id,
         role: 0,
       });
 
@@ -71,7 +70,7 @@ describe('NoteSettings API', () => {
           'role': 0,
           'user': {
             'email': user.email,
-            'id': user.userId,
+            'id': user.id,
             'name': user.name,
             'photo': null,
           },
@@ -138,22 +137,14 @@ describe('NoteSettings API', () => {
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: user.id,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: note.noteId,
+        noteId: note.id,
         isPublic: false,
-        invitationHash: 'Hzh2hy4igf',
-      });
-
-      /** create test team member for created note */
-      await global.db.insertNoteTeam({
-        userId: user.userId,
-        noteId: note.noteId,
-        role: 0,
       });
 
       const response = await global.api?.fakeRequest({
@@ -176,38 +167,30 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user1 = await global.db.insertUser({
+      const creator = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
       /** create test user */
-      const user2 = await global.db.insertUser({
+      const randomGuy = await global.db.insertUser({
         email: 'b@b.com',
         name: 'Test user 2',
       });
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user1.userId,
+        creatorId: creator.id,
         publicId: 'Pq1T9vc23Q',
       });
 
-      /** create test note settings for created note */
+      /** create note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: note.noteId,
+        noteId: note.id,
         isPublic: false,
-        invitationHash: 'Hzh2hy4igf',
       });
 
-      /** create test team member for created note */
-      await global.db.insertNoteTeam({
-        userId: user1.userId,
-        noteId: note.noteId,
-        role: 0,
-      });
-
-      const accessToken = global.auth(user2.userId);
+      const accessToken = global.auth(randomGuy.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -224,7 +207,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('GET /note-settings/:notePublicId/team ', () => {
-    test('Returns team by public id with 200 status, user is creator of the note', async () => {
+    test('Returns the team if user is a creator of the note', async () => {
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -234,32 +217,24 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
+      const creator = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: creator.id,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       await global.db.insertNoteSetting({
-        noteId: note.noteId,
+        noteId: note.id,
         isPublic: false,
-        invitationHash: 'Hzh2hy4igf',
       });
 
-      /** create test team member for created note */
-      await global.db.insertNoteTeam({
-        userId: user.userId,
-        noteId: note.noteId,
-        role: 0,
-      });
-
-      const accessToken = global.auth(user.userId);
+      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -344,25 +319,24 @@ describe('NoteSettings API', () => {
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: user.id,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
-      await global.db.insertNoteSetting({
-        noteId: note.noteId,
+      const noteSettings = await global.db.insertNoteSetting({
+        noteId: note.id,
         isPublic: true,
-        invitationHash: 'Hzh2hy4igf',
       });
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: user.userId,
-        noteId: note.noteId,
+        userId: user.id,
+        noteId: note.id,
         role: 0,
       });
 
-      const accessToken = global.auth(user.userId);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -378,9 +352,9 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        'noteId': note.noteId,
+        'noteId': note.id,
         'isPublic': false,
-        'invitationHash': 'Hzh2hy4igf',
+        'invitationHash': noteSettings.invitationHash,
       });
     });
 
@@ -455,7 +429,7 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
-    test('Generate invitation hash by public id with 200 status, user is creator of the note', async () => {
+    test('Generate the new invitation hash if user is a creator of the note', async () => {
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -465,32 +439,25 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
+      const creator = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: creator.id,
         publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
-      await global.db.insertNoteSetting({
-        noteId: note.noteId,
+      const noteSettings = await global.db.insertNoteSetting({
+        noteId: note.id,
         isPublic: true,
         invitationHash: 'Hzh2hy4igf',
       });
 
-      /** create test team member for created note */
-      await global.db.insertNoteTeam({
-        userId: user.userId,
-        noteId: note.noteId,
-        role: 0,
-      });
-
-      const accessToken = global.auth(user.userId);
+      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -505,6 +472,9 @@ describe('NoteSettings API', () => {
       expect(response?.json().invitationHash).not.toBe('');
 
       expect(response?.json().invitationHash).toHaveLength(10);
+
+      /** chech if invitation hash is different than the previous */
+      expect(response?.json().invitationHash).not.toBe(noteSettings.invitationHash);
     });
 
     test('Returns status 406 when the public id does not exist', async () => {
@@ -557,25 +527,29 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
+      const creator = await global.db.insertUser({
         email: 'testemal@CodeXmail.com',
         name: 'CodeX',
       });
 
+      const randomTeamMember = await global.db.insertUser({
+        email: 'randomGuy@CodeXmail.com',
+        name: 'Guy',
+      });
+
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: creator.id,
         publicId: 'Pq1T9vc23Q',
       });
 
-      /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: user.userId,
-        noteId: note.noteId,
+        userId: randomTeamMember.id,
+        noteId: note.id,
         role: 0,
       });
 
-      const accessToken = await global.auth(user.userId);
+      const accessToken = await global.auth(creator.id);
 
       /** patch member role of existing team member */
       const response = await global.api?.fakeRequest({
@@ -585,7 +559,7 @@ describe('NoteSettings API', () => {
         },
         url: '/note-settings/Pq1T9vc23Q/team',
         body: {
-          userId: user.userId,
+          userId: randomTeamMember.id,
           newRole: 1,
         },
       });
@@ -596,30 +570,63 @@ describe('NoteSettings API', () => {
       const team = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
-          authorization: `Bearer ${global.auth(1)}`,
+          authorization: `Bearer ${accessToken}`,
         },
         url: '/note-settings/Pq1T9vc23Q/team',
       });
 
       expect(team?.json()).toMatchObject([
         {
-          'noteId': note.noteId,
-          'userId': user.userId,
+          'noteId': note.id,
+          'userId': randomTeamMember.id,
           'role': 1,
         },
       ]);
     });
 
     test('Returns status code 200 and new role, if role was patched (if the user already had passing a role, then behavior is the same)', async () => {
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+
+      /** create test user */
+      const creator = await global.db.insertUser({
+        email: 'testemal@CodeXmail.com',
+        name: 'CodeX',
+      });
+
+      const randomTeamMember = await global.db.insertUser({
+        email: 'randomGuy@CodeXmail.com',
+        name: 'Guy',
+      });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      await global.db.insertNoteTeam({
+        userId: randomTeamMember.id,
+        noteId: note.id,
+        role: 1,
+      });
+
+      const accessToken = await global.auth(creator.id);
+
       /** in note_teams there already is this user with this role */
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
-          authorization: `Bearer ${global.auth(1)}`,
+          authorization: `Bearer ${accessToken}`,
         },
         url: '/note-settings/Pq1T9vc23Q/team',
         body: {
-          userId: 1,
+          userId: randomTeamMember.id,
           newRole: 1,
         },
       });
@@ -645,25 +652,18 @@ describe('NoteSettings API', () => {
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: user.id,
         publicId: '73NdxFZ4k7',
       });
 
-      /** create test team member (userId 1) for created note */
-      await global.db.insertNoteTeam({
-        userId: user.userId,
-        noteId: note.noteId,
-        role: 0,
-      });
-
-      const accessToken = await global.auth(user.userId);
+      const accessToken = await global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: '/note-settings/73NdxFZ4k7/team',
+        url: `/note-settings/${note.publicId}/team`,
         body: {
           userId: 15,
           newRole: 1,

@@ -21,38 +21,27 @@ describe('Join API', () => {
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: user.id,
         publicId: 'TJmEb89e0l',
       });
 
       /** create test note-settings for created note */
       await global.db.insertNoteSetting({
-        noteId: note.noteId,
+        noteId: note.id,
         isPublic: true,
         invitationHash,
       });
 
-      const accessToken = global.auth(user.userId);
-
-      let response = await global.api?.fakeRequest({
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/join/${invitationHash}`,
+      await global.db.insertNoteTeam({
+        userId: user.id,
+        noteId: note.id,
+        role: 0,
       });
 
-      /** check if we added user to team */
-      expect(response?.json()).toMatchObject({
-        result: {
-          userId: user.userId,
-          noteId: note.noteId,
-          role: 0,
-        },
-      });
+      const accessToken = global.auth(user.id);
 
       /** add same user to the same note team */
-      response = await global.api?.fakeRequest({
+      const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
           authorization: `Bearer ${accessToken}`,
@@ -106,18 +95,18 @@ describe('Join API', () => {
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.userId,
+        creatorId: user.id,
         publicId: 'TJmEb89e0l',
       });
 
       /** create test note-settings for created note */
       await global.db.insertNoteSetting({
-        noteId: note.noteId,
+        noteId: note.id,
         isPublic: true,
         invitationHash,
       });
 
-      const accessToken = global.auth(user.userId);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
@@ -131,8 +120,8 @@ describe('Join API', () => {
 
       expect(response?.json()).toMatchObject({
         result: {
-          userId: user.userId,
-          noteId: note.noteId,
+          userId: user.id,
+          noteId: note.id,
           role: 0,
         },
       });
