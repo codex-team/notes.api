@@ -19,12 +19,13 @@ export default async function notePublicOrUserInTeam(request: FastifyRequest, re
 
   const { creatorId } = request.note;
   const { isPublic } = request.noteSettings;
+  const { memberRole } = request
 
   /**
    * If note is public, everyone can access it
-   * If note is private, only creator can access it
+   * If note is private, only team member and creator can access it
    */
-  if (isPublic === false && creatorId !== userId) {
+  if (isPublic === false && creatorId !== userId && isEmpty(memberRole)) {
     return await reply.forbidden();
   }
 }
