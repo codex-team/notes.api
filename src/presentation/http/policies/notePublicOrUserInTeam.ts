@@ -19,7 +19,7 @@ export default async function notePublicOrUserInTeam(request: FastifyRequest, re
 
   const { creatorId } = request.note;
   const { isPublic } = request.noteSettings;
-  const { memberRole } = request
+  const { memberRole } = request;
 
   /**
    * If note is public, everyone can access it
