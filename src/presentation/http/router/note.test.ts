@@ -164,7 +164,7 @@ describe('Note API', () => {
 
       const notPublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-        const team = noteTeams.find(nt => nt.note_id === newNote.id, { user_id: userId });
+        const team = noteTeams.find(nt => nt.note_id === newNote.id && nt.user_id === userId);
 
         return settings!.is_public === false && newNote.creator_id != userId && team === undefined;
       });

@@ -84,9 +84,9 @@ describe('NoteSettings API', () => {
 
       const notPublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-        const team = noteTeams.find(nt => nt.note_id === newNote.id, { userId: userId });
+        const team = noteTeams.find(nt => nt.note_id === newNote.id && nt.user_id === userId);
 
-        return settings!.is_public === false && newNote.creator_id != userId, team === undefined;
+        return settings!.is_public === false && newNote.creator_id != userId && team === undefined;
       });
 
       const response = await global.api?.fakeRequest({
@@ -414,7 +414,7 @@ describe('NoteSettings API', () => {
     });
 
     test.todo('Returns 200 and a new role, when patch is done by a member role = write');
-    test.todo('Returns 200 when patch is done by a creator')
+    test.todo('Returns 200 when patch is done by a creator');
     test.todo('Returns 403 when patch is done by a member role = read');
     test.todo('Returns 403 when test is done by a user who is not a member of the team and not a creator');
   });
