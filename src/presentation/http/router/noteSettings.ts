@@ -7,6 +7,7 @@ import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type { NotePublicId } from '@domain/entities/note.js';
 import type { Team } from '@domain/entities/team.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the note settings router.
@@ -170,7 +171,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const team = await noteSettingsService.getTeamByNoteId(noteId);
 
-    return reply.send(team);
+    return reply.status(StatusCodes.OK).send(team);
   });
 
   done();

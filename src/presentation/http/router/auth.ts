@@ -55,7 +55,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     await opts.authService.removeSessionByRefreshToken(token);
     const refreshToken = await opts.authService.signRefreshToken(userSession.userId);
 
-    return reply.send({
+    return reply.status(StatusCodes.OK).send({
       accessToken,
       refreshToken,
     });

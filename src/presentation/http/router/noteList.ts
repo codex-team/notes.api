@@ -1,5 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteListService from '@domain/service/noteList.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the noteList router.
@@ -50,7 +51,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
 
     const noteList = await noteListService.getNoteListByCreatorId(userId, page);
 
-    return reply.send(noteList);
+    return reply.status(StatusCodes.OK).send(noteList);
   });
 
   done();

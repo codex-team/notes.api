@@ -1,3 +1,4 @@
+import { StatusCodes } from 'http-status-codes';
 import type AIService from '@domain/service/ai';
 import type { FastifyPluginCallback } from 'fastify';
 
@@ -26,12 +27,23 @@ interface GetCompletionOptions {
  * @param done - done callback
  */
 const AIRouter: FastifyPluginCallback<AIRouterOptions> = (fastify, opts, done) => {
-  fastify.post('/complete', async (request, reply) => {
+  fastify.post<{
+    Body: {
+      content: string; 
+    }, 
+    Reply: {
+      result: string;
+    }, 
+  }>('/complete', {
+
+  }, async (request, reply) => {
     const { content } = request.body as GetCompletionOptions;
 
     const result = await opts.aiService.getCompletion(content);
 
-    return reply.send({ result });
+    return reply.status(StatusCodes.OK).send({ 
+      result 
+    });
   });
 
   done();

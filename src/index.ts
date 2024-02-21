@@ -1,13 +1,13 @@
 import config from '@infrastructure/config/index.js';
 import logger from '@infrastructure/logging/index.js';
-import API from '@presentation/index.js';
+import API from '@presentation/index.js'; 
 import runMetricsServer from '@infrastructure/metrics/index.js';
-import { init as initDomainServices } from '@domain/index.js';
+import { init as initDomainServices } from '@domain/index.js';  
 import { initORM, init as initRepositories } from '@repository/index.js';
-
+  
 /**
- * Application entry point
- */
+ * Application entry point    
+ */ 
 const start = async (): Promise<void> => {
   try {
     const orm = await initORM(config.database);

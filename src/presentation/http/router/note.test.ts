@@ -114,7 +114,7 @@ describe('Note API', () => {
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
       const expectedStatus = 403;
 
-      const notPublicNote = notes.find(newNote => {
+      const notePublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
 
         return settings!.is_public === false;
@@ -122,7 +122,7 @@ describe('Note API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note/${notPublicNote!.public_id}`,
+        url: `/note/${notePublicNote!.public_id}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -135,7 +135,7 @@ describe('Note API', () => {
       const userId = 2;
       const accessToken = global.auth(userId);
 
-      const notPublicNote = notes.find(newNote => {
+      const notePublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
 
         return settings!.is_public === false && newNote.creator_id != userId;
@@ -146,7 +146,7 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${notPublicNote!.public_id}`,
+        url: `/note/${notePublicNote!.public_id}`,
       });
 
       expect(response?.statusCode).toBe(expectedStatus);
@@ -154,7 +154,7 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 404 when the id  does not exist', async () => {
+    test('Returns 404 when the id does not exist', async () => {
       const expectedStatus = 404;
       const nonexistentId = 'ishvm5qH84';
 
@@ -245,6 +245,29 @@ describe('Note API', () => {
       });
     });
 
+    //test not written yet, subject to modification
     test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
   });
+
+  describe('POST note', async () => {
+    test('Returns 200 when note is created', async () => {
+      const expectedResponse = 200; 
+      const userId = 1; 
+      const accessToken = global.auth(userId); 
+
+      const noteTobeCreated = {}; 
+      
+      const response = await global.api?.fakeRequest({
+        method: 'POST', 
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note`,  
+        body: noteTobeCreated, 
+      }); 
+
+      expect(response?.statusCode).toBe(expectedResponse); 
+      expect(response?.json()).toStrictEqual(noteTobeCreated); 
+    })
+  })
 });

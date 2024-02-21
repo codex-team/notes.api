@@ -5,6 +5,7 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the note router.
@@ -90,7 +91,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = note.creatorId === request.userId;
 
-    return reply.send({
+    return reply.status(StatusCodes.OK).send({
       note: note,
       accessRights: { canEdit: canEdit },
     });
@@ -164,7 +165,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     await noteSettingsService.addNoteSettings(addedNote.id);
 
-    return reply.send({
+    return reply.status(StatusCodes.OK).send({
       id: addedNote.publicId,
     });
   });
@@ -210,7 +211,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const note = await noteService.updateNoteContentById(noteId, content);
 
-    return reply.send({
+    return reply.status(StatusCodes.OK).send({
       updatedAt: note.updatedAt,
     });
   });
@@ -230,7 +231,14 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       note : Note
       accessRights: { canEdit: boolean },
     } | ErrorResponse,
-  }>('/resolve-hostname/:hostname', async (request, reply) => {
+  }>('/resolve-hostname/:hostname', { 
+    schema: {
+      params: {
+        hostname:{
+          $ref: 'NoteSchema#/properties/id'
+        }
+      }
+  }}, async (request, reply) => {
     const params = request.params;
 
     const note = await noteService.getNoteByHostname(params.hostname);
@@ -247,7 +255,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = note.creatorId === request.userId;
 
-    return reply.send({
+    return reply.status(StatusCodes.OK).send({
       note: note,
       accessRights: { canEdit: canEdit },
     });

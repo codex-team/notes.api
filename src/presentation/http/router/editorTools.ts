@@ -1,6 +1,7 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the editor tools router
@@ -52,7 +53,7 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   }, async (_, reply) => {
     const tools = await editorToolsService.getTools();
 
-    return reply.send({
+    return reply.status(StatusCodes.OK).send({
       data: tools,
     });
   });
@@ -87,7 +88,7 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
 
     const tool = await editorToolsService.addTool(editorTool);
 
-    return reply.send({
+    return reply.status(StatusCodes.OK).send({
       data: tool,
     });
   });
