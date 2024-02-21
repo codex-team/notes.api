@@ -82,6 +82,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     preHandler: [
       noteResolver,
       noteSettingsResolver,
+      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
