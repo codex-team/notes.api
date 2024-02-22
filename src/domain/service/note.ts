@@ -57,12 +57,20 @@ export default class NoteService {
     return note;
   }
 
+
+  /**
+   * @todo Build a note tree and delete all descendants of a deleted note
+   */
   /**
    * Deletes note by id
    *
    * @param id - note internal id
    */
   public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
+    /**
+     * @todo If the note has not been deleted,
+     * we must reset the note_relations database to its original state
+     */
     const hasRelation = await this.noteRelationsRepository.hasRelation(id);
 
     if (hasRelation) {

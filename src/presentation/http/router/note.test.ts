@@ -502,9 +502,6 @@ describe('Note API', () => {
        */
       const childNote = 'Uyd8TgkdA0';
 
-      /**
-       * Checks if the note saved as a parent has been deleted
-       */
       response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
