@@ -1,4 +1,5 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
@@ -146,9 +147,13 @@ export default class NoteRelationsSequelizeStorage {
    * @param noteId - id of the current note
    */
   public async deleteNoteRelationsByNoteId(noteId: NoteInternalId): Promise<boolean> {
-    const affectedRows = await this.model.destroy({
-      where:{
-        noteId,
+    const affectedRows = await this.model.destroy ({
+      where: {
+        [Op.or]: [ {
+          noteId: noteId,
+        }, {
+          parentId: noteId,
+        } ],
       },
     });
 
@@ -182,18 +187,16 @@ export default class NoteRelationsSequelizeStorage {
    * @param noteId - id of the current note
    */
   public async hasRelation(noteId: NoteInternalId): Promise<boolean> {
-    const foundNote = await this.model.findOne({
+    const foundNote = await this.model.findOne ({
       where: {
-        noteId: noteId,
+        [Op.or]: [ {
+          noteId: noteId,
+        }, {
+          parentId: noteId,
+        } ],
       },
     });
 
-    const foundParent = await this.model.findOne({
-      where: {
-        parentId: noteId,
-      },
-    });
-
-    return foundNote !== null || foundParent !== null;
+    return foundNote !== null;
   };
 }
