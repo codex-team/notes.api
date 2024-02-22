@@ -8,6 +8,7 @@ import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import type UserRepository from '@repository/user.repository';
 
 /**
  * Service responsible for Note Settings
@@ -20,15 +21,19 @@ export default class NoteSettingsService {
 
   private readonly teamRepository: TeamRepository;
 
+  private readonly userRepository: UserRepository;
+
   /**
    * Note Settings service constructor
    *
    * @param noteSettingsRepository - note settings repository
    * @param teamRepository - team repository
+   * @param userRepository - user repository
    */
-  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository) {
+  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository, userRepository: UserRepository) {
     this.noteSettingsRepository = noteSettingsRepository;
     this.teamRepository = teamRepository;
+    this.userRepository = userRepository;
   }
 
   /**
