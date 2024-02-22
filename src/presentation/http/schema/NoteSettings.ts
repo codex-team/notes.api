@@ -9,7 +9,10 @@ export const NoteSettingsSchema = {
       type: 'number',
     },
     noteId: {
-      type: 'number',
+      type: 'string',
+      pattern: '[a-zA-Z0-9-_]+',
+      maxLength: 10,
+      minLength: 10,
     },
     customHostname: {
       type: 'string',
