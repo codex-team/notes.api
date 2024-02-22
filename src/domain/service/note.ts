@@ -66,7 +66,7 @@ export default class NoteService {
     const hasRelation = await this.noteRelationsRepository.hasRelation(id);
 
     if (hasRelation) {
-      const isNoteRelationsDeleted = await this.noteRelationsRepository.deleteNoteRelationsByNoteId(id);
+      const isNoteRelationsDeleted = await this.noteRelationsRepository.deleteNoteRelationByNoteId(id);
 
       if (isNoteRelationsDeleted === false) {
         throw new DomainError(`Relation with noteId ${id} was not deleted`);
