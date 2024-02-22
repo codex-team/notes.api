@@ -30,9 +30,9 @@ await global.db.truncateTables();
 ```
 /** create test user */
 const user = await global.db.insertUser({
-        email: 'testemal@CodeXmail.com',
-        name: 'CodeX',
-      });
+  email: 'testemal@CodeXmail.com',
+  name: 'CodeX',
+});
 
 /** create test note for created user */
 const note = await global.db.insertNote({
@@ -74,13 +74,13 @@ In this block of code the actual behavior of the request is compared with the ex
 - Expect parsed response to strictly equal expected response
 ```
 expect(response?.json()).toStrictEqual({
-        'customHostname': 'codex.so',
-        'id': 54,
-        'invitationHash': 'FfAwyaR80C',
-        'isPublic': true,
-        'noteId': 54,
-        'team':  [],
-      });
+  'customHostname': 'codex.so',
+  'id': 54,
+  'invitationHash': 'FfAwyaR80C',
+  'isPublic': true,
+  'noteId': 54,
+  'team':  [],
+});
 ```
 **Do not use variables (expectedResponse, expectedNote, etc) to store expected data** 
 

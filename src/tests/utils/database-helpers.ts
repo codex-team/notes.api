@@ -92,6 +92,7 @@ export default class DatabaseHelpers {
     this.noteId = 1;
     this.userId = 1;
   }
+
   /**
    * Executes specified sql query in test DB.
    * Might be used in tests to perform some specific database operations
@@ -128,7 +129,7 @@ export default class DatabaseHelpers {
    *
    * @param user - user object which contain all info about user (some info is optional)
    *
-   * if no editorTools passed, then editor_tools would be []] in database
+   * If editorTools is not passed, the editor_tools database will have []
    */
   public async insertUser(user: user): Promise<createdUser> {
     const editorTools = user.editorTools ?? '[]';
@@ -167,7 +168,7 @@ export default class DatabaseHelpers {
    *
    * @param noteSettings - noteSettings object which contain all info about noteSettings (some info is optional
    *
-   * if no custoHostname passed, then custom_hostname would be null in database
+   * If customHostname is not passed, custom_hostname will be set to null in the database
    */
   public async insertNoteSetting(noteSettings: noteSettings): Promise<noteSettings> {
     const customHostname = noteSettings.customHostname ?? null;

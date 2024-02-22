@@ -6,8 +6,8 @@ describe('Join API', () => {
       const invitationHash = 'Hzh2hy4igf';
 
       /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
+       * Truncate all tables, which are needed
+       * Restart autoincrement sequences for data to start with id 1
        *
        * TODO get rid of restarting database data in tests (move to beforeEach)
        */
