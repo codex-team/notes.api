@@ -482,6 +482,36 @@ describe('Note API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
+
+    test('Should remove all note relations containing note id', async () => {
+      const accessToken = global.auth(2);
+      const currentNoteId = 'f43NU75weU';
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${currentNoteId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      /**
+       * Id of the note that is a child of the current note that has been deleted
+       */
+      const childNote = 'Uyd8TgkdA0';
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote}`,
+      });
+
+      expect(response).not.toHaveProperty('parentNote');
+    });
   });
 
   test.todo('Tests with access rights');

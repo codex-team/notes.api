@@ -47,4 +47,22 @@ export default class NoteRelationsRepository {
   public async getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<number | null> {
     return await this.storage.getParentNoteIdByNoteId(noteId);
   }
+
+  /**
+   * Delete all note ralations contains noteId
+   *
+   * @param noteId - id of the current note
+   */
+  public async deleteNoteRelationsByNoteId(noteId: NoteInternalId): Promise<boolean> {
+    return await this.storage.deleteNoteRelationsByNoteId(noteId);
+  }
+
+  /**
+   * Checks if the note has any connection
+   *
+   * @param noteId - id of the current note
+   */
+  public async hasRelation(noteId: NoteInternalId): Promise<boolean> {
+    return await this.storage.hasRelation(noteId);
+  }
 }

@@ -29,5 +29,13 @@
     "custom_hostname": "codex.so",
     "is_public": true,
     "invitation_hash": "FfAwyaR80C"
+  },
+
+  {
+    "id": 55,
+    "note_id": 56,
+    "custom_hostname": "codex.so",
+    "is_public": true,
+    "invitation_hash": "HgdwyaC9g7R"
   }
 ]
