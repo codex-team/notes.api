@@ -1,5 +1,5 @@
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
-import { fn, col } from 'sequelize';
+import { fn, col, literal } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type User from '@domain/entities/user.js';
@@ -176,7 +176,7 @@ export default class UserSequelizeStorage {
     toolId,
   }: AddUserToolOptions): Promise<void> {
     await this.model.update({
-      editorTools: fn('array_append', col('editor_tools'), toolId),
+      editorTools: literal(`COALESCE(editor_tools, '[]'::jsonb) || '["${toolId}"]'::jsonb`),
     }, {
       where: {
         id: userId,
@@ -195,7 +195,7 @@ export default class UserSequelizeStorage {
     toolId,
   }: RemoveUserEditorTool): Promise<void> {
     await this.model.update({
-      editorTools: fn('array_remove', col('editor_tools'), toolId),
+      editorTools: literal(`editor_tools - '${toolId}'`),
     }, {
       where: {
         id: userId,

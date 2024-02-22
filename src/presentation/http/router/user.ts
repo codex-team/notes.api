@@ -2,6 +2,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import type UserService from '@domain/service/user.js';
 import type User from '@domain/entities/user.js';
 import type EditorToolsService from '@domain/service/editorTools';
+import fastify from 'fastify';
 
 /**
  * Interface for the user router
@@ -125,6 +126,39 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     const userId = request.userId as number;
 
     await userService.addUserEditorTool({
+      userId,
+      toolId,
+    });
+
+    return reply.send({
+      data: toolId,
+    });
+  });
+
+  /**
+   * Remove editor tool from user extensions
+   */
+  fastify.delete<{
+    Body: { toolId: string }
+  }>('/editor-tools', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+    schema: {
+      body: {
+        toolId: {
+          type: 'string',
+          description: 'Unique editor tool id',
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const toolId = request.body.toolId;
+    const userId = request.userId as number;
+
+    await userService.removeUserEditorTool({
       userId,
       toolId,
     });
