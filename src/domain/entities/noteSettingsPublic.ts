@@ -14,7 +14,7 @@ export interface NoteSettingsPublic extends Omit<NoteSettings, 'noteId'> {
  * @param noteSettings - note settings data
  * @param notePublicId - note public id
  */
-export function createPublicNoteSettings(noteSettings: NoteSettings, notePublicId: NotePublicId): NoteSettingsPublic {
+export function definePublicNoteSettings(noteSettings: NoteSettings, notePublicId: NotePublicId): NoteSettingsPublic {
   return {
     id: noteSettings.id,
     noteId: notePublicId,
