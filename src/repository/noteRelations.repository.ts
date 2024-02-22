@@ -49,12 +49,12 @@ export default class NoteRelationsRepository {
   }
 
   /**
-   * Delete note ralation containing noteId
+   * Delete all note ralations contains noteId
    *
    * @param noteId - id of the current note
    */
-  public async deleteNoteRelationByNoteId(noteId: NoteInternalId): Promise<boolean> {
-    return await this.storage.deleteNoteRelationByNoteId(noteId);
+  public async deleteNoteRelationsByNoteId(noteId: NoteInternalId): Promise<boolean> {
+    return await this.storage.deleteNoteRelationsByNoteId(noteId);
   }
 
   /**
