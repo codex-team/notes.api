@@ -38,7 +38,7 @@ export default class NoteSettingsService {
    * @param userId - user to add
    */
   public async addUserToTeamByInvitationHash(invitationHash: InvitationHash, userId: User['id']): Promise<TeamMember | null> {
-    const defaultUserRole = MemberRole.read;
+    const defaultUserRole = MemberRole.Read;
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByInvitationHash(invitationHash);
 
     /**

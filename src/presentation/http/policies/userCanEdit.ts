@@ -33,7 +33,7 @@ export default async function userCanEdit(request: FastifyRequest, reply: Fastif
    * user has a Read Role or is not in team at all,
    * he doesn't have permission to edit the note
    */
-  if (creatorId !== userId && memberRole === MemberRole.write) {
+  if (creatorId !== userId && memberRole !== MemberRole.Write) {
     return await reply.forbidden();
   }
 }

@@ -5,12 +5,12 @@ export enum MemberRole {
   /**
    * Team member can only read notes
    */
-  read = 0,
+  Read = 0,
 
   /**
    * Team member can read and write notes
    */
-  write = 1,
+  Write = 1,
 }
 
 /**
