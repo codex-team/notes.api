@@ -166,7 +166,7 @@ describe('Note API', () => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
         const team = noteTeams.find(nt => nt.note_id === newNote.id && nt.user_id === userId);
 
-        return settings!.is_public === false && newNote.creator_id != userId && team === undefined;
+        return settings!.is_public === false && newNote.creator_id !== userId && team === undefined;
       });
 
       const response = await global.api?.fakeRequest({
