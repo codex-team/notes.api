@@ -35,14 +35,25 @@ export const NoteSettingsSchema = {
           id: {
             type: 'number',
           },
-          noteId: {
-            type: 'number',
-          },
-          userId: {
-            type: 'number',
-          },
           role: {
             type: 'number',
+          },
+          user: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'number',
+              },
+              name: {
+                type: 'string',
+              },
+              email: {
+                type: 'string',
+              },
+              photo: {
+                type: 'string',
+              },
+            },
           },
         },
       },

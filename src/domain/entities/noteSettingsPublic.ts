@@ -21,5 +21,6 @@ export function createPublicNoteSettings(noteSettings: NoteSettings, notePublicI
     customHostname: noteSettings.customHostname,
     isPublic: noteSettings.isPublic,
     invitationHash: noteSettings.invitationHash,
+    team: noteSettings.team,
   };
 }

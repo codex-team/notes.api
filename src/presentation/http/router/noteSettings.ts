@@ -71,6 +71,11 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -147,6 +152,11 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       params: {
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
         },
       },
     },
