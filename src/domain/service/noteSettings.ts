@@ -132,7 +132,7 @@ export default class NoteSettingsService {
       throw new DomainError(`Note not found`);
     }
 
-    return createPublicNoteSettings(noteSettings, note.publicId);;
+    return createPublicNoteSettings(noteSettings, note.publicId);
   }
 
   /**

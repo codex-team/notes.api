@@ -1,6 +1,7 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
+import { type NoteSettingsPublic } from '@domain/entities/noteSettingsPublic.js';
 import type { InvitationHash } from '@domain/entities/noteSettings.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
@@ -57,7 +58,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -80,7 +81,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
-    return reply.send(noteSettings);
+    const noteSettingsPublic = await noteSettingsService.definePublicNoteSettings(noteSettings);
+
+    return reply.send(noteSettingsPublic);
   });
 
   /**
@@ -132,7 +135,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -171,7 +174,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('Note settings not found');
     }
 
-    return reply.send(updatedNoteSettings);
+    const noteSettingsPublic = await noteSettingsService.definePublicNoteSettings(updatedNoteSettings);
+
+    return reply.send(noteSettingsPublic);
   });
 
   /**
