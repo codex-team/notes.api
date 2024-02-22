@@ -2,7 +2,6 @@ import type { FastifyPluginCallback } from 'fastify';
 import type UserService from '@domain/service/user.js';
 import type User from '@domain/entities/user.js';
 import type EditorToolsService from '@domain/service/editorTools';
-import fastify from 'fastify';
 
 /**
  * Interface for the user router
