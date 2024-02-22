@@ -9,6 +9,8 @@ import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRepository from '@repository/note.repository';
+import type { NoteSettingsPublic } from '@domain/entities/noteSettingsPublic.js';
+import { createPublicNoteSettings } from '@domain/entities/noteSettingsPublic.js';
 
 /**
  * Service responsible for Note Settings
@@ -116,6 +118,21 @@ export default class NoteSettingsService {
     }
 
     return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
+  }
+
+  /**
+   * define note settings for public usage
+   *
+   * @param noteSettings - note settings object with note internal id
+   */
+  public async definePublicNoteSettings(noteSettings: NoteSettings): Promise<NoteSettingsPublic> {
+    const note = await this.noteRepository.getNoteById(noteSettings.noteId);
+
+    if (note === null) {
+      throw new DomainError(`Note not found`);
+    }
+
+    return createPublicNoteSettings(noteSettings, note.publicId);;
   }
 
   /**

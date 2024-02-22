@@ -3,7 +3,7 @@ import type { NotePublicId } from '@domain/entities/note.js';
 
 export interface NoteSettingsPublic extends Omit<NoteSettings, 'noteId'> {
   /**
-   * Expose public id as the "id" property
+   * Expose note public id as the "noteId" property
    */
   noteId: NotePublicId;
 }
@@ -14,7 +14,7 @@ export interface NoteSettingsPublic extends Omit<NoteSettings, 'noteId'> {
  * @param noteSettings - note settings data
  * @param notePublicId - note public id
  */
-export function definePublicNoteSettings(noteSettings: NoteSettings, notePublicId: NotePublicId): NoteSettingsPublic {
+export function createPublicNoteSettings(noteSettings: NoteSettings, notePublicId: NotePublicId): NoteSettingsPublic {
   return {
     id: noteSettings.id,
     noteId: notePublicId,
