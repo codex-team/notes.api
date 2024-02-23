@@ -12,6 +12,8 @@ import API from '@presentation/index.js';
 import { beforeAll, afterAll } from 'vitest';
 import type Api from '@presentation/api.interface';
 
+import DatabaseHelpers from './database-helpers.js';
+
 /**
  * Tests setup maximum duration.
  * Added as default 10000 is not enough
@@ -35,16 +37,11 @@ declare global {
    */
   function auth(userId: number): string;
 
+  /**
+   * DatabaseHelpers class that contains methods for work with database
+   */
   /* eslint-disable-next-line no-var */
-  var db: {
-    /**
-     * Executes specified sql query in test DB.
-     * Might be used in tests to perform some specific database operations
-     *
-     * @param sql - string containing sql to executein test DB
-     */
-    query: (sql: string) => Promise<unknown>;
-  };
+  var db: DatabaseHelpers;
 }
 
 /**
@@ -75,11 +72,7 @@ beforeAll(async () => {
     return domainServices.authService.signAccessToken({ id : userId });
   };
 
-  global.db = {
-    query: async (sqlString: string) => {
-      return await orm.connection.query(sqlString);
-    },
-  };
+  global.db = new DatabaseHelpers(orm);
 }, TIMEOUT);
 
 afterAll(async () => {

@@ -1,8 +1,4 @@
 import { describe, test, expect } from 'vitest';
-
-import notes from '@tests/test-data/notes.json';
-import noteSettings from '@tests/test-data/notes-settings.json';
-
 describe('NoteSettings API', () => {
   describe('GET /note-settings/:notePublicId ', () => {
     test('Returns note settings by public id with 200 status', async () => {
@@ -10,10 +6,8 @@ describe('NoteSettings API', () => {
 
       const expectedNoteSettings = {
         'customHostname': 'codex.so',
-        'id': 54,
         'invitationHash': 'FfAwyaR80C',
         'isPublic': true,
-        'noteId': 54,
         'team':  [],
       };
 
@@ -27,8 +21,46 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual(expectedNoteSettings);
     });
 
-    test('Returns team with note settings by public id with 200 status', async () => {
+    test('Returns "team" along with the note settings if the note contains a team', async () => {
       const existingNotePublicId = 'Pq1T9vc23Q';
+
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+
+      /** create test user */
+      const creator = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
+      });
+
+      const randomTeamMember = await global.db.insertUser({
+        email: 'b@b.com',
+        name: 'random guy',
+      });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: existingNotePublicId,
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      /** create test team member for created note */
+      await global.db.insertNoteTeam({
+        userId: randomTeamMember.id,
+        noteId: note.id,
+        role: 0,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -39,13 +71,13 @@ describe('NoteSettings API', () => {
 
       expect(response?.json().team).toStrictEqual([
         {
-          'id': 2,
+          'id': 1,
           'role': 0,
           'user': {
-            'email': 'a@a.com',
-            'id': 1,
-            'name': 'Test user 1',
-            'photo': null,
+            'email': randomTeamMember.email,
+            'id': randomTeamMember.id,
+            'name': randomTeamMember.name,
+            'photo': '',
           },
         },
       ]);
@@ -53,6 +85,14 @@ describe('NoteSettings API', () => {
 
     test('Returns 404 when note settings with specified note public id do not exist', async () => {
       const nonexistentId = 'ishvm5qH84';
+
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -86,15 +126,35 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
-      const notPublicNote = notes.find(newNote => {
-        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
 
-        return settings!.is_public === false;
+      /** create test user */
+      const user = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
+      });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
       });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note-settings/${notPublicNote!.public_id}`,
+        url: `/note-settings/Pq1T9vc23Q`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -103,21 +163,46 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
 
-      const notPublicNote = notes.find(newNote => {
-        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-
-        return settings!.is_public === false && newNote.creator_id != userId;
+      /** create test user */
+      const creator = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
       });
+
+      /** create test user */
+      const randomGuy = await global.db.insertUser({
+        email: 'b@b.com',
+        name: 'Test user 2',
+      });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      const accessToken = global.auth(randomGuy.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${notPublicNote!.public_id}`,
+        url: `/note-settings/Pq1T9vc23Q`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -127,23 +212,62 @@ describe('NoteSettings API', () => {
   });
 
   describe('GET /note-settings/:notePublicId/team ', () => {
-    test('Returns team by public id with 200 status, user is creator of the note', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
+    test('Returns the team if user is a creator of the note', async () => {
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
 
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
+      /** create test user */
+      const creator = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
       });
+
+      const randomTeamMember = await global.db.insertUser({
+        email: 'b@b.com',
+        name: 'random guy',
+      });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      /** create test team member for created note */
+      await global.db.insertNoteTeam({
+        userId: randomTeamMember.id,
+        noteId: note.id,
+        role: 0,
+      });
+
+      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${userNote!.public_id}/team`,
+        url: `/note-settings/Pq1T9vc23Q/team`,
       });
 
       expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject([ {
+        noteId: note.id,
+        role: 0,
+        userId: randomTeamMember.id,
+      } ]);
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
@@ -202,27 +326,40 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId ', () => {
     test('Update note settings by public id with 200 status, user is creator of the note', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
 
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
+      /** create test user */
+      const user = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
       });
 
-      const updatedNoteSettings = {
-        'id': 54,
-        'noteId': 54,
-        'customHostname': 'codex.so',
-        'isPublic': false,
-        'invitationHash': 'FfAwyaR80C',
-      };
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      const noteSettings = await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${userNote!.public_id}`,
+        url: `/note-settings/Pq1T9vc23Q`,
         body: {
           'isPublic': false,
         },
@@ -230,7 +367,10 @@ describe('NoteSettings API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual(updatedNoteSettings);
+      expect(response?.json()).toMatchObject({
+        'isPublic': false,
+        'invitationHash': noteSettings.invitationHash,
+      });
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
@@ -304,20 +444,42 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
-    test('Generate invitation hash by public id with 200 status, user is creator of the note', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
+    test('Generate the new invitation hash if user is a creator of the note', async () => {
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
 
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
+      /** create test user */
+      const creator = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'Test user 1',
       });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      /** create test note settings for created note */
+      const noteSettings = await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+        invitationHash: 'Hzh2hy4igf',
+      });
+
+      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${userNote!.public_id}/invitation-hash`,
+        url: `/note-settings/Pq1T9vc23Q/invitation-hash`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -325,6 +487,9 @@ describe('NoteSettings API', () => {
       expect(response?.json().invitationHash).not.toBe('');
 
       expect(response?.json().invitationHash).toHaveLength(10);
+
+      /** chech if invitation hash is different than the previous */
+      expect(response?.json().invitationHash).not.toBe(noteSettings.invitationHash);
     });
 
     test('Returns status 406 when the public id does not exist', async () => {
@@ -360,57 +525,123 @@ describe('NoteSettings API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
 
-      test.todo('Return 403 when user in team and have Member Role = read');
-
-      test.todo('Return 403 when user authorized, but not member of the team');
+      test.todo('Return 403 when user in team');
+      test.todo('Return 403 when user authorized, but not member of the team and not the creator');
+      test.todo('Return 200 when user is not creator of the note, but a member of the team with member role = write');
     });
   });
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
-      // patch member role of existing team member
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+
+      /** create test user */
+      const creator = await global.db.insertUser({
+        email: 'test@codexmail.com',
+        name: 'CodeX',
+      });
+
+      const randomTeamMember = await global.db.insertUser({
+        email: 'randomGuy@CodeXmail.com',
+        name: 'Guy',
+      });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      await global.db.insertNoteTeam({
+        userId: randomTeamMember.id,
+        noteId: note.id,
+        role: 0,
+      });
+
+      const accessToken = await global.auth(creator.id);
+
+      /** patch member role of existing team member */
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
-          authorization: `Bearer ${global.auth(1)}`,
+          authorization: `Bearer ${accessToken}`,
         },
         url: '/note-settings/Pq1T9vc23Q/team',
         body: {
-          userId: 1,
+          userId: randomTeamMember.id,
           newRole: 1,
         },
       });
 
       expect(response?.statusCode).toBe(200);
 
-      // check if we changed role correctly
+      /** check if we changed role correctly */
       const team = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
-          authorization: `Bearer ${global.auth(1)}`,
+          authorization: `Bearer ${accessToken}`,
         },
         url: '/note-settings/Pq1T9vc23Q/team',
       });
 
-      expect(team?.json()).toStrictEqual([
+      expect(team?.json()).toMatchObject([
         {
-          'id': 2,
-          'noteId': 3,
-          'userId': 1,
+          'noteId': note.id,
+          'userId': randomTeamMember.id,
           'role': 1,
         },
       ]);
     });
 
     test('Returns status code 200 and new role, if role was patched (if the user already had passing a role, then behavior is the same)', async () => {
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+
+      /** create test user */
+      const creator = await global.db.insertUser({
+        email: 'test@codexmail.com',
+        name: 'CodeX',
+      });
+
+      const randomTeamMember = await global.db.insertUser({
+        email: 'randomGuy@CodeXmail.com',
+        name: 'Guy',
+      });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      await global.db.insertNoteTeam({
+        userId: randomTeamMember.id,
+        noteId: note.id,
+        role: 1,
+      });
+
+      const accessToken = await global.auth(creator.id);
+
+      /** in note_teams there already is this user with this role */
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
-          authorization: `Bearer ${global.auth(1)}`,
+          authorization: `Bearer ${accessToken}`,
         },
         url: '/note-settings/Pq1T9vc23Q/team',
         body: {
-          userId: 1,
+          userId: randomTeamMember.id,
           newRole: 1,
         },
       });
@@ -420,12 +651,34 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+
+      /** create test user */
+      const user = await global.db.insertUser({
+        email: 'test@codexmail.com',
+        name: 'CodeX',
+      });
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: '73NdxFZ4k7',
+      });
+
+      const accessToken = await global.auth(user.id);
+
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
-          authorization: `Bearer ${global.auth(1)}`,
+          authorization: `Bearer ${accessToken}`,
         },
-        url: '/note-settings/73NdxFZ4k7/team',
+        url: `/note-settings/${note.publicId}/team`,
         body: {
           userId: 15,
           newRole: 1,
@@ -435,6 +688,11 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(404);
       expect(response?.json().message).toBe('User does not belong to Note\'s team');
     });
+
+    test.todo('Returns 200 and a new role, when patch is done by a member role = write');
+    test.todo('Returns 200 when patch is done by a creator');
+    test.todo('Returns 403 when patch is done by a member role = read');
+    test.todo('Returns 403 when test is done by a user who is not a member of the team and not a creator');
   });
 });
 

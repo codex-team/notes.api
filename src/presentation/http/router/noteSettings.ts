@@ -1,7 +1,8 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
-import type { InvitationHash } from '@domain/entities/noteSettings.js';
+import { definePublicNoteSettings } from '@domain/entities/noteSettings.js';
+import type { InvitationHash, NoteSettingsPublic } from '@domain/entities/noteSettings.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
@@ -57,7 +58,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -70,6 +71,11 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -80,13 +86,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
-    return reply.send(noteSettings);
+    const noteSettingsPublic = definePublicNoteSettings(noteSettings);
+
+    return reply.send(noteSettingsPublic);
   });
 
   /**
    * Patch team member role by user and note id
-   *
-   * @todo add policy for this route to check id user have 'write' role if this team to patch someone's else role
    */
   fastify.patch<{
     Params: {
@@ -101,6 +107,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     config: {
       policy: [
         'authRequired',
+        'userCanEdit',
       ],
     },
     schema: {
@@ -117,7 +124,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const noteId = request.note?.id as number;
     const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, noteId, request.body.newRole);
 
-    if (newRole === null) {
+    if (newRole === undefined) {
       return reply.notFound('User does not belong to Note\'s team');
     }
 
@@ -132,18 +139,23 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
         'authRequired',
-        'userInTeam',
+        'userCanEdit',
       ],
     },
     schema: {
       params: {
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
         },
       },
     },
@@ -158,10 +170,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
      */
     const { customHostname, isPublic } = request.body;
 
-    /**
-     * TODO: check is user collaborator
-     */
-
     const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
       customHostname,
       isPublic,
@@ -171,13 +179,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('Note settings not found');
     }
 
-    return reply.send(updatedNoteSettings);
+    const noteSettingsPublic = definePublicNoteSettings(updatedNoteSettings);
+
+    return reply.send(noteSettingsPublic);
   });
 
   /**
    * Get team by note id
-   *
-   * @todo add policy for this route (check if user is collaborator)
    */
   fastify.get<{
     Params: {
@@ -188,7 +196,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     config: {
       policy: [
         'authRequired',
-        'userInTeam',
+        'userCanEdit',
       ],
     },
     schema: {
@@ -211,7 +219,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
   /**
    * Generates a new invitation hash for a specific note
-   * TODO add policy for this route (check if user's role is write)
    */
   fastify.patch<{
     Params: {
@@ -224,7 +231,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     config: {
       policy: [
         'authRequired',
-        'userInTeam',
+        'userCanEdit',
       ],
     },
     schema: {

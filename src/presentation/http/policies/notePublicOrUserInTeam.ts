@@ -1,13 +1,15 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
 import { isEmpty } from '@infrastructure/utils/empty.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
+import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 
 /**
  * Policy to check does user have permission to access note
  *
- * @param request - Fastify request object
- * @param reply - Fastify reply object
+ * @param context - Context, object containing Fatify request, Fastify reply and domain services
  */
-export default async function notePublicOrUserInTeam(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export default async function notePublicOrUserInTeam(context: PolicyContext): Promise<void> {
+  const { request, reply, domainServices } = context;
+
   const { userId } = request;
 
   /**
@@ -19,12 +21,21 @@ export default async function notePublicOrUserInTeam(request: FastifyRequest, re
 
   const { creatorId } = request.note;
   const { isPublic } = request.noteSettings;
+  let memberRole;
+
+  /**
+   * If user is not authorized, we can't check his role
+   * If note is public, we don't need to check for the role
+   */
+  if (notEmpty(userId) && isPublic === false) {
+    memberRole = domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, request.note.id);
+  }
 
   /**
    * If note is public, everyone can access it
-   * If note is private, only creator can access it
+   * If note is private, only team member and creator can access it
    */
-  if (isPublic === false && creatorId !== userId) {
+  if (isPublic === false && creatorId !== userId && isEmpty(memberRole)) {
     return await reply.forbidden();
   }
 }

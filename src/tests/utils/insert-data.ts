@@ -18,7 +18,6 @@ async function insertUsers(db: SequelizeOrm): Promise<void> {
     await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.email}', '${user.name}', '${user.created_at}')`);
   }
 }
-
 /**
  * Fills in the database with note teams data
  *
@@ -29,7 +28,6 @@ async function insertNoteTeams(db: SequelizeOrm): Promise<void> {
     await db.connection.query(`INSERT INTO public.note_teams ("note_id", "user_id", "role") VALUES (${noteTeam.note_id}, ${noteTeam.user_id}, '${noteTeam.role}')`);
   }
 }
-
 /**
  * Fills in the database with user sessions
  *
