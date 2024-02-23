@@ -165,4 +165,18 @@ export default class NoteService {
   public async getParentNoteIdByNoteId(noteId: Note['id']): Promise<number | null> {
     return await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
   }
+
+  /**
+   * Update or delete parent note relation
+   *
+   * @param noteId - id of the current note
+   * @param parentId - new parent id, null if parent need to be removed
+   */
+  public async updateNoteRelationById(noteId: Note['id'], parentId: Note['id'] | null): Promise<boolean> {
+    if (parentId == null) {
+      return await this.noteRelationsRepository.deleteParentNoteRelationByNoteId(noteId);
+    } else {
+      return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentId);
+    }
+  }
 }
