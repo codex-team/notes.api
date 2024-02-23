@@ -235,6 +235,52 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     });
   });
 
+  /**
+   * Update or delete note parent by id.
+   */
+  fastify.patch<{
+    Params: {
+      notePublicId: NotePublicId,
+    },
+    Body: {
+      parentId: NotePublicId | null,
+    },
+    Reply: {
+      isDone: boolean,
+    }
+  }>('/:notePublicId/parent', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      body: {
+        parentPublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+    const parentId = request.body.parentId;
+
+    const isDone = await noteService.updateNoteParentRelationById(noteId, parentId);
+
+    return reply.send({
+      isDone: isDone,
+    });
+  });
+
 
   /**
    * Get note by custom hostname
