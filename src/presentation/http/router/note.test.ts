@@ -60,7 +60,21 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns note by public id with 200 status when access is disabled, but user is creator', async () => {
+    test('Returns note by public id with 200 status when access is disabled, but user is in team', async () => {
+      const expectedResponse = {
+        'note': {
+          'id': 4,
+          'publicId': '73NdxFZ4k7',
+          'creatorId': 1,
+          'content': null,
+          'createdAt': '2023-10-16T13:49:19.000Z',
+          'updatedAt': '2023-10-16T13:49:19.000Z',
+        },
+        'accessRights': {
+          'canEdit': true,
+        },
+      };
+
       const userId = 1;
       const accessToken = global.auth(userId);
 

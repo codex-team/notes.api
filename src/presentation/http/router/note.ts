@@ -211,11 +211,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     await noteSettingsService.addNoteSettings(addedNote.id);
 
     /**
-     * Creates TeamMember with admin priveleges
+     * Creates TeamMember with write priveleges
      */
-    await noteSettingsService.createTeamMember({ noteId: addedNote.id,
+    await noteSettingsService.createTeamMember({
+      noteId: addedNote.id,
       userId: userId as number,
-      role: MemberRole.Write });
+      role: MemberRole.Write,
+    });
 
     return reply.send({
       id: addedNote.publicId,

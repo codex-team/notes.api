@@ -204,7 +204,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('GET /note-settings/:notePublicId/team ', () => {
-    test('Returns the team if user is a creator of the note', async () => {
+    test('Returns the team if user is in team with role write', async () => {
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -217,11 +217,6 @@ describe('NoteSettings API', () => {
       const creator = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
-      });
-
-      const randomTeamMember = await global.db.insertUser({
-        email: 'b@b.com',
-        name: 'random guy',
       });
 
       /** create test note for created user */
@@ -237,9 +232,9 @@ describe('NoteSettings API', () => {
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: randomTeamMember.id,
+        userId: creator.id,
         noteId: note.id,
-        role: 0,
+        role: 1,
       });
 
       const accessToken = global.auth(creator.id);
@@ -256,8 +251,8 @@ describe('NoteSettings API', () => {
 
       expect(response?.json()).toMatchObject([ {
         noteId: note.id,
-        role: 0,
-        userId: randomTeamMember.id,
+        role: 1,
+        userId: creator.id,
       } ]);
     });
 
@@ -343,6 +338,12 @@ describe('NoteSettings API', () => {
       const noteSettings = await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
+      });
+
+      await global.db.insertNoteTeam({
+        noteId: note.id,
+        userId: user.id,
+        role: 1,
       });
 
       const accessToken = global.auth(user.id);
@@ -472,6 +473,12 @@ describe('NoteSettings API', () => {
         isPublic: true,
       });
 
+      await global.db.insertNoteTeam({
+        noteId: note.id,
+        userId: creator.id,
+        role: 1,
+      });
+
       const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
@@ -558,6 +565,12 @@ describe('NoteSettings API', () => {
       });
 
       await global.db.insertNoteTeam({
+        userId: creator.id,
+        noteId: note.id,
+        role: 1,
+      });
+
+      await global.db.insertNoteTeam({
         userId: randomTeamMember.id,
         noteId: note.id,
         role: 0,
@@ -592,6 +605,11 @@ describe('NoteSettings API', () => {
       expect(team?.json()).toMatchObject([
         {
           'noteId': note.id,
+          'userId': creator.id,
+          'role': 1,
+        },
+        {
+          'noteId': note.id,
           'userId': randomTeamMember.id,
           'role': 1,
         },
@@ -621,6 +639,12 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
+      });
+
+      await global.db.insertNoteTeam({
+        userId: creator.id,
+        noteId: note.id,
+        role: 1,
       });
 
       await global.db.insertNoteTeam({
@@ -663,6 +687,12 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
+      });
+
+      await global.db.insertNoteTeam({
+        noteId: note.id,
+        userId: user.id,
+        role: 1,
       });
 
       const accessToken = await global.auth(user.id);
