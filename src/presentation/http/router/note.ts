@@ -132,7 +132,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     config: {
       policy: [
         'authRequired',
-        'userIsCreator',
+        'userCanEdit',
       ],
     },
     preHandler: [
