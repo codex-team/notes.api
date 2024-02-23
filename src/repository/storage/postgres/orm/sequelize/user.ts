@@ -157,7 +157,7 @@ export default class UserSequelizeStorage {
         type: DataTypes.STRING,
       },
       editorTools: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+        type: DataTypes.JSONB,
       },
     }, {
       tableName: this.tableName,

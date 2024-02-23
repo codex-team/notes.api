@@ -68,7 +68,7 @@ describe('User API', () => {
           exportName: 'Markdown',
           isDefault: false,
           source: {},
-        }
+        },
       });
     });
   });

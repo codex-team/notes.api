@@ -58,7 +58,7 @@ async function insertNotes(db: SequelizeOrm): Promise<void> {
  */
 async function insertEditorTools(db: SequelizeOrm): Promise<void> {
   for (const editorTool of editorTools) {
-    await db.connection.query(`INSERT INTO public.editor_tools (id, "name", "title", "export_name", "source", "is_default") VALUES (${editorTool.id}, '${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.source}', ${editorTool.isDefault})`);
+    await db.connection.query(`INSERT INTO public.editor_tools (id, "name", "title", "export_name", "source", "is_default") VALUES (${editorTool.id}, '${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${JSON.stringify(editorTool.source)}', ${editorTool.isDefault})`);
   }
 }
 
