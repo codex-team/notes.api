@@ -169,14 +169,20 @@ export default class NoteService {
   /**
    * Update or delete parent note relation
    *
-   * @param noteId - id of the current note
-   * @param parentId - new parent id, null if parent need to be removed
+   * @param noteInternalId - id of the current note
+   * @param parentPublicId - new parent id, null if parent need to be removed
    */
-  public async updateNoteRelationById(noteId: Note['id'], parentId: Note['id'] | null): Promise<boolean> {
-    if (parentId == null) {
-      return await this.noteRelationsRepository.deleteParentNoteRelationByNoteId(noteId);
+  public async updateNoteParentRelationById(noteInternalId: Note['id'], parentPublicId: Note['publicId'] | null): Promise<boolean> {
+    if (parentPublicId == null) {
+      return await this.noteRelationsRepository.deleteParentRelationByNoteId(noteInternalId);
     } else {
-      return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentId);
+      const parentInternalId = (await this.getNoteByPublicId(parentPublicId)).id;
+
+      if (parentInternalId === noteInternalId) {
+        throw new DomainError(`Note can't be parent to itself`);
+      }
+
+      return await this.noteRelationsRepository.updateNoteRelationById(noteInternalId, parentInternalId);
     }
   }
 }
