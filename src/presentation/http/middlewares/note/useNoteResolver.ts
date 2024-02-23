@@ -4,7 +4,7 @@ import { notEmpty } from '@infrastructure/utils/empty.js';
 import { StatusCodes } from 'http-status-codes';
 import hasProperty from '@infrastructure/utils/hasProperty.js';
 import { getLogger } from '@infrastructure/logging/index.js';
-import type { Note, NotePublicId } from '@domain/entities/note';
+import type { Note, NotePublicId } from '@domain/entities/note.js';
 
 /**
  * Add middleware for resolve Note by public id and add it to request
