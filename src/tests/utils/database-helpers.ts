@@ -1,77 +1,84 @@
 import { createInvitationHash } from '@infrastructure/utils/invitationHash';
 import { QueryTypes } from 'sequelize';
+import type User from '@domain/entities/user.ts';
+import type { Note } from '@domain/entities/note.ts';
+import type UserSession from '@domain/entities/userSession.ts';
+import type NoteSettings from '@domain/entities/noteSettings.ts';
+import type { TeamMember } from '@domain/entities/team.ts';
+import type EditorTool from '@domain/entities/editorTools.ts';
+
 
 /**
  * default type for note
  */
-type note = {
-  creatorId: number,
-  content?: JSON,
-  publicId: string,
+type noteMockCreationAttributes = {
+  creatorId: Note['creatorId'],
+  content?:  Note['content'],
+  publicId:  Note['publicId'],
 };
 
-interface createdNote extends note {
-  id: number,
+interface createdNote extends noteMockCreationAttributes {
+  id: Note['id'],
 };
 
 /**
  * default type for user
  */
-type user = {
-  email: string,
-  name: string,
-  editorTools?: [string],
+type userMockCreationAttributes = {
+  email: User['email'],
+  name: User['name'],
+  editorTools?: User['editorTools'],
 };
 
-interface createdUser extends user {
-  id: number,
+interface createdUser extends userMockCreationAttributes {
+  id: User['id'],
 }
 
 /**
  * default type for userSession
  */
-type userSession = {
-  userId: number,
-  refreshToker: string,
-  refreshTokenExpiresAt?: string,
+type userSessionMockCreationAttributes = {
+  userId: UserSession['userId'],
+  refreshToker: UserSession['refreshToken'],
+  refreshTokenExpiresAt?: UserSession['refreshTokenExpiresAt'],
 };
 
 /**
  * default type for note settings
  */
-type noteSettings = {
-  noteId: number,
-  customHostname?: string,
-  isPublic: boolean,
-  invitationHash?: string,
+type noteSettingsMockCreationAttributes = {
+  noteId: NoteSettings['noteId'],
+  customHostname?: NoteSettings['customHostname'],
+  isPublic: NoteSettings['isPublic'],
+  invitationHash?: NoteSettings['invitationHash'],
 };
 
 /**
  * default type for note team
  */
-type noteTeam = {
-  userId: number,
-  noteId: number,
-  role: number,
+type noteTeamMockCreationAttributes = {
+  userId: TeamMember['userId'],
+  noteId: TeamMember['noteId'],
+  role: TeamMember['role'],
 };
 
 /**
  * default type for note relation
  */
-type noteRelation = {
-  noteId: number,
-  parentId: number,
+type noteRelationMockCreationAttributes = {
+  noteId: Note['id'],
+  parentId: Note['id'],
 };
 
 /**
  * default type for editor tool
  */
-type editorTool = {
-  name: string,
-  title: string,
-  exportName: string,
-  source: JSON,
-  isDefault: boolean,
+type editorToolMockCreationAttributes = {
+  name: EditorTool['name'],
+  title: EditorTool['title'],
+  exportName: EditorTool['exportName'],
+  source: EditorTool['source'],
+  isDefault: EditorTool['isDefault'],
 };
 
 /**
@@ -104,22 +111,25 @@ export default class DatabaseHelpers {
    *
    * @param note - note object which contain all info about note (some info is optional)
    */
-  public async insertNote(note: note): Promise<createdNote> {
+  public async insertNote(note: noteMockCreationAttributes): Promise<createdNote> {
     const content = note.content ?? '{}';
 
-    const response = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
+    // eslint-disable-next-line
+    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
     VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}') 
     RETURNING "id", "content", "creator_id", "public_id"`,
     {
       type: QueryTypes.INSERT,
       returning: true,
+      fieldMap: {
+        public_id: 'publicId',
+      },
     });
 
-    const createdNote = response[0][0];
+    const createdNote = results[0];
 
     createdNote['creatorId'] = createdNote['creator_id'];
-    createdNote['publicId'] = createdNote['public_id'];
-    delete createdNote['creator_id'], createdNote['public_id'];
+    delete createdNote['creator_id'];
 
     return createdNote;
   }
@@ -131,20 +141,21 @@ export default class DatabaseHelpers {
    *
    * If editorTools is not passed, the editor_tools database will have []
    */
-  public async insertUser(user: user): Promise<createdUser> {
+  public async insertUser(user: userMockCreationAttributes): Promise<createdUser> {
     const editorTools = user.editorTools ?? '[]';
 
-    const response = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") 
+    // eslint-disable-next-line
+    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") 
     VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])
     RETURNING id, email, name, editor_tools`,
     {
       type: QueryTypes.INSERT,
       returning: true,
+      fieldMap: {
+        editor_tools: 'editorTools',
+      },
     });
-    const createdUser = response[0][0];
-
-    createdUser['editorTools'] = createdUser['editor_tools'];
-    delete createdUser['editor_tools'];
+    const createdUser = results[0];
 
     return createdUser;
   }
@@ -158,7 +169,7 @@ export default class DatabaseHelpers {
    *
    * if no refreshTokenExpiresAt passed, then it would be `CURRENT_DATE + INTERVAL '1 day'`
    */
-  public async insertUserSession(userSession: userSession): Promise<userSession> {
+  public async insertUserSession(userSession: userSessionMockCreationAttributes): Promise<userSessionMockCreationAttributes> {
     const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? `CURRENT_DATE + INTERVAL '1 day')`;
 
     await this.orm.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_toker_expires_at") VALUES (${userSession.userId}, '${userSession.refreshToker}, '${refreshTokerExpiresAt}')`);
@@ -173,7 +184,7 @@ export default class DatabaseHelpers {
    *
    * If customHostname is not passed, custom_hostname will be set to null in the database
    */
-  public async insertNoteSetting(noteSettings: noteSettings): Promise<noteSettings> {
+  public async insertNoteSetting(noteSettings: noteSettingsMockCreationAttributes): Promise<noteSettingsMockCreationAttributes> {
     const customHostname = noteSettings.customHostname ?? null;
     const invitationHash = noteSettings.invitationHash ?? createInvitationHash();
 
@@ -189,7 +200,7 @@ export default class DatabaseHelpers {
    *
    * @param noteTeam - noteTam object which contain all info about noteTeam
    */
-  public async insertNoteTeam(noteTeam: noteTeam): Promise<noteTeam> {
+  public async insertNoteTeam(noteTeam: noteTeamMockCreationAttributes): Promise<noteTeamMockCreationAttributes> {
     await this.orm.connection.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (${noteTeam.userId}, ${noteTeam.noteId}, ${noteTeam.role})`);
 
     return noteTeam;
@@ -200,7 +211,7 @@ export default class DatabaseHelpers {
    *
    * @param noteRelation object which contain all info about noteRelation
    */
-  public async insertNoteRelation(noteRelation: noteRelation): Promise<noteRelation> {
+  public async insertNoteRelation(noteRelation: noteRelationMockCreationAttributes): Promise<noteRelationMockCreationAttributes> {
     await this.orm.connection.query(`INSERT INTO public.note_relations ("note_id", "parent_id") VALUES (${noteRelation.noteId}, ${noteRelation.parentId})`);
 
     return noteRelation;
@@ -213,7 +224,7 @@ export default class DatabaseHelpers {
    *
    * if no isDefault passed, then is_default would be false in database
    */
-  public async insertEditorTool(editorTool: editorTool): Promise<editorTool> {
+  public async insertEditorTool(editorTool: editorToolMockCreationAttributes): Promise<editorToolMockCreationAttributes> {
     const isDefault = editorTool.isDefault ?? null;
 
     await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);

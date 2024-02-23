@@ -113,7 +113,7 @@ describe('Join API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/join/Hzh2hy4igf`,
+        url: `/join/${invitationHash}`,
       });
 
       expect(response?.statusCode).toBe(200);

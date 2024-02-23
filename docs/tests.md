@@ -3,7 +3,7 @@
 We use [testcontainers](https://testcontainers.com/) to run separate DB instance during API testing. Make sure you have [docker](https://www.docker.com/) installed and launched to be able to run test DB.
 
 ## Setup file
-File `src/tests/utils/setup.ts` does necessary preparations to make in possible to run tests in each test file. It starts test DB, initializes API and makes it available through `global.api` in tests. File `setup.ts` also shuts down the DB after all the tests are run.
+File `src/tests/utils/setup.ts` does necessary preparations to make it possible to run tests in each test file. It starts test DB, initializes API and makes it available through `global.api` in tests. File `setup.ts` also shuts down the DB after all the tests are run.
 
 ## Authorization in test
 Use `global.auth(userId)` for getting accessToken, which you can use in:
