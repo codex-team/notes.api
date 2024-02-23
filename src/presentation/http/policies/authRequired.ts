@@ -1,4 +1,4 @@
-import type { PolicyContext } from '@presentation/http/types/PolicyContext';
+import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 
 /**
  * Policy to enforce user to be logged in

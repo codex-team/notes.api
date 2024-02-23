@@ -1,5 +1,5 @@
 import { isEmpty } from '@infrastructure/utils/empty.js';
-import { MemberRole } from '@domain/entities/team';
+import { MemberRole } from '@domain/entities/team.js';
 import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 
 /**
