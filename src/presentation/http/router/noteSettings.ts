@@ -9,7 +9,6 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import type { NotePublicId } from '@domain/entities/note.js';
 import type { Team, MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
-import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 
 /**
  * Interface for the note settings router.
@@ -56,7 +55,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * Prepare user role resolver middleware
    * It should be used to use user role in middlewares
    */
-  const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService); // eslint-disable-line @typescript-eslint/no-unused-vars, no-unused-vars
 
   /**
    * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware

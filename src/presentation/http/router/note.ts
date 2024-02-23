@@ -53,7 +53,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Prepare user role resolver middleware
    * It should be used to use user role in middlewares
    */
-  const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService); // eslint-disable-line @typescript-eslint/no-unused-vars, no-unused-vars
+  const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService);
 
   /**
    * Get note by id
