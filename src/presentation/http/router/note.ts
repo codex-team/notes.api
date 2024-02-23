@@ -125,9 +125,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const notePublic = definePublicNote(note);
 
-    const parentId = await noteService.getParentNoteIdByNoteId(note.id);
-
-    const parentNote = parentId !== null ? await noteService.getNoteById(parentId) : undefined;
     /**
      * Check if current user can edit the note
      */

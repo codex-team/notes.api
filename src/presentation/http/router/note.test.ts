@@ -79,6 +79,8 @@ describe('Note API', () => {
     });
 
     test('Returns note by public id with 200 status when access is disabled, but user is creator', async () => {
+      const userId = 1;
+      const accessToken = global.auth(userId);
       const expectedResponse = {
         'note': {
           'id': '73NdxFZ4k7',
