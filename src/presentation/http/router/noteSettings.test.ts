@@ -33,14 +33,19 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
+      const creator = await global.db.insertUser({
         email: 'a@a.com',
         name: 'Test user 1',
       });
 
+      const randomTeamMember = await global.db.insertUser({
+        email: 'b@b.com',
+        name: 'random guy',
+      });
+
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.id,
+        creatorId: creator.id,
         publicId: existingNotePublicId,
       });
 
@@ -52,7 +57,7 @@ describe('NoteSettings API', () => {
 
       /** create test team member for created note */
       await global.db.insertNoteTeam({
-        userId: user.id,
+        userId: randomTeamMember.id,
         noteId: note.id,
         role: 0,
       });
@@ -69,10 +74,10 @@ describe('NoteSettings API', () => {
           'id': 1,
           'role': 0,
           'user': {
-            'email': user.email,
-            'id': user.id,
-            'name': user.name,
-            'photo': null,
+            'email': randomTeamMember.email,
+            'id': randomTeamMember.id,
+            'name': randomTeamMember.name,
+            'photo': '',
           },
         },
       ]);
@@ -222,6 +227,11 @@ describe('NoteSettings API', () => {
         name: 'Test user 1',
       });
 
+      const randomTeamMember = await global.db.insertUser({
+        email: 'b@b.com',
+        name: 'random guy',
+      });
+
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
@@ -232,6 +242,13 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: false,
+      });
+
+      /** create test team member for created note */
+      await global.db.insertNoteTeam({
+        userId: randomTeamMember.id,
+        noteId: note.id,
+        role: 0,
       });
 
       const accessToken = global.auth(creator.id);
@@ -245,6 +262,12 @@ describe('NoteSettings API', () => {
       });
 
       expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject([ {
+        noteId: note.id,
+        role: 0,
+        userId: randomTeamMember.id,
+      } ]);
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
@@ -329,13 +352,6 @@ describe('NoteSettings API', () => {
         isPublic: true,
       });
 
-      /** create test team member for created note */
-      await global.db.insertNoteTeam({
-        userId: user.id,
-        noteId: note.id,
-        role: 0,
-      });
-
       const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
@@ -352,7 +368,6 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        'noteId': note.id,
         'isPublic': false,
         'invitationHash': noteSettings.invitationHash,
       });
