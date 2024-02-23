@@ -6,7 +6,7 @@ import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
-import { MemberRole } from '@domain/entities/team';
+import { MemberRole } from '@domain/entities/team.js';
 
 /**
  * Interface for the note router.

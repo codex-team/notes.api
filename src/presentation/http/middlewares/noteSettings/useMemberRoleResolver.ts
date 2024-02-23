@@ -1,7 +1,7 @@
 import type { preHandlerHookHandler } from 'fastify';
 import { getLogger } from '@infrastructure/logging/index.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
-import type { MemberRole } from '@domain/entities/team';
+import type { MemberRole } from '@domain/entities/team.js';
 import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**

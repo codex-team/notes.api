@@ -1,7 +1,7 @@
 import type { preHandlerHookHandler } from 'fastify';
 import { getLogger } from '@infrastructure/logging/index.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
-import type NoteSettings from '@domain/entities/noteSettings';
+import type NoteSettings from '@domain/entities/noteSettings.js';
 
 /**
  * Add middleware for resolve Note settings and add it to request
