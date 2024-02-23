@@ -176,7 +176,12 @@ export default class UserSequelizeStorage {
     toolId,
   }: AddUserToolOptions): Promise<void> {
     await this.model.update({
-      editorTools: literal(`COALESCE(editor_tools, '[]'::jsonb) || '["${toolId}"]'::jsonb`),
+      editorTools: literal(
+        /**
+         * If editorTools is null, then set it to empty array
+         * Then add the tool to the list
+         */
+        `COALESCE(editor_tools, '[]'::jsonb) || '["${toolId}"]'::jsonb`),
     }, {
       where: {
         id: userId,

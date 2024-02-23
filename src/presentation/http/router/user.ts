@@ -152,6 +152,20 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
           description: 'Unique editor tool id',
         },
       },
+      response: {
+        '2xx': {
+          description: 'Removed editor tool id',
+          content: {
+            'application/json': {
+              schema: {
+                removeId: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      },
     },
   }, async (request, reply) => {
     const toolId = request.body.toolId;
@@ -163,7 +177,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     });
 
     return reply.send({
-      data: toolId,
+      removeId: toolId,
     });
   });
 
