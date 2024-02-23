@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest';
 
 import notes from '@tests/test-data/notes.json';
 import noteSettings from '@tests/test-data/notes-settings.json';
+import noteTeams from '@tests/test-data/note-teams.json';
 
 describe('NoteSettings API', () => {
   describe('GET /note-settings/:notePublicId ', () => {
@@ -100,14 +101,15 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
+    test('Returns 403 when public access is disabled, user is not creator of the note and is not in the team', async () => {
       const userId = 2;
       const accessToken = global.auth(userId);
 
       const notPublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
+        const team = noteTeams.find(nt => nt.note_id === newNote.id && nt.user_id === userId);
 
-        return settings!.is_public === false && newNote.creator_id != userId;
+        return settings!.is_public === false && newNote.creator_id != userId && team === undefined;
       });
 
       const response = await global.api?.fakeRequest({
@@ -356,9 +358,9 @@ describe('NoteSettings API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
 
-      test.todo('Return 403 when user in team and have Member Role = read');
-
-      test.todo('Return 403 when user authorized, but not member of the team');
+      test.todo('Return 403 when user in team');
+      test.todo('Return 403 when user authorized, but not member of the team and not the creator');
+      test.todo('Return 200 when user is not creator of the note, but a member of the team with member role = write');
     });
   });
 
@@ -431,6 +433,11 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(404);
       expect(response?.json().message).toBe('User does not belong to Note\'s team');
     });
+
+    test.todo('Returns 200 and a new role, when patch is done by a member role = write');
+    test.todo('Returns 200 when patch is done by a creator');
+    test.todo('Returns 403 when patch is done by a member role = read');
+    test.todo('Returns 403 when test is done by a user who is not a member of the team and not a creator');
   });
 });
 
