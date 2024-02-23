@@ -1,13 +1,15 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { isEmpty } from '@infrastructure/utils/empty.js';
+import type { DomainServices } from '@domain/index.js';
 
 /**
  * Policy to check does user have permission to access note
  *
  * @param request - Fastify request object
  * @param reply - Fastify reply object
+ * @param domainServices - instances of domain services
  */
-export default async function notePublicOrUserInTeam(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export default async function notePublicOrUserInTeam(request: FastifyRequest, reply: FastifyReply, domainServices: DomainServices): Promise<void> { // eslint-disable-line @typescript-eslint/no-unused-vars, no-unused-vars
   const { userId } = request;
 
   /**
