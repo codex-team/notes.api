@@ -56,7 +56,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * Prepare user role resolver middleware
    * It should be used to use user role in middlewares
    */
-  const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService);
+  const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService); // eslint-disable-line @typescript-eslint/no-unused-vars, no-unused-vars
 
   /**
    * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware
@@ -82,7 +82,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     preHandler: [
       noteResolver,
       noteSettingsResolver,
-      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
@@ -127,13 +126,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     preHandler: [
       noteResolver,
-      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, noteId, request.body.newRole);
 
-    if (newRole === undefined) {
+    if (isEmpty(newRole)) {
       return reply.notFound('User does not belong to Note\'s team');
     }
 
@@ -165,7 +163,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     preHandler: [
       noteResolver,
-      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
@@ -258,7 +255,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     },
     preHandler: [
       noteResolver,
-      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
