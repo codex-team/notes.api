@@ -20,7 +20,6 @@ export default class NoteSettingsService {
 
   private readonly teamRepository: TeamRepository;
 
-
   /**
    * Note Settings service constructor
    *
@@ -113,7 +112,6 @@ export default class NoteSettingsService {
 
     return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
   }
-
 
   /**
    * Get user role in team by user id and note id
