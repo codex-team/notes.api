@@ -1,7 +1,8 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
-import type { InvitationHash } from '@domain/entities/noteSettings.js';
+import { definePublicNoteSettings } from '@domain/entities/noteSettings.js';
+import type { InvitationHash, NoteSettingsPublic } from '@domain/entities/noteSettings.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
@@ -57,7 +58,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -70,6 +71,11 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -80,7 +86,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
-    return reply.send(noteSettings);
+    const noteSettingsPublic = definePublicNoteSettings(noteSettings);
+
+    return reply.send(noteSettingsPublic);
   });
 
   /**
@@ -132,7 +140,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -144,6 +152,11 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       params: {
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
         },
       },
     },
@@ -171,7 +184,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('Note settings not found');
     }
 
-    return reply.send(updatedNoteSettings);
+    const noteSettingsPublic = definePublicNoteSettings(updatedNoteSettings);
+
+    return reply.send(noteSettingsPublic);
   });
 
   /**

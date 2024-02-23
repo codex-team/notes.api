@@ -10,10 +10,8 @@ describe('NoteSettings API', () => {
 
       const expectedNoteSettings = {
         'customHostname': 'codex.so',
-        'id': 54,
         'invitationHash': 'FfAwyaR80C',
         'isPublic': true,
-        'noteId': 54,
         'team':  [],
       };
 
@@ -45,7 +43,7 @@ describe('NoteSettings API', () => {
             'email': 'a@a.com',
             'id': 1,
             'name': 'Test user 1',
-            'photo': null,
+            'photo': '',
           },
         },
       ]);
@@ -210,8 +208,6 @@ describe('NoteSettings API', () => {
       });
 
       const updatedNoteSettings = {
-        'id': 54,
-        'noteId': 54,
         'customHostname': 'codex.so',
         'isPublic': false,
         'invitationHash': 'FfAwyaR80C',
