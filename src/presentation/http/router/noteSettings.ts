@@ -1,6 +1,7 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
+import { definePublicNoteSettings } from '@domain/entities/noteSettings.js';
 import type { InvitationHash } from '@domain/entities/noteSettings.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
@@ -85,12 +86,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
-    const noteSettingsPublic:  Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'> = {
-      customHostname: noteSettings.customHostname,
-      isPublic: noteSettings.isPublic,
-      invitationHash: noteSettings.invitationHash,
-      team: noteSettings.team,
-    };
+    const noteSettingsPublic = definePublicNoteSettings(noteSettings);
 
     return reply.send(noteSettingsPublic);
   });
@@ -188,13 +184,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('Note settings not found');
     }
 
-    const noteSettingsPublic:  Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'> = {
-      customHostname: updatedNoteSettings.customHostname,
-      isPublic: updatedNoteSettings.isPublic,
-      invitationHash: updatedNoteSettings.invitationHash,
-      team: updatedNoteSettings.team,
-    };
-
+    const noteSettingsPublic = definePublicNoteSettings(updatedNoteSettings);
 
     return reply.send(noteSettingsPublic);
   });
