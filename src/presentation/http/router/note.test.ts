@@ -344,7 +344,7 @@ describe('Note API', () => {
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and length');
-    test.todo('Update note by public id with 200 status when team member has a Write role');
+    test.todo('Return 200 when user is not the creator, but a team member with a Write role');
     test.todo('Return 403 when user has no Write role and he is not a creator');
   });
 
