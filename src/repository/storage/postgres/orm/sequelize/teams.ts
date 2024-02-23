@@ -233,16 +233,19 @@ export default class TeamsSequelizeStorage {
   /**
    * Remove team member by id
    *
-   * @param id - team member id
+   * @param userId - id of team member
+   * @param noteId - note internal id
+   * @returns returns userId if team member was deleted and undefined overwise
    */
-  public async removeTeamMemberById(id: TeamMember['id']): Promise<boolean> {
+  public async removeTeamMemberByUserIdAndNoteId(userId: TeamMember['id'], noteId: NoteInternalId): Promise<User['id'] | undefined> {
     const affectedRows = await this.model.destroy({
       where: {
-        id,
+        userId,
+        noteId,
       },
     });
 
-    return affectedRows > 0;
+    return affectedRows > 0 ? userId : undefined;
   }
 
   /**

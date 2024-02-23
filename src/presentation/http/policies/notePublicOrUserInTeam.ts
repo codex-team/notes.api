@@ -19,6 +19,7 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
     return await reply.notAcceptable('Note not found');
   };
 
+  const { creatorId } = request.note;
   const { isPublic } = request.noteSettings;
   let memberRole;
 
@@ -34,7 +35,7 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
    * If note is public, everyone can access it
    * If note is private, only team member and creator can access it
    */
-  if (isPublic === false && isEmpty(memberRole)) {
+  if (isPublic === false && creatorId !== userId && isEmpty(memberRole)) {
     return await reply.forbidden();
   }
 }

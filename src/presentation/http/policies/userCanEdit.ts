@@ -26,6 +26,7 @@ export default async function userCanEdit(context: PolicyContext): Promise<void>
     return await reply.notAcceptable('Note not found');
   };
 
+  const { creatorId } = request.note;
   const memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(request.userId!, request.note.id);
 
   /**
@@ -33,7 +34,7 @@ export default async function userCanEdit(context: PolicyContext): Promise<void>
    * user has a Read Role or is not in team at all,
    * he doesn't have permission to edit the note
    */
-  if (memberRole !== MemberRole.Write) {
+  if (creatorId !== userId && memberRole !== MemberRole.Write) {
     return await reply.forbidden();
   }
 }
