@@ -42,11 +42,18 @@ export default interface NoteSettings {
 }
 
 /**
+ * Attributes of public note settings
+ */
+type NoteSettingsPublicProperties = 'customHostname' | 'isPublic' | 'invitationHash' | 'team' ;
+
+export interface NoteSettingsPublic extends Pick<NoteSettings, NoteSettingsPublicProperties> {}
+
+/**
  * Define note settings for public usage
  *
  * @param noteSettings - note settings data
  */
-export function definePublicNoteSettings(noteSettings: NoteSettings): Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'> {
+export function definePublicNoteSettings(noteSettings: NoteSettings): NoteSettingsPublic {
   return {
     customHostname: noteSettings.customHostname,
     isPublic: noteSettings.isPublic,

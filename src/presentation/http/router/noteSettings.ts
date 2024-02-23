@@ -2,7 +2,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import { definePublicNoteSettings } from '@domain/entities/noteSettings.js';
-import type { InvitationHash } from '@domain/entities/noteSettings.js';
+import type { InvitationHash, NoteSettingsPublic } from '@domain/entities/noteSettings.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
@@ -58,7 +58,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'>,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -140,7 +140,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'>,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
