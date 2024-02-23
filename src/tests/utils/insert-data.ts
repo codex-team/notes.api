@@ -4,6 +4,7 @@ import users from '../test-data/users.json';
 import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
 import noteSettings from '../test-data/notes-settings.json';
+import noteTeams from '../test-data/note-teams.json';
 
 
 /**
@@ -14,6 +15,16 @@ import noteSettings from '../test-data/notes-settings.json';
 async function insertUsers(db: SequelizeOrm): Promise<void> {
   for (const user of users) {
     await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.email}', '${user.name}', '${user.created_at}')`);
+  }
+}
+/**
+ * Fills in the database with note teams data
+ *
+ * @param db - SequelizeOrm instance
+ */
+async function insertNoteTeams(db: SequelizeOrm): Promise<void> {
+  for (const noteTeam of noteTeams) {
+    await db.connection.query(`INSERT INTO public.note_teams ("note_id", "user_id", "role") VALUES (${noteTeam.note_id}, ${noteTeam.user_id}, '${noteTeam.role}')`);
   }
 }
 /**
@@ -70,6 +81,7 @@ export async function insertData(db: SequelizeOrm): Promise<void> {
   await insertUserSessions(db);
   await insertNotes(db);
   await insertNoteSettings(db);
+  await insertNoteTeams(db);
   await insertNoteRelatons(db);
 }
 
