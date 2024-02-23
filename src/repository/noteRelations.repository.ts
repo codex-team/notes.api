@@ -58,6 +58,15 @@ export default class NoteRelationsRepository {
   }
 
   /**
+   * Delete only parent note relation
+   *
+   * @param noteId - id of the current note
+   */
+  public async deleteParentNoteRelationByNoteId(noteId: NoteInternalId): Promise<boolean> {
+    return await this.storage.deleteParentNoteRelationByNoteId(noteId);
+  }
+
+  /**
    * Checks if the note has any connection
    *
    * @param noteId - id of the current note
