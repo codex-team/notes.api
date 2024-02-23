@@ -134,6 +134,53 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     });
   });
 
+  /**
+   * Remove editor tool from user extensions
+   */
+  fastify.delete<{
+    Body: { toolId: string }
+  }>('/editor-tools', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+    schema: {
+      body: {
+        toolId: {
+          type: 'string',
+          description: 'Unique editor tool id',
+        },
+      },
+      response: {
+        '2xx': {
+          description: 'Removed editor tool id',
+          content: {
+            'application/json': {
+              schema: {
+                removedId: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const toolId = request.body.toolId;
+    const userId = request.userId as number;
+
+    await userService.removeUserEditorTool({
+      userId,
+      toolId,
+    });
+
+    return reply.send({
+      removedId: toolId,
+    });
+  });
+
   done();
 };
 

@@ -91,4 +91,22 @@ export default class UserService {
       toolId,
     });
   }
+
+  /**
+   * Removes editor tool from user settings by its id
+   *
+   * @param options - user id & editor tool
+   */
+  public async removeUserEditorTool({
+    userId,
+    toolId,
+  }: {
+    userId: User['id'],
+    toolId: EditorTool['id'],
+  }): Promise<void> {
+    return await this.repository.removeUserEditorTool({
+      userId,
+      toolId,
+    });
+  }
 }
