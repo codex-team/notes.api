@@ -332,7 +332,8 @@ export default class HttpApi implements Api {
 
       routeOptions.preHandler.push(async (request, reply) => {
         for (const policy of policies) {
-          await Policies[policy]({ request,
+          await Policies[policy]({
+            request,
             reply,
             domainServices });
         }

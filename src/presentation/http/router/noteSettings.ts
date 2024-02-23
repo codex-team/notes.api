@@ -52,11 +52,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
 
   /**
-   * Prepare user role resolver middleware
-   * It should be used to use user role in middlewares
-   */
-
-  /**
    * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware
    */
   fastify.get<{
