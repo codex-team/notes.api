@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { isEmpty } from '@infrastructure/utils/empty.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 import type { DomainServices } from '@domain/index.js';
 
 /**
@@ -21,7 +22,15 @@ export default async function notePublicOrUserInTeam(request: FastifyRequest, re
 
   const { creatorId } = request.note;
   const { isPublic } = request.noteSettings;
-  const { memberRole } = request;
+  let memberRole;
+
+  /**
+   * If user is not authorized, we can't check his role
+   * If note is public, we don't need to check for the role
+   */
+  if (notEmpty(userId) && isPublic === false) {
+    memberRole = domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, request.note.id);
+  }
 
   /**
    * If note is public, everyone can access it
