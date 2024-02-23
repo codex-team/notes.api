@@ -186,8 +186,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
   /**
    * Get team by note id
-   *
-   * @todo add policy for this route (check if user is collaborator)
    */
   fastify.get<{
     Params: {
@@ -198,6 +196,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     config: {
       policy: [
         'authRequired',
+        'userCanEdit',
       ],
     },
     schema: {
