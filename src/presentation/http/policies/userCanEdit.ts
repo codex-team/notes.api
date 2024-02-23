@@ -1,16 +1,15 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
 import { isEmpty } from '@infrastructure/utils/empty.js';
 import { MemberRole } from '@domain/entities/team';
-import type { DomainServices } from '@domain/index.js';
+import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 
 /**
  * Policy to check whether a user has permission to edit the note
  *
- * @param request - Fastify request object
- * @param reply - Fastify reply object
- * @param domainServices - instances of domain services
+ * @param context - Context object, containing Fatify request, Fastify reply and domain services
  */
-export default async function userCanEdit(request: FastifyRequest, reply: FastifyReply, domainServices: DomainServices): Promise<void> { // eslint-disable-line @typescript-eslint/no-unused-vars, no-unused-vars
+export default async function userCanEdit(context: PolicyContext): Promise<void> {
+  const { request, reply, domainServices } = context;
+
   const { userId } = request;
 
   /**
