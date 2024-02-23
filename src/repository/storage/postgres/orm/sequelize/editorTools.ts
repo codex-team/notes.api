@@ -149,14 +149,7 @@ export default class UserSequelizeStorage {
       return null;
     }
 
-    return {
-      id: res.id,
-      name: res.name,
-      title: res.title,
-      exportName: res.exportName,
-      source: res.source,
-      isDefault: res.isDefault,
-    };
+    return res;
   }
 
   /**
