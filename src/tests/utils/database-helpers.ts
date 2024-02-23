@@ -117,7 +117,8 @@ export default class DatabaseHelpers {
 
     const createdNote = response[0][0];
 
-    createdNote['publicId'], createdNote['creatorId'] = createdNote['public_id'], createdNote['creator_id'];
+    createdNote['creatorId'] = createdNote['creator_id'];
+    createdNote['publicId'] = createdNote['public_id'];
     delete createdNote['creator_id'], createdNote['public_id'];
 
     return createdNote;
