@@ -117,19 +117,13 @@ export default class DatabaseHelpers {
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
     VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}') 
-    RETURNING "id", "content", "creator_id", "public_id"`,
+    RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId"`,
     {
       type: QueryTypes.INSERT,
       returning: true,
-      fieldMap: {
-        public_id: 'publicId',
-      },
     });
 
     const createdNote = results[0];
-
-    createdNote['creatorId'] = createdNote['creator_id'];
-    delete createdNote['creator_id'];
 
     return createdNote;
   }
@@ -147,13 +141,10 @@ export default class DatabaseHelpers {
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") 
     VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])
-    RETURNING id, email, name, editor_tools`,
+    RETURNING "id", "email", "name", "editor_tools" AS "editorTools"`,
     {
       type: QueryTypes.INSERT,
       returning: true,
-      fieldMap: {
-        editor_tools: 'editorTools',
-      },
     });
     const createdUser = results[0];
 
