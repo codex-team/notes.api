@@ -1,7 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
-import { definePublicNoteSettings, type NoteSettingsPublic } from '@domain/entities/noteSettingsPublic.js';
 import type { InvitationHash } from '@domain/entities/noteSettings.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
@@ -58,7 +57,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettingsPublic,
+    Reply: Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'>,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -86,7 +85,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
-    const noteSettingsPublic = definePublicNoteSettings(noteSettings, request.note!.publicId);
+    const noteSettingsPublic:  Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'> = {
+      customHostname: noteSettings.customHostname,
+      isPublic: noteSettings.isPublic,
+      invitationHash: noteSettings.invitationHash,
+      team: noteSettings.team,
+    };
 
     return reply.send(noteSettingsPublic);
   });
@@ -140,7 +144,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettingsPublic,
+    Reply: Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'>,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -184,7 +188,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('Note settings not found');
     }
 
-    const noteSettingsPublic = definePublicNoteSettings(updatedNoteSettings, request.note!.publicId);
+    const noteSettingsPublic:  Pick<NoteSettings, 'customHostname' | 'isPublic' | 'team' | 'invitationHash'> = {
+      customHostname: updatedNoteSettings.customHostname,
+      isPublic: updatedNoteSettings.isPublic,
+      invitationHash: updatedNoteSettings.invitationHash,
+      team: updatedNoteSettings.team,
+    };
+
 
     return reply.send(noteSettingsPublic);
   });

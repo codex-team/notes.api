@@ -5,15 +5,6 @@ export const NoteSettingsSchema = {
   $id: 'NoteSettingsSchema',
   type: 'object',
   properties: {
-    id: {
-      type: 'number',
-    },
-    noteId: {
-      type: 'string',
-      pattern: '[a-zA-Z0-9-_]+',
-      maxLength: 10,
-      minLength: 10,
-    },
     customHostname: {
       type: 'string',
     },
