@@ -9,44 +9,50 @@ import type EditorTool from '@domain/entities/editorTools.ts';
 
 
 /**
- * default type for note
+ * default type for note mock creation attributes
  */
-type noteMockCreationAttributes = {
+type NoteMockCreationAttributes = {
   creatorId: Note['creatorId'],
   content?:  Note['content'],
   publicId:  Note['publicId'],
 };
 
-interface createdNote extends noteMockCreationAttributes {
+/**
+ * interface of the inserted note
+ */
+interface createdNote extends NoteMockCreationAttributes {
   id: Note['id'],
 };
 
 /**
- * default type for user
+ * default type for user mock creation attributes
  */
-type userMockCreationAttributes = {
+type UserMockCreationAttributes = {
   email: User['email'],
   name: User['name'],
   editorTools?: User['editorTools'],
 };
 
-interface createdUser extends userMockCreationAttributes {
+/**
+ * interface of the inserted user
+ */
+interface createdUser extends UserMockCreationAttributes {
   id: User['id'],
 }
 
 /**
- * default type for userSession
+ * default type for user session mock creation attributes
  */
-type userSessionMockCreationAttributes = {
+type UserSessionMockCreationAttributes = {
   userId: UserSession['userId'],
   refreshToker: UserSession['refreshToken'],
   refreshTokenExpiresAt?: UserSession['refreshTokenExpiresAt'],
 };
 
 /**
- * default type for note settings
+ * default type for note settings mock creation attributes
  */
-type noteSettingsMockCreationAttributes = {
+type NoteSettingsMockCreationAttributes = {
   noteId: NoteSettings['noteId'],
   customHostname?: NoteSettings['customHostname'],
   isPublic: NoteSettings['isPublic'],
@@ -54,32 +60,22 @@ type noteSettingsMockCreationAttributes = {
 };
 
 /**
- * default type for note team
+ * default type for note team mock creation attributes
  */
-type noteTeamMockCreationAttributes = {
-  userId: TeamMember['userId'],
-  noteId: TeamMember['noteId'],
-  role: TeamMember['role'],
-};
+type NoteTeamMockCreationAttributes = Omit<TeamMember, 'id'>;
 
 /**
- * default type for note relation
+ * default type for note relation mock creation attributes
  */
-type noteRelationMockCreationAttributes = {
+type NoteRelationMockCreationAttributes = {
   noteId: Note['id'],
   parentId: Note['id'],
 };
 
 /**
- * default type for editor tool
+ * default type for editor tool mock creation attributes
  */
-type editorToolMockCreationAttributes = {
-  name: EditorTool['name'],
-  title: EditorTool['title'],
-  exportName: EditorTool['exportName'],
-  source: EditorTool['source'],
-  isDefault: EditorTool['isDefault'],
-};
+type EditorToolMockCreationAttributes = Omit<EditorTool, 'id'>;
 
 /**
  * class of db helpers
@@ -111,7 +107,7 @@ export default class DatabaseHelpers {
    *
    * @param note - note object which contain all info about note (some info is optional)
    */
-  public async insertNote(note: noteMockCreationAttributes): Promise<createdNote> {
+  public async insertNote(note: NoteMockCreationAttributes): Promise<createdNote> {
     const content = note.content ?? '{}';
 
     // eslint-disable-next-line
@@ -135,7 +131,7 @@ export default class DatabaseHelpers {
    *
    * If editorTools is not passed, the editor_tools database will have []
    */
-  public async insertUser(user: userMockCreationAttributes): Promise<createdUser> {
+  public async insertUser(user: UserMockCreationAttributes): Promise<createdUser> {
     const editorTools = user.editorTools ?? '[]';
 
     // eslint-disable-next-line
@@ -152,7 +148,7 @@ export default class DatabaseHelpers {
   }
 
   /**
-   * Inserts user session mock to then db
+   * Inserts user session mock to the db
    *
    * @param userSession - userSession object which contain all info about userSession (some info is optional)
    *
@@ -160,7 +156,7 @@ export default class DatabaseHelpers {
    *
    * if no refreshTokenExpiresAt passed, then it would be `CURRENT_DATE + INTERVAL '1 day'`
    */
-  public async insertUserSession(userSession: userSessionMockCreationAttributes): Promise<userSessionMockCreationAttributes> {
+  public async insertUserSession(userSession: UserSessionMockCreationAttributes): Promise<UserSessionMockCreationAttributes> {
     const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? `CURRENT_DATE + INTERVAL '1 day')`;
 
     await this.orm.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_toker_expires_at") VALUES (${userSession.userId}, '${userSession.refreshToker}, '${refreshTokerExpiresAt}')`);
@@ -175,7 +171,7 @@ export default class DatabaseHelpers {
    *
    * If customHostname is not passed, custom_hostname will be set to null in the database
    */
-  public async insertNoteSetting(noteSettings: noteSettingsMockCreationAttributes): Promise<noteSettingsMockCreationAttributes> {
+  public async insertNoteSetting(noteSettings: NoteSettingsMockCreationAttributes): Promise<NoteSettingsMockCreationAttributes> {
     const customHostname = noteSettings.customHostname ?? null;
     const invitationHash = noteSettings.invitationHash ?? createInvitationHash();
 
@@ -191,7 +187,7 @@ export default class DatabaseHelpers {
    *
    * @param noteTeam - noteTam object which contain all info about noteTeam
    */
-  public async insertNoteTeam(noteTeam: noteTeamMockCreationAttributes): Promise<noteTeamMockCreationAttributes> {
+  public async insertNoteTeam(noteTeam: NoteTeamMockCreationAttributes): Promise<NoteTeamMockCreationAttributes> {
     await this.orm.connection.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (${noteTeam.userId}, ${noteTeam.noteId}, ${noteTeam.role})`);
 
     return noteTeam;
@@ -202,7 +198,7 @@ export default class DatabaseHelpers {
    *
    * @param noteRelation object which contain all info about noteRelation
    */
-  public async insertNoteRelation(noteRelation: noteRelationMockCreationAttributes): Promise<noteRelationMockCreationAttributes> {
+  public async insertNoteRelation(noteRelation: NoteRelationMockCreationAttributes): Promise<NoteRelationMockCreationAttributes> {
     await this.orm.connection.query(`INSERT INTO public.note_relations ("note_id", "parent_id") VALUES (${noteRelation.noteId}, ${noteRelation.parentId})`);
 
     return noteRelation;
@@ -215,7 +211,7 @@ export default class DatabaseHelpers {
    *
    * if no isDefault passed, then is_default would be false in database
    */
-  public async insertEditorTool(editorTool: editorToolMockCreationAttributes): Promise<editorToolMockCreationAttributes> {
+  public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorToolMockCreationAttributes> {
     const isDefault = editorTool.isDefault ?? null;
 
     await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
