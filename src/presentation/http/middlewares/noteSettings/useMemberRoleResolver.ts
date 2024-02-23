@@ -40,7 +40,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
         }
 
         if (memberRole !== undefined) {
-        request.memberRole = memberRole;
+          request.memberRole = memberRole;
         }
       } catch (error) {
         logger.error('Can not resolve Member role by note [id = ${request.note.id}] and user [id = ${request.userId}]');
