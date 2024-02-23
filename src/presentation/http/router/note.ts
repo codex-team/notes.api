@@ -5,8 +5,6 @@ import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
-import { MemberRole } from '@domain/entities/team';
 
 /**
  * Interface for the note router.
@@ -50,12 +48,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
 
   /**
-   * Prepare user role resolver middleware
-   * It should be used to use user role in middlewares
-   */
-  const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService);
-
-  /**
    * Get note by id
    */
   fastify.get<{
@@ -83,11 +75,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     preHandler: [
       noteResolver,
       noteSettingsResolver,
-      memberRoleResolver,
     ],
   }, async (request, reply) => {
     const { note } = request;
-    const { memberRole } = request;
 
     /**
      * Check if note does not exist
@@ -100,9 +90,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const parentNote = parentId !== null ? await noteService.getNoteById(parentId) : undefined;
     /**
-     * Check if current user can edit the note
+     * Check if current user is creator of the note
      */
-    const canEdit = memberRole === MemberRole.Write || note.creatorId === request.userId;
+    const canEdit = note.creatorId === request.userId;
 
     return reply.send({
       note: note,
@@ -132,7 +122,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     config: {
       policy: [
         'authRequired',
-        'userCanEdit',
+        'userInTeam',
       ],
     },
     preHandler: [
@@ -216,12 +206,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     config: {
       policy: [
         'authRequired',
-        'userCanEdit',
+        'userInTeam',
       ],
     },
     preHandler: [
       noteResolver,
-      noteSettingsResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
@@ -263,21 +252,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     }
 
     /**
-     * By default, unauthorized user can not edit the note
+     * Check if current user is creator of the note
      */
-    let canEdit = false;
-
-    /**
-     * Check if current user is logged in and can edit the note
-     */
-    if (request.userId !== null) {
-      const memberRole = await noteSettingsService.getUserRoleByUserIdAndNoteId(request.userId, note.id);
-
-      /**
-       * Check if current user can edit the note
-       */
-      canEdit = memberRole === MemberRole.Write || note.creatorId === request.userId;
-    }
+    const canEdit = note.creatorId === request.userId;
 
     return reply.send({
       note: note,

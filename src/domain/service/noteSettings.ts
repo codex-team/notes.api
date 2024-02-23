@@ -38,7 +38,7 @@ export default class NoteSettingsService {
    * @param userId - user to add
    */
   public async addUserToTeamByInvitationHash(invitationHash: InvitationHash, userId: User['id']): Promise<TeamMember | null> {
-    const defaultUserRole = MemberRole.Read;
+    const defaultUserRole = MemberRole.read;
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByInvitationHash(invitationHash);
 
     /**
@@ -120,7 +120,7 @@ export default class NoteSettingsService {
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
     return await this.teamRepository.getUserRoleByUserIdAndNoteId(userId, noteId);
   }
 
@@ -182,7 +182,7 @@ export default class NoteSettingsService {
    * @param role - new team member role
    * @returns returns 1 if the role has been changed and 0 otherwise
    */
-  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | undefined> {
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | null> {
     return await this.teamRepository.patchMemberRoleByUserId(id, noteId, role);
   }
 }

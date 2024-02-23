@@ -3,7 +3,6 @@ import { describe, test, expect } from 'vitest';
 
 import notes from '@tests/test-data/notes.json';
 import noteSettings from '@tests/test-data/notes-settings.json';
-import noteTeams from '@tests/test-data/note-teams.json';
 
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
@@ -158,15 +157,14 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 403 when public access is disabled, user is not creator of the note and is not in the team', async () => {
+    test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
       const userId = 2;
       const accessToken = global.auth(userId);
 
       const notPublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-        const team = noteTeams.find(nt => nt.note_id === newNote.id && nt.user_id === userId);
 
-        return settings!.is_public === false && newNote.creator_id !== userId && team === undefined;
+        return settings!.is_public === false && newNote.creator_id != userId;
       });
 
       const response = await global.api?.fakeRequest({
@@ -265,9 +263,6 @@ describe('Note API', () => {
 
         expect(response?.json().accessRights).toStrictEqual({ canEdit: true });
       });
-
-      test.todo('Returns 200 when note is private, user is in team but is not creator');
-      test.todo('Returns canEdit=true, when user is authorized, is in the team and is not creator');
     });
   });
 
@@ -343,9 +338,7 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    test.todo('Returns 400 when parentId has incorrect characters and length');
-    test.todo('Return 200 when user is not the creator, but a team member with a Write role');
-    test.todo('Return 403 when user has no Write role and he is not a creator');
+    test.todo('Returns 400 when parentId has incorrect characters and lenght');
   });
 
   describe('POST /note', () => {

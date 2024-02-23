@@ -1,4 +1,5 @@
 import type { preHandlerHookHandler } from 'fastify';
+import { StatusCodes } from 'http-status-codes';
 import { getLogger } from '@infrastructure/logging/index.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings';
@@ -27,7 +28,7 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
 
       try {
         if (!request.note) {
-          throw new Error('Note was not resolved');
+          throw new Error('Note did not resolved');
         }
 
         noteSettings = await noteSettingsService.getNoteSettingsByNoteId(request.note.id);
@@ -37,7 +38,11 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
         logger.error('Can not resolve Note settings by note');
         logger.error(error);
 
-        await reply.notAcceptable('Note settings not found');
+        await reply
+          .code(StatusCodes.NOT_ACCEPTABLE)
+          .send({
+            message: 'Note settings not found',
+          });
       }
     },
   };
