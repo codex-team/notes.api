@@ -67,7 +67,7 @@ declare module 'fastify' {
     /**
      * This property added by userTeamRoleResolver middleware
      */
-    memberRole: MemberRole | null;
+    memberRole?: MembersRole;
 
     /**
      * This property added by noteRelationshipResolver middleware

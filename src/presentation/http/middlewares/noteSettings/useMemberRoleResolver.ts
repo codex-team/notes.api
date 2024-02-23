@@ -25,7 +25,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
   return {
     memberRoleResolver: async function memberRoleResolver(request, reply) {
       /** If MemberRole equals null, it means that user is not in the team or is not authenticated */
-      let memberRole: MemberRole | null;
+      let memberRole: MemberRole | undefined;
 
       try {
         if (isEmpty(request.note)) {
@@ -34,17 +34,19 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
 
         /** If user is not authenticated, we can't resolve his role */
         if (isEmpty(request.userId)) {
-          memberRole = null;
+          memberRole = undefined;
         } else {
           memberRole = await noteSettingsService.getUserRoleByUserIdAndNoteId(request.userId, request.note.id);
         }
 
+        if (memberRole !== undefined) {
         request.memberRole = memberRole;
+        }
       } catch (error) {
         logger.error('Can not resolve Member role by note [id = ${request.note.id}] and user [id = ${request.userId}]');
         logger.error(error);
 
-        await reply.notAcceptable('Team member not found'); // ???
+        await reply.notAcceptable('Team member not found');
       }
     },
   };

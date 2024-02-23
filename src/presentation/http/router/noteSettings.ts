@@ -133,7 +133,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const noteId = request.note?.id as number;
     const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, noteId, request.body.newRole);
 
-    if (newRole === null) {
+    if (newRole === undefined) {
       return reply.notFound('User does not belong to Note\'s team');
     }
 
