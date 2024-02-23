@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "name": "header",
+    "title": "Heading",
+    "exportName": "Header",
+    "isDefault": true,
+    "source": {"cdn": "https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js"}
+  },
+  {
+    "id": "2",
+    "name": "paragraph",
+    "title": "Paragraph",
+    "exportName": "Paragraph",
+    "isDefault": true,
+    "source": {"cdn": "https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js"}
+  },
+  {
+    "id": "3",
+    "name": "list",
+    "title": "List",
+    "exportName": "List",
+    "isDefault": true,
+    "source": {"cdn": "https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js"}
+  },
+  {
+    "id": "4",
+    "name": "markdown",
+    "title": "Markdown",
+    "exportName": "Markdown",
+    "isDefault": false,
+    "source": {}
+  }
+]

@@ -40,4 +40,36 @@ describe('User API', () => {
       expect(body.message).toBe('You must be authenticated to access this resource');
     });
   });
+  describe('POST /user/editor-tools', () => {
+    test('Returns editor tools with status code 200 if user exists', async () => {
+      const userId = 1;
+      const accessToken = global.auth(userId);
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: '/user/editor-tools',
+        body: {
+          'toolId': '4',
+        }
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      const body = response?.json();
+
+      expect(body).toStrictEqual({
+        addedTool: {
+          id: '4',
+          name: 'markdown',
+          title: 'Markdown',
+          exportName: 'Markdown',
+          isDefault: false,
+          source: {},
+        }
+      });
+    });
+  });
 });
