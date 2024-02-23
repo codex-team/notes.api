@@ -158,7 +158,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
           content: {
             'application/json': {
               schema: {
-                removeId: {
+                removedId: {
                   type: 'string',
                 },
               },
@@ -177,7 +177,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     });
 
     return reply.send({
-      removeId: toolId,
+      removedId: toolId,
     });
   });
 
