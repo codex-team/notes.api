@@ -15,7 +15,7 @@ describe('Join API', () => {
 
       /** create test user */
       const user = await global.db.insertUser({
-        email: 'testemal@CodeXmail.com',
+        email: 'test@codexmail.com',
         name: 'CodeX',
       });
 
@@ -88,7 +88,7 @@ describe('Join API', () => {
 
       /** create test user */
       const user = await global.db.insertUser({
-        email: 'testemal@CodeXmail.com',
+        email: 'test@codexmail.com',
         name: 'CodeX',
       });
 

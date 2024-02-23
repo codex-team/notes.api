@@ -38,7 +38,7 @@ declare global {
   function auth(userId: number): string;
 
   /**
-   * dbHelpers class that contains methods for work with database
+   * DatabaseHelpers class that contains methods for work with database
    */
   /* eslint-disable-next-line no-var */
   var db: DatabaseHelpers;
@@ -74,7 +74,6 @@ beforeAll(async () => {
 
   global.db = new DatabaseHelpers(orm);
 }, TIMEOUT);
-
 
 afterAll(async () => {
   await postgresContainer?.stop();

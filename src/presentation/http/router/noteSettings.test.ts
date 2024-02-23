@@ -528,7 +528,7 @@ describe('NoteSettings API', () => {
 
       /** create test user */
       const creator = await global.db.insertUser({
-        email: 'testemal@CodeXmail.com',
+        email: 'test@codexmail.com',
         name: 'CodeX',
       });
 
@@ -595,7 +595,7 @@ describe('NoteSettings API', () => {
 
       /** create test user */
       const creator = await global.db.insertUser({
-        email: 'testemal@CodeXmail.com',
+        email: 'test@codexmail.com',
         name: 'CodeX',
       });
 
@@ -646,7 +646,7 @@ describe('NoteSettings API', () => {
 
       /** create test user */
       const user = await global.db.insertUser({
-        email: 'testemal@CodeXmail.com',
+        email: 'test@codexmail.com',
         name: 'CodeX',
       });
 

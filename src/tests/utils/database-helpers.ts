@@ -18,13 +18,6 @@ type NoteMockCreationAttributes = {
 };
 
 /**
- * interface of the inserted note
- */
-interface createdNote extends NoteMockCreationAttributes {
-  id: Note['id'],
-};
-
-/**
  * default type for user mock creation attributes
  */
 type UserMockCreationAttributes = {
@@ -32,13 +25,6 @@ type UserMockCreationAttributes = {
   name: User['name'],
   editorTools?: User['editorTools'],
 };
-
-/**
- * interface of the inserted user
- */
-interface createdUser extends UserMockCreationAttributes {
-  id: User['id'],
-}
 
 /**
  * default type for user session mock creation attributes
@@ -78,7 +64,7 @@ type NoteRelationMockCreationAttributes = {
 type EditorToolMockCreationAttributes = Omit<EditorTool, 'id'>;
 
 /**
- * class of db helpers
+ * class with database helper functions which are inserting mocks into database
  */
 export default class DatabaseHelpers {
   private orm;
@@ -107,13 +93,13 @@ export default class DatabaseHelpers {
    *
    * @param note - note object which contain all info about note (some info is optional)
    */
-  public async insertNote(note: NoteMockCreationAttributes): Promise<createdNote> {
+  public async insertNote(note: NoteMockCreationAttributes): Promise<Note> {
     const content = note.content ?? '{}';
 
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
     VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}') 
-    RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId"`,
+    RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,
       returning: true,
@@ -131,13 +117,13 @@ export default class DatabaseHelpers {
    *
    * If editorTools is not passed, the editor_tools database will have []
    */
-  public async insertUser(user: UserMockCreationAttributes): Promise<createdUser> {
+  public async insertUser(user: UserMockCreationAttributes): Promise<User> {
     const editorTools = user.editorTools ?? '[]';
 
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") 
     VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])
-    RETURNING "id", "email", "name", "editor_tools" AS "editorTools"`,
+    RETURNING "id", "email", "name", "editor_tools" AS "editorTools", "created_at" AS "createdAt", "photo"`,
     {
       type: QueryTypes.INSERT,
       returning: true,
