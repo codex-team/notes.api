@@ -343,8 +343,9 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    test.todo('Returns 400 when parentId has incorrect characters and lenght');
-    test.todo('Update note by public id with 200 status, user is in the team and is not creator');
+    test.todo('Returns 400 when parentId has incorrect characters and length');
+    test.todo('Update note by public id with 200 status when team member has a Write role');
+    test.todo('Return 403 when user has no Write role and he is not a creator');
   });
 
   describe('POST /note', () => {
