@@ -80,8 +80,8 @@ export default class HttpApi implements Api {
 
     this.addSchema();
     this.addDecorators();
-    this.addPoliciesCheckHook();
 
+    await this.addPoliciesCheckHook(domainServices);
     await this.addApiRoutes(domainServices);
 
     this.domainErrorHandler();
@@ -310,8 +310,10 @@ export default class HttpApi implements Api {
 
   /**
    * Add "onRoute" hook that will add "preHandler" checking policies passed through the route config
+   *
+   * @param domainServices - instances of domain services
    */
-  private addPoliciesCheckHook(): void {
+  private addPoliciesCheckHook(domainServices: DomainServices): void {
     this.server?.addHook('onRoute', (routeOptions) => {
       const policies = routeOptions.config?.policy ?? [];
 
@@ -330,7 +332,10 @@ export default class HttpApi implements Api {
 
       routeOptions.preHandler.push(async (request, reply) => {
         for (const policy of policies) {
-          await Policies[policy](request, reply);
+          await Policies[policy]({
+            request,
+            reply,
+            domainServices });
         }
       });
     });

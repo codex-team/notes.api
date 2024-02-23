@@ -1,14 +1,15 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
 import { isEmpty } from '@infrastructure/utils/empty.js';
+import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 
 
 /**
- * Policy to check whether user in a team of note
+ * Policy to check whether a user is a creator of the note
  *
- * @param request - Fastify request object
- * @param reply - Fastify reply object
+ * @param context - Context object, containing Fatify request, Fastify reply and domain services
  */
-export default async function userInTeam(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export default async function userIsCreator(context: PolicyContext): Promise<void> {
+  const { request, reply } = context;
+
   const { userId } = request;
 
   if (isEmpty(userId)) {
@@ -25,7 +26,7 @@ export default async function userInTeam(request: FastifyRequest, reply: Fastify
   const { creatorId } = request.note;
 
   /**
-   * Check if user can edit note
+   * Check if user is a creator of the note
    */
   if (creatorId !== userId) {
     return await reply.forbidden();

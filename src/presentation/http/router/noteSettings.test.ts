@@ -1,5 +1,4 @@
 import { describe, test, expect } from 'vitest';
-
 describe('NoteSettings API', () => {
   describe('GET /note-settings/:notePublicId ', () => {
     test('Returns note settings by public id with 200 status', async () => {
@@ -526,9 +525,9 @@ describe('NoteSettings API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
 
-      test.todo('Return 403 when user in team and have Member Role = read');
-
-      test.todo('Return 403 when user authorized, but not member of the team');
+      test.todo('Return 403 when user in team');
+      test.todo('Return 403 when user authorized, but not member of the team and not the creator');
+      test.todo('Return 200 when user is not creator of the note, but a member of the team with member role = write');
     });
   });
 
@@ -689,6 +688,11 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(404);
       expect(response?.json().message).toBe('User does not belong to Note\'s team');
     });
+
+    test.todo('Returns 200 and a new role, when patch is done by a member role = write');
+    test.todo('Returns 200 when patch is done by a creator');
+    test.todo('Returns 403 when patch is done by a member role = read');
+    test.todo('Returns 403 when test is done by a user who is not a member of the team and not a creator');
   });
 });
 

@@ -49,7 +49,7 @@ export default class TeamRepository {
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
     return await this.storage.getUserRoleByUserIdAndNoteId(userId, noteId);
   }
 
@@ -89,7 +89,7 @@ export default class TeamRepository {
    * @param role - team member new role
    * @returns returns 1 if the role has been changed and 0 otherwise
    */
-  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRole): Promise<MemberRole | null> {
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRole): Promise<MemberRole | undefined> {
     return await this.storage.patchMemberRoleById(id, noteId, role);
   }
 }

@@ -99,7 +99,7 @@ export default class TeamsSequelizeStorage {
       role: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: MemberRole.read,
+        defaultValue: MemberRole.Read,
       },
     }, {
       tableName: this.tableName,
@@ -182,7 +182,7 @@ export default class TeamsSequelizeStorage {
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
     const res = await this.model.findOne({
       where: {
         userId,
@@ -190,7 +190,7 @@ export default class TeamsSequelizeStorage {
       },
     });
 
-    return res?.role ?? null;
+    return res?.role ?? undefined;
   }
 
   /**
@@ -253,7 +253,7 @@ export default class TeamsSequelizeStorage {
    * @param role - new team member role
    * @returns returns 1 if the role has been changed and 0 otherwise
    */
-  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | null> {
+  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | undefined> {
     const affectedRows = await this.model.update({
       role: role,
     }, {
@@ -264,6 +264,6 @@ export default class TeamsSequelizeStorage {
     });
 
     // if counter of affected rows is more than 0, then we return new role
-    return affectedRows[0] ? role : null;
+    return affectedRows[0] ? role : undefined;
   }
 }
