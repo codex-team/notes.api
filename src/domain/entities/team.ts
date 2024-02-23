@@ -3,14 +3,14 @@ import type User from './user.js';
 
 export enum MemberRole {
   /**
-   * Team member can read and write notes
-   */
-  read = 'read',
-
-  /**
    * Team member can only read notes
    */
-  write = 'write',
+  Read = 0,
+
+  /**
+   * Team member can read and write notes
+   */
+  Write = 1,
 }
 
 /**
@@ -36,7 +36,7 @@ export interface TeamMember {
   /**
    * Team member role, show what user can do with note
    */
-  role:  MemberRole;
+  role: MemberRole;
 }
 
 export type Team = TeamMember[];

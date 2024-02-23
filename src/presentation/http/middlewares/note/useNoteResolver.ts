@@ -29,7 +29,10 @@ export default function useNoteResolver(noteService: NoteService): {
    *
    * @param requestData - fastify request data. Can be query, params or body
    */
-  async function resolveNoteByPublicId(requestData: FastifyRequest['query'] | FastifyRequest['params'] | FastifyRequest['body']): Promise<Note | undefined> {
+  async function resolveNoteByPublicId(requestData: FastifyRequest['query'] | FastifyRequest['body'] | FastifyRequest['params']): Promise<Note | undefined> {
+    /**
+     * Request params validation
+     */
     if (hasProperty(requestData, 'notePublicId') && notEmpty(requestData.notePublicId)) {
       const publicId = requestData.notePublicId as NotePublicId;
 
