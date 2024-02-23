@@ -85,11 +85,19 @@ export default class UserService {
   }: {
     userId: User['id'],
     toolId: EditorTool['id'],
-  }): Promise<void> {
-    return await this.repository.addUserEditorTool({
+  }): Promise<EditorTool> {
+    await this.repository.addUserEditorTool({
       userId,
       toolId,
     });
+
+    const addedTool =  await this.shared.editorTools.getToolById(toolId);
+
+    if (addedTool === null) {
+      throw new DomainError('Editor tool not found');
+    }
+
+    return addedTool;
   }
 
   /**
