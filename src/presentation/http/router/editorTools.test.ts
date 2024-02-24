@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 
 let accessToken: string;
+let userId: number;
 
 describe('Editor Tools', () => {
   beforeEach(async () => {
@@ -8,7 +9,8 @@ describe('Editor Tools', () => {
 
     const createdUser = await global.db.insertUser();
 
-    accessToken = global.auth(createdUser.id);
+    userId = createdUser.id;
+    accessToken = global.auth(userId);
   });
   describe('POST /editor-tools/add-tool', () => {
     test('Returns added tool with status code 200 if tool added to all tools', async () => {
@@ -35,7 +37,10 @@ describe('Editor Tools', () => {
 
       const body = addToolResponse?.json();
 
-      expect(body.data).toMatchObject(toolToAdd);
+      expect(body.data).toMatchObject({
+        ...toolToAdd,
+        userId,
+      });
 
       /**
        * Check if tool was added to all tools

@@ -40,9 +40,9 @@ export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, Inf
   public declare isDefault: EditorTool['isDefault'];
 
   /**
-   * Author of the tool
+   * User id that added the tool to the marketplace
    */
-  public declare author: UserModel['id'];
+  public declare userId: UserModel['id'];
 }
 
 /**
@@ -86,7 +86,7 @@ export default class UserSequelizeStorage {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      author: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
@@ -124,13 +124,13 @@ export default class UserSequelizeStorage {
     name,
     title,
     exportName,
-    author,
+    userId,
     source,
     isDefault,
   }: EditorToolCreationAttributes): Promise<EditorTool> {
     return await this.model.create({
       name,
-      author,
+      userId,
       title,
       exportName,
       source,

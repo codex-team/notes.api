@@ -3,10 +3,10 @@ DO $$
 BEGIN
   IF NOT EXISTS(SELECT *
     FROM information_schema.columns
-    WHERE table_name='editor_tools' AND column_name='author')
+    WHERE table_name='editor_tools' AND column_name='user_id')
   THEN
-    ALTER TABLE "public"."editor_tools" ADD COLUMN "author" integer;
+    ALTER TABLE "public"."editor_tools" ADD COLUMN "user_id" integer;
     ALTER TABLE "public"."editor_tools" ADD CONSTRAINT "fk_author"
-      FOREIGN KEY ("author") REFERENCES "public"."users" ("id");
+      FOREIGN KEY ("user_id") REFERENCES "public"."users" ("id");
   END IF;
 END $$;
