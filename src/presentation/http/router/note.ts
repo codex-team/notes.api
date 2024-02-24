@@ -131,7 +131,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if note does not exist
      */
-    return reply.send({ isDeleted : isDeleted });
+    return reply
+      .status(StatusCodes.OK)
+      .send({ isDeleted : isDeleted });
   });
 
   /**
@@ -165,9 +167,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     await noteSettingsService.addNoteSettings(addedNote.id);
 
-    return reply.status(StatusCodes.OK).send({
-      id: addedNote.publicId,
-    });
+    return reply
+      .status(StatusCodes.OK)
+      .send({
+        id: addedNote.publicId,
+      });
   });
 
   /**
@@ -211,9 +215,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const note = await noteService.updateNoteContentById(noteId, content);
 
-    return reply.status(StatusCodes.OK).send({
-      updatedAt: note.updatedAt,
-    });
+    return reply
+      .status(StatusCodes.OK)
+      .send({
+        updatedAt: note.updatedAt,
+      });
   });
 
 
@@ -255,10 +261,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = note.creatorId === request.userId;
 
-    return reply.status(StatusCodes.OK).send({
-      note: note,
-      accessRights: { canEdit: canEdit },
-    });
+    return reply
+      .status(StatusCodes.OK)
+      .send({
+        note: note,
+        accessRights: { canEdit: canEdit },
+      });
   });
 
   done();
