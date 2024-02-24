@@ -3,7 +3,7 @@ import { describe, test, expect, beforeEach } from 'vitest';
 let accessToken: string;
 let userId: number;
 
-describe('Editor Tools', () => {
+describe('EditorTools API', () => {
   beforeEach(async () => {
     await global.db.truncateTables();
 
