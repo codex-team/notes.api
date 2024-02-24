@@ -97,8 +97,8 @@ export default class DatabaseHelpers {
     const content = note.content ?? '{}';
 
     // eslint-disable-next-line
-    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
-    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}') 
+    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id")
+    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}')
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,
@@ -121,8 +121,8 @@ export default class DatabaseHelpers {
     const editorTools = user.editorTools ?? '[]';
 
     // eslint-disable-next-line
-    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") 
-    VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])
+    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
+    VALUES ('${user.email}', '${user.name}', CURRENT_DATE, '${editorTools}'::jsonb)
     RETURNING "id", "email", "name", "editor_tools" AS "editorTools", "created_at" AS "createdAt", "photo"`,
     {
       type: QueryTypes.INSERT,
@@ -197,12 +197,17 @@ export default class DatabaseHelpers {
    *
    * if no isDefault passed, then is_default would be false in database
    */
-  public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorToolMockCreationAttributes> {
-    const isDefault = editorTool.isDefault ?? null;
+  public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorTool['id']> {
+    const isDefault = editorTool.isDefault ?? false;
 
-    await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
+    // eslint-disable-next-line
+    const [result, _] = await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default")
+    VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${JSON.stringify(editorTool.source)}', ${isDefault})
+    RETURNING "id"`);
 
-    return editorTool;
+    const addedToolData = result[0];
+
+    return String(addedToolData.id);
   }
 
   /**
@@ -210,14 +215,14 @@ export default class DatabaseHelpers {
    */
   public async truncateTables(): Promise<unknown> {
     return await this.orm.connection.query(`DO $$
-    DECLARE 
+    DECLARE
       -- table iterator
       tbl RECORD;
       -- sequence iterator
       seq RECORD;
     BEGIN
       -- truncate all tables (except migrations) in database
-      FOR tbl IN 
+      FOR tbl IN
         SELECT * FROM information_schema.tables
         WHERE table_name!= 'migrations'
         AND table_schema= 'public'
@@ -225,10 +230,10 @@ export default class DatabaseHelpers {
       LOOP
         EXECUTE format('TRUNCATE public.%s CASCADE', tbl.table_name);
       END LOOP;
-    
-      -- restart all sequences 
+
+      -- restart all sequences
       -- (autoincrement should start with 1 when test-data is truncated)
-      FOR seq IN 
+      FOR seq IN
         SELECT * FROM information_schema.sequences
         WHERE sequence_schema= 'public'
       LOOP
