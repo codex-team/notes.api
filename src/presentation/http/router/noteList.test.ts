@@ -1,10 +1,8 @@
 import type User from '@domain/entities/user';
 import { describe, test, expect, beforeEach } from 'vitest';
 
-/**
- * Access token that will be used for Auhorization header
- */
 let accessToken = '';
+let user: User;
 
 describe('NoteList API', () => {
   beforeEach(async () => {
