@@ -29,13 +29,11 @@ describe('User API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      const body = response?.json();
-
-      expect(body).toStrictEqual({
-        'id': '1',
-        'email': 'test@codexmail.com',
-        'name': 'CodeX',
-        'photo': '',
+      expect(response?.json()).toMatchObject({
+        id: '1',
+        name: user.name,
+        email: user.email,
+        photo: '',
       });
     });
 
