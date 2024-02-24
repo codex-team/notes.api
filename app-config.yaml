@@ -32,4 +32,3 @@ database:
 
 openai:
   token: 'token'
-
