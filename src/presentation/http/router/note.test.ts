@@ -247,20 +247,39 @@ describe('Note API', () => {
   });
 
   describe('PATCH note/:notePublicId ', () => {
+    beforeEach(async () => {
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+    });
     test('Update note by public id with 200 status, user is creator of the note', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
-
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
+      const user = await global.db.insertUser({
+        email: 'test@codexmail.com',
+        name: 'CodeX',
       });
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'ishvm5qH84',
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${userNote!.public_id}`,
+        url: `/note/${note.publicId}`,
         body: {
           'content': { new: 'content added' },
         },
@@ -270,12 +289,27 @@ describe('Note API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      const correctID = 'Pq1T9vc23Q';
+      const user = await global.db.insertUser({
+        email: 'test@codexmail.com',
+        name: 'CodeX',
+      });
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'Pq1T9vc23Q',
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
-        url: `/note/${correctID}`,
-        body: {},
+        url: `/note/${note.publicId}`,
+        body: {
+          'content': { new: 'content added' },
+        },
       });
 
       expect(response?.statusCode).toBe(401);
@@ -324,8 +358,27 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
+    beforeEach(async () => {
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+    });
     test('Should correctly save relation to parent note if parentId passed', async () => {
-      const accessToken = global.auth(2);
+      const user = await global.db.insertUser({
+        email: 'test@codexmail.com',
+        name: 'CodeX',
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'ishvm5qH84',
+      });
+
+      const accessToken = global.auth(user.id);
 
       let response = await global.api?.fakeRequest({
         method: 'POST',
@@ -334,7 +387,7 @@ describe('Note API', () => {
         },
         url: `/note`,
         body: {
-          parentId: 'Hu8Gsm0sA1',
+          parentId: 'ishvm5qH84',
         },
       });
 
@@ -353,8 +406,9 @@ describe('Note API', () => {
       body = await response?.json();
 
       expect(body.parentNote).toMatchObject({
-        id: 'Hu8Gsm0sA1',
-        content: {},
+        creatorId: parentNote.creatorId,
+        id: parentNote.id,
+        publicId: parentNote.publicId,
       });
     });
 
