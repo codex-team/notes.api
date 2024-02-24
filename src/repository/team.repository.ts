@@ -1,5 +1,5 @@
 import type TeamStorage from '@repository/storage/team.storage.js';
-import type { MemberRole, Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
+import type { Team, TeamMember, TeamMemberCreationAttributes, MemberRole } from '@domain/entities/team.js';
 import type { NoteInternalId } from '@domain/entities/note';
 import type User from '@domain/entities/user';
 
@@ -22,13 +22,24 @@ export default class TeamRepository {
   }
 
   /**
-   * Creates team member
+   * Creates team member membership
    *
-   * @param team - data for team creation
-   * @returns created team
+   * @param teamMembershipData - data for team membership creation
+   * @returns created team membership
    */
-  public async create(team: TeamMemberCreationAttributes): Promise<TeamMember> {
-    return await this.storage.insert(team);
+  public async createTeamMembership(teamMembershipData: TeamMemberCreationAttributes): Promise<TeamMember> {
+    return await this.storage.createTeamMembership(teamMembershipData);
+  }
+
+  /**
+   * Check if user is note team member
+   *
+   * @param userId - user id to check
+   * @param noteId - note id to identify team
+   * @returns { Promise<boolean> } returns true if user is team member
+   */
+  public async isUserInTeam(userId: User['id'], noteId: NoteInternalId): Promise<boolean> {
+    return await this.storage.isUserInTeam(userId, noteId);
   }
 
   /**
@@ -38,7 +49,7 @@ export default class TeamRepository {
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
     return await this.storage.getUserRoleByUserIdAndNoteId(userId, noteId);
   }
 
@@ -53,11 +64,32 @@ export default class TeamRepository {
   }
 
   /**
+   * Get all team members by note id with info about users
+   *
+   * @param noteId - note id to get all team members
+   * @returns team with additional info
+   */
+  public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
+    return  await this.storage.getTeamMembersByNoteId(noteId);
+  };
+
+  /**
    * Remove team member by id
    *
    * @param id - team member id
    */
   public async removeMemberById(id: TeamMember['id']): Promise<boolean> {
     return await this.storage.removeTeamMemberById(id);
+  }
+  /**
+   * Patch team member role by user and note id
+   *
+   * @param id - id of team member
+   * @param noteId - note internal id
+   * @param role - team member new role
+   * @returns returns 1 if the role has been changed and 0 otherwise
+   */
+  public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role : MemberRole): Promise<MemberRole | undefined> {
+    return await this.storage.patchMemberRoleById(id, noteId, role);
   }
 }

@@ -4,7 +4,7 @@ import { notEmpty } from '@infrastructure/utils/empty.js';
 import { StatusCodes } from 'http-status-codes';
 import hasProperty from '@infrastructure/utils/hasProperty.js';
 import { getLogger } from '@infrastructure/logging/index.js';
-import type { Note, NotePublicId } from '@domain/entities/note';
+import type { Note, NotePublicId } from '@domain/entities/note.js';
 
 /**
  * Add middleware for resolve Note by public id and add it to request
@@ -29,7 +29,10 @@ export default function useNoteResolver(noteService: NoteService): {
    *
    * @param requestData - fastify request data. Can be query, params or body
    */
-  async function resolveNoteByPublicId(requestData: FastifyRequest['query'] | FastifyRequest['params'] | FastifyRequest['body']): Promise<Note | undefined> {
+  async function resolveNoteByPublicId(requestData: FastifyRequest['query'] | FastifyRequest['body'] | FastifyRequest['params']): Promise<Note | undefined> {
+    /**
+     * Request params validation
+     */
     if (hasProperty(requestData, 'notePublicId') && notEmpty(requestData.notePublicId)) {
       const publicId = requestData.notePublicId as NotePublicId;
 

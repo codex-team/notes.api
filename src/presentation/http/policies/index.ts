@@ -1,9 +1,11 @@
 import authRequired from './authRequired.js';
 import notePublicOrUserInTeam from './notePublicOrUserInTeam.js';
-import userInTeam from './userInTeam.js';
+import userIsCreator from './userIsCreator.js';
+import userCanEdit from './userCanEdit.js';
 
 export default {
   authRequired,
   notePublicOrUserInTeam,
-  userInTeam,
+  userIsCreator,
+  userCanEdit,
 };

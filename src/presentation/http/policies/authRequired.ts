@@ -1,12 +1,13 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 
 /**
  * Policy to enforce user to be logged in
  *
- * @param request - Fastify request object
- * @param reply - Fastify reply object
+ * @param context - Context object, containing Fatify request, Fastify reply and domain services
  */
-export default async function authRequired(request: FastifyRequest, reply: FastifyReply): Promise<void> {
+export default async function authRequired(context: PolicyContext): Promise<void> {
+  const { request, reply } = context;
+
   const { userId } = request;
 
   if (userId === null) {

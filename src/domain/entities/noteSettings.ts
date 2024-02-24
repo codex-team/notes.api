@@ -1,3 +1,6 @@
+import type { Team } from './team.js';
+
+
 /**
  * Invitation hash. It's used to invite users to team
  */
@@ -31,6 +34,32 @@ export default interface NoteSettings {
    * Invitation hash
    */
   invitationHash: InvitationHash;
+
+  /**
+   * Team members. Team is empty by default because note creator is not stored in team
+   */
+  team?: Team;
+}
+
+/**
+ * Attributes of public note settings
+ */
+type NoteSettingsPublicProperties = 'customHostname' | 'isPublic' | 'invitationHash' | 'team' ;
+
+export interface NoteSettingsPublic extends Pick<NoteSettings, NoteSettingsPublicProperties> {}
+
+/**
+ * Define note settings for public usage
+ *
+ * @param noteSettings - note settings data
+ */
+export function definePublicNoteSettings(noteSettings: NoteSettings): NoteSettingsPublic {
+  return {
+    customHostname: noteSettings.customHostname,
+    isPublic: noteSettings.isPublic,
+    invitationHash: noteSettings.invitationHash,
+    team: noteSettings.team,
+  };
 }
 
 /**

@@ -3,6 +3,7 @@ import { Provider } from '@repository/user.repository.js';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools';
 import type { SharedDomainMethods } from './shared/index.js';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 export {
   Provider
@@ -57,7 +58,7 @@ export default class UserService {
     const user = await this.getUserById(userId);
 
     if (user === null) {
-      throw new Error('User not found');
+      throw new DomainError('User not found');
     }
 
     const userToolsIds = user.editorTools ?? [];
@@ -84,8 +85,34 @@ export default class UserService {
   }: {
     userId: User['id'],
     toolId: EditorTool['id'],
+  }): Promise<EditorTool> {
+    const toolToAdd =  await this.shared.editorTools.getToolById(toolId);
+
+    if (toolToAdd === null) {
+      throw new DomainError('Editor tool not found');
+    }
+
+    await this.repository.addUserEditorTool({
+      userId,
+      toolId,
+    });
+
+    return toolToAdd;
+  }
+
+  /**
+   * Removes editor tool from user settings by its id
+   *
+   * @param options - user id & editor tool
+   */
+  public async removeUserEditorTool({
+    userId,
+    toolId,
+  }: {
+    userId: User['id'],
+    toolId: EditorTool['id'],
   }): Promise<void> {
-    return await this.repository.addUserEditorTool({
+    return await this.repository.removeUserEditorTool({
       userId,
       toolId,
     });
