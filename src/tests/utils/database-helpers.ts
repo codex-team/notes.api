@@ -102,8 +102,8 @@ export default class DatabaseHelpers {
     const publicId = note.publicId ?? createPublicId();
 
     // eslint-disable-next-line
-    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
-    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}') 
+    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id")
+    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}')
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,
