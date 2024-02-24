@@ -164,24 +164,6 @@ export default class NoteRelationsSequelizeStorage {
   }
 
   /**
-   * Delete only parent note relation
-   *
-   * @param noteId - id of the current note
-   */
-  public async deleteParentRelationByNoteId(noteId: NoteInternalId): Promise<boolean> {
-    const affectedRows = await this.model.destroy({
-      where: {
-        noteId: noteId,
-      },
-    });
-
-    /**
-     * If parent relation was not found return false
-     */
-    return affectedRows == 1;
-  }
-
-  /**
    * Creates association with note model to make joins
    *
    * @param model - initialized note model
