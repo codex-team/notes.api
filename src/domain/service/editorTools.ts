@@ -38,6 +38,15 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
   }
 
   /**
+   * Get tool by it's identifier
+   *
+   * @param editorToolId - unique tool identifier
+   */
+  public async getToolById(editorToolId: EditorTool['id']): Promise<EditorTool | null> {
+    return await this.repository.getToolById(editorToolId);
+  }
+
+  /**
    * Return tools that are available at Editor by default
    */
   public async getDefaultTools(): Promise<EditorTool[]> {
