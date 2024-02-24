@@ -616,7 +616,7 @@ describe('Note API', () => {
   });
 
   describe('PATCH /note/:notePublicId/parent', () => {
-    test('Returns 200 when parent was successfully updated', async () => {
+    test('Returns isUpdated=true when parent was successfully updated', async () => {
       const childNotePublicId = '9OYDD9d4_Y';
 
       const parentNotePublicId = 'Tocn1f7rQS';
@@ -625,10 +625,7 @@ describe('Note API', () => {
 
       await global.db.truncateTables();
 
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'test user',
-      });
+      const creator = await global.db.insertUser();
 
       const childNote = await global.db.insertNote({
         creatorId: creator.id,
@@ -675,10 +672,7 @@ describe('Note API', () => {
 
       await global.db.truncateTables();
 
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'test user',
-      });
+      const creator = await global.db.insertUser();
 
       const childNote = await global.db.insertNote({
         creatorId: creator.id,
@@ -720,10 +714,7 @@ describe('Note API', () => {
 
       await global.db.truncateTables();
 
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'test user',
-      });
+      const creator = await global.db.insertUser();
 
       await global.db.insertNote({
         creatorId: creator.id,
