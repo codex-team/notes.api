@@ -65,7 +65,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Reply: {
       note: NotePublic,
-      parentNote?: Note | undefined,
+      parentNote?: NotePublic | undefined,
       accessRights: {
         canEdit: boolean,
       },
@@ -121,7 +121,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     }
     const parentId = await noteService.getParentNoteIdByNoteId(note.id);
 
-    const parentNote = parentId !== null ? await noteService.getNoteById(parentId) : undefined;
+    const parentNote = parentId !== null ? definePublicNote(await noteService.getNoteById(parentId)) : undefined;
     /**
      * Wrap note for public use
      */
