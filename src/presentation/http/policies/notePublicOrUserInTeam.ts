@@ -28,7 +28,7 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
    * If note is public, we don't need to check for the role
    */
   if (notEmpty(userId) && isPublic === false) {
-    memberRole = domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, request.note.id);
+    memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, request.note.id);
   }
 
   /**
