@@ -444,7 +444,7 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${note.publicId}/invitation-hash`,
       });
 
-      // expect(response?.statusCode).toBe(401);
+      expect(response?.statusCode).toBe(401);
 
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
