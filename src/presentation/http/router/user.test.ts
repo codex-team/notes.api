@@ -63,7 +63,7 @@ describe('User API', () => {
     test('Returns response with status 401 when user is not authorized', async () => {
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: '/user/editor-tools',
+        url: '/user/editor-tools', 
       });
 
       expect(response?.statusCode).toBe(401);
