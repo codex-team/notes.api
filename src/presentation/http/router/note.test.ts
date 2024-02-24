@@ -367,6 +367,15 @@ describe('Note API', () => {
        */
       await global.db.truncateTables();
     });
+    beforeEach(async () => {
+      /**
+       * truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+    });
     test('Should correctly save relation to parent note if parentId passed', async () => {
       const user = await global.db.insertUser({
         email: 'test@codexmail.com',
