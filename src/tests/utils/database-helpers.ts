@@ -200,11 +200,14 @@ export default class DatabaseHelpers {
   public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorTool['id']> {
     const isDefault = editorTool.isDefault ?? false;
 
-    const res = await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default")
+    // eslint-disable-next-line
+    const [result, _] = await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default")
     VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${JSON.stringify(editorTool.source)}', ${isDefault})
     RETURNING "id"`);
 
-    return String(res[0][0].id);
+    const addedToolData = result[0];
+
+    return String(addedToolData.id);
   }
 
   /**
