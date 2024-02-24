@@ -36,11 +36,6 @@ describe('NoteSettings API', () => {
         name: 'Test user 1',
       });
 
-      const randomTeamMember = await global.db.insertUser({
-        email: 'b@b.com',
-        name: 'random guy',
-      });
-
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
@@ -50,13 +45,6 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
-      });
-
-      /** create test team member for created note */
-      await global.db.insertNoteTeam({
-        userId: randomTeamMember.id,
-        noteId: note.id,
-        role: 0,
       });
 
       const response = await global.api?.fakeRequest({
@@ -69,11 +57,11 @@ describe('NoteSettings API', () => {
       expect(response?.json().team).toStrictEqual([
         {
           'id': 1,
-          'role': 0,
+          'role': 1,
           'user': {
-            'email': randomTeamMember.email,
-            'id': randomTeamMember.id,
-            'name': randomTeamMember.name,
+            'email': creator.email,
+            'id': creator.id,
+            'name': creator.name,
             'photo': '',
           },
         },
@@ -228,13 +216,6 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: false,
-      });
-
-      /** create test team member for created note */
-      await global.db.insertNoteTeam({
-        userId: creator.id,
-        noteId: note.id,
-        role: 1,
       });
 
       const accessToken = global.auth(creator.id);
@@ -562,12 +543,6 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-      });
-
-      await global.db.insertNoteTeam({
-        userId: creator.id,
-        noteId: note.id,
-        role: 1,
       });
 
       await global.db.insertNoteTeam({
