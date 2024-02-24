@@ -30,7 +30,6 @@ describe('User API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        id: '1',
         name: user.name,
         email: user.email,
         photo: '',

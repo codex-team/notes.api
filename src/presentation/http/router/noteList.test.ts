@@ -28,7 +28,7 @@ describe('NoteList API', () => {
       const pageNumber = 1;
 
       /** create test notes for created user */
-      for (let i = 0; i < portionSize; i++) {
+      for (let i = 0; i < portionSize + 19; i++) {
         await global.db.insertNote({
           creatorId: user.id,
           publicId: 'TJmEb89e0l',
@@ -51,14 +51,6 @@ describe('NoteList API', () => {
     test('Returns noteList with specified length (for last page)', async () => {
       const portionSize = 19;
       const pageNumber = 2;
-
-      /** create test notes for created user */
-      for (let i = 0; i < portionSize; i++) {
-        await global.db.insertNote({
-          creatorId: user.id,
-          publicId: 'TJmEb89e0l',
-        });
-      }
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
