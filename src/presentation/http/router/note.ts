@@ -97,6 +97,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
                 },
               },
             },
+            parentNote: {
+              $ref: 'NoteSchema',
+            },
           },
         },
       },
@@ -116,7 +119,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     if (note === null) {
       return reply.notFound('Note not found');
     }
-
     const parentId = await noteService.getParentNoteIdByNoteId(note.id);
 
     const parentNote = parentId !== null ? await noteService.getNoteById(parentId) : undefined;
@@ -197,11 +199,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * @todo Validate request query
      */
-    const content = request.body.content as JSON;
+    const content = request.body.content !== undefined ? request.body.content : {};
     const { userId } = request;
     const parentId = request.body.parentId;
 
-    const addedNote = await noteService.addNote(content, userId as number, parentId); // "authRequired" policy ensures that userId is not null
+    const addedNote = await noteService.addNote(content as JSON, userId as number, parentId); // "authRequired" policy ensures that userId is not null
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'

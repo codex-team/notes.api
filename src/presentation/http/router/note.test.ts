@@ -384,16 +384,10 @@ describe('Note API', () => {
 
       body = await response?.json();
 
-      const expectedParentNote = {
-        'id': 55,
-        'publicId': 'Hu8Gsm0sA1',
-        'creatorId': 2,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
-      };
-
-      expect(body.parentNote).toStrictEqual(expectedParentNote);
+      expect(body.parentNote).toMatchObject({
+        id: '55',
+        content: {},
+      });
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
