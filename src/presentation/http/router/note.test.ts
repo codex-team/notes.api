@@ -403,9 +403,8 @@ describe('Note API', () => {
       body = await response?.json();
 
       expect(body.parentNote).toMatchObject({
-        creatorId: parentNote.creatorId,
-        id: parentNote.id,
-        publicId: parentNote.publicId,
+        id: parentNote.publicId,
+        content: parentNote.content,
       });
     });
 
