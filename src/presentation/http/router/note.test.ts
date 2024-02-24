@@ -1,5 +1,5 @@
 
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
 
 import notes from '@tests/test-data/notes.json';
 import noteSettings from '@tests/test-data/notes-settings.json';
@@ -400,16 +400,36 @@ describe('Note API', () => {
   });
 
   describe('DELETE /note/:notePublicId', () => {
+    beforeEach(async () => {
+      /**
+       * Truncate all tables, which are needed
+       * Restart autoincrement sequences for data to start with id 1
+       *
+       * TODO get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+    });
     test('Returns 200 status and "true" if note was removed successfully', async () => {
-      const accessToken = global.auth(1);
-      const correctID = 'Pq1T9vc23Q';
+      /** Create test user */
+      const user = await global.db.insertUser({
+        email: 'test@codexmail.com',
+        name: 'CodeX',
+      });
+
+      /** Create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'TJmEb89e0l',
+      });
+
+      const accessToken = global.auth(user.id);
 
       let response = await global.api?.fakeRequest({
         method: 'DELETE',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${correctID}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -421,7 +441,7 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${correctID}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(404);
@@ -430,15 +450,32 @@ describe('Note API', () => {
     });
 
     test('Returns 403 when user is not creator of the note', async () => {
-      const accessToken = global.auth(2);
-      const correctID = 'TJmEb89e0l';
+      /** Create test user */
+      const creator = await global.db.insertUser({
+        email: 'test1@codexmail.com',
+        name: 'CodeX1',
+      });
+
+      /** Create test user */
+      const nonCreator = await global.db.insertUser({
+        email: 'test2@codexmail.com',
+        name: 'CodeX2',
+      });
+
+      /** Create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: 'TJmEb89e0l',
+      });
+
+      const accessToken = global.auth(nonCreator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${correctID}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -447,11 +484,21 @@ describe('Note API', () => {
     });
 
     test('Returns 401 when the user is not authorized', async () => {
-      const correctID = '73NdxFZ4k7';
+      /** Create test user */
+      const user = await global.db.insertUser({
+        email: 'test1@codexmail.com',
+        name: 'CodeX1',
+      });
+
+      /** Create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'TJmEb89e0l',
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
-        url: `/note/${correctID}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(401);
@@ -460,8 +507,14 @@ describe('Note API', () => {
     });
 
     test('Returns 406 when the id does not exist', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser({
+        email: 'test1@codexmail.com',
+        name: 'CodeX1',
+      });
+
       const nonexistentId = 'ishvm5qH84';
-      const accessToken = global.auth(2);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
@@ -498,30 +551,48 @@ describe('Note API', () => {
     });
 
     test('Should remove all note relations containing note id', async () => {
-      const accessToken = global.auth(2);
-      const currentNoteId = 'f43NU75weU';
+      /** Create test user */
+      const user = await global.db.insertUser({
+        email: 'test1@codexmail.com',
+        name: 'CodeX1',
+      });
+
+      /** Create test note for created user */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'TJmEb89e0l',
+      });
+
+      /** Create test note for created user */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+        publicId: 'TJmEb89e0lfd',
+      });
+
+      /** Create notes relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const accessToken = global.auth(user.id);
 
       let response = await global.api?.fakeRequest({
         method: 'DELETE',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${currentNoteId}`,
+        url: `/note/${parentNote.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
-
-      /**
-       * Id of the note that is a child of the current note that has been deleted
-       */
-      const childNote = 'Uyd8TgkdA0';
 
       response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${childNote}`,
+        url: `/note/${childNote.publicId}`,
       });
 
       expect(response).not.toHaveProperty('parentNote');
