@@ -8,20 +8,6 @@ import noteTeams from '@tests/test-data/note-teams.json';
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
     test('Returns note with specified hostname', async () => {
-      const expectedResponse = {
-        'note': {
-          'id': 2,
-          'publicId': 'TJmEb89e0l',
-          'creatorId': 1,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
-        'accessRights': {
-          'canEdit': false,
-        },
-      };
-
       const response = await global.api?.fakeRequest({
         method: 'GET',
         url: '/note/resolve-hostname/codex.so',
@@ -29,7 +15,15 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual(expectedResponse);
+      expect(response?.json()).toMatchObject({
+        note: {
+          id: 'TJmEb89e0l',
+          content: {},
+        },
+        accessRights: {
+          canEdit: false,
+        },
+      });
     });
 
     test('Returns 404 when note not found', async () => {
@@ -47,19 +41,6 @@ describe('Note API', () => {
   describe('GET note/:notePublicId ', () => {
     test('Returns note by public id with 200 status when note is publicly available', async () => {
       const correctID = 'Pq1T9vc23Q';
-      const expectedResponse = {
-        'note': {
-          'id': 3,
-          'publicId': 'Pq1T9vc23Q',
-          'creatorId': 1,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
-        'accessRights': {
-          'canEdit': false,
-        },
-      };
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -68,23 +49,18 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual(expectedResponse);
+      expect(response?.json()).toStrictEqual({
+        note: {
+          id: 'Pq1T9vc23Q',
+          content: {},
+        },
+        accessRights: {
+          canEdit: false,
+        },
+      });
     });
 
     test('Returns note by public id with 200 status when access is disabled, but user is creator', async () => {
-      const expectedResponse = {
-        'note': {
-          'id': 4,
-          'publicId': '73NdxFZ4k7',
-          'creatorId': 1,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
-        'accessRights': {
-          'canEdit': true,
-        },
-      };
       const userId = 1;
       const accessToken = global.auth(userId);
 
@@ -104,32 +80,19 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual(expectedResponse);
+      expect(response?.json()).toStrictEqual({
+        note: {
+          id: '73NdxFZ4k7',
+          content: {},
+        },
+        accessRights: {
+          canEdit: true,
+        },
+      });
     });
 
     test('Returns note and parent note by note public id with 200 status', async () => {
       const correctID = 'f43NU75weU';
-      const expectedResponse = {
-        'note': {
-          'id': 54,
-          'publicId': 'f43NU75weU',
-          'creatorId': 2,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
-        'parentNote': {
-          'id': 55,
-          'publicId': 'Hu8Gsm0sA1',
-          'creatorId': 2,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-        },
-        'accessRights': {
-          'canEdit': false,
-        },
-      };
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -138,7 +101,19 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual(expectedResponse);
+      expect(response?.json()).toStrictEqual({
+        note: {
+          id: 'f43NU75weU',
+          content: {},
+        },
+        parentNote: {
+          id: 'Hu8Gsm0sA1',
+          content: {},
+        },
+        accessRights: {
+          canEdit: false,
+        },
+      });
     });
 
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
@@ -272,20 +247,35 @@ describe('Note API', () => {
   });
 
   describe('PATCH note/:notePublicId ', () => {
+    beforeEach(async () => {
+      /**
+       * Truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * @todo get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+    });
     test('Update note by public id with 200 status, user is creator of the note', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
+      const user = await global.db.insertUser();
 
-      const userNote = notes.find(newNote => {
-        return newNote.creator_id === userId;
+      const note = await global.db.insertNote({
+        creatorId: user.id,
       });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${userNote!.public_id}`,
+        url: `/note/${note.publicId}`,
         body: {
           'content': { new: 'content added' },
         },
@@ -295,12 +285,23 @@ describe('Note API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      const correctID = 'Pq1T9vc23Q';
+      const user = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
-        url: `/note/${correctID}`,
-        body: {},
+        url: `/note/${note.publicId}`,
+        body: {
+          'content': { new: 'content added' },
+        },
       });
 
       expect(response?.statusCode).toBe(401);
@@ -349,8 +350,32 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
+    beforeEach(async () => {
+      /**
+       * Truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * @todo get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+    });
+    beforeEach(async () => {
+      /**
+       * Truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * @todo get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+    });
     test('Should correctly save relation to parent note if parentId passed', async () => {
-      const accessToken = global.auth(2);
+      const user = await global.db.insertUser();
+
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const accessToken = global.auth(user.id);
 
       let response = await global.api?.fakeRequest({
         method: 'POST',
@@ -359,7 +384,7 @@ describe('Note API', () => {
         },
         url: `/note`,
         body: {
-          parentId: 'Hu8Gsm0sA1',
+          parentId: parentNote.publicId,
         },
       });
 
@@ -377,16 +402,10 @@ describe('Note API', () => {
 
       body = await response?.json();
 
-      const expectedParentNote = {
-        'id': 55,
-        'publicId': 'Hu8Gsm0sA1',
-        'creatorId': 2,
-        'content': null,
-        'createdAt': '2023-10-16T13:49:19.000Z',
-        'updatedAt': '2023-10-16T13:49:19.000Z',
-      };
-
-      expect(body.parentNote).toStrictEqual(expectedParentNote);
+      expect(body.parentNote).toMatchObject({
+        id: parentNote.publicId,
+        content: parentNote.content,
+      });
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
@@ -398,21 +417,17 @@ describe('Note API', () => {
        * Truncate all tables, which are needed
        * Restart autoincrement sequences for data to start with id 1
        *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
+       * @todo get rid of restarting database data in tests (move to beforeEach)
        */
       await global.db.truncateTables();
     });
     test('Returns 200 status and "true" if note was removed successfully', async () => {
       /** Create test user */
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0l',
       });
 
       const accessToken = global.auth(user.id);
@@ -458,7 +473,6 @@ describe('Note API', () => {
       /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        publicId: 'TJmEb89e0l',
       });
 
       const accessToken = global.auth(nonCreator.id);
@@ -478,15 +492,11 @@ describe('Note API', () => {
 
     test('Returns 401 when the user is not authorized', async () => {
       /** Create test user */
-      const user = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'CodeX1',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0l',
       });
 
       const response = await global.api?.fakeRequest({
@@ -501,10 +511,7 @@ describe('Note API', () => {
 
     test('Returns 406 when the id does not exist', async () => {
       /** Create test user */
-      const user = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'CodeX1',
-      });
+      const user = await global.db.insertUser();
 
       const nonexistentId = 'ishvm5qH84';
       const accessToken = global.auth(user.id);
@@ -545,21 +552,16 @@ describe('Note API', () => {
 
     test('Should remove all note relations containing note id', async () => {
       /** Create test user */
-      const user = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'CodeX1',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note for created user */
       const parentNote = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0l',
       });
 
       /** Create test note for created user */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0lfd',
       });
 
       /** Create notes relation */

@@ -1,6 +1,12 @@
 export const EditorToolSchema = {
   $id: 'EditorToolSchema',
   type: 'object',
+  required: [
+    'name',
+    'title',
+    'exportName',
+    'source',
+  ],
   properties: {
     id: {
       type: 'string',
@@ -23,6 +29,10 @@ export const EditorToolSchema = {
       type: 'boolean',
       description: 'Is plugin included by default in the editor',
       default: false,
+    },
+    userId: {
+      type: ['number', 'null'],
+      description: 'User id that added the tool to the marketplace',
     },
     source: {
       type: 'object',

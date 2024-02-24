@@ -4,8 +4,17 @@ import { describe, test, expect } from 'vitest';
 describe('User API', () => {
   describe('GET /user/myself', () => {
     test('Returns user with status code 200 if user exists', async () => {
-      const userId = 1;
-      const accessToken = global.auth(userId);
+      /**
+       * Truncate all tables, which are needed
+       * Restart autoincrement sequences for data to start with id 1
+       *
+       * @todo get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+
+      const user = await global.db.insertUser();
+
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -17,13 +26,9 @@ describe('User API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      const body = response?.json();
-
-      expect(body).toStrictEqual({
-        'id': '1',
-        'email': 'a@a.com',
-        'name': 'Test user 1',
-        'photo': '',
+      expect(response?.json()).toMatchObject({
+        name: user.name,
+        email: user.email,
       });
     });
 
@@ -47,16 +52,14 @@ describe('User API', () => {
       /**
        * Create user and get accessToken
        */
-      const createdUser = await global.db.insertUser({
-        email: 'test@gmail.com',
-        name: 'Test',
-      });
+      const createdUser = await global.db.insertUser();
       const accessToken = global.auth(createdUser.id);
 
       const addedToolId = await global.db.insertEditorTool({
         name: 'code',
         title: 'Code Tool',
         exportName: 'Code',
+        userId: null,
         isDefault: false,
         source: {
           cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
@@ -84,6 +87,7 @@ describe('User API', () => {
           name: 'code',
           title: 'Code Tool',
           exportName: 'Code',
+          userId: null,
           isDefault: false,
           source: {
             cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
