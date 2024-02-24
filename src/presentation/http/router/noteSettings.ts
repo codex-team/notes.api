@@ -89,7 +89,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettingsPublic = definePublicNoteSettings(noteSettings);
 
-    return reply.send(noteSettingsPublic);
+    return reply.status(StatusCodes.OK).send(noteSettingsPublic);
   });
 
   /**
@@ -129,7 +129,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('User does not belong to Note\'s team');
     }
 
-    return reply.send(newRole);
+    return reply.status(StatusCodes.OK).send(newRole);
   });
 
   /**
