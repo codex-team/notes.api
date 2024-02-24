@@ -1,11 +1,11 @@
 import type User from '@domain/entities/user';
-import { describe, test, expect, beforeAll } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
 
 let accessToken = '';
 let user: User;
 
 describe('NoteList API', () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     /**
      * Truncate all tables, which are needed
      * Restart autoincrement sequences for data to start with id 1
