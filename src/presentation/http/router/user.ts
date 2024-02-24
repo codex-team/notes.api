@@ -98,7 +98,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     return reply
       .status(StatusCodes.OK).send({
         data: tools,
-    });
+      });
   });
 
   /**
@@ -134,7 +134,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
             },
           },
         },
-      }
+      },
     },
   }, async (request, reply) => {
     const toolId = request.body.toolId;

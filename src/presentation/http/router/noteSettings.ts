@@ -53,7 +53,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
 
   /**
-   * Returns Note settings by note id. Note public id is passed in route params, 
+   * Returns Note settings by note id. Note public id is passed in route params,
    * and it converted to internal id via middleware
    */
   fastify.get<{

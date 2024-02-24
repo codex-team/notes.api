@@ -1,5 +1,5 @@
 
-import { describe, test, expect, beforeEach } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import notes from '@tests/test-data/notes.json';
 import noteSettings from '@tests/test-data/notes-settings.json';
 import noteTeams from '@tests/test-data/note-teams.json';
@@ -240,7 +240,5 @@ describe('Note API', () => {
         expect(response?.json().accessRights).toStrictEqual({ canEdit: true });
       });
     });
-
-    test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
   });
 });

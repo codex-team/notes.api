@@ -1,4 +1,3 @@
-import { StatusCodes } from 'http-status-codes';
 import type AIService from '@domain/service/ai';
 import type { FastifyPluginCallback } from 'fastify';
 
@@ -29,20 +28,20 @@ interface GetCompletionOptions {
 const AIRouter: FastifyPluginCallback<AIRouterOptions> = (fastify, opts, done) => {
   fastify.post<{
     Body: {
-      content: string; 
-    }, 
+      content: string;
+    },
     Reply: {
       result: string;
-    }, 
+    },
   }>('/complete', {
 
   }, async (request, reply) => {
-    const { content } = request.body as GetCompletionOptions; 
+    const { content } = request.body as GetCompletionOptions;
 
     const result = await opts.aiService.getCompletion(content);
 
-    return reply.status(StatusCodes.OK).send({ 
-      result 
+    return reply.send({
+      result,
     });
   });
 
