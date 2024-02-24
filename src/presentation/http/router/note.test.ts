@@ -257,14 +257,10 @@ describe('Note API', () => {
       await global.db.truncateTables();
     });
     test('Update note by public id with 200 status, user is creator of the note', async () => {
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'ishvm5qH84',
       });
 
       await global.db.insertNoteSetting({
@@ -289,14 +285,10 @@ describe('Note API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'Pq1T9vc23Q',
       });
 
       await global.db.insertNoteSetting({
@@ -377,14 +369,10 @@ describe('Note API', () => {
       await global.db.truncateTables();
     });
     test('Should correctly save relation to parent note if parentId passed', async () => {
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser();
 
       const parentNote = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'ishvm5qH84',
       });
 
       const accessToken = global.auth(user.id);
@@ -436,15 +424,11 @@ describe('Note API', () => {
     });
     test('Returns 200 status and "true" if note was removed successfully', async () => {
       /** Create test user */
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0l',
       });
 
       const accessToken = global.auth(user.id);
@@ -490,7 +474,6 @@ describe('Note API', () => {
       /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        publicId: 'TJmEb89e0l',
       });
 
       const accessToken = global.auth(nonCreator.id);
@@ -510,15 +493,11 @@ describe('Note API', () => {
 
     test('Returns 401 when the user is not authorized', async () => {
       /** Create test user */
-      const user = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'CodeX1',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0l',
       });
 
       const response = await global.api?.fakeRequest({
@@ -533,10 +512,7 @@ describe('Note API', () => {
 
     test('Returns 406 when the id does not exist', async () => {
       /** Create test user */
-      const user = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'CodeX1',
-      });
+      const user = await global.db.insertUser();
 
       const nonexistentId = 'ishvm5qH84';
       const accessToken = global.auth(user.id);
@@ -577,21 +553,16 @@ describe('Note API', () => {
 
     test('Should remove all note relations containing note id', async () => {
       /** Create test user */
-      const user = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'CodeX1',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note for created user */
       const parentNote = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0l',
       });
 
       /** Create test note for created user */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0lfd',
       });
 
       /** Create notes relation */
