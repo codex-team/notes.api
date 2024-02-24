@@ -39,23 +39,30 @@ describe('Note API', () => {
   });
 
   describe('GET note/:notePublicId ', () => {
-    test('Returns note by public id with 200 status when note is publicly available', async () => {
-      const correctID = 'Pq1T9vc23Q';
+    test('Returns note with access rights by public id with 200 status when note is publicly available', async () => {
+      await global.db.truncateTables();
+
+      const user = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note/${correctID}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual({
-        note: {
-          id: 'Pq1T9vc23Q',
-          content: {},
+      expect(response?.json()).toMatchObject({
+        'note': {
+          'id': note.id,
+          'publicId': note.publicId,
+          'creatorId': note.creatorId,
         },
-        accessRights: {
-          canEdit: false,
+        'accessRights': {
+          'canEdit': false,
         },
       });
     });
@@ -299,6 +306,8 @@ describe('Note API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
+      await global.db.truncateTables();
+
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -307,15 +316,13 @@ describe('Note API', () => {
 
       await global.db.insertNoteSetting({
         noteId: note.id,
-        isPublic: false,
+        isPublic: true,
       });
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         url: `/note/${note.publicId}`,
-        body: {
-          'content': { new: 'content added' },
-        },
+        body: {},
       });
 
       expect(response?.statusCode).toBe(401);
@@ -383,10 +390,17 @@ describe('Note API', () => {
       await global.db.truncateTables();
     });
     test('Should correctly save relation to parent note if parentId passed', async () => {
+      await global.db.truncateTables();
+
       const user = await global.db.insertUser();
 
       const parentNote = await global.db.insertNote({
         creatorId: user.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: parentNote.id,
+        isPublic: true,
       });
 
       const accessToken = global.auth(user.id);
@@ -404,21 +418,18 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      let body = await response?.json();
-
       response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${body.id}`,
+        url: `/note/${response?.json().id}`,
       });
 
-      body = await response?.json();
-
-      expect(body.parentNote).toMatchObject({
-        id: parentNote.publicId,
+      expect(response?.json().parentNote).toMatchObject({
         content: parentNote.content,
+        creatorId: parentNote.creatorId,
+        publicId: parentNote.publicId,
       });
     });
 
