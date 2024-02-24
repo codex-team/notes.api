@@ -22,8 +22,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns "team" along with the note settings if the note contains a team', async () => {
-      const existingNotePublicId = 'Pq1T9vc23Q';
-
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -46,7 +44,6 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        publicId: existingNotePublicId,
       });
 
       /** create test note settings for created note */
@@ -64,7 +61,7 @@ describe('NoteSettings API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note-settings/${existingNotePublicId}`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -135,15 +132,11 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'Test user 1',
-      });
+      const user = await global.db.insertUser({});
 
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
@@ -186,7 +179,6 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        publicId: 'Pq1T9vc23Q',
       });
 
       /** create note settings for created note */
@@ -235,7 +227,6 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
@@ -335,15 +326,11 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'Test user 1',
-      });
+      const user = await global.db.insertUser({});
 
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
@@ -359,7 +346,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/Pq1T9vc23Q`,
+        url: `/note-settings/${note.publicId}`,
         body: {
           'isPublic': false,
         },
@@ -454,22 +441,17 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'Test user 1',
-      });
+      const creator = await global.db.insertUser({});
 
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        publicId: 'Pq1T9vc23Q',
       });
 
       /** create test note settings for created note */
       const noteSettings = await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
-        invitationHash: 'Hzh2hy4igf',
       });
 
       const accessToken = global.auth(creator.id);
@@ -479,7 +461,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/Pq1T9vc23Q/invitation-hash`,
+        url: `/note-settings/${note.publicId}/invitation-hash`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -555,7 +537,6 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        publicId: 'Pq1T9vc23Q',
       });
 
       await global.db.insertNoteTeam({
@@ -572,7 +553,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: '/note-settings/Pq1T9vc23Q/team',
+        url: `/note-settings/${note.publicId}/team`,
         body: {
           userId: randomTeamMember.id,
           newRole: 1,
@@ -622,7 +603,6 @@ describe('NoteSettings API', () => {
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        publicId: 'Pq1T9vc23Q',
       });
 
       await global.db.insertNoteTeam({
@@ -639,7 +619,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: '/note-settings/Pq1T9vc23Q/team',
+        url: `/note-settings/${note.publicId}/team`,
         body: {
           userId: randomTeamMember.id,
           newRole: 1,
@@ -660,15 +640,11 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser({});
 
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: '73NdxFZ4k7',
       });
 
       const accessToken = await global.auth(user.id);
