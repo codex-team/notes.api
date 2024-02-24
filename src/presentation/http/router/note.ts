@@ -143,16 +143,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   fastify.delete<{
     Params: {
-      notePublicId : NotePublicId;
+      notePublicId: NotePublicId;
     },
     Reply: {
-      isDeleted : boolean
+      isDeleted: boolean
     },
   }>('/:notePublicId', {
     schema: {
       params: {
         notePublicId: {
-          $ref: 'NoteSchema',
+          $ref: 'NoteSchema#/properties/id',
         },
       },
     },
