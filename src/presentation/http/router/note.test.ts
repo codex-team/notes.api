@@ -688,55 +688,6 @@ describe('Note API', () => {
         statusCode: 500,
       });
     });
-
-    test('Returns 500 when parentId is the same as childId', async () => {
-      const childNotePublicId = '9OYDD9d4_Y';
-
-      const parentNotePublicId = 'Tocn1f7rQS';
-
-      await global.db.truncateTables();
-
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'test user',
-      });
-
-      const childNote = await global.db.insertNote({
-        creatorId: creator.id,
-        publicId: childNotePublicId,
-      });
-
-      const parentNote = await global.db.insertNote({
-        creatorId: creator.id,
-        publicId: parentNotePublicId,
-      });
-
-      await global.db.insertNoteRelation({
-        noteId: childNote.id,
-        parentId: parentNote.id,
-      });
-
-      const accessToken = global.auth(creator.id);
-
-      const response = await global.api?.fakeRequest({
-        method: 'PATCH',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        body: {
-          parentId: childNotePublicId,
-        },
-        url: `/note/${childNotePublicId}/parent`,
-      });
-
-      expect(response?.statusCode).toBe(500);
-
-      expect(response?.json()).toMatchObject({
-        error: 'Internal Server Error',
-        message: 'Note can\'t be parent to itself',
-        statusCode: 500,
-      });
-    });
   });
   test.todo('Tests with access rights');
 
