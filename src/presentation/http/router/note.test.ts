@@ -196,14 +196,20 @@ describe('Note API', () => {
     });
 
     test.each([
-      { id: 'mVz3iHuez',
-        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+      {
+        id: 'mVz3iHuez',
+        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters',
+      },
 
-      { id: 'cR8eqF1mFf0',
-        expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+      {
+        id: 'cR8eqF1mFf0',
+        expectedMessage: 'params/notePublicId must NOT have more than 10 characters',
+      },
 
-      { id: '+=*&*5%&&^&-',
-        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component' },
+      {
+        id: '+=*&*5%&&^&-',
+        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component',
+      },
     ])
     ('Returns 400 when id has incorrect characters and length', async ({ id, expectedMessage }) => {
       const response = await global.api?.fakeRequest({
@@ -323,16 +329,25 @@ describe('Note API', () => {
     });
 
     test.each([
-      { id: 'mVz3iHuez',
-        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+      {
+        id: 'mVz3iHuez',
+        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters',
+      },
 
-      { id: 'cR8eqF1mFf0',
-        expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+      {
+        id: 'cR8eqF1mFf0',
+        expectedMessage: 'params/notePublicId must NOT have more than 10 characters',
+      },
 
-      { id: '+=*&*5%&&^&-',
-        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component' },
+      {
+        id: '+=*&*5%&&^&-',
+        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component',
+      },
     ])
-    ('Returns 400 when public id of the note settings has incorrect characters and length', async ({ id, expectedMessage }) => {
+    ('Returns 400 when public id of the note settings has incorrect characters and length', async ({
+      id,
+      expectedMessage,
+    }) => {
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         url: `/note/${id}`,
@@ -470,14 +485,20 @@ describe('Note API', () => {
     });
 
     test.each([
-      { id: 'mVz3iHuez',
-        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+      {
+        id: 'mVz3iHuez',
+        expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters',
+      },
 
-      { id: 'cR8eqF1mFf0',
-        expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+      {
+        id: 'cR8eqF1mFf0',
+        expectedMessage: 'params/notePublicId must NOT have more than 10 characters',
+      },
 
-      { id: '+=*&*5%&&^&-',
-        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component' },
+      {
+        id: '+=*&*5%&&^&-',
+        expectedMessage: '\'/note/+=*&*5%&&^&-\' is not a valid url component',
+      },
     ])
     ('Returns 400 when id has incorrect characters and length', async ({ id, expectedMessage }) => {
       const response = await global.api?.fakeRequest({
@@ -521,6 +542,202 @@ describe('Note API', () => {
     });
   });
 
+  describe('PATCH /note/:notePublicId/parent', () => {
+    test('Returns 200 when parent relation was successfully deleted', async () => {
+      const childNotePublicId = '9OYDD9d4_Y';
+
+      const parentNotePublicId = 'Tocn1f7rQS';
+
+      await global.db.truncateTables();
+
+      const creator = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'test user',
+      });
+
+      const childNote = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: childNotePublicId,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: parentNotePublicId,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const accessToken = global.auth(creator.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentId: null,
+        },
+        url: `/note/${childNotePublicId}/parent`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toStrictEqual({ isDone: true });
+    });
+
+    test('Returns 200 when parent was successfully updated', async () => {
+      const childNotePublicId = '9OYDD9d4_Y';
+
+      const parentNotePublicId = 'Tocn1f7rQS';
+
+      const newParentNotePublicId = 'lMkesQ1gpg';
+
+      await global.db.truncateTables();
+
+      const creator = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'test user',
+      });
+
+      const childNote = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: childNotePublicId,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: parentNotePublicId,
+      });
+
+      await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: newParentNotePublicId,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const accessToken = global.auth(creator.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentId: newParentNotePublicId,
+        },
+        url: `/note/${childNotePublicId}/parent`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toStrictEqual({ isDone: true });
+    });
+
+    test('Returns 500 when parentId is the same as childId', async () => {
+      const childNotePublicId = '9OYDD9d4_Y';
+
+      const parentNotePublicId = 'Tocn1f7rQS';
+
+      await global.db.truncateTables();
+
+      const creator = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'test user',
+      });
+
+      const childNote = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: childNotePublicId,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: parentNotePublicId,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const accessToken = global.auth(creator.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentId: childNotePublicId,
+        },
+        url: `/note/${childNotePublicId}/parent`,
+      });
+
+      expect(response?.statusCode).toBe(500);
+
+      expect(response?.json()).toMatchObject({
+        error: 'Internal Server Error',
+        message: 'Note can\'t be parent to itself',
+        statusCode: 500,
+      });
+    });
+
+    test('Returns 500 when parentId is the same as childId', async () => {
+      const childNotePublicId = '9OYDD9d4_Y';
+
+      const parentNotePublicId = 'Tocn1f7rQS';
+
+      await global.db.truncateTables();
+
+      const creator = await global.db.insertUser({
+        email: 'a@a.com',
+        name: 'test user',
+      });
+
+      const childNote = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: childNotePublicId,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+        publicId: parentNotePublicId,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const accessToken = global.auth(creator.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentId: childNotePublicId,
+        },
+        url: `/note/${childNotePublicId}/parent`,
+      });
+
+      expect(response?.statusCode).toBe(500);
+
+      expect(response?.json()).toMatchObject({
+        error: 'Internal Server Error',
+        message: 'Note can\'t be parent to itself',
+        statusCode: 500,
+      });
+    });
+  });
   test.todo('Tests with access rights');
 
   test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
