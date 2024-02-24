@@ -31,7 +31,7 @@ export const EditorToolSchema = {
       default: false,
     },
     userId: {
-      type: 'number',
+      type: ['number', 'null'],
       description: 'User id that added the tool to the marketplace',
     },
     source: {

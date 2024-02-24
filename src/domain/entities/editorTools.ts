@@ -28,7 +28,7 @@ export default interface EditorTool {
   /**
    * User id that added the tool to the marketplace
    */
-  userId?: User['id'];
+  userId: User['id'] | null;
 
   /**
    * Is plugin included by default in the editor

@@ -61,7 +61,7 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
    * @param userId - user identifier
    * @returns {Promise<EditorTool>} editor tool data
    */
-  public async addTool(editorTool: Omit<EditorToolCreationAttributes, 'author'>, userId?: User['id']): Promise<EditorTool> {
+  public async addTool(editorTool: Omit<EditorToolCreationAttributes, 'userId'>, userId: User['id']): Promise<EditorTool> {
     return await this.repository.addTool({
       userId,
       ...editorTool,

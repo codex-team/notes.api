@@ -42,7 +42,7 @@ export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, Inf
   /**
    * User id that added the tool to the marketplace
    */
-  public declare userId: UserModel['id'];
+  public declare userId: UserModel['id'] | null;
 }
 
 /**
@@ -93,6 +93,7 @@ export default class UserSequelizeStorage {
           model: UserModel,
           key: 'id',
         },
+        defaultValue: null,
       },
       title: {
         type: DataTypes.STRING,
@@ -159,7 +160,9 @@ export default class UserSequelizeStorage {
    * @param editorToolId - unique tool identifier
    */
   public async getToolById(editorToolId: EditorTool['id']): Promise<EditorTool | null> {
-    return await this.model.findByPk(editorToolId);
+    const res = await this.model.findByPk(editorToolId);
+    console.log(res);
+    return res;
   }
 
   /**
