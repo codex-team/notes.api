@@ -1,16 +1,18 @@
-import type { Sequelize, InferAttributes, InferCreationAttributes } from 'sequelize';
+import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { Model, DataTypes, Op } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type EditorTool from '@domain/entities/editorTools.js';
+import { UserModel } from './user.js';
+import type { EditorToolCreationAttributes } from '@domain/entities/editorTools.js';
 
 /**
  * Class representing an EditorTool model in database
  */
 export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, InferCreationAttributes<EditorToolModel>> {
   /**
-   * Editor tool unique id, Nano-ID
+   * Editor tool unique id
    */
-  public declare id: EditorTool['id'];
+  public declare id: CreationOptional<EditorTool['id']>;
 
   /**
    * Custom name that uses in editor initialization. e.g. 'code'
@@ -36,6 +38,11 @@ export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, Inf
    * Applies to user editor tools by default
    */
   public declare isDefault: EditorTool['isDefault'];
+
+  /**
+   * Author of the tool
+   */
+  public declare author: UserModel['id'];
 }
 
 /**
@@ -70,13 +77,22 @@ export default class UserSequelizeStorage {
      */
     this.model = EditorToolModel.init({
       id: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      author: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: UserModel,
+          key: 'id',
+        },
       },
       title: {
         type: DataTypes.STRING,
@@ -105,16 +121,16 @@ export default class UserSequelizeStorage {
    * @param options - tool data to identify and connect to the editor
    */
   public async addTool({
-    id,
     name,
     title,
     exportName,
+    author,
     source,
     isDefault,
-  }: EditorTool): Promise<EditorTool> {
+  }: EditorToolCreationAttributes): Promise<EditorTool> {
     return await this.model.create({
-      id,
       name,
+      author,
       title,
       exportName,
       source,

@@ -1,3 +1,5 @@
+import type User from './user';
+
 /**
  * Plugin that connects to the editor based on user settings
  */
@@ -24,6 +26,11 @@ export default interface EditorTool {
   exportName: string;
 
   /**
+   * Author of the tool
+   */
+  author?: User['id'];
+
+  /**
    * Is plugin included by default in the editor
    */
   isDefault?: boolean;
@@ -38,3 +45,8 @@ export default interface EditorTool {
     cdn?: string;
   }
 }
+
+/**
+ * Editor tool creation attributes
+ */
+export type EditorToolCreationAttributes = Omit<EditorTool, 'id'>;
