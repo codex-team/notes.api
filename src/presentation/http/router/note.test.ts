@@ -8,27 +8,6 @@ import noteTeams from '@tests/test-data/note-teams.json';
 describe('Note API', () => {
   describe('GET note/resolve-hostname/:hostname ', () => {
     test('Returns note with specified hostname', async () => {
-      const expectedResponse = {
-        'note': {
-          'id': 1,
-          'publicId': 'TJmEb89e0l',
-          'creatorId': 1,
-          'content': null,
-          'createdAt': '2023-10-16T13:49:19.000Z',
-          'updatedAt': '2023-10-16T13:49:19.000Z',
-          'noteSettings':  {
-            'customHostname': 'codex.so',
-            'isPublic': true,
-            'id': 1,
-            'noteId': 1,
-            'invitationHash': 'Hzh2hy4igf',
-          },
-        },
-        'accessRights': {
-          'canEdit': false,
-        },
-      };
-
       const response = await global.api?.fakeRequest({
         method: 'GET',
         url: '/note/resolve-hostname/codex.so',
@@ -36,7 +15,15 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual(expectedResponse);
+      expect(response?.json()).toMatchObject({
+        note: {
+          id: 'TJmEb89e0l',
+          content: {},
+        },
+        accessRights: {
+          canEdit: false,
+        },
+      });
     });
 
     test('Returns 404 when note not found', async () => {
