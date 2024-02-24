@@ -1,9 +1,8 @@
 import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import type EditorTool from '@domain/entities/editorTools.js';
-import { createEditorToolId } from '@infrastructure/utils/id.js';
 import type EditorToolsServiceSharedMethods from './shared/editorTools.js';
 import type User from '@domain/entities/user.js';
-import { EditorToolCreationAttributes } from '@domain/entities/editorTools.js';
+import type { EditorToolCreationAttributes } from '@domain/entities/editorTools.js';
 
 /**
  * Editor tools service

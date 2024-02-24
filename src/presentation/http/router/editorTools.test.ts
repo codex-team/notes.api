@@ -47,7 +47,7 @@ describe('Editor Tools', () => {
       expect(allTools.data).toEqual(
         expect.arrayContaining([
           expect.objectContaining(toolToAdd),
-        ]),
+        ])
       );
     });
   });
