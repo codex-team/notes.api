@@ -41,7 +41,7 @@ describe('User API', () => {
     });
   });
   describe('POST /user/editor-tools', () => {
-    test('Returns editor tool with status code 200 if tool added to user extensions', async () => {
+    test('Returns added tool with status code 200 if tool added to user extensions', async () => {
       await global.db.truncateTables();
 
       /**
