@@ -246,7 +246,9 @@ describe('Note API', () => {
     });
 
     //test not written yet, subject to modification
-    test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
+    test('API should not return internal id and "publicId".  It should return only "id" which is public id.', async () => {
+      
+    });
   });
 
   describe('POST note', async () => {

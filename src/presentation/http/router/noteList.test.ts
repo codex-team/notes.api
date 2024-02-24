@@ -5,7 +5,7 @@ import { describe, test, expect, beforeAll } from 'vitest';
 /**
  * Access token that will be used for Authorization header
  */
-let accessToken = '';
+let accessToken:string = '';
 
 describe('NoteList API', () => {
   beforeAll(() => {
@@ -18,7 +18,7 @@ describe('NoteList API', () => {
   });
 
   describe('GET /notes?page', () => {
-    test('Returns noteList with specified length (not for last page)', async () => {
+    test('Returns noteList with specified length (note for last page)', async () => {
       const expectedStatus = 200;
       const portionSize = 30;
       const pageNumber = 1;
@@ -94,7 +94,7 @@ describe('NoteList API', () => {
       expect(response?.statusCode).toBe(expectedStatus);
     });
 
-    test('Returns 400 when page is too large (maximum page numbrer is 30 by default)', async () => {
+    test('Returns 400 when page is too large (maximum page numbers is 30 by default)', async () => {
       const expectedStatus = 400;
       const pageNumber = 31;
 

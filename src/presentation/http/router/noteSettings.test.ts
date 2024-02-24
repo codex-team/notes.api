@@ -44,14 +44,18 @@ describe('NoteSettings API', () => {
 
   test.each([
     { id: 'mVz3iHuez',
-      expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' },
+      expectedMessage: 'params/notePublicId must NOT have fewer than 10 characters' 
+    },
 
     { id: 'cR8eqF1mFf0',
-      expectedMessage: 'params/notePublicId must NOT have more than 10 characters' },
+      expectedMessage: 'params/notePublicId must NOT have more than 10 characters' 
+    },
 
     { id: '+=*&*5%&&^&-',
-      expectedMessage: '\'/note-settings/+=*&*5%&&^&-\' is not a valid url component' },
+      expectedMessage: '\'/note-settings/+=*&*5%&&^&-\' is not a valid url component' 
+    },
   ])
+
   ('Returns 400 when public id of the note settings has incorrect characters and length', async ({ id, expectedMessage }) => {
     const expectedStatus = 400;
 
@@ -89,7 +93,7 @@ describe('NoteSettings API', () => {
     const userId = 2;
     const accessToken = global.auth(userId);
 
-    const notPublicNote = notes.find(newNote => {
+    const notePublicNote = notes.find(newNote => {
       const settings = noteSettings.find(ns => ns.note_id === newNote.id);
 
       return settings!.is_public === false && newNote.creator_id != userId;
@@ -100,7 +104,7 @@ describe('NoteSettings API', () => {
       headers: {
         authorization: `Bearer ${accessToken}`,
       },
-      url: `/note-settings/${notPublicNote!.public_id}`,
+      url: `/note-settings/${notePublicNote!.public_id}`,
     });
 
     expect(response?.statusCode).toBe(expectedStatus);

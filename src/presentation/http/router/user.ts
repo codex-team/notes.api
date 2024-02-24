@@ -130,8 +130,10 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
       toolId,
     });
 
-    return reply.status(StatusCodes.OK).send({
-      data: toolId,
+    return reply
+      .status(StatusCodes.OK)
+      .send({
+        data: toolId,
     });
   });
 
