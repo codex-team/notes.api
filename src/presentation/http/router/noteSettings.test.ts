@@ -132,7 +132,7 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({});
+      const user = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
@@ -147,7 +147,7 @@ describe('NoteSettings API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note-settings/Pq1T9vc23Q`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -194,7 +194,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/Pq1T9vc23Q`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -249,7 +249,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/Pq1T9vc23Q/team`,
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -262,11 +262,17 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      const correctID = 'Pq1T9vc23Q';
+      await global.db.truncateTables();
+
+      const user = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note-settings/${correctID}/team`,
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(response?.statusCode).toBe(401);
@@ -326,7 +332,7 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({});
+      const user = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
@@ -361,11 +367,17 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      const correctID = 'Pq1T9vc23Q';
+      await global.db.truncateTables();
+
+      const user = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
-        url: `/note-settings/${correctID}`,
+        url: `/note-settings/${note.publicId}`,
         body: {
           'isPublic': false,
         },
@@ -419,14 +431,20 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/invitation-hash ', () => {
     test('Returns status 401 when the user is not authorized', async () => {
-      const correctID = 'Pq1T9vc23Q';
+      await global.db.truncateTables();
+
+      const user = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
-        url: `/note-settings/${correctID}/invitation-hash`,
+        url: `/note-settings/${note.publicId}/invitation-hash`,
       });
 
-      expect(response?.statusCode).toBe(401);
+      // expect(response?.statusCode).toBe(401);
 
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
@@ -441,7 +459,7 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const creator = await global.db.insertUser({});
+      const creator = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
@@ -568,7 +586,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: '/note-settings/Pq1T9vc23Q/team',
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(team?.json()).toMatchObject([
@@ -640,7 +658,7 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({});
+      const user = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({

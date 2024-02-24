@@ -14,7 +14,7 @@ describe('Join API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({});
+      const user = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
@@ -83,7 +83,7 @@ describe('Join API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({});
+      const user = await global.db.insertUser();
 
 
       /** create test note for created user */

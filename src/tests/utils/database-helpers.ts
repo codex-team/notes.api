@@ -1,4 +1,5 @@
 import { createInvitationHash } from '@infrastructure/utils/invitationHash';
+import { createPublicId } from '@infrastructure/utils/id';
 import { QueryTypes } from 'sequelize';
 import type User from '@domain/entities/user.ts';
 import type { Note } from '@domain/entities/note.ts';
@@ -94,11 +95,11 @@ export default class DatabaseHelpers {
    * @param note - note object which contain all info about note
    *
    * If content is not passed, it's value in database would be {}
-   * If publicId is not passed, it's value in database would be 'Pq1T9vc23Q'
+   * If publicId is not passed, it's value in database would be created via `createPublicId()` method
    */
   public async insertNote(note: NoteMockCreationAttributes): Promise<Note> {
     const content = note.content ?? '{}';
-    const publicId = note.publicId ?? 'Pq1T9vc23Q';
+    const publicId = note.publicId ?? createPublicId();
 
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
@@ -123,10 +124,10 @@ export default class DatabaseHelpers {
    * If email is not passed, it's value in database would be 'test@codexmail.com'
    * If editorTools is not passed, it's value in database would be []
    */
-  public async insertUser(user: UserMockCreationAttributes): Promise<User> {
-    const editorTools = user.editorTools ?? '[]';
-    const name = user.name ?? 'CodeX';
-    const email = user.email ?? 'test@codexmail.com';
+  public async insertUser(user?: UserMockCreationAttributes): Promise<User> {
+    const editorTools = user?.editorTools ?? '[]';
+    const name = user?.name ?? 'CodeX';
+    const email = user?.email ?? 'test@codexmail.com';
 
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
