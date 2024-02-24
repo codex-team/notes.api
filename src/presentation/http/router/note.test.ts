@@ -249,10 +249,10 @@ describe('Note API', () => {
   describe('PATCH note/:notePublicId ', () => {
     beforeEach(async () => {
       /**
-       * truncate all tables, which are needed
+       * Truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
        *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
+       * @todo get rid of restarting database data in tests (move to beforeEach)
        */
       await global.db.truncateTables();
     });
@@ -360,10 +360,10 @@ describe('Note API', () => {
   describe('POST /note', () => {
     beforeEach(async () => {
       /**
-       * truncate all tables, which are needed
+       * Truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
        *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
+       * @todo get rid of restarting database data in tests (move to beforeEach)
        */
       await global.db.truncateTables();
     });
@@ -430,7 +430,7 @@ describe('Note API', () => {
        * Truncate all tables, which are needed
        * Restart autoincrement sequences for data to start with id 1
        *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
+       * @todo get rid of restarting database data in tests (move to beforeEach)
        */
       await global.db.truncateTables();
     });
