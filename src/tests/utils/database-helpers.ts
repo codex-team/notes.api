@@ -1,4 +1,5 @@
 import { createInvitationHash } from '@infrastructure/utils/invitationHash';
+import { createPublicId } from '@infrastructure/utils/id';
 import { QueryTypes } from 'sequelize';
 import type User from '@domain/entities/user.ts';
 import type { Note } from '@domain/entities/note.ts';
@@ -14,15 +15,15 @@ import type EditorTool from '@domain/entities/editorTools.ts';
 type NoteMockCreationAttributes = {
   creatorId: Note['creatorId'],
   content?:  Note['content'],
-  publicId:  Note['publicId'],
+  publicId?:  Note['publicId'],
 };
 
 /**
  * default type for user mock creation attributes
  */
 type UserMockCreationAttributes = {
-  email: User['email'],
-  name: User['name'],
+  email?: User['email'],
+  name?: User['name'],
   editorTools?: User['editorTools'],
 };
 
@@ -31,7 +32,7 @@ type UserMockCreationAttributes = {
  */
 type UserSessionMockCreationAttributes = {
   userId: UserSession['userId'],
-  refreshToker: UserSession['refreshToken'],
+  refreshToker?: UserSession['refreshToken'],
   refreshTokenExpiresAt?: UserSession['refreshTokenExpiresAt'],
 };
 
@@ -91,14 +92,18 @@ export default class DatabaseHelpers {
   /**
    * Inserts note mock to then db
    *
-   * @param note - note object which contain all info about note (some info is optional)
+   * @param note - note object which contain all info about note
+   *
+   * If content is not passed, it's value in database would be {}
+   * If publicId is not passed, it's value in database would be created via `createPublicId()` method
    */
   public async insertNote(note: NoteMockCreationAttributes): Promise<Note> {
     const content = note.content ?? '{}';
+    const publicId = note.publicId ?? createPublicId();
 
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
-    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${note.publicId}') 
+    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}') 
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,
@@ -113,16 +118,20 @@ export default class DatabaseHelpers {
   /**
    * Inserts user mock to then db
    *
-   * @param user - user object which contain all info about user (some info is optional)
+   * @param user - user object which contain all info about user
    *
-   * If editorTools is not passed, the editor_tools database will have []
+   * If name is not passed, it's value in database would be 'CodeX'
+   * If email is not passed, it's value in database would be 'test@codexmail.com'
+   * If editorTools is not passed, it's value in database would be []
    */
-  public async insertUser(user: UserMockCreationAttributes): Promise<User> {
-    const editorTools = user.editorTools ?? '[]';
+  public async insertUser(user?: UserMockCreationAttributes): Promise<User> {
+    const editorTools = user?.editorTools ?? '[]';
+    const name = user?.name ?? 'CodeX';
+    const email = user?.email ?? 'test@codexmail.com';
 
     // eslint-disable-next-line
-    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools") 
-    VALUES ('${user.email}', '${user.name}', CURRENT_DATE, array${editorTools}::text[])
+    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
+    VALUES ('${email}', '${name}', CURRENT_DATE, '${editorTools}'::jsonb)
     RETURNING "id", "email", "name", "editor_tools" AS "editorTools", "created_at" AS "createdAt", "photo"`,
     {
       type: QueryTypes.INSERT,
@@ -140,7 +149,7 @@ export default class DatabaseHelpers {
    *
    * refreshTokenExpiresAt should be given as Postgres DATE string (e.g. `CURRENT_DATE + INTERVAL '1 day'`)
    *
-   * if no refreshTokenExpiresAt passed, then it would be `CURRENT_DATE + INTERVAL '1 day'`
+   * if no refreshTokenExpiresAt passed, it's value in database would be `CURRENT_DATE + INTERVAL '1 day'`
    */
   public async insertUserSession(userSession: UserSessionMockCreationAttributes): Promise<UserSessionMockCreationAttributes> {
     const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? `CURRENT_DATE + INTERVAL '1 day')`;
@@ -155,7 +164,8 @@ export default class DatabaseHelpers {
    *
    * @param noteSettings - noteSettings object which contain all info about noteSettings (some info is optional
    *
-   * If customHostname is not passed, custom_hostname will be set to null in the database
+   * If customHostname is not passed, it's value in database would be null
+   * If invitationHash is not passed, it's value in database would be calculated via `createInvitationHash()` method
    */
   public async insertNoteSetting(noteSettings: NoteSettingsMockCreationAttributes): Promise<NoteSettingsMockCreationAttributes> {
     const customHostname = noteSettings.customHostname ?? null;
@@ -197,12 +207,17 @@ export default class DatabaseHelpers {
    *
    * if no isDefault passed, then is_default would be false in database
    */
-  public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorToolMockCreationAttributes> {
-    const isDefault = editorTool.isDefault ?? null;
+  public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorTool['id']> {
+    const isDefault = editorTool.isDefault ?? false;
 
-    await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
+    // eslint-disable-next-line
+    const [result, _] = await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default")
+    VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${JSON.stringify(editorTool.source)}', ${isDefault})
+    RETURNING "id"`);
 
-    return editorTool;
+    const addedToolData = result[0];
+
+    return String(addedToolData.id);
   }
 
   /**
@@ -210,14 +225,14 @@ export default class DatabaseHelpers {
    */
   public async truncateTables(): Promise<unknown> {
     return await this.orm.connection.query(`DO $$
-    DECLARE 
+    DECLARE
       -- table iterator
       tbl RECORD;
       -- sequence iterator
       seq RECORD;
     BEGIN
       -- truncate all tables (except migrations) in database
-      FOR tbl IN 
+      FOR tbl IN
         SELECT * FROM information_schema.tables
         WHERE table_name!= 'migrations'
         AND table_schema= 'public'
@@ -225,10 +240,10 @@ export default class DatabaseHelpers {
       LOOP
         EXECUTE format('TRUNCATE public.%s CASCADE', tbl.table_name);
       END LOOP;
-    
-      -- restart all sequences 
+
+      -- restart all sequences
       -- (autoincrement should start with 1 when test-data is truncated)
-      FOR seq IN 
+      FOR seq IN
         SELECT * FROM information_schema.sequences
         WHERE sequence_schema= 'public'
       LOOP

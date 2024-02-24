@@ -23,7 +23,7 @@ export default interface NoteSettings {
   /**
    * Custom hostname
    */
-  customHostname?: string;
+  customHostname?: string ;
 
   /**
    * Is note public for everyone or only for collaborators
