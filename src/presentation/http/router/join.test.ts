@@ -14,15 +14,11 @@ describe('Join API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0l',
       });
 
       /** create test note-settings for created note */
@@ -87,16 +83,12 @@ describe('Join API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser();
 
 
       /** create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'TJmEb89e0l',
       });
 
       /** create test note-settings for created note */
