@@ -1,7 +1,7 @@
 import type User from '@domain/entities/user';
 import { describe, test, expect, beforeEach } from 'vitest';
 
-let accessToken = '';
+let accessToken: string = '';
 let user: User;
 
 describe('NoteList API', () => {

@@ -116,9 +116,7 @@ describe('Note API', () => {
     });
 
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
-      const expectedStatus = 403;
-
-      const notePublicNote = notes.find(newNote => {
+      const notPublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
 
         return settings!.is_public === false;
@@ -126,7 +124,7 @@ describe('Note API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note/${notePublicNote!.public_id}`,
+        url: `/note/${notPublicNote!.public_id}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -138,7 +136,7 @@ describe('Note API', () => {
       const userId = 2;
       const accessToken = global.auth(userId);
 
-      const notePublicNote = notes.find(newNote => {
+      const notPublicNote = notes.find(newNote => {
         const settings = noteSettings.find(ns => ns.note_id === newNote.id);
         const team = noteTeams.find(nt => nt.note_id === newNote.id && nt.user_id === userId);
 
@@ -150,7 +148,7 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${notePublicNote!.public_id}`,
+        url: `/note/${notPublicNote!.public_id}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -159,7 +157,6 @@ describe('Note API', () => {
     });
 
     test('Returns 404 when the id  does not exist', async () => {
-      const expectedStatus = 404;
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
