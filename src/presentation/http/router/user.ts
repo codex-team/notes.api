@@ -95,8 +95,9 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
 
     const tools = await userService.getUserEditorTools(userId);
 
-    return reply.status(StatusCodes.OK).send({
-      data: tools,
+    return reply
+      .status(StatusCodes.OK).send({
+        data: tools,
     });
   });
 

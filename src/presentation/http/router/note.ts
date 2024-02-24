@@ -91,9 +91,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = note.creatorId === request.userId;
 
-    return reply.status(StatusCodes.OK).send({
-      note: note,
-      accessRights: { canEdit: canEdit },
+    return reply
+      .status(StatusCodes.OK).send({
+        note: note,
+        accessRights: { canEdit: canEdit },
     });
   });
 
@@ -216,8 +217,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const note = await noteService.updateNoteContentById(noteId, content);
 
     return reply
-      .status(StatusCodes.OK)
-      .send({
+      .status(StatusCodes.OK).send({
         updatedAt: note.updatedAt,
       });
   });
@@ -261,8 +261,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = note.creatorId === request.userId;
 
-    return reply
-      .status(StatusCodes.OK)
+    return reply.status(StatusCodes.OK)
       .send({
         note: note,
         accessRights: { canEdit: canEdit },

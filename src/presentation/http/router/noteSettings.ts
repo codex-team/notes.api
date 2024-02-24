@@ -137,7 +137,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('Note settings not found');
     }
 
-    return reply.send(updatedNoteSettings);
+    return reply.status(StatusCodes.OK).send(updatedNoteSettings);
   });
 
   /**

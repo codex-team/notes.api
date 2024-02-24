@@ -51,7 +51,9 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
 
     const noteList = await noteListService.getNoteListByCreatorId(userId, page);
 
-    return reply.status(StatusCodes.OK).send(noteList);
+    return reply
+      .status(StatusCodes.OK)
+      .send(noteList);
   });
 
   done();

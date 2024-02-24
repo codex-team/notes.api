@@ -37,7 +37,7 @@ const AIRouter: FastifyPluginCallback<AIRouterOptions> = (fastify, opts, done) =
   }>('/complete', {
 
   }, async (request, reply) => {
-    const { content } = request.body as GetCompletionOptions;
+    const { content } = request.body as GetCompletionOptions; 
 
     const result = await opts.aiService.getCompletion(content);
 
