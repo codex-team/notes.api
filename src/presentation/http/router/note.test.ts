@@ -615,15 +615,22 @@ describe('Note API', () => {
     });
   });
 
-  describe('PATCH /note/:notePublicId/parent', () => {
+  describe('PATCH /note/:notePublicId/relation', () => {
+    beforeEach(async () => {
+      /**
+       * Truncate all tables, which are needed
+       * restart autoincrement sequences for data to start with id 1
+       *
+       * @todo get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+    });
     test('Returns isUpdated=true when parent was successfully updated', async () => {
       const childNotePublicId = '9OYDD9d4_Y';
 
       const parentNotePublicId = 'Tocn1f7rQS';
 
       const newParentNotePublicId = 'lMkesQ1gpg';
-
-      await global.db.truncateTables();
 
       const creator = await global.db.insertUser();
 
@@ -657,7 +664,7 @@ describe('Note API', () => {
         body: {
           parentId: newParentNotePublicId,
         },
-        url: `/note/${childNotePublicId}/parent`,
+        url: `/note/${childNotePublicId}/relation`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -665,12 +672,10 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ isUpdated: true });
     });
 
-    test('Returns 500 when parentId is the same as childId', async () => {
+    test('Returns 400 when parentId is the same as childId', async () => {
       const childNotePublicId = '9OYDD9d4_Y';
 
       const parentNotePublicId = 'Tocn1f7rQS';
-
-      await global.db.truncateTables();
 
       const creator = await global.db.insertUser();
 
@@ -699,20 +704,18 @@ describe('Note API', () => {
         body: {
           parentId: childNotePublicId,
         },
-        url: `/note/${childNotePublicId}/parent`,
+        url: `/note/${childNotePublicId}/relation`,
       });
 
-      expect(response?.statusCode).toBe(500);
+      expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual('Parent note is the same as the child note');
     });
 
-    test('Return 500 when parent note does not exist', async () => {
+    test('Return 400 when parent note does not exist', async () => {
       const childNotePublicId = '9OYDD9d4_Y';
 
       const parentNotePublicId = 'Tocn1f7rQS';
-
-      await global.db.truncateTables();
 
       const creator = await global.db.insertUser();
 
@@ -731,10 +734,10 @@ describe('Note API', () => {
         body: {
           parentId: parentNotePublicId,
         },
-        url: `/note/${childNotePublicId}/parent`,
+        url: `/note/${childNotePublicId}/relation`,
       });
 
-      expect(response?.statusCode).toBe(500);
+      expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual('Incorrect parent note');
     });
