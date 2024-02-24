@@ -7,7 +7,7 @@ import { describe, test, expect, beforeAll } from 'vitest';
  */
 let accessToken = '';
 
-describe('NoteList API', () => {
+describe('User API', () => {
   beforeAll(() => {
     /**
      * userId for authorization

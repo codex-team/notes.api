@@ -5,7 +5,6 @@ import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
 import noteSettings from '../test-data/notes-settings.json';
 import noteTeams from '../test-data/note-teams.json';
-import editorTools from '../test-data/editor-tools.json';
 
 
 /**
@@ -50,17 +49,6 @@ async function insertNotes(db: SequelizeOrm): Promise<void> {
 }
 
 /**
- * Fill in the database with editor tools data
- *
- * @param db - SequelizeOrm instance
- */
-async function insertEditorTools(db: SequelizeOrm): Promise<void> {
-  for (const editorTool of editorTools) {
-    await db.connection.query(`INSERT INTO public.editor_tools (id, "name", "title", "export_name", "source", "is_default") VALUES (${editorTool.id}, '${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${JSON.stringify(editorTool.source)}', ${editorTool.isDefault})`);
-  }
-}
-
-/**
  * Fills in the database with notes settings data
  *
  * @param db - SequelizeOrm instance
@@ -95,6 +83,5 @@ export async function insertData(db: SequelizeOrm): Promise<void> {
   await insertNoteSettings(db);
   await insertNoteTeams(db);
   await insertNoteRelatons(db);
-  await insertEditorTools(db);
 }
 

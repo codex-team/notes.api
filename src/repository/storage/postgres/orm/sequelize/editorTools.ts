@@ -143,13 +143,7 @@ export default class UserSequelizeStorage {
    * @param editorToolId - unique tool identifier
    */
   public async getToolById(editorToolId: EditorTool['id']): Promise<EditorTool | null> {
-    const res = await this.model.findByPk(editorToolId);
-
-    if (res === null) {
-      return null;
-    }
-
-    return res;
+    return await this.model.findByPk(editorToolId);
   }
 
   /**

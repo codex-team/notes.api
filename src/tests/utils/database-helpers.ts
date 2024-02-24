@@ -197,12 +197,14 @@ export default class DatabaseHelpers {
    *
    * if no isDefault passed, then is_default would be false in database
    */
-  public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorToolMockCreationAttributes> {
-    const isDefault = editorTool.isDefault ?? null;
+  public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorTool['id']> {
+    const isDefault = editorTool.isDefault ?? false;
 
-    await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default") VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${editorTool.exportName}', ${isDefault}')`);
+    const res = await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default")
+    VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${JSON.stringify(editorTool.source)}', ${isDefault})
+    RETURNING "id"`);
 
-    return editorTool;
+    return String(res[0][0].id);
   }
 
   /**
