@@ -1,5 +1,4 @@
 import type User from '@domain/entities/user';
-import { createPublicId } from '@infrastructure/utils/id';
 import { describe, test, expect, beforeEach } from 'vitest';
 
 let accessToken = '';
@@ -29,7 +28,6 @@ describe('NoteList API', () => {
       for (let i = 0; i < portionSize + 1; i++) {
         await global.db.insertNote({
           creatorId: user.id,
-          publicId: createPublicId(),
         });
       }
 
@@ -54,7 +52,6 @@ describe('NoteList API', () => {
       for (let i = 0; i < portionSize + 30; i++) {
         await global.db.insertNote({
           creatorId: user.id,
-          publicId: createPublicId(),
         });
       }
 
