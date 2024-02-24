@@ -16,10 +16,7 @@ describe('NoteList API', () => {
     await global.db.truncateTables();
 
     /** create test user */
-    user = await global.db.insertUser({
-      email: 'test@codexmail.com',
-      name: 'CodeX',
-    });
+    user = await global.db.insertUser();
 
     accessToken = global.auth(user.id);
   });

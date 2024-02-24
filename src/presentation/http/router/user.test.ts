@@ -12,10 +12,7 @@ describe('User API', () => {
        */
       await global.db.truncateTables();
 
-      const user = await global.db.insertUser({
-        email: 'test@codexmail.com',
-        name: 'CodeX',
-      });
+      const user = await global.db.insertUser();
 
       const accessToken = global.auth(user.id);
 
@@ -32,7 +29,6 @@ describe('User API', () => {
       expect(response?.json()).toMatchObject({
         name: user.name,
         email: user.email,
-        photo: '',
       });
     });
 
@@ -56,10 +52,7 @@ describe('User API', () => {
       /**
        * Create user and get accessToken
        */
-      const createdUser = await global.db.insertUser({
-        email: 'test@gmail.com',
-        name: 'Test',
-      });
+      const createdUser = await global.db.insertUser();
       const accessToken = global.auth(createdUser.id);
 
       const addedToolId = await global.db.insertEditorTool({
