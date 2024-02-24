@@ -224,7 +224,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Body: {
       content: JSON;
-      parentId?: NotePublicId;
     },
     Reply: {
       updatedAt: Note['updatedAt'],
@@ -255,9 +254,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content as JSON;
-    const parentId = request.body.parentId;
 
-    const note = await noteService.updateNoteContentById(noteId, content, parentId);
+    const note = await noteService.updateNoteContentById(noteId, content);
 
     return reply.send({
       updatedAt: note.updatedAt,
