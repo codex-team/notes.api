@@ -275,7 +275,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Reply: {
       isUpdated: boolean,
     }
-  }>('/:notePublicId/parent', {
+  }>('/:notePublicId/relation', {
     schema: {
       params: {
         notePublicId: {
