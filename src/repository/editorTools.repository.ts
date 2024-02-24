@@ -24,6 +24,15 @@ export default class EditorToolsRepository {
   }
 
   /**
+   * Get tool by it's identifier
+   *
+   * @param editorToolId - unique tool identifier
+   */
+  public async getToolById(editorToolId: EditorTool['id']): Promise<EditorTool | null> {
+    return await this.storage.getToolById(editorToolId);
+  }
+
+  /**
    * Get bunch of tools by their ids
    *
    * @param editorToolIds - unique tool ids

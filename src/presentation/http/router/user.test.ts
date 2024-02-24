@@ -40,4 +40,56 @@ describe('User API', () => {
       expect(body.message).toBe('You must be authenticated to access this resource');
     });
   });
+  describe('POST /user/editor-tools', () => {
+    test('Returns added tool with status code 200 if tool added to user extensions', async () => {
+      await global.db.truncateTables();
+
+      /**
+       * Create user and get accessToken
+       */
+      const createdUser = await global.db.insertUser({
+        email: 'test@gmail.com',
+        name: 'Test',
+      });
+      const accessToken = global.auth(createdUser.id);
+
+      const addedToolId = await global.db.insertEditorTool({
+        name: 'code',
+        title: 'Code Tool',
+        exportName: 'Code',
+        isDefault: false,
+        source: {
+          cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
+        },
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: '/user/editor-tools',
+        body: {
+          'toolId': addedToolId,
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      const body = response?.json();
+
+      expect(body).toStrictEqual({
+        addedTool :{
+          id: addedToolId,
+          name: 'code',
+          title: 'Code Tool',
+          exportName: 'Code',
+          isDefault: false,
+          source: {
+            cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
+          },
+        },
+      });
+    });
+  });
 });

@@ -16,4 +16,11 @@ export default interface  EditorToolsServiceSharedMethods {
    * @param ids - tool ids to resolve
    */
   getToolsByIds(ids: EditorTool['id'][]): Promise<EditorTool[]>;
+
+  /**
+   * Get tool by it's identifier
+   *
+   * @param id - unique tool identifier
+   */
+  getToolById(id: EditorTool['id']): Promise<EditorTool | null>;
 }
