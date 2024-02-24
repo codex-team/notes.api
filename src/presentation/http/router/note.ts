@@ -236,17 +236,17 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   });
 
   /**
-   * Update or delete note parent by id.
+   * Update note relation by id.
    */
   fastify.patch<{
     Params: {
       notePublicId: NotePublicId,
     },
     Body: {
-      parentId: NotePublicId | null,
+      parentId: NotePublicId,
     },
     Reply: {
-      isDone: boolean,
+      isUpdated: boolean,
     }
   }>('/:notePublicId/parent', {
     schema: {
@@ -274,13 +274,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteId = request.note?.id as number;
     const parentId = request.body.parentId;
 
-    const isDone = await noteService.updateNoteParentRelationById(noteId, parentId);
+    const isUpdated = await noteService.updateNoteRelation(noteId, parentId);
 
-    return reply.send({
-      isDone: isDone,
-    });
+    return reply.send({ isUpdated });
   });
-
 
   /**
    * Get note by custom hostname
