@@ -1,28 +1,37 @@
-import userSessions from '@tests/test-data/user-sessions.json';
-import { describe, test, expect, beforeAll } from 'vitest';
+import type User from '@domain/entities/user';
+import { describe, test, expect, beforeEach } from 'vitest';
 
-
-/**
- * Access token that will be used for Authorization header
- */
-let accessToken:string = '';
+let accessToken = '';
+let user: User;
 
 describe('NoteList API', () => {
-  beforeAll(() => {
+  beforeEach(async () => {
     /**
-     * userId for authorization
+     * Truncate all tables, which are needed
+     * Restart autoincrement sequences for data to start with id 1
+     *
+     * @todo get rid of restarting database data in tests (move to beforeEach)
      */
-    const userId = userSessions[0]['user_id'];
+    await global.db.truncateTables();
 
-    accessToken = global.auth(userId);
+    /** create test user */
+    user = await global.db.insertUser();
+
+    accessToken = global.auth(user.id);
   });
-
+  
   describe('GET /notes?page', () => {
-    test('Returns noteList with specified length (note for last page)', async () => {
-      const expectedStatus = 200;
+    test('Returns noteList with specified length (not for last page)', async () => {
       const portionSize = 30;
       const pageNumber = 1;
 
+      /** create test notes for created user */
+      for (let i = 0; i < portionSize + 1; i++) {
+        await global.db.insertNote({
+          creatorId: user.id,
+        });
+      }
+
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
@@ -31,17 +40,21 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
-      const body = response?.json();
-
-      expect(body.items).toHaveLength(portionSize);
+      expect(response?.json().items).toHaveLength(portionSize);
     });
 
     test('Returns noteList with specified length (for last page)', async () => {
-      const expectedStatus = 200;
       const portionSize = 19;
       const pageNumber = 2;
+
+      /** create test notes for created user */
+      for (let i = 0; i < portionSize + 30; i++) {
+        await global.db.insertNote({
+          creatorId: user.id,
+        });
+      }
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -51,15 +64,12 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
-      const body = response?.json();
-
-      expect(body.items).toHaveLength(portionSize);
+      expect(response?.json().items).toHaveLength(portionSize);
     });
 
     test('Returns noteList with no items if it has no notes', async () => {
-      const expectedStatus = 200;
       const pageNumber = 3;
 
       const response = await global.api?.fakeRequest({
@@ -70,18 +80,14 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(200);
 
-      const body = response?.json();
-
-      expect(body).toEqual( { items : [] } );
-      expect(body.items).toHaveLength(0);
+      expect(response?.json()).toEqual( { items : [] } );
+      expect(response?.json().items).toHaveLength(0);
     });
 
     test('Returns 400 when page < 0', async () => {
-      const expectedStatus = 400;
       const pageNumber = 0;
-
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -91,7 +97,7 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(400);
     });
 
     test('Returns 400 when page is too large (maximum page numbers is 30 by default)', async () => {
@@ -106,7 +112,7 @@ describe('NoteList API', () => {
         url: `/notes?page=${pageNumber}`,
       });
 
-      expect(response?.statusCode).toBe(expectedStatus);
+      expect(response?.statusCode).toBe(400);
     });
   });
 });

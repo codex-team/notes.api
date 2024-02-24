@@ -4,8 +4,17 @@ import { describe, test, expect } from 'vitest';
 describe('User API', () => {
   describe('GET /user/myself', () => {
     test('Returns user with status code 200 if user exists', async () => {
-      const userId = 1;
-      const accessToken = global.auth(userId);
+      /**
+       * Truncate all tables, which are needed
+       * Restart autoincrement sequences for data to start with id 1
+       *
+       * @todo get rid of restarting database data in tests (move to beforeEach)
+       */
+      await global.db.truncateTables();
+
+      const user = await global.db.insertUser();
+
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -17,13 +26,9 @@ describe('User API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      const body = response?.json();
-
-      expect(body).toStrictEqual({
-        'id': '1',
-        'email': 'a@a.com',
-        'name': 'Test user 1',
-        'photo': '',
+      expect(response?.json()).toMatchObject({
+        name: user.name,
+        email: user.email,
       });
     });
 
@@ -40,83 +45,53 @@ describe('User API', () => {
       expect(body.message).toBe('You must be authenticated to access this resource');
     });
   });
+  describe('POST /user/editor-tools', () => {
+    test('Returns added tool with status code 200 if tool added to user extensions', async () => {
+      await global.db.truncateTables();
 
-  //NOTE: note tested yet
-  describe('GET /user/editor-tools', () => {
-    test('Returns user list of editor-tools (GET)', async () => {
-      const userId = 1; 
+      /**
+       * Create user and get accessToken
+       */
+      const createdUser = await global.db.insertUser();
+      const accessToken = global.auth(createdUser.id);
 
-      const accessToken = global.auth(userId); 
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET', 
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        }, 
-        url: '/user/editor-tools'
-      }); 
-
-      expect(response?.statusCode).toBe(200);
-    })
-
-
-    test('Returns response with status 401 when user is not authorized', async () => {
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        url: '/user/editor-tools', 
+      const addedToolId = await global.db.insertEditorTool({
+        name: 'code',
+        title: 'Code Tool',
+        exportName: 'Code',
+        isDefault: false,
+        source: {
+          cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
+        },
       });
 
-      expect(response?.statusCode).toBe(401);
-
-      const body = response?.json();
-
-      expect(body.message).toBe('You must be authenticated to access this resource');
-    })
-  })
-
-
-  //NOTE: note tested yet
-  describe('POST /user/editor-tools', () => {
-    test('Add an editor-tool (POST)', async () => {
-      const userId = 1; 
-      const editorTool = 1; 
-      const accessToken = global.auth(userId); 
-
-      const response = await global.api?.fakeRequest({
-        method: 'POST', 
-        headers: {
-          authorization: `Bearer ${accessToken}`
-        }, 
-        url: '/user/editor-tools', 
-        body: {
-          toolId: editorTool
-        }
-      }); 
-
-
-      expect(response?.statusCode).toBe(200);
-
-      const body = response?.json(); 
-
-      expect(body).toStrictEqual({
-        //the editor tool being added
-      })
-    })
-
-
-    test('Returns response with status 401 when user is not authorized', async () => {
       const response = await global.api?.fakeRequest({
         method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
         url: '/user/editor-tools',
+        body: {
+          'toolId': addedToolId,
+        },
       });
 
-      expect(response?.statusCode).toBe(401);
+      expect(response?.statusCode).toBe(200);
 
       const body = response?.json();
 
-      expect(body.message).toBe('You must be authenticated to access this resource');
-    })
-  })
+      expect(body).toStrictEqual({
+        addedTool :{
+          id: addedToolId,
+          name: 'code',
+          title: 'Code Tool',
+          exportName: 'Code',
+          isDefault: false,
+          source: {
+            cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
+          },
+        },
+      });
+    });
+  });
 });
-
-

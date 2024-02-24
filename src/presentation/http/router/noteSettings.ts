@@ -1,12 +1,14 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
-import { isEmpty } from '@infrastructure/utils/empty.js';
+import { definePublicNoteSettings } from '@domain/entities/noteSettings.js';
+import type { InvitationHash, NoteSettingsPublic } from '@domain/entities/noteSettings.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import type { NotePublicId } from '@domain/entities/note.js';
-import type { Team } from '@domain/entities/team.js';
+import type { Team, MemberRole } from '@domain/entities/team.js';
+import type User from '@domain/entities/user.js';
 import { StatusCodes } from 'http-status-codes';
 
 /**
@@ -57,7 +59,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -70,6 +72,11 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -80,14 +87,49 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(noteId);
 
-    /**
-     * Check if note does not exist
-     */
-    if (isEmpty(noteSettings)) {
-      return reply.notFound('Note settings not found');
+    const noteSettingsPublic = definePublicNoteSettings(noteSettings);
+
+    return reply.send(noteSettingsPublic);
+  });
+
+  /**
+   * Patch team member role by user and note id
+   */
+  fastify.patch<{
+    Params: {
+      notePublicId: NotePublicId,
+      },
+    Body: {
+      userId: User['id'],
+      newRole: MemberRole,
+      },
+    Reply: MemberRole,
+  }>('/:notePublicId/team', {
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+    const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, noteId, request.body.newRole);
+
+    if (newRole === undefined) {
+      return reply.notFound('User does not belong to Note\'s team');
     }
 
-    return reply.send(noteSettings);
+    return reply.send(newRole);
   });
 
   /**
@@ -98,18 +140,23 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     Params: {
       notePublicId: NotePublicId;
     },
-    Reply: NoteSettings,
+    Reply: NoteSettingsPublic,
   }>('/:notePublicId', {
     config: {
       policy: [
         'authRequired',
-        'userInTeam',
+        'userCanEdit',
       ],
     },
     schema: {
       params: {
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
         },
       },
     },
@@ -124,10 +171,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
      */
     const { customHostname, isPublic } = request.body;
 
-    /**
-     * TODO: check is user collaborator
-     */
-
     const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
       customHostname,
       isPublic,
@@ -137,12 +180,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('Note settings not found');
     }
 
-    return reply.status(StatusCodes.OK).send(updatedNoteSettings);
+    const noteSettingsPublic = definePublicNoteSettings(updatedNoteSettings);
+
+    return reply.status(StatusCodes.OK).send(noteSettingsPublic);
   });
 
   /**
    * Get team by note id
-   * TODO add policy for this route (check if user is collaborator)
    */
   fastify.get<{
     Params: {
@@ -153,7 +197,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     config: {
       policy: [
         'authRequired',
-        'userInTeam',
+        'userCanEdit',
       ],
     },
     schema: {
@@ -172,6 +216,54 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const team = await noteSettingsService.getTeamByNoteId(noteId);
 
     return reply.status(StatusCodes.OK).send(team);
+  });
+
+  /**
+   * Generates a new invitation hash for a specific note
+   */
+  fastify.patch<{
+    Params: {
+      notePublicId: NotePublicId;
+    },
+    Reply: {
+      invitationHash: InvitationHash;
+    },
+  }>('/:notePublicId/invitation-hash', {
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          description: 'New invitation hash',
+          properties: {
+            invitationHash: {
+              $ref: 'NoteSettingsSchema#/properties/invitationHash',
+            },
+          },
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+
+    const updatedNoteSettings = await noteSettingsService.regenerateInvitationHash(noteId);
+
+    return reply.status(StatusCodes.OK).send({
+      invitationHash: updatedNoteSettings.invitationHash,
+    });
   });
 
   done();

@@ -1,6 +1,9 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteListService from '@domain/service/noteList.js';
+import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
+import type { NoteListPublic } from '@domain/entities/noteList';
 import { StatusCodes } from 'http-status-codes';
+
 
 /**
  * Interface for the noteList router.
@@ -50,10 +53,20 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     const page = request.query.page;
 
     const noteList = await noteListService.getNoteListByCreatorId(userId, page);
+    /**
+     * Wrapping Notelist for public use
+     */
+    const noteListItemsPublic: NotePublic[] = noteList.items.map(definePublicNote);
+
+
+    const noteListPublic: NoteListPublic = {
+      items: noteListItemsPublic,
+    };
+
 
     return reply
       .status(StatusCodes.OK)
-      .send(noteList);
+      .send(noteListPublic);
   });
 
   done();

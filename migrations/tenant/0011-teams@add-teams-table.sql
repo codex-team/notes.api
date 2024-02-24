@@ -10,11 +10,11 @@ CREATE TABLE IF NOT EXISTS public.teams (
 );
 
 --
--- Name: teams relation_id_pkey; Type: PK CONSTRAINT; Schema: public; Owner: codex
+-- Name: teams team_id_pkey; Type: PK CONSTRAINT; Schema: public; Owner: codex
 --
-ALTER TABLE public.teams DROP CONSTRAINT IF EXISTS relation_id_pkey;
+ALTER TABLE public.teams DROP CONSTRAINT IF EXISTS teams_pkey;
 ALTER TABLE public.teams 
-    ADD CONSTRAINT relation_id_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT teams_pkey PRIMARY KEY (id);
 
 --
 -- Name: teams user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: codex

@@ -7,6 +7,7 @@ import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 /**
  * Class representing a teams model in database
@@ -96,9 +97,9 @@ export default class TeamsSequelizeStorage {
         },
       },
       role: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: MemberRole.read,
+        defaultValue: MemberRole.Read,
       },
     }, {
       tableName: this.tableName,
@@ -139,17 +140,39 @@ export default class TeamsSequelizeStorage {
      */
     this.model.belongsTo(model, {
       foreignKey: 'userId',
-      as: this.userModel.tableName,
+      as: 'user',
     });
   }
 
   /**
-   * Create new team member
+   * Create new team member membership
    *
-   * @param data - team member data
+   * @param data - team membership data
    */
-  public async insert(data: TeamMemberCreationAttributes): Promise<TeamMember> {
-    return await this.model.create(data);
+  public async createTeamMembership(data: TeamMemberCreationAttributes): Promise<TeamMember> {
+    return await this.model.create({
+      noteId: data.noteId,
+      userId: data.userId,
+      role: data.role,
+    });
+  }
+
+  /**
+   * Check if user is note team member
+   *
+   * @param userId - user id to check
+   * @param noteId - note id to identify team
+   * @returns { Promise<boolean> } returns true if user is team member
+   */
+  public async isUserInTeam(userId: User['id'], noteId: NoteInternalId): Promise<boolean> {
+    const teamMemberShip = await this.model.findOne({
+      where: {
+        noteId,
+        userId,
+      },
+    });
+
+    return teamMemberShip !== null;
   }
 
   /**
@@ -159,7 +182,7 @@ export default class TeamsSequelizeStorage {
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | null> {
+  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
     const res = await this.model.findOne({
       where: {
         userId,
@@ -167,7 +190,7 @@ export default class TeamsSequelizeStorage {
       },
     });
 
-    return res?.role ?? null;
+    return res?.role ?? undefined;
   }
 
   /**
@@ -185,6 +208,29 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
+   * Get all team members by note id with info about users
+   *
+   * @param noteId - note id to get all team members
+   * @returns team with additional info
+   */
+  public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
+    if (!this.userModel) {
+      throw new DomainError('User model not initialized');
+    }
+
+    return await this.model.findAll({
+      where: { noteId },
+      attributes: ['id', 'role'],
+      include: {
+        model: this.userModel,
+        as: 'user',
+        required: true,
+        attributes: ['id', 'name', 'email', 'photo'],
+      },
+    });
+  }
+
+  /**
    * Remove team member by id
    *
    * @param id - team member id
@@ -197,5 +243,27 @@ export default class TeamsSequelizeStorage {
     });
 
     return affectedRows > 0;
+  }
+
+  /**
+   * Patch team member role by user and note id
+   *
+   * @param userId - id of team member
+   * @param noteId - note internal id
+   * @param role - new team member role
+   * @returns returns 1 if the role has been changed and 0 otherwise
+   */
+  public async patchMemberRoleById(userId: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | undefined> {
+    const affectedRows = await this.model.update({
+      role: role,
+    }, {
+      where: {
+        userId,
+        noteId,
+      },
+    });
+
+    // if counter of affected rows is more than 0, then we return new role
+    return affectedRows[0] ? role : undefined;
   }
 }
