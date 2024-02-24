@@ -64,6 +64,9 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
     Body: EditorTool
   }>('/add-tool', {
     config: {
+      /**
+       * @todo check if user is superadmin
+       */
       policy: [
         'authRequired',
       ],

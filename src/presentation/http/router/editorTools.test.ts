@@ -1,14 +1,17 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
+
+let accessToken: string;
 
 describe('Editor Tools', () => {
+  beforeEach(async () => {
+    await global.db.truncateTables();
+
+    const createdUser = await global.db.insertUser();
+
+    accessToken = global.auth(createdUser.id);
+  });
   describe('POST /editor-tools/add-tool', () => {
     test('Returns added tool with status code 200 if tool added to all tools', async () => {
-      await global.db.truncateTables();
-
-      const createdUser = await global.db.insertUser();
-
-      const accessToken = global.auth(createdUser.id);
-
       const toolToAdd = {
         name: 'code',
         title: 'Code Tool',
@@ -49,6 +52,27 @@ describe('Editor Tools', () => {
           expect.objectContaining(toolToAdd),
         ])
       );
+    });
+    test('Returns 400 if tool data is invalid', async () => {
+      const toolDataWithoutName = {
+        title: 'Code Tool',
+        exportName: 'Code',
+        isDefault: false,
+        source: {
+          cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
+        },
+      };
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: '/editor-tools/add-tool',
+        body: toolDataWithoutName,
+      });
+
+      expect(response?.statusCode).toBe(400);
     });
   });
 });
