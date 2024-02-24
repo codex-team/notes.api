@@ -173,7 +173,7 @@ export default class NoteService {
    * @param parentPublicId - new parent id
    */
   public async updateNoteRelation(noteId: NoteInternalId, parentPublicId: NotePublicId): Promise<boolean> {
-    const parentNote = (await this.noteRepository.getNoteByPublicId(parentPublicId));
+    const parentNote = await this.noteRepository.getNoteByPublicId(parentPublicId);
 
     if (parentNote === null) {
       throw new DomainError(`Incorrect parent note`);
