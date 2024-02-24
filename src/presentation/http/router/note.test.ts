@@ -384,7 +384,7 @@ describe('Note API', () => {
         },
         url: `/note`,
         body: {
-          parentId: 'ishvm5qH84',
+          parentId: parentNote.publicId,
         },
       });
 
