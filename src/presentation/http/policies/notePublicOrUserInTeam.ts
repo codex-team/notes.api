@@ -32,7 +32,7 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
 
   /**
    * If note is public, everyone can access it
-   * If note is private, only team member and creator can access it
+   * If note is private, only team member can access it
    */
   if (isPublic === false && isEmpty(memberRole)) {
     return await reply.forbidden();

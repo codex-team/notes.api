@@ -29,8 +29,7 @@ export default async function userCanEdit(context: PolicyContext): Promise<void>
   const memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(request.userId!, request.note.id);
 
   /**
-   * If user is not a creator of the note and
-   * user has a Read Role or is not in team at all,
+   * If user has a Read Role or is not in team at all,
    * he doesn't have permission to edit the note
    */
   if (memberRole !== MemberRole.Write) {
