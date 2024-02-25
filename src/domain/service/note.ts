@@ -159,7 +159,7 @@ export default class NoteService {
    * Update note relation
    *
    * @param noteId - id of the current note
-   * @param parentPublicId - new parent id
+   * @param parentPublicId - id of the new parent note
    */
   public async updateNoteRelation(noteId: NoteInternalId, parentPublicId: NotePublicId): Promise<boolean> {
     const parentNote = await this.noteRepository.getNoteByPublicId(parentPublicId);
