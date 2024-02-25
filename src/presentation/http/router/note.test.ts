@@ -450,7 +450,6 @@ describe('Note API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: '012kdj8729',
         creatorId: creator.id,
       });
 
@@ -731,7 +730,6 @@ describe('Note API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: '829IWka&10',
         creatorId: creator.id,
       });
 
@@ -770,7 +768,6 @@ describe('Note API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'juikll1234',
         creatorId: creator.id,
       });
 

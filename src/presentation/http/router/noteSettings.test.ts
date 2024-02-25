@@ -20,7 +20,6 @@ describe('NoteSettings API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        publicId: 'f43NU75weU',
       });
 
       /** Create test note settings */
@@ -102,7 +101,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'kwjsuI2UYT',
         creatorId: creator.id,
       });
 
@@ -339,7 +337,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'jdkfuw8201',
         creatorId: creator.id,
       });
 
@@ -418,7 +415,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'jdkfuw8201',
         creatorId: creator.id,
       });
 
@@ -516,7 +512,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'ppp1238201',
         creatorId: creator.id,
       });
 
@@ -558,7 +553,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'jdJJJw90oW',
         creatorId: creator.id,
       });
 
@@ -692,7 +686,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'KKKjuw8IIo',
         creatorId: creator.id,
       });
 
@@ -734,7 +727,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'JDKfuiKLwo',
         creatorId: creator.id,
       });
 
@@ -763,7 +755,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'lllKmdjsu&',
         creatorId: creator.id,
       });
 
@@ -943,7 +934,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'jlpDosiw98',
         creatorId: creator.id,
       });
 
@@ -988,7 +978,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'jkdopl9802',
         creatorId: creator.id,
       });
 
@@ -1032,7 +1021,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'jdkKKKoq92',
         creatorId: creator.id,
       });
 
@@ -1082,7 +1070,6 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: '000UI29381',
         creatorId: creator.id,
       });
 
