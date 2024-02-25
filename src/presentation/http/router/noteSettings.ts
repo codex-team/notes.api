@@ -122,6 +122,11 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
+
+    if (request.note?.creatorId === request.body.userId) {
+      return reply.forbidden('You can\'t patch creator\'s role');
+    }
+
     const newRole = await noteSettingsService.patchMemberRoleByUserId(request.body.userId, noteId, request.body.newRole);
 
     if (newRole === undefined) {
@@ -129,6 +134,61 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     }
 
     return reply.send(newRole);
+  });
+
+  /**
+   * Deletes user from the noteTeam
+   */
+  fastify.delete<{
+    Params: {
+      notePublicId: NotePublicId,
+    },
+    Body: {
+      userId: User['id'],
+    },
+    Reply: User['id']
+  }>('/:notePublicId/team', {
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      body: {
+        userId: {
+          $ref: 'UserSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          $ref: 'UserSchema#/properties/id',
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+    const userId = request.body.userId;
+
+    if (request.note?.creatorId === request.body.userId) {
+      return reply.forbidden('You can\'t delete from the team ccreator of the note');
+    }
+
+    const deletedTeamMemberId = await noteSettingsService.removeTeamMemberByUserIdAndNoteId(userId, noteId);
+
+    if (deletedTeamMemberId === undefined) {
+      return reply.notFound('User does not belong to Note\'s team');
+    }
+
+    return reply.send(deletedTeamMemberId);
   });
 
   /**

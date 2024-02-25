@@ -92,6 +92,7 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts note mock to then db
+   * Automatically adds note creator to note team
    *
    * @param note - note object which contain all info about note
    *
@@ -112,6 +113,12 @@ export default class DatabaseHelpers {
     });
 
     const createdNote = results[0];
+
+    await this.insertNoteTeam({
+      userId: createdNote.creatorId,
+      noteId: createdNote.id,
+      role: 1,
+    });
 
     return createdNote;
   }

@@ -76,10 +76,12 @@ export default class TeamRepository {
   /**
    * Remove team member by id
    *
-   * @param id - team member id
+   * @param userId - id of the team member
+   * @param noteId - note internal id
+   * @returns returns userId if team member was deleted and undefined overwise
    */
-  public async removeMemberById(id: TeamMember['id']): Promise<boolean> {
-    return await this.storage.removeTeamMemberById(id);
+  public async removeTeamMemberByUserIdAndNoteId(userId: TeamMember['id'], noteId: NoteInternalId): Promise<User['id'] | undefined> {
+    return await this.storage.removeTeamMemberByUserIdAndNoteId(userId, noteId);
   }
   /**
    * Patch team member role by user and note id
