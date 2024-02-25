@@ -667,15 +667,18 @@ describe('Note API', () => {
 
       accessToken = global.auth(user.id);
     });
-    test('Returns true when note was successfully unlinked', async () => {
+    test('Returns 200 and true when note was successfully unlinked', async () => {
+      /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
+      /* create test parent note */
       const parentNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
+      /* create notes relation */
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
@@ -705,6 +708,7 @@ describe('Note API', () => {
     });
 
     test('Return 406 when note has no parent', async () => {
+      /* create test note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
@@ -723,6 +727,7 @@ describe('Note API', () => {
     });
 
     test('Return 406 when there is no note with that public id', async () => {
+      /* id of non-existent note*/
       const nonExistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
@@ -739,14 +744,17 @@ describe('Note API', () => {
     });
 
     test('Return 401 when user not authorized', async () => {
+      /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
+      /* create test parent note*/
       const parentNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
+      /* create test note relation */
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
@@ -763,21 +771,26 @@ describe('Note API', () => {
     });
 
     test('Return 403 when user in team with read role', async () => {
+      /* create second user, who will be the creator of the note */
       const creator = await global.db.insertUser();
 
+      /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: creator.id,
       });
 
+      /* create test parent note */
       const parentNote = await global.db.insertNote({
         creatorId: creator.id,
       });
 
+      /* create test note relation */
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
       });
 
+      /* create test team for child note */
       await global.db.insertNoteTeam({
         noteId: childNote.id,
         userId: user.id,
@@ -797,22 +810,27 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual('Permission denied');
     });
 
-    test('Returns true when note was successfully unlinked by user in team with edit role', async () => {
+    test('Returns 200 and true when note was successfully unlinked by user in team with edit role', async () => {
+      /* create second user, who will be the creator of the note */
       const creator = await global.db.insertUser();
 
+      /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: creator.id,
       });
 
+      /* create test parent note */
       const parentNote = await global.db.insertNote({
         creatorId: creator.id,
       });
 
+      /* create test note relation */
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
       });
 
+      /* create test team for child note */
       await global.db.insertNoteTeam({
         noteId: childNote.id,
         userId: user.id,
