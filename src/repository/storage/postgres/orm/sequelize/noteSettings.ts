@@ -35,7 +35,7 @@ export class NoteSettingsModel extends Model<InferAttributes<NoteSettingsModel>,
   public declare invitationHash: NoteSettings['invitationHash'];
 
   /**
-   * Hashed if of the cover file
+   * Hashed id of the cover file
    */
   public declare cover: CreationOptional<NoteSettings['cover']>;
 }

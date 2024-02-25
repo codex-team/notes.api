@@ -1,4 +1,4 @@
--- Create "invitation hash" column in note_settings table
+-- Create "cover" column in note_settings table
 DO $$
 BEGIN
   IF NOT EXISTS(SELECT *
