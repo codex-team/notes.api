@@ -1,24 +1,38 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, beforeEach } from 'vitest';
 describe('NoteSettings API', () => {
+  beforeEach(async () => {
+    /**
+     * truncate all tables, which are needed
+     * restart autoincrement sequences for data to start with id 1
+     *
+     * TODO get rid of restarting database data in tests (move to beforeEach)
+     */
+    await global.db.truncateTables();
+  });
   describe('GET /note-settings/:notePublicId ', () => {
     test('Returns note settings by public id with 200 status', async () => {
-      const existingNotePublicId = 'f43NU75weU';
+      const user = await global.db.insertUser();
 
-      const expectedNoteSettings = {
-        'customHostname': 'codex.so',
-        'invitationHash': 'FfAwyaR80C',
-        'isPublic': true,
-        'team':  [],
-      };
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const noteSettings = await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note-settings/${existingNotePublicId}`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual(expectedNoteSettings);
+      expect(response?.json()).toMatchObject({
+        isPublic: noteSettings.isPublic,
+        invitationHash: noteSettings.invitationHash,
+      });
     });
 
     test('Returns "team" along with the note settings if the note contains a team', async () => {
@@ -202,10 +216,7 @@ describe('NoteSettings API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'Test user 1',
-      });
+      const creator = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
@@ -298,7 +309,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-settings/:notePublicId ', () => {
-    test('Update note settings by public id with 200 status, user is creator of the note', async () => {
+    test('Update note settings by public id with 200 status, user is in team with role write', async () => {
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -431,7 +442,7 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
-    test('Generate the new invitation hash if user is a creator of the note', async () => {
+    test('Generate the new invitation hash if user is in team with role write', async () => {
       /**
        * truncate all tables, which are needed
        * restart autoincrement sequences for data to start with id 1
@@ -688,10 +699,119 @@ describe('NoteSettings API', () => {
       expect(response?.json().message).toBe('User does not belong to Note\'s team');
     });
 
-    test.todo('Returns 200 and a new role, when patch is done by a member role = write');
-    test.todo('Returns 200 when patch is done by a creator');
+    test('Returns status code 403 and message "You can\'t patch creator\'s role" when you patching creator\'s memberRole', async () => {
+      await global.db.truncateTables();
+
+      const creator = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const accessToker = await global.auth(creator.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToker}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+        body: {
+          userId: creator.id,
+          newRole: 0,
+        },
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toBe('You can\'t patch creator\'s role');
+    });
+
     test.todo('Returns 403 when patch is done by a member role = read');
     test.todo('Returns 403 when test is done by a user who is not a member of the team and not a creator');
+  });
+
+  describe('DELETE /:notePublicId/team', () => {
+    test('User is deleted from the team by team member with role write', async () => {
+      await global.db.truncateTables();
+
+      const creator = await global.db.insertUser();
+
+      const RandomGuy = await global.db.insertUser({
+        email: 'randomGuy@CodeXmail.com',
+        name: 'random guy',
+      });
+
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      await global.db.insertNoteTeam({
+        noteId: note.id,
+        userId: RandomGuy.id,
+        role: 1,
+      });
+
+      const accessToken = await global.auth(creator.id);
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+        body: {
+          userId: RandomGuy.id,
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toBe(RandomGuy.id);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+      });
+
+      expect(response?.json()).toMatchObject([
+        {
+          'noteId': note.id,
+          'userId': creator.id,
+          'role': 1,
+        },
+      ]);
+    });
+
+    test('Returns status code 403 and message "You can\'t delete from the team ccreator of the note" when you are deleting creator from the team', async () => {
+      await global.db.truncateTables();
+
+      const creator = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const accessToken = await global.auth(creator.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+        body: {
+          userId: creator.id,
+        },
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toBe('You can\'t delete from the team ccreator of the note');
+    });
   });
 });
 

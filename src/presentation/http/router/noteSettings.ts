@@ -169,7 +169,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const userId = request.body.userId;
 
     if (request.note?.creatorId === request.body.userId) {
-      return reply.forbidden('you can\'t delete from the team ccreator of the note');
+      return reply.forbidden('You can\'t delete from the team ccreator of the note');
     }
 
     const deletedTeamMemberId = await noteSettingsService.removeTeamMemberByUserIdAndNoteId(userId, noteId);
