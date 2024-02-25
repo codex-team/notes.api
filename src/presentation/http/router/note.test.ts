@@ -1,6 +1,6 @@
-import { MemberRole } from '@domain/entities/team';
+import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
-import type User from '@domain/entities/user';
+import type User from '@domain/entities/user.js';
 
 describe('Note API', () => {
   beforeEach(async () => {
@@ -667,7 +667,7 @@ describe('Note API', () => {
 
       accessToken = global.auth(user.id);
     });
-    test('Returns true when parent relation was deleted successfully', async () => {
+    test('Returns true when note was successfully unlinked', async () => {
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
@@ -797,7 +797,7 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual('Permission denied');
     });
 
-    test('Returns true when parent relation was deleted successfully by user in team with edit role', async () => {
+    test('Returns true when note was successfully unlinked by user in team with edit role', async () => {
       const creator = await global.db.insertUser();
 
       const childNote = await global.db.insertNote({
