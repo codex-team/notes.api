@@ -168,12 +168,13 @@ export default class NoteService {
       throw new DomainError(`Incorrect parent note`);
     }
 
-    const parentNoteId = parentNote.id;
-
-    if (parentNoteId === noteId) {
+    if (parentNote.id === noteId) {
       throw new DomainError(`Parent note is the same as the child note`);
     }
 
+    /**
+     * @todo: implement recursive check to avoid circular references
+     */
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
 }
