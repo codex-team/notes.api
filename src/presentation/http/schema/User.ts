@@ -1,9 +1,10 @@
 /**
  * User entity used for validation and serialization
  */
-export const UserSchema = {
+export const UserSchema  = {
   $id: 'User',
   type: 'object',
+  required: ['email', 'name'],
   properties: {
     id: { type: 'string' },
     email: { type: 'string' },

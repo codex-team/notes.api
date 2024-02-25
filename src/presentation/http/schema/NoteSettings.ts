@@ -4,6 +4,7 @@
 export const NoteSettingsSchema = {
   $id: 'NoteSettingsSchema',
   type: 'object',
+  required: ['isPublic', 'invitationHash'],
   properties: {
     customHostname: {
       type: 'string',

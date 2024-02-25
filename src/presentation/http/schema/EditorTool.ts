@@ -1,6 +1,11 @@
+
+/**
+ * Editor tool entity schema used for validation and serialization
+ */
 export const EditorToolSchema = {
   $id: 'EditorToolSchema',
   type: 'object',
+  required: ['name', 'title', 'exportName', 'source'],
   properties: {
     id: {
       type: 'string',

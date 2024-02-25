@@ -1,6 +1,9 @@
+
+/** Join schema params for validation and serialization */
 export const JoinSchemaParams = {
   $id: 'JoinSchemaParams',
   type: 'object',
+  required: [ 'hash' ],
   properties: {
     hash: {
       type: 'string',
@@ -11,6 +14,8 @@ export const JoinSchemaParams = {
   },
 };
 
+
+/** Join schema for response */
 export const JoinSchemaResponse = {
   $id: 'JoinSchemaResponse',
   type: 'object',
