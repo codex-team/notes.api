@@ -63,6 +63,14 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   fastify.post<{
     Body: EditorTool
   }>('/add-tool', {
+    config: {
+      /**
+       * @todo check if user is superadmin
+       */
+      policy: [
+        'authRequired',
+      ],
+    },
     schema: {
       body: {
         $ref: 'EditorToolSchema',
@@ -84,8 +92,9 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
     },
   }, async (request, reply) => {
     const editorTool = request.body;
+    const userId = request.userId as number;
 
-    const tool = await editorToolsService.addTool(editorTool);
+    const tool = await editorToolsService.addTool(editorTool, userId);
 
     return reply.send({
       data: tool,
