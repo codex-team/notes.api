@@ -1,5 +1,6 @@
 
 import { describe, test, expect, beforeEach } from 'vitest';
+import type User from '@domain/entities/user.js';
 
 describe('Note API', () => {
   beforeEach(async () => {
@@ -678,45 +679,36 @@ describe('Note API', () => {
   });
 
   describe('PATCH /note/:notePublicId/relation', () => {
+    let accessToken = '';
+    let user: User;
+
     beforeEach(async () => {
-      /**
-       * Truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * @todo get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
+      /** create test user */
+      user = await global.db.insertUser();
+
+      accessToken = global.auth(user.id);
     });
-    test('Returns isUpdated=true when parent was successfully updated', async () => {
-      const childNotePublicId = '9OYDD9d4_Y';
-
-      const parentNotePublicId = 'Tocn1f7rQS';
-
-      const newParentNotePublicId = 'lMkesQ1gpg';
-
-      const creator = await global.db.insertUser();
-
+    test('Returns 200 and true when parent was successfully updated', async () => {
+      /* create test child note */
       const childNote = await global.db.insertNote({
-        creatorId: creator.id,
-        publicId: childNotePublicId,
+        creatorId: user.id,
       });
 
+      /* create test parent note */
       const parentNote = await global.db.insertNote({
-        creatorId: creator.id,
-        publicId: parentNotePublicId,
+        creatorId: user.id,
       });
 
-      await global.db.insertNote({
-        creatorId: creator.id,
-        publicId: newParentNotePublicId,
+      /* create test note, that will be new parent for the child note */
+      const newParentNote = await global.db.insertNote({
+        creatorId: user.id,
       });
 
+      /* create test relation */
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
       });
-
-      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -724,39 +716,32 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          parentId: newParentNotePublicId,
+          parentId: newParentNote.publicId,
         },
-        url: `/note/${childNotePublicId}/relation`,
+        url: `/note/${childNote.publicId}/relation`,
       });
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual({ isUpdated: true });
+      expect(response?.json().isUpdated).toBe(true);
     });
 
-    test('Returns 400 when parentId is the same as childId', async () => {
-      const childNotePublicId = '9OYDD9d4_Y';
-
-      const parentNotePublicId = 'Tocn1f7rQS';
-
-      const creator = await global.db.insertUser();
-
+    test('Returns 400 when parent is the same as child', async () => {
+      /* create test child note*/
       const childNote = await global.db.insertNote({
-        creatorId: creator.id,
-        publicId: childNotePublicId,
+        creatorId: user.id,
       });
 
+      /* create test parent note*/
       const parentNote = await global.db.insertNote({
-        creatorId: creator.id,
-        publicId: parentNotePublicId,
+        creatorId: user.id,
       });
 
+      /* create test note relation*/
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
       });
-
-      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -764,9 +749,9 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          parentId: childNotePublicId,
+          parentId: childNote.publicId,
         },
-        url: `/note/${childNotePublicId}/relation`,
+        url: `/note/${childNote.publicId}/relation`,
       });
 
       expect(response?.statusCode).toBe(400);
@@ -775,18 +760,11 @@ describe('Note API', () => {
     });
 
     test('Return 400 when parent note does not exist', async () => {
-      const childNotePublicId = '9OYDD9d4_Y';
+      const nonExistentParentId = '47L43yY7dp';
 
-      const parentNotePublicId = 'Tocn1f7rQS';
-
-      const creator = await global.db.insertUser();
-
-      await global.db.insertNote({
-        creatorId: creator.id,
-        publicId: childNotePublicId,
+      const childNote= await global.db.insertNote({
+        creatorId: user.id,
       });
-
-      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -794,9 +772,9 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          parentId: parentNotePublicId,
+          parentId: nonExistentParentId,
         },
-        url: `/note/${childNotePublicId}/relation`,
+        url: `/note/${childNote.publicId}/relation`,
       });
 
       expect(response?.statusCode).toBe(400);
