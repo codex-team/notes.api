@@ -696,7 +696,7 @@ describe('NoteSettings API', () => {
       ]);
     });
 
-    test('Returns status code 403 and message "You can\'t delete from the team ccreator of the note" when you are deleting creator from the team', async () => {
+    test('Returns status code 403 and message "You can\'t delete from the team creator of the note" when you are deleting creator from the team', async () => {
       const creator = await global.db.insertUser();
 
       const note = await global.db.insertNote({

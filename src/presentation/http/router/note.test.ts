@@ -66,7 +66,7 @@ describe('Note API', () => {
         url: `/note/${note.publicId}`,
       });
 
-      // expect(response?.statusCode).toBe(200);
+      expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
         'note': {
@@ -100,7 +100,7 @@ describe('Note API', () => {
         url: `/note/${note.publicId}`,
       });
 
-      // expect(response?.statusCode).toBe(200);
+      expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
         'note': {
@@ -298,7 +298,7 @@ describe('Note API', () => {
         expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
       });
 
-      test('Returns canEdit=true, when user is authorized and is in the team', async () => {
+      test('Returns canEdit=true, when user is in the team and has the Write role', async () => {
         const user = await global.db.insertUser();
 
         const note = await global.db.insertNote({
