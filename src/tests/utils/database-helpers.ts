@@ -7,7 +7,7 @@ import type UserSession from '@domain/entities/userSession.ts';
 import type NoteSettings from '@domain/entities/noteSettings.ts';
 import type { TeamMember } from '@domain/entities/team.ts';
 import type EditorTool from '@domain/entities/editorTools.ts';
-import { nanoid} from 'nanoid';
+import { nanoid } from 'nanoid';
 
 
 /**
