@@ -1,0 +1,1 @@
+UPDATE public.users SET "editor_tools" = '[]'::jsonb WHERE "editor_tools" = null
