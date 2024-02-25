@@ -94,8 +94,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 200 and team by public id, user is not creator of the note, but a member of the team with Write role', async () => {
-      const publicId = 'kwjsuI2UYT';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -104,7 +102,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'kwjsuI2UYT',
         creatorId: creator.id,
       });
 
@@ -122,7 +120,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${publicId}/team`,
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -333,8 +331,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when user is authorized, but is not member of the team and not creator', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -343,7 +339,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'jdkfuw8201',
         creatorId: creator.id,
       });
 
@@ -360,7 +356,7 @@ describe('NoteSettings API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note-settings/${publicId}/team`,
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -414,8 +410,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 200 when user is in team and has a Write role', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -424,7 +418,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'jdkfuw8201',
         creatorId: creator.id,
       });
 
@@ -451,7 +445,7 @@ describe('NoteSettings API', () => {
         body: {
           'isPublic': false,
         },
-        url: `/note-settings/${publicId}`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -514,8 +508,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when user is in team and has a Read role', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -524,7 +516,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'ppp1238201',
         creatorId: creator.id,
       });
 
@@ -551,15 +543,13 @@ describe('NoteSettings API', () => {
         body: {
           'isPublic': false,
         },
-        url: `/note-settings/${publicId}`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
     });
 
     test('Return 403 when user authorized, but not member of the team', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -568,7 +558,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'jdJJJw90oW',
         creatorId: creator.id,
       });
 
@@ -588,7 +578,7 @@ describe('NoteSettings API', () => {
         body: {
           'isPublic': false,
         },
-        url: `/note-settings/${publicId}`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -694,8 +684,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 200 when user is not the creator, but in team with Write role', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -704,7 +692,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'KKKjuw8IIo',
         creatorId: creator.id,
       });
 
@@ -731,15 +719,13 @@ describe('NoteSettings API', () => {
         body: {
           'isPublic': false,
         },
-        url: `/note-settings/${publicId}`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
     });
 
     test('Returns 403 when user is not in team', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -747,8 +733,8 @@ describe('NoteSettings API', () => {
       const user = await global.db.insertUser();
 
       /** Create test note */
-      await global.db.insertNote({
-        publicId: publicId,
+      const note = await global.db.insertNote({
+        publicId: 'JDKfuiKLwo',
         creatorId: creator.id,
       });
 
@@ -762,15 +748,13 @@ describe('NoteSettings API', () => {
         body: {
           'isPublic': false,
         },
-        url: `/note-settings/${publicId}`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
     });
 
     test('Returns 403 when user is in team with Read role', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -779,7 +763,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'lllKmdjsu&',
         creatorId: creator.id,
       });
 
@@ -800,7 +784,7 @@ describe('NoteSettings API', () => {
         body: {
           'isPublic': false,
         },
-        url: `/note-settings/${publicId}`,
+        url: `/note-settings/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -945,8 +929,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 200 and a new role, when patch is done by a member with a Write role', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -961,7 +943,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'jlpDosiw98',
         creatorId: creator.id,
       });
 
@@ -990,7 +972,7 @@ describe('NoteSettings API', () => {
           'userId': teamMember2.id,
           'newRole': MemberRole.Write,
         },
-        url: `/note-settings/${publicId}/team`,
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -998,8 +980,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 200 when patch is done by a creator', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -1008,7 +988,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'jkdopl9802',
         creatorId: creator.id,
       });
 
@@ -1030,7 +1010,7 @@ describe('NoteSettings API', () => {
           'userId': teamMember.id,
           'newRole': MemberRole.Read,
         },
-        url: `/note-settings/${publicId}/team`,
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -1038,8 +1018,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when patch is done by member with a Read role', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -1054,7 +1032,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: 'jdkKKKoq92',
         creatorId: creator.id,
       });
 
@@ -1083,15 +1061,13 @@ describe('NoteSettings API', () => {
           'userId': teamMember2.id,
           'newRole': MemberRole.Write,
         },
-        url: `/note-settings/${publicId}/team`,
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(response?.statusCode).toBe(403);
     });
 
     test('Returns 403 when patch is done by a user who is not a member of the team', async () => {
-      const publicId = 'jdkfuw8201';
-
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -1106,7 +1082,7 @@ describe('NoteSettings API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: publicId,
+        publicId: '000UI29381',
         creatorId: creator.id,
       });
 
@@ -1128,7 +1104,7 @@ describe('NoteSettings API', () => {
           'userId': teamMember.id,
           'newRole': MemberRole.Write,
         },
-        url: `/note-settings/${publicId}/team`,
+        url: `/note-settings/${note.publicId}/team`,
       });
 
       expect(response?.statusCode).toBe(403);
