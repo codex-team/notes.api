@@ -50,15 +50,9 @@ describe('NoteSettings API', () => {
 
     test('Returns "team" along with the note settings if the note contains a team', async () => {
       /** create test user */
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'Test user 1',
-      });
+      const creator = await global.db.insertUser();
 
-      const randomTeamMember = await global.db.insertUser({
-        email: 'b@b.com',
-        name: 'random guy',
-      });
+      const randomTeamMember = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
@@ -103,16 +97,10 @@ describe('NoteSettings API', () => {
       const publicId = 'kwjsuI2UYT';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -206,16 +194,10 @@ describe('NoteSettings API', () => {
 
     test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
       /** create test user */
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'Test user 1',
-      });
+      const creator = await global.db.insertUser();
 
       /** create test user */
-      const randomGuy = await global.db.insertUser({
-        email: 'b@b.com',
-        name: 'Test user 2',
-      });
+      const randomGuy = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
@@ -256,15 +238,9 @@ describe('NoteSettings API', () => {
     });
     test('Returns the team if user is a creator of the note', async () => {
       /** create test user */
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'Test user 1',
-      });
+      const creator = await global.db.insertUser();
 
-      const randomTeamMember = await global.db.insertUser({
-        email: 'b@b.com',
-        name: 'random guy',
-      });
+      const randomTeamMember = await global.db.insertUser();
 
       /** create test note for created user */
       const note = await global.db.insertNote({
@@ -360,16 +336,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const user = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -447,16 +417,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -553,16 +517,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -603,16 +561,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const user = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -745,16 +697,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -795,16 +741,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const user = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const user = await global.db.insertUser();
 
       /** Create test note */
       await global.db.insertNote({
@@ -832,16 +772,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -1014,16 +948,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create test user whose team role will be changed */
       const teamMember2 = await global.db.insertUser({
@@ -1073,16 +1001,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -1119,16 +1041,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create test user whose team role will be changed */
       const teamMember2 = await global.db.insertUser({
@@ -1177,16 +1093,10 @@ describe('NoteSettings API', () => {
       const publicId = 'jdkfuw8201';
 
       /** Create test user */
-      const creator = await global.db.insertUser({
-        email: 'test1@codexmail.com',
-        name: 'testUser1',
-      });
+      const creator = await global.db.insertUser();
 
       /** Create another test user */
-      const teamMember = await global.db.insertUser({
-        email: 'test2@codexmail.com',
-        name: 'testUser2',
-      });
+      const teamMember = await global.db.insertUser();
 
       /** Create another test user */
       const user = await global.db.insertUser({
