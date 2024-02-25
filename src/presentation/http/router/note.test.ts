@@ -1,5 +1,6 @@
 
 import { describe, test, expect, beforeEach } from 'vitest';
+import type User from '@domain/entities/user';
 
 describe('Note API', () => {
   beforeEach(async () => {
@@ -657,11 +658,16 @@ describe('Note API', () => {
   });
 
   describe('DELETE /note/:publicId/relation', () => {
-    test('Return isDeleted==true when parent relation was deleted successfully', async () => {
-      const user = await global.db.insertUser();
+    let accessToken = '';
+    let user: User;
 
-      const accessToken = global.auth(user.id);
+    beforeEach(async () => {
+      /** create test user */
+      user = await global.db.insertUser();
 
+      accessToken = global.auth(user.id);
+    });
+    test('Returns true when parent relation was deleted successfully', async () => {
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
@@ -698,11 +704,7 @@ describe('Note API', () => {
       expect(response).not.toHaveProperty('parentNote');
     });
 
-    test('Return 404 when note has no parent', async () => {
-      const user = await global.db.insertUser();
-
-      const accessToken = global.auth(user.id);
-
+    test('Return 406 when note has no parent', async () => {
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
@@ -715,24 +717,20 @@ describe('Note API', () => {
         url: `/note/${childNote.publicId}/relation`,
       });
 
-      expect(response?.statusCode).toBe(404);
+      expect(response?.statusCode).toBe(406);
 
       expect(response?.json().message).toStrictEqual('Parent note does not exist');
     });
 
     test('Return 406 when there is no note with that public id', async () => {
-      const user = await global.db.insertUser();
-
-      const nonexistentId = 'ishvm5qH84';
-
-      const accessToken = global.auth(user.id);
+      const nonExistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${nonexistentId}/relation`,
+        url: `/note/${nonExistentId}/relation`,
       });
 
       expect(response?.statusCode).toBe(406);
@@ -741,8 +739,6 @@ describe('Note API', () => {
     });
 
     test('Return 401 when user not authorized', async () => {
-      const user = await global.db.insertUser();
-
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
@@ -768,9 +764,6 @@ describe('Note API', () => {
 
     test('Return 403 when user in team with read role', async () => {
       const creator = await global.db.insertUser();
-      const user = await global.db.insertUser();
-
-      const accessToken = global.auth(user.id);
 
       const childNote = await global.db.insertNote({
         creatorId: creator.id,
@@ -806,9 +799,6 @@ describe('Note API', () => {
 
     test('Return isDeleted==true when parent relation was deleted successfully by user in team with edit role', async () => {
       const creator = await global.db.insertUser();
-      const user = await global.db.insertUser();
-
-      const accessToken = global.auth(user.id);
 
       const childNote = await global.db.insertNote({
         creatorId: creator.id,
