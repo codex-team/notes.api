@@ -1,6 +1,6 @@
 
 import { describe, test, expect, beforeEach } from 'vitest';
-import { MemberRole } from '../../../domain/entities/team';
+import { MemberRole } from '@domain/entities/team.js';
 
 describe('Note API', () => {
   beforeEach(async () => {
@@ -106,6 +106,11 @@ describe('Note API', () => {
       if (isAuthorized) {
         accessToken = global.auth(user.id);
       }
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',

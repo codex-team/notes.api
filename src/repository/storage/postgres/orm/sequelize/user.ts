@@ -35,6 +35,11 @@ interface InsertUserOptions {
    * User photo
    */
   photo?: string;
+
+  /**
+   * User editor tools
+   */
+   editorTools: EditorTool['id'][];
 }
 
 /**
@@ -218,12 +223,14 @@ export default class UserSequelizeStorage {
     email,
     name,
     photo,
+    editorTools,
   }: InsertUserOptions): Promise<User> {
     return await this.model.create({
       email,
       name,
       createdAt: new Date(),
       photo,
+      editorTools,
     });
   }
 

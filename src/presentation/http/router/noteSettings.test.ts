@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { MemberRole } from '@domain/entities/team.js';
+
 describe('NoteSettings API', () => {
   beforeEach(async () => {
     /**
@@ -19,6 +20,7 @@ describe('NoteSettings API', () => {
       const note = await global.db.insertNote({
         creatorId: user.id,
       });
+
 
       /** Create test note settings */
       const noteSettings = await global.db.insertNoteSetting({
@@ -199,6 +201,40 @@ describe('NoteSettings API', () => {
   });
 
   describe('GET /note-settings/:notePublicId/team ', () => {
+    test('Returns the team if user is in team with role write', async () => {
+      /** create test user */
+      const creator = await global.db.insertUser();
+
+      /** create test note for created user */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /** create test note settings for created note */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      const accessToken = global.auth(creator.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject([ {
+        noteId: note.id,
+        role: 1,
+        userId: creator.id,
+      } ]);
+    });
+
     test('Returns status 401 when the user is not authorized', async () => {
       const user = await global.db.insertUser();
 
@@ -701,6 +737,85 @@ describe('NoteSettings API', () => {
           },
         ]);
       }
+    });
+
+    test('Returns status code 403 and message "You can\'t delete from the team creator of the note" when you are deleting creator from the team', async () => {
+      const creator = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const accessToken = await global.auth(creator.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+        body: {
+          userId: creator.id,
+        },
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toBe('You can\'t delete from the team ccreator of the note');
+    });
+  });
+
+  describe('DELETE /:notePublicId/team', () => {
+    test('User is deleted from the team by team member with role write', async () => {
+      const creator = await global.db.insertUser();
+
+      const RandomGuy = await global.db.insertUser({
+        email: 'randomGuy@CodeXmail.com',
+        name: 'random guy',
+      });
+
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      await global.db.insertNoteTeam({
+        noteId: note.id,
+        userId: RandomGuy.id,
+        role: 1,
+      });
+
+      const accessToken = await global.auth(creator.id);
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+        body: {
+          userId: RandomGuy.id,
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toBe(RandomGuy.id);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+      });
+
+      expect(response?.json()).toMatchObject([
+        {
+          'noteId': note.id,
+          'userId': creator.id,
+          'role': 1,
+        },
+      ]);
     });
 
     test('Returns status code 403 and message "You can\'t delete from the team creator of the note" when you are deleting creator from the team', async () => {
