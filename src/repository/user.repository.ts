@@ -119,6 +119,7 @@ export default class UserRepository {
       email: res.email,
       photo: res.picture,
       name: res.name,
+      editorTools: [],
     });
   }
 
