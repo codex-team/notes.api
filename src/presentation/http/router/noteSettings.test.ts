@@ -36,14 +36,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns "team" along with the note settings if the note contains a team', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const creator = await global.db.insertUser({
         email: 'a@a.com',
@@ -85,14 +77,6 @@ describe('NoteSettings API', () => {
     test('Returns 404 when note settings with specified note public id do not exist', async () => {
       const nonexistentId = 'ishvm5qH84';
 
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       const response = await global.api?.fakeRequest({
         method: 'GET',
         url: `/note-settings/${nonexistentId}`,
@@ -125,14 +109,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const user = await global.db.insertUser();
 
@@ -158,14 +134,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const creator = await global.db.insertUser({
         email: 'a@a.com',
@@ -207,14 +175,6 @@ describe('NoteSettings API', () => {
 
   describe('GET /note-settings/:notePublicId/team ', () => {
     test('Returns the team if user is in team with role write', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const creator = await global.db.insertUser();
 
@@ -249,8 +209,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      await global.db.truncateTables();
-
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -310,14 +268,6 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId ', () => {
     test('Update note settings by public id with 200 status, user is in team with role write', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const user = await global.db.insertUser();
 
@@ -360,8 +310,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      await global.db.truncateTables();
-
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -424,8 +372,6 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/invitation-hash ', () => {
     test('Returns status 401 when the user is not authorized', async () => {
-      await global.db.truncateTables();
-
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -443,14 +389,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Generate the new invitation hash if user is in team with role write', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const creator = await global.db.insertUser();
 
@@ -532,14 +470,6 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test('Update team member role by user id and note id, with status code 200', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const creator = await global.db.insertUser({
         email: 'test@codexmail.com',
@@ -603,14 +533,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 200 and new role, if role was patched (if the user already had passing a role, then behavior is the same)', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const creator = await global.db.insertUser({
         email: 'test@codexmail.com',
@@ -659,14 +581,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
-      /**
-       * truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * TODO get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-
       /** create test user */
       const user = await global.db.insertUser();
 
@@ -700,8 +614,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 403 and message "You can\'t patch creator\'s role" when you patching creator\'s memberRole', async () => {
-      await global.db.truncateTables();
-
       const creator = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -733,8 +645,6 @@ describe('NoteSettings API', () => {
 
   describe('DELETE /:notePublicId/team', () => {
     test('User is deleted from the team by team member with role write', async () => {
-      await global.db.truncateTables();
-
       const creator = await global.db.insertUser();
 
       const RandomGuy = await global.db.insertUser({
@@ -787,8 +697,6 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 403 and message "You can\'t delete from the team ccreator of the note" when you are deleting creator from the team', async () => {
-      await global.db.truncateTables();
-
       const creator = await global.db.insertUser();
 
       const note = await global.db.insertNote({
