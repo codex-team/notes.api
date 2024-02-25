@@ -45,7 +45,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     schema: {
       response: {
         '2xx': {
-          $ref: 'User',
+          $ref: 'UserSchema',
         },
       },
     },
@@ -132,7 +132,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
             },
           },
         },
-      }
+      },
     },
   }, async (request, reply) => {
     const toolId = request.body.toolId;
