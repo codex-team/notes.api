@@ -28,11 +28,11 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        'note': {
-          'id': note.publicId,
+        note: {
+          id: note.publicId,
         },
-        'accessRights': {
-          'canEdit': false,
+        accessRights: {
+          canEdit: false,
         },
       });
     });
@@ -54,29 +54,29 @@ describe('Note API', () => {
       { role: MemberRole.Read,
         isPublic: false,
         isAuthorized: true,
-        statusCode: 200 },
+        expectedStatusCode: 200 },
 
       { role: MemberRole.Write,
         isPublic: false,
         isAuthorized: true,
-        statusCode: 200 },
+        expectedStatusCode: 200 },
 
       { role: null,
         isPublic: false,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isPublic: false,
         isAuthorized: false,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isPublic: false,
         isAuthorized: false,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
     ])
-    ('Returns note with access rights by public id. Request is done by user who is anon, not in team or in team with different rights', async ({ role, isPublic, isAuthorized, statusCode }) => {
+    ('Returns note with access rights by public id. Request is done by user who is anon, not in team or in team with different rights', async ({ role, isPublic, isAuthorized, expectedStatusCode }) => {
       const canEdit = role === MemberRole.Write;
 
       const creator = await global.db.insertUser();
@@ -120,9 +120,9 @@ describe('Note API', () => {
         url: `/note/${note.publicId}`,
       });
 
-      expect(response?.statusCode).toBe(statusCode);
+      expect(response?.statusCode).toBe(expectedStatusCode);
 
-      if (statusCode === 200) {
+      if (expectedStatusCode === 200) {
         expect(response?.json()).toMatchObject({
           'note': {
             'id': note.publicId,
@@ -386,24 +386,6 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    beforeEach(async () => {
-      /**
-       * Truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * @todo get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-    });
-    beforeEach(async () => {
-      /**
-       * Truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * @todo get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-    });
     test('Should correctly save relation to parent note if parentId passed', async () => {
       const user = await global.db.insertUser();
 

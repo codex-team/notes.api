@@ -85,7 +85,7 @@ describe('Join API', () => {
       /** create test user */
       const creator = await global.db.insertUser();
 
-      const RandomGuy = await global.db.insertUser({
+      const randomGuy = await global.db.insertUser({
         email: 'randomGuy@CodeXmail.com',
         name: 'random guy',
       });
@@ -103,7 +103,7 @@ describe('Join API', () => {
         invitationHash,
       });
 
-      const accessToken = global.auth(RandomGuy.id);
+      const accessToken = global.auth(randomGuy.id);
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
@@ -117,7 +117,7 @@ describe('Join API', () => {
 
       expect(response?.json()).toMatchObject({
         result: {
-          userId: RandomGuy.id,
+          userId: randomGuy.id,
           noteId: note.id,
           role: 0,
         },

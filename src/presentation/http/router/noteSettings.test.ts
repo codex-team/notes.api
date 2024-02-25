@@ -316,21 +316,21 @@ describe('NoteSettings API', () => {
     test.each([
       { role: MemberRole.Write,
         isAuthorized: true,
-        statusCode: 200 },
+        expectedStatusCode: 200 },
 
       { role: MemberRole.Read,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isAuthorized: false,
-        statusCode: 401 },
+        expectedStatusCode: 401 },
     ])
-    ('Update note settings by public id, user is anon or not in team or in team with different roles', async ({ role, isAuthorized, statusCode }) => {
+    ('Update note settings by public id, user is anon or not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
       /** create test user */
       const creator = await global.db.insertUser();
 
@@ -375,7 +375,7 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${note.publicId}`,
       });
 
-      expect(response?.statusCode).toBe(statusCode);
+      expect(response?.statusCode).toBe(expectedStatusCode);
     });
 
     test('Returns status 406 when the public id does not exist', async () => {
@@ -417,21 +417,21 @@ describe('NoteSettings API', () => {
     test.each([
       { role: MemberRole.Write,
         isAuthorized: true,
-        statusCode: 200 },
+        expectedStatusCode: 200 },
 
       { role: MemberRole.Read,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isAuthorized: false,
-        statusCode: 401 },
+        expectedStatusCode: 401 },
     ])
-    ('Generation of new invitation hash. User is anon, not in team or in team with different roles', async ({ role, isAuthorized, statusCode }) => {
+    ('Generation of new invitation hash. User is anon, not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
       /** Create test user */
       const creator = await global.db.insertUser();
 
@@ -476,9 +476,9 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${note.publicId}/invitation-hash`,
       });
 
-      expect(response?.statusCode).toBe(statusCode);
+      expect(response?.statusCode).toBe(expectedStatusCode);
 
-      if (statusCode === 200) {
+      if (expectedStatusCode === 200) {
         expect(response?.json().invitationHash).not.toBe('');
 
         expect(response?.json().invitationHash).toHaveLength(10);
@@ -527,21 +527,21 @@ describe('NoteSettings API', () => {
     test.each([
       { role: MemberRole.Write,
         isAuthorized: true,
-        statusCode: 200 },
+        expectedStatusCode: 200 },
 
       { role: MemberRole.Read,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isAuthorized: false,
-        statusCode: 401 },
+        expectedStatusCode: 401 },
     ])
-    ('Update team member role by user id and note id. Update is done by user who is anon, is not in team or in team with different roles', async ({ role, isAuthorized, statusCode }) => {
+    ('Update team member role by user id and note id. Update is done by user who is anon, is not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
     /** create test user */
       const creator = await global.db.insertUser();
 
@@ -581,9 +581,9 @@ describe('NoteSettings API', () => {
         },
       });
 
-      expect(response?.statusCode).toBe(statusCode);
+      expect(response?.statusCode).toBe(expectedStatusCode);
 
-      if (statusCode === 200) {
+      if (expectedStatusCode === 200) {
         expect(response?.body).toBe(MemberRole.Read.toString());
       }
     });
@@ -652,21 +652,21 @@ describe('NoteSettings API', () => {
     test.each([
       { role: MemberRole.Write,
         isAuthorized: true,
-        statusCode: 200 },
+        expectedStatusCode: 200 },
 
       { role: MemberRole.Read,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isAuthorized: true,
-        statusCode: 403 },
+        expectedStatusCode: 403 },
 
       { role: null,
         isAuthorized: false,
-        statusCode: 401 },
+        expectedStatusCode: 401 },
     ])
-    ('User is deleted from the team by anon user, user not in team or in team with different roles', async ( { role, isAuthorized, statusCode } ) => {
+    ('User is deleted from the team by anon user, user not in team or in team with different roles', async ( { role, isAuthorized, expectedStatusCode } ) => {
       const creator = await global.db.insertUser();
 
       const user = await global.db.insertUser();
@@ -711,9 +711,9 @@ describe('NoteSettings API', () => {
         },
       });
 
-      expect(response?.statusCode).toBe(statusCode);
+      expect(response?.statusCode).toBe(expectedStatusCode);
 
-      if (statusCode === 200) {
+      if (expectedStatusCode === 200) {
         expect(response?.json()).toBe(anotherUser.id);
 
         response = await global.api?.fakeRequest({
