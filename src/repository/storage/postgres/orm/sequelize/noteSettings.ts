@@ -33,6 +33,11 @@ export class NoteSettingsModel extends Model<InferAttributes<NoteSettingsModel>,
    * Invitation hash
    */
   public declare invitationHash: NoteSettings['invitationHash'];
+
+  /**
+   * Hashed if of the cover file
+   */
+  public declare cover: CreationOptional<NoteSettings['cover']>;
 }
 
 /**
@@ -96,6 +101,10 @@ export default class NoteSettingsSequelizeStorage {
       invitationHash: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      cover: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     }, {
       tableName: this.tableName,
