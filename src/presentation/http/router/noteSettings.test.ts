@@ -314,23 +314,35 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId ', () => {
     test.each([
-      { role: MemberRole.Write,
+      /** Returns 200 if user is a team member with a Write role */
+      {
+        role: MemberRole.Write,
         isAuthorized: true,
-        expectedStatusCode: 200 },
+        expectedStatusCode: 200
+      },
 
-      { role: MemberRole.Read,
+      /** Returns 403 if user is a team member with a Read role */
+      {
+        role: MemberRole.Read,
         isAuthorized: true,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 403
+      },
 
-      { role: null,
+      /** Returns 403 if user is not in the team */
+      {
+        role: null,
         isAuthorized: true,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 403
+      },
 
-      { role: null,
+      /** Returns 401 if user is not authorized */
+      {
+        role: null,
         isAuthorized: false,
-        expectedStatusCode: 401 },
+        expectedStatusCode: 401
+      },
     ])
-    ('Update note settings by public id, user is anon or not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
+    ('Update note settings by public id', async ({ role, isAuthorized, expectedStatusCode }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -415,23 +427,35 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/invitation-hash ', () => {
     test.each([
-      { role: MemberRole.Write,
+      /** Returns 200 if user is a team member with a Write role */
+      {
+        role: MemberRole.Write,
         isAuthorized: true,
-        expectedStatusCode: 200 },
+        expectedStatusCode: 200
+      },
 
-      { role: MemberRole.Read,
+      /** Returns 403 if user is a team member with a Read role */
+      {
+        role: MemberRole.Read,
         isAuthorized: true,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 403
+      },
 
-      { role: null,
+      /** Returns 403 if user is not in the team */
+      {
+        role: null,
         isAuthorized: true,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 403
+      },
 
-      { role: null,
+      /** Returns 401 if user is not authorized */
+      {
+        role: null,
         isAuthorized: false,
-        expectedStatusCode: 401 },
+        expectedStatusCode: 401
+      },
     ])
-    ('Generation of new invitation hash. User is anon, not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
+    ('Generate invitation hash', async ({ role, isAuthorized, expectedStatusCode }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -525,26 +549,39 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test.each([
-      { role: MemberRole.Write,
+      /** Returns 200 if user is a team member with a Write role */
+      {
+        role: MemberRole.Write,
         isAuthorized: true,
-        expectedStatusCode: 200 },
+        expectedStatusCode: 200
+      },
 
-      { role: MemberRole.Read,
+      /** Returns 403 if user is a team member with a Read role */
+      {
+        role: MemberRole.Read,
         isAuthorized: true,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 403
+      },
 
-      { role: null,
+      /** Returns 403 if user is not in the team */
+      {
+        role: null,
         isAuthorized: true,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 403
+      },
 
-      { role: null,
+      /** Returns 401 if user is not authorized */
+      {
+        role: null,
         isAuthorized: false,
-        expectedStatusCode: 401 },
+        expectedStatusCode: 401
+      },
     ])
-    ('Update team member role by user id and note id. Update is done by user who is anon, is not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
+    ('Update team member role by user id and note id', async ({ role, isAuthorized, expectedStatusCode }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
+      /** Create test user */
       const user = await global.db.insertUser();
 
       /** Create test note for created user */
@@ -650,23 +687,35 @@ describe('NoteSettings API', () => {
 
   describe('DELETE /:notePublicId/team', () => {
     test.each([
-      { role: MemberRole.Write,
+      /** Returns 200 if user is a team member with a Write role */
+      {
+        role: MemberRole.Write,
         isAuthorized: true,
-        expectedStatusCode: 200 },
+        expectedStatusCode: 200
+      },
 
-      { role: MemberRole.Read,
+      /** Returns 403 if user is a team member with a Read role */
+      {
+        role: MemberRole.Read,
         isAuthorized: true,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 403
+      },
 
-      { role: null,
+      /** Returns 403 if user is not in the team */
+      {
+        role: null,
         isAuthorized: true,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 403
+      },
 
-      { role: null,
+      /** Returns 401 if user is not authorized */
+      {
+        role: null,
         isAuthorized: false,
-        expectedStatusCode: 401 },
+        expectedStatusCode: 401
+      },
     ])
-    ('User is deleted from the team by anon user, user not in team or in team with different roles', async ( { role, isAuthorized, expectedStatusCode } ) => {
+    ('Delete user from the team', async ( { role, isAuthorized, expectedStatusCode } ) => {
       const creator = await global.db.insertUser();
 
       const user = await global.db.insertUser();
