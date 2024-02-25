@@ -7,7 +7,7 @@ import type UserSession from '@domain/entities/userSession.ts';
 import type NoteSettings from '@domain/entities/noteSettings.ts';
 import type { TeamMember } from '@domain/entities/team.ts';
 import type EditorTool from '@domain/entities/editorTools.ts';
-
+import { nanoid } from 'nanoid';
 
 /**
  * default type for note mock creation attributes
@@ -132,9 +132,11 @@ export default class DatabaseHelpers {
    * If editorTools is not passed, it's value in database would be []
    */
   public async insertUser(user?: UserMockCreationAttributes): Promise<User> {
+    const randomPartSize = 6;
+    const randomPart = await nanoid(randomPartSize);
     const editorTools = user?.editorTools ?? '[]';
-    const name = user?.name ?? 'CodeX';
-    const email = user?.email ?? 'test@codexmail.com';
+    const name = user?.name ?? `CodeX-${randomPart}`;
+    const email = user?.email ?? `${randomPart}@codexmail.com`;
 
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
