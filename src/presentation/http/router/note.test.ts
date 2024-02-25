@@ -698,7 +698,7 @@ describe('Note API', () => {
       expect(response).not.toHaveProperty('parentNote');
     });
 
-    test('Return isDeleted==false when note has no parent', async () => {
+    test('Return 404 when note has no parent', async () => {
       const user = await global.db.insertUser();
 
       const accessToken = global.auth(user.id);
@@ -715,9 +715,9 @@ describe('Note API', () => {
         url: `/note/${childNote.publicId}/relation`,
       });
 
-      expect(response?.statusCode).toBe(200);
+      expect(response?.statusCode).toBe(404);
 
-      expect(response?.json().isDeleted).toBe(false);
+      expect(response?.json().message).toStrictEqual('Parent note does not exist');
     });
 
     test('Return 406 when there is no note with that public id', async () => {

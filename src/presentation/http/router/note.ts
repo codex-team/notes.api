@@ -315,6 +315,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const isDeleted = await noteService.deleteParentRelationById(noteId);
 
+    /**
+     * Check if parent relation was successfully deleted
+     */
+    if (!isDeleted) {
+      return reply.notFound('Parent note does not exist');
+    }
+
     return reply.send({ isDeleted });
   });
 
