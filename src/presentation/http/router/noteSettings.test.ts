@@ -142,15 +142,15 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when the note is not public, the user is not authorized', async () => {
-      /** create test user */
+      /** Create test user */
       const user = await global.db.insertUser();
 
-      /** create test note for created user */
+      /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
       });
 
-      /** create test note settings for created note */
+      /** Create test note settings for created note */
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: false,
@@ -167,18 +167,18 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when public access is disabled, user is not in the team', async () => {
-      /** create test user */
+      /** Create test user */
       const creator = await global.db.insertUser();
 
-      /** create test user */
+      /** Create test user */
       const randomGuy = await global.db.insertUser();
 
-      /** create test note for created user */
+      /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
 
-      /** create note settings for created note */
+      /** Create note settings for created note */
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: false,
@@ -202,15 +202,15 @@ describe('NoteSettings API', () => {
 
   describe('GET /note-settings/:notePublicId/team ', () => {
     test('Returns the team if user is in team with role write', async () => {
-      /** create test user */
+      /** Create test user */
       const creator = await global.db.insertUser();
 
-      /** create test note for created user */
+      /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
 
-      /** create test note settings for created note */
+      /** Create test note settings for created note */
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: false,
@@ -331,24 +331,24 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 401 },
     ])
     ('Update note settings by public id, user is anon or not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
-      /** create test user */
+      /** Create test user */
       const creator = await global.db.insertUser();
 
-      /** create another test user */
+      /** Create another test user */
       const user = await global.db.insertUser();
 
-      /** create test note for created user */
+      /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
 
-      /** create test note settings for created note */
+      /** Create test note settings for created note */
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
       });
 
-      /** create test team if user is in team */
+      /** Create test team if user is in team */
       if (role !== null) {
         await global.db.insertNoteTeam({
           noteId: note.id,
@@ -357,7 +357,7 @@ describe('NoteSettings API', () => {
         });
       }
 
-      /** if user is not authorized, accessToken is empty */
+      /** If user is not authorized, accessToken is empty */
       let accessToken = '';
 
       if (isAuthorized) {
@@ -449,7 +449,7 @@ describe('NoteSettings API', () => {
         isPublic: true,
       });
 
-      /** create test team if user is in team */
+      /** Create test team if user is in team */
       if (role !== null) {
         await global.db.insertNoteTeam({
           noteId: note.id,
@@ -458,7 +458,7 @@ describe('NoteSettings API', () => {
         });
       }
 
-      /** if user is not authorized, accessToken is empty */
+      /** If user is not authorized, accessToken is empty */
       let accessToken = '';
 
       if (isAuthorized) {
@@ -542,17 +542,17 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 401 },
     ])
     ('Update team member role by user id and note id. Update is done by user who is anon, is not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
-    /** create test user */
+    /** Create test user */
       const creator = await global.db.insertUser();
 
       const user = await global.db.insertUser();
 
-      /** create test note for created user */
+      /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
 
-      /** create test team if user is in team */
+      /** Create test team if user is in team */
       if (role !== null) {
         await global.db.insertNoteTeam({
           noteId: note.id,
@@ -561,14 +561,14 @@ describe('NoteSettings API', () => {
         });
       }
 
-      /** if user is not authorized, accessToken is empty */
+      /** If user is not authorized, accessToken is empty */
       let accessToken = '';
 
       if (isAuthorized) {
         accessToken = global.auth(user.id);
       }
 
-      /** patch member role of existing team member */
+      /** Patch member role of existing team member */
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -589,10 +589,10 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
-    /** create test user */
+    /** Create test user */
       const user = await global.db.insertUser();
 
-      /** create test note for created user */
+      /** Create test note for created user */
       const note = await global.db.insertNote({
         creatorId: user.id,
       });
@@ -677,14 +677,14 @@ describe('NoteSettings API', () => {
         creatorId: creator.id,
       });
 
-      /** create teset team for user whose role will be changed */
+      /** Create teset team for user whose role will be changed */
       await global.db.insertNoteTeam({
         noteId: note.id,
         userId: anotherUser.id,
         role: MemberRole.Write,
       });
 
-      /** create test team if user is in team */
+      /** Create test team if user is in team */
       if (role !== null) {
         await global.db.insertNoteTeam({
           noteId: note.id,
@@ -693,7 +693,7 @@ describe('NoteSettings API', () => {
         });
       }
 
-      /** if user is not authorized, accessToken is empty */
+      /** If user is not authorized, accessToken is empty */
       let accessToken = '';
 
       if (isAuthorized) {

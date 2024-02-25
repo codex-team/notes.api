@@ -100,7 +100,7 @@ describe('Note API', () => {
         });
       }
 
-      /** if user is not authorized, accessToken is empty */
+      /** If user is not authorized, accessToken is empty */
       let accessToken = '';
 
       if (isAuthorized) {
