@@ -766,7 +766,7 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
     });
 
-    test('Return 403 when user is not creator and not in team', async () => {
+    test('Return 403 when user in team with read role', async () => {
       const creator = await global.db.insertUser();
       const user = await global.db.insertUser();
 
@@ -785,6 +785,12 @@ describe('Note API', () => {
         parentId: parentNote.id,
       });
 
+      await global.db.insertNoteTeam({
+        noteId: childNote.id,
+        userId: user.id,
+        role: 0,
+      });
+
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
         headers: {
@@ -796,6 +802,54 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(403);
 
       expect(response?.json().message).toStrictEqual('Permission denied');
+    });
+
+    test('Return isDeleted==true when parent relation was deleted successfully by user in team with edit role', async () => {
+      const creator = await global.db.insertUser();
+      const user = await global.db.insertUser();
+
+      const accessToken = global.auth(user.id);
+
+      const childNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      await global.db.insertNoteTeam({
+        noteId: childNote.id,
+        userId: user.id,
+        role: 1,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().isDeleted).toBe(true);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response).not.toHaveProperty('parentNote');
     });
   });
 
