@@ -296,6 +296,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            isUpdated: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
     },
     config: {
       policy: [
