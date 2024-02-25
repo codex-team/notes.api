@@ -83,12 +83,17 @@ describe('Join API', () => {
       await global.db.truncateTables();
 
       /** create test user */
-      const user = await global.db.insertUser();
+      const creator = await global.db.insertUser();
+
+      const RandomGuy = await global.db.insertUser({
+        email: 'randomGuy@CodeXmail.com',
+        name: 'random guy',
+      });
 
 
       /** create test note for created user */
       const note = await global.db.insertNote({
-        creatorId: user.id,
+        creatorId: creator.id,
       });
 
       /** create test note-settings for created note */
@@ -98,7 +103,7 @@ describe('Join API', () => {
         invitationHash,
       });
 
-      const accessToken = global.auth(user.id);
+      const accessToken = global.auth(RandomGuy.id);
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
@@ -112,7 +117,7 @@ describe('Join API', () => {
 
       expect(response?.json()).toMatchObject({
         result: {
-          userId: user.id,
+          userId: RandomGuy.id,
           noteId: note.id,
           role: 0,
         },

@@ -1,27 +1,37 @@
 
 import { describe, test, expect, beforeEach } from 'vitest';
 
-import notes from '@tests/test-data/notes.json';
-import noteSettings from '@tests/test-data/notes-settings.json';
-import noteTeams from '@tests/test-data/note-teams.json';
-
 describe('Note API', () => {
+  beforeEach(async () => {
+    await global.db.truncateTables();
+  });
   describe('GET note/resolve-hostname/:hostname ', () => {
-    test('Returns note with specified hostname', async () => {
+    test('Returns note by specified hostname', async () => {
+      const user = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const noteSettings = await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+        customHostname: 'codex.so',
+      });
+
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: '/note/resolve-hostname/codex.so',
+        url: `/note/resolve-hostname/${noteSettings.customHostname}`,
       });
 
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        note: {
-          id: 'TJmEb89e0l',
-          content: {},
+        'note': {
+          'id': note.publicId,
         },
-        accessRights: {
-          canEdit: false,
+        'accessRights': {
+          'canEdit': false,
         },
       });
     });
@@ -39,93 +49,127 @@ describe('Note API', () => {
   });
 
   describe('GET note/:notePublicId ', () => {
-    test('Returns note by public id with 200 status when note is publicly available', async () => {
-      const correctID = 'Pq1T9vc23Q';
+    test('Returns note with access rights by public id with 200 status when note is publicly available', async () => {
+      const user = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note/${correctID}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual({
-        note: {
-          id: 'Pq1T9vc23Q',
-          content: {},
+      expect(response?.json()).toMatchObject({
+        'note': {
+          'id': note.publicId,
         },
-        accessRights: {
-          canEdit: false,
+        'accessRights': {
+          'canEdit': false,
         },
       });
     });
 
-    test('Returns note by public id with 200 status when access is disabled, but user is creator', async () => {
-      const userId = 1;
-      const accessToken = global.auth(userId);
+    test('Returns note by public id with 200 status when access is disabled, but user is in team', async () => {
+      const user = await global.db.insertUser();
 
-      const privateUserNote = notes.find(newNote => {
-        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-
-        return settings!.is_public === false && newNote.creator_id === userId;
+      const note = await global.db.insertNote({
+        creatorId: user.id,
       });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${privateUserNote!.public_id}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual({
-        note: {
-          id: '73NdxFZ4k7',
-          content: {},
+      expect(response?.json()).toMatchObject({
+        'note': {
+          'id': note.publicId,
         },
-        accessRights: {
-          canEdit: true,
+        'accessRights': {
+          'canEdit': true,
         },
       });
     });
 
     test('Returns note and parent note by note public id with 200 status', async () => {
-      const correctID = 'f43NU75weU';
+      const user = await global.db.insertUser();
+
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: childNote.id,
+      });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note/${correctID}`,
+        url: `/note/${childNote.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual({
-        note: {
-          id: 'f43NU75weU',
-          content: {},
+      expect(response?.json()).toMatchObject({
+        'note': {
+          'id': childNote.publicId,
+          'content': childNote.content,
         },
-        parentNote: {
-          id: 'Hu8Gsm0sA1',
-          content: {},
+        'parentNote': {
+          'id': parentNote.publicId,
+          'content': parentNote.content,
         },
-        accessRights: {
-          canEdit: false,
+        'accessRights': {
+          'canEdit': false,
         },
       });
     });
 
-    test('Returns 403 when the note is not public, the user is not authorized', async () => {
-      const notPublicNote = notes.find(newNote => {
-        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
+    test('Returns 403 when the note is not public, user is not authorized', async () => {
+      const user = await global.db.insertUser();
 
-        return settings!.is_public === false;
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
       });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
-        url: `/note/${notPublicNote!.public_id}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -133,23 +177,31 @@ describe('Note API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 403 when public access is disabled, user is not creator of the note and is not in the team', async () => {
-      const userId = 2;
-      const accessToken = global.auth(userId);
+    test('Returns 403 when public access is disabled, user is not in the team', async () => {
+      const creator = await global.db.insertUser();
 
-      const notPublicNote = notes.find(newNote => {
-        const settings = noteSettings.find(ns => ns.note_id === newNote.id);
-        const team = noteTeams.find(nt => nt.note_id === newNote.id && nt.user_id === userId);
-
-        return settings!.is_public === false && newNote.creator_id !== userId && team === undefined;
+      const randomGuy = await global.db.insertUser({
+        email: 'randomGuy@CodeXmail.com',
+        name: 'random guy',
       });
+
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      const accessToken = global.auth(randomGuy.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${notPublicNote!.public_id}`,
+        url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(403);
@@ -193,11 +245,20 @@ describe('Note API', () => {
 
     describe('Access rights', () => {
       test('Returns canEdit=false flag, when user is not authorized', async () => {
-        const publicId = 'Pq1T9vc23Q';
+        const user = await global.db.insertUser();
+
+        const note = await global.db.insertNote({
+          creatorId: user.id,
+        });
+
+        await global.db.insertNoteSetting({
+          noteId: note.id,
+          isPublic: true,
+        });
 
         const response = await global.api?.fakeRequest({
           method: 'GET',
-          url: `/note/${publicId}`,
+          url: `/note/${note.publicId}`,
         });
 
         expect(response?.statusCode).toBe(200);
@@ -205,17 +266,31 @@ describe('Note API', () => {
         expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
       });
 
-      test('Returns canEdit=false when user is authorized, but is not the creator', async () => {
-        const publicId = 'Pq1T9vc23Q';
-        const userId = 4;
-        const accessToken = global.auth(userId);
+      test('Returns canEdit=false when user is authorized, but is not in the team', async () => {
+        const creator = await global.db.insertUser();
+
+        const randomGuy = await global.db.insertUser({
+          email: 'randomGuy@CodeXmail.com',
+          name: 'random guy',
+        });
+
+        const note = await global.db.insertNote({
+          creatorId: creator.id,
+        });
+
+        await global.db.insertNoteSetting({
+          noteId: note.id,
+          isPublic: true,
+        });
+
+        const accessToken = global.auth(randomGuy.id);
 
         const response = await global.api?.fakeRequest({
           method: 'GET',
           headers: {
             authorization: `Bearer ${accessToken}`,
           },
-          url: `/note/${publicId}`,
+          url: `/note/${note.publicId}`,
         });
 
         expect(response?.statusCode).toBe(200);
@@ -223,40 +298,37 @@ describe('Note API', () => {
         expect(response?.json().accessRights).toStrictEqual({ canEdit: false });
       });
 
-      test('Returns canEdit=true, when user is authorized and is the creator of the note', async () => {
-        const publicId = 'Pq1T9vc23Q';
-        const userId = 1;
-        const accessToken = global.auth(userId);
+      test('Returns canEdit=true, when user is in the team and has the Write role', async () => {
+        const user = await global.db.insertUser();
+
+        const note = await global.db.insertNote({
+          creatorId: user.id,
+        });
+
+        await global.db.insertNoteSetting({
+          noteId: note.id,
+          isPublic: false,
+        });
+
+        const accessToken = global.auth(user.id);
 
         const response = await global.api?.fakeRequest({
           method: 'GET',
           headers: {
             authorization: `Bearer ${accessToken}`,
           },
-          url: `/note/${publicId}`,
+          url: `/note/${note.publicId}`,
         });
 
         expect(response?.statusCode).toBe(200);
 
         expect(response?.json().accessRights).toStrictEqual({ canEdit: true });
       });
-
-      test.todo('Returns 200 when note is private, user is in team but is not creator');
-      test.todo('Returns canEdit=true, when user is authorized, is in the team and is not creator');
     });
   });
 
   describe('PATCH note/:notePublicId ', () => {
-    beforeEach(async () => {
-      /**
-       * Truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * @todo get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-    });
-    test('Update note by public id with 200 status, user is creator of the note', async () => {
+    test('Update note by public id with 200 status, user is in team with role write', async () => {
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -293,15 +365,13 @@ describe('Note API', () => {
 
       await global.db.insertNoteSetting({
         noteId: note.id,
-        isPublic: false,
+        isPublic: true,
       });
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
         url: `/note/${note.publicId}`,
-        body: {
-          'content': { new: 'content added' },
-        },
+        body: {},
       });
 
       expect(response?.statusCode).toBe(401);
@@ -375,6 +445,11 @@ describe('Note API', () => {
         creatorId: user.id,
       });
 
+      await global.db.insertNoteSetting({
+        noteId: parentNote.id,
+        isPublic: true,
+      });
+
       const accessToken = global.auth(user.id);
 
       let response = await global.api?.fakeRequest({
@@ -390,21 +465,17 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      let body = await response?.json();
-
       response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${body.id}`,
+        url: `/note/${response?.json().id}`,
       });
 
-      body = await response?.json();
-
-      expect(body.parentNote).toMatchObject({
-        id: parentNote.publicId,
+      expect(response?.json().parentNote).toMatchObject({
         content: parentNote.content,
+        id: parentNote.publicId,
       });
     });
 
@@ -412,15 +483,6 @@ describe('Note API', () => {
   });
 
   describe('DELETE /note/:notePublicId', () => {
-    beforeEach(async () => {
-      /**
-       * Truncate all tables, which are needed
-       * Restart autoincrement sequences for data to start with id 1
-       *
-       * @todo get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-    });
     test('Returns 200 status and "true" if note was removed successfully', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
