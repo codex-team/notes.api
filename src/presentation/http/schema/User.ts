@@ -10,7 +10,7 @@ export const UserSchema = {
     name: { type: 'string' },
     photo: { type: 'string' },
     editorTools: {
-      type: 'array',
+      type: ['array', 'null'],
       description: 'List of editor tools ids installed by user from Marketplace',
       items: {
         type: 'string',
