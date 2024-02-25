@@ -1,4 +1,4 @@
-
+import { MemberRole } from '@domain/entities/team';
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user';
 
@@ -781,7 +781,7 @@ describe('Note API', () => {
       await global.db.insertNoteTeam({
         noteId: childNote.id,
         userId: user.id,
-        role: 0,
+        role: MemberRole.Read,
       });
 
       const response = await global.api?.fakeRequest({
@@ -797,7 +797,7 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual('Permission denied');
     });
 
-    test('Return isDeleted==true when parent relation was deleted successfully by user in team with edit role', async () => {
+    test('Returns true when parent relation was deleted successfully by user in team with edit role', async () => {
       const creator = await global.db.insertUser();
 
       const childNote = await global.db.insertNote({
@@ -816,7 +816,7 @@ describe('Note API', () => {
       await global.db.insertNoteTeam({
         noteId: childNote.id,
         userId: user.id,
-        role: 1,
+        role: MemberRole.Write,
       });
 
       let response = await global.api?.fakeRequest({
