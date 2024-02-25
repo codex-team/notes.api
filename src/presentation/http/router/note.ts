@@ -290,6 +290,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            isDeleted: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
     },
     config: {
       policy: [
