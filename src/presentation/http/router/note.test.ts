@@ -8,12 +8,15 @@ describe('Note API', () => {
   });
   describe('GET note/resolve-hostname/:hostname ', () => {
     test('Returns note by specified hostname', async () => {
+      /** Create test user */
       const user = await global.db.insertUser();
 
+      /** Create test note */
       const note = await global.db.insertNote({
         creatorId: user.id,
       });
 
+      /** Create test note settings */
       const noteSettings = await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
@@ -72,26 +75,32 @@ describe('Note API', () => {
         expectedStatusCode: 403 },
 
       { role: null,
-        isPublic: false,
+        isPublic: true,
         isAuthorized: false,
-        expectedStatusCode: 403 },
+        expectedStatusCode: 200 },
     ])
     ('Returns note with access rights by public id. Request is done by user who is anon, not in team or in team with different rights', async ({ role, isPublic, isAuthorized, expectedStatusCode }) => {
+      /** If user has a Write role, he can edit the note */
       const canEdit = role === MemberRole.Write;
 
+      /** Create test user - creator of note */
       const creator = await global.db.insertUser();
 
+      /** Create test user */
       const user = await global.db.insertUser();
 
+      /** Create test note */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
 
+      /** Create test note settings */
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: isPublic,
       });
 
+      /** Create test team */
       if (role !== null) {
         await global.db.insertNoteTeam({
           noteId: note.id,
@@ -106,11 +115,6 @@ describe('Note API', () => {
       if (isAuthorized) {
         accessToken = global.auth(user.id);
       }
-
-      await global.db.insertNoteSetting({
-        noteId: note.id,
-        isPublic: false,
-      });
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -135,21 +139,26 @@ describe('Note API', () => {
     });
 
     test('Returns note and parent note by note public id with 200 status', async () => {
+      /** Create test user */
       const user = await global.db.insertUser();
 
+      /** Create test note - a parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note - a child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
+      /** Create test note settings */
       await global.db.insertNoteSetting({
         noteId: childNote.id,
         isPublic: true,
       });
 
-      const parentNote = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
+      /** Create test note relation */
       await global.db.insertNoteRelation({
         parentId: parentNote.id,
         noteId: childNote.id,
@@ -302,11 +311,11 @@ describe('Note API', () => {
     test.todo('Returns 400 when parentId has incorrect characters and length');
 
     test('Returns 200 when user is a team member with a Write role', async () => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
-      /** Create another test user */
-      const teamMember = await global.db.insertUser();
+      /** Create test user */
+      const user = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -323,11 +332,11 @@ describe('Note API', () => {
       /** Create test team */
       await global.db.insertNoteTeam({
         noteId: note.id,
-        userId: teamMember.id,
+        userId: user.id,
         role: MemberRole.Write,
       });
 
-      const accessToken = global.auth(teamMember.id);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -344,11 +353,11 @@ describe('Note API', () => {
     });
 
     test('Return 403 when user has Read role', async () => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
-      /** Create another test user */
-      const teamMember = await global.db.insertUser();
+      /** Create test user */
+      const user = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -364,11 +373,11 @@ describe('Note API', () => {
       /** Create test team */
       await global.db.insertNoteTeam({
         noteId: note.id,
-        userId: teamMember.id,
+        userId: user.id,
         role: MemberRole.Read,
       });
 
-      const accessToken = global.auth(teamMember.id);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -598,11 +607,11 @@ describe('Note API', () => {
     });
 
     test('Returns 200 when user is team member with a Write role', async () => {
-      /** Create test user */
+      /** Create test user - creator of note */
       const creator = await global.db.insertUser();
 
-      /** Create another test user */
-      const teamMember = await global.db.insertUser();
+      /** Create test user */
+      const user = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -618,11 +627,11 @@ describe('Note API', () => {
       /** Create test team */
       await global.db.insertNoteTeam({
         noteId: note.id,
-        userId: teamMember.id,
+        userId: user.id,
         role: MemberRole.Write,
       });
 
-      const accessToken = global.auth(teamMember.id);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
@@ -636,11 +645,11 @@ describe('Note API', () => {
     });
 
     test('Returns 403 when user is team member with a Read role', async () => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
-      /** Create another test user */
-      const teamMember = await global.db.insertUser();
+      /** Create test user */
+      const user = await global.db.insertUser();
 
       /** Create test note */
       const note = await global.db.insertNote({
@@ -655,11 +664,11 @@ describe('Note API', () => {
       /** Create test team */
       await global.db.insertNoteTeam({
         noteId: note.id,
-        userId: teamMember.id,
+        userId: user.id,
         role: MemberRole.Read,
       });
 
-      const accessToken = global.auth(teamMember.id);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
