@@ -28,9 +28,7 @@ describe('Note API', () => {
 
       expect(response?.json()).toMatchObject({
         'note': {
-          'id': note.id,
-          'publicId': note.publicId,
-          'creatorId': note.creatorId,
+          'id': note.publicId,
         },
         'accessRights': {
           'canEdit': false,
@@ -72,9 +70,7 @@ describe('Note API', () => {
 
       expect(response?.json()).toMatchObject({
         'note': {
-          'id': note.id,
-          'publicId': note.publicId,
-          'creatorId': note.creatorId,
+          'id': note.publicId,
         },
         'accessRights': {
           'canEdit': false,
@@ -108,9 +104,7 @@ describe('Note API', () => {
 
       expect(response?.json()).toMatchObject({
         'note': {
-          'id': note.id,
-          'publicId': note.publicId,
-          'creatorId': note.creatorId,
+          'id': note.publicId,
         },
         'accessRights': {
           'canEdit': true,
@@ -148,14 +142,12 @@ describe('Note API', () => {
 
       expect(response?.json()).toMatchObject({
         'note': {
-          'id': childNote.id,
-          'publicId': childNote.publicId,
-          'creatorId': childNote.creatorId,
+          'id': childNote.publicId,
+          'content': childNote.content,
         },
         'parentNote': {
-          'id': parentNote.id,
-          'publicId': parentNote.publicId,
-          'creatorId': parentNote.creatorId,
+          'id': parentNote.publicId,
+          'content': parentNote.content,
         },
         'accessRights': {
           'canEdit': false,
@@ -483,8 +475,7 @@ describe('Note API', () => {
 
       expect(response?.json().parentNote).toMatchObject({
         content: parentNote.content,
-        creatorId: parentNote.creatorId,
-        publicId: parentNote.publicId,
+        id: parentNote.publicId,
       });
     });
 
