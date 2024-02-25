@@ -594,6 +594,37 @@ describe('Note API', () => {
     });
   });
 
+  describe('DELETE /note/:publicId/relation', () => {
+    test('Return isDeletes==true when parent relation was deleted successfully', async () => {
+      const creator = await global.db.insertUser();
+
+      const accessToken = global.auth(creator.id);
+
+      const childNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+    });
+  });
+
   test.todo('Tests with access rights');
 
   test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
