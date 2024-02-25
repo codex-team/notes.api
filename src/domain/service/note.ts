@@ -122,8 +122,8 @@ export default class NoteService {
    *
    * @param noteId - id of current note
    */
-  public async deleteParentRelationById(noteId:NoteInternalId): Promise<boolean> {
-    return this.noteRelationsRepository.deleteParentRelationById(noteId);
+  public async deleteRelation(noteId:NoteInternalId): Promise<boolean> {
+    return this.noteRelationsRepository.deleteRelation(noteId);
   }
 
   /**

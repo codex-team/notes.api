@@ -313,7 +313,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
 
-    const isDeleted = await noteService.deleteParentRelationById(noteId);
+    const isDeleted = await noteService.deleteRelation(noteId);
 
     /**
      * Check if parent relation was successfully deleted
