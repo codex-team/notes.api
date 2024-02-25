@@ -54,33 +54,48 @@ describe('Note API', () => {
 
   describe('GET note/:notePublicId ', () => {
     test.each([
-      { role: MemberRole.Read,
+      /** Returns 200 if user is team member with a Read role */
+      {
+        role: MemberRole.Read,
         isPublic: false,
         isAuthorized: true,
-        expectedStatusCode: 200 },
+        expectedStatusCode: 200
+      },
 
-      { role: MemberRole.Write,
+      /** Returns 200 if user is team member with a Write role */
+      {
+        role: MemberRole.Write,
         isPublic: false,
         isAuthorized: true,
-        expectedStatusCode: 200 },
+        expectedStatusCode: 200
+      },
 
-      { role: null,
-        isPublic: false,
-        isAuthorized: true,
-        expectedStatusCode: 403 },
-
-      { role: null,
-        isPublic: false,
-        isAuthorized: false,
-        expectedStatusCode: 403 },
-
-      { role: null,
+      /** Returns 200 if note is public */
+      {
+        role: null,
         isPublic: true,
         isAuthorized: false,
-        expectedStatusCode: 200 },
+        expectedStatusCode: 200
+      },
+
+      /** Returns 403 if user is not in the team */
+      {
+        role: null,
+        isPublic: false,
+        isAuthorized: true,
+        expectedStatusCode: 403
+      },
+
+      /** Returns 403 if user is not authorized */
+      {
+        role: null,
+        isPublic: false,
+        isAuthorized: false,
+        expectedStatusCode: 403
+      },
     ])
-    ('Returns note with access rights by public id. Request is done by user who is anon, not in team or in team with different rights', async ({ role, isPublic, isAuthorized, expectedStatusCode }) => {
-      /** If user has a Write role, he can edit the note */
+    ('Returns note with access rights by public id', async ({ role, isPublic, isAuthorized, expectedStatusCode }) => {
+      /** Only if user has a Write role, he can edit the note */
       const canEdit = role === MemberRole.Write;
 
       /** Create test user - creator of note */
@@ -134,6 +149,10 @@ describe('Note API', () => {
           'accessRights': {
             'canEdit': canEdit,
           },
+        });
+      } else {
+        expect(response?.json()).toStrictEqual({
+          message: 'Permission denied',
         });
       }
     });
@@ -338,18 +357,40 @@ describe('Note API', () => {
 
       const accessToken = global.auth(user.id);
 
-      const response = await global.api?.fakeRequest({
+      let response;
+
+      response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
         url: `/note/${note.publicId}`,
         body: {
-          'content': { new: 'content added' },
+          content: { new: 'content added' },
         },
       });
 
       expect(response?.statusCode).toBe(200);
+
+      // response = await global.api?.fakeRequest({
+      //   method: 'GET',
+      //   headers: {
+      //     authorization: `Bearer ${accessToken}`,
+      //   },
+      //   url: `/note/${note.publicId}`,
+      // });
+
+      // expect(response?.json()).toMatchObject({
+      //   note: {
+      //     id: note.publicId,
+      //     content: {
+      //       new: 'content added',
+      //     },
+      //   },
+      //   accessRights: {
+      //     canEdit: true,
+      //   },
+      // });
     });
 
     test('Return 403 when user has Read role', async () => {
@@ -391,6 +432,7 @@ describe('Note API', () => {
       });
 
       expect(response?.statusCode).toBe(403);
+      expect(response?.json().message).toStrictEqual('Permission denied');
     });
   });
 
@@ -642,6 +684,7 @@ describe('Note API', () => {
       });
 
       expect(response?.statusCode).toBe(200);
+      expect(response?.json().isDeleted).toBe(true);
     });
 
     test('Returns 403 when user is team member with a Read role', async () => {
@@ -679,6 +722,9 @@ describe('Note API', () => {
       });
 
       expect(response?.statusCode).toBe(403);
+      expect(response?.json()).toStrictEqual({
+        message: 'Permission denied',
+      });
     });
   });
 });

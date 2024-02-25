@@ -42,13 +42,10 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns "team" along with the note settings if the note contains a team', async () => {
-      /** create test user */
-      const creator = await global.db.insertUser({
-        email: 'a@a.com',
-        name: 'Test user 1',
-      });
+      /** Сreate test user */
+      const creator = await global.db.insertUser();
 
-      /** create test note for created user */
+      /** Сreate test note for created user */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
@@ -78,33 +75,6 @@ describe('NoteSettings API', () => {
           },
         },
       ]);
-    });
-
-    test('Returns 200 and team by public id, user is a member of the team with Write role', async () => {
-      /** Create test user - creator of a note */
-      const creator = await global.db.insertUser();
-
-      /** Create test note */
-      const note = await global.db.insertNote({
-        creatorId: creator.id,
-      });
-
-      const accessToken = global.auth(creator.id);
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note-settings/${note.publicId}/team`,
-      });
-
-      expect(response?.statusCode).toBe(200);
-      expect(response?.json()).toMatchObject([ {
-        noteId: note.id,
-        role: MemberRole.Write,
-        userId: creator.id,
-      } ]);
     });
 
     test('Returns 404 when note settings with specified note public id do not exist', async () => {
@@ -140,83 +110,69 @@ describe('NoteSettings API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
-
-    test('Returns 403 when the note is not public, the user is not authorized', async () => {
-      /** Create test user */
-      const user = await global.db.insertUser();
-
-      /** Create test note for created user */
-      const note = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
-      /** Create test note settings for created note */
-      await global.db.insertNoteSetting({
-        noteId: note.id,
-        isPublic: false,
-      });
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        url: `/note-settings/${note.publicId}`,
-      });
-
-      expect(response?.statusCode).toBe(403);
-
-      expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
-    });
-
-    test('Returns 403 when public access is disabled, user is not in the team', async () => {
-      /** Create test user - creator of a note */
-      const creator = await global.db.insertUser();
-
-      /** Create test user */
-      const randomGuy = await global.db.insertUser();
-
-      /** Create test note for created user */
-      const note = await global.db.insertNote({
-        creatorId: creator.id,
-      });
-
-      /** Create note settings for created note */
-      await global.db.insertNoteSetting({
-        noteId: note.id,
-        isPublic: false,
-      });
-
-      const accessToken = global.auth(randomGuy.id);
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note-settings/${note.publicId}`,
-      });
-
-      expect(response?.statusCode).toBe(403);
-
-      expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
-    });
   });
 
   describe('GET /note-settings/:notePublicId/team ', () => {
-    test('Returns the team if user is in team with role write', async () => {
+    test.each([
+      /** Returns 200 if user is a team member */
+      {
+        role: MemberRole.Write,
+        isAuthorized: true,
+        isPublic: true,
+        expectedStatusCode: 200,
+      },
+
+      /** Returns 401 when the note is not public, the user is not authorized */
+      {
+        role: null,
+        isAuthorized: false,
+        isPublic: false,
+        expectedStatusCode: 401,
+        expectedMessage: 'You must be authenticated to access this resource',
+      },
+      
+      /** Returns 403 when the note is not public and the user is not in the team */
+      {
+        role: null,
+        isAuthorized: true,
+        isPublic: false,
+        expectedStatusCode: 403,
+        expectedMessage: 'Permission denied',
+      }
+    ])
+    ('Get note by public id', async ({ role, isAuthorized, isPublic, expectedStatusCode, expectedMessage }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
-      /** Create test note for created user */
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      /** Create test note */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
 
-      /** Create test note settings for created note */
+      /** Create test note settings */
       await global.db.insertNoteSetting({
         noteId: note.id,
-        isPublic: false,
+        isPublic: isPublic,
       });
 
-      const accessToken = global.auth(creator.id);
+      /** Create test team */
+      if (role !== null) {
+        await global.db.insertNoteTeam({
+          noteId: note.id,
+          userId: user.id,
+          role: role,
+        });
+      }
+
+      /** If user is not authorized, the access token is empty */
+      let accessToken = '';
+
+      if (isAuthorized) {
+        accessToken = global.auth(user.id);
+      }
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -226,30 +182,26 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${note.publicId}/team`,
       });
 
-      expect(response?.statusCode).toBe(200);
+      expect(response?.statusCode).toBe(expectedStatusCode);
 
-      expect(response?.json()).toMatchObject([ {
-        noteId: note.id,
-        role: 1,
-        userId: creator.id,
-      } ]);
-    });
-
-    test('Returns status 401 when the user is not authorized', async () => {
-      const user = await global.db.insertUser();
-
-      const note = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        url: `/note-settings/${note.publicId}/team`,
-      });
-
-      expect(response?.statusCode).toBe(401);
-
-      expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
+      if (expectedStatusCode === 200) {
+        expect(response?.json()).toMatchObject([
+          {
+            noteId: note.id,
+            role: MemberRole.Write,
+            userId: creator.id,
+          },
+          {
+            noteId: note.id,
+            role: MemberRole.Write,
+            userId: user.id,
+          }]);
+      } else {
+        expect(response?.json()).toStrictEqual(
+          {
+            message: expectedMessage,
+          });
+      }
     });
 
     test('Returns status 404 when the public id does not exist', async () => {
@@ -284,31 +236,6 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
-    });
-
-    test('Returns 403 when user is authorized, but is not member of the team', async () => {
-      /** Create test user - creator of a note */
-      const creator = await global.db.insertUser();
-
-      /** Create test user */
-      const user = await global.db.insertUser();
-
-      /** Create test note */
-      const note = await global.db.insertNote({
-        creatorId: creator.id,
-      });
-
-      const accessToken = global.auth(user.id);
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note-settings/${note.publicId}/team`,
-      });
-
-      expect(response?.statusCode).toBe(403);
     });
   });
 
