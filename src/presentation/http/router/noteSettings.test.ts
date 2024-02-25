@@ -698,7 +698,7 @@ describe('NoteSettings API', () => {
             'noteId': note.id,
             'userId': user.id,
             'role': role,
-          }
+          },
         ]);
       }
     });

@@ -57,8 +57,8 @@ describe('Note API', () => {
         statusCode: 200 },
 
       { role: MemberRole.Write,
-        isPublic: false, 
-        isAuthorized: true, 
+        isPublic: false,
+        isAuthorized: true,
         statusCode: 200 },
 
       { role: null,
