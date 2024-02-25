@@ -45,7 +45,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     schema: {
       response: {
         '2xx': {
-          $ref: 'User',
+          $ref: 'UserSchema',
         },
       },
     },
