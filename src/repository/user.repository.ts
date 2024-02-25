@@ -62,7 +62,7 @@ export default class UserRepository {
    * @returns { Promise<User | null> } found user
    */
   public async getUserById(userId: User['id']): Promise<User | null> {
-    return await this.storage.getUserByIdOrEmail({
+    return this.storage.getUserByIdOrEmail({
       id: userId,
     });
   }
