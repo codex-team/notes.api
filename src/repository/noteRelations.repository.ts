@@ -58,6 +58,15 @@ export default class NoteRelationsRepository {
   }
 
   /**
+   * Unlink parent note from the current note
+   *
+   * @param noteId - id of note to unlink parent
+   */
+  public async unlinkParent(noteId: NoteInternalId): Promise<boolean> {
+    return await this.storage.unlinkParent(noteId);
+  }
+
+  /**
    * Checks if the note has any connection
    *
    * @param noteId - id of the current note

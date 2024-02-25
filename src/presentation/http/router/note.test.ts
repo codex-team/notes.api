@@ -1,5 +1,6 @@
-
+import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
+import type User from '@domain/entities/user.js';
 
 describe('Note API', () => {
   beforeEach(async () => {
@@ -643,6 +644,210 @@ describe('Note API', () => {
       });
 
       expect(response?.statusCode).toBe(200);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response).not.toHaveProperty('parentNote');
+    });
+  });
+
+  describe('DELETE /note/:publicId/relation', () => {
+    let accessToken = '';
+    let user: User;
+
+    beforeEach(async () => {
+      /** create test user */
+      user = await global.db.insertUser();
+
+      accessToken = global.auth(user.id);
+    });
+    test('Returns 200 and true when note was successfully unlinked', async () => {
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create notes relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().isDeleted).toBe(true);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response).not.toHaveProperty('parentNote');
+    });
+
+    test('Return 406 when note has no parent', async () => {
+      /* create test note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(406);
+
+      expect(response?.json().message).toStrictEqual('Parent note does not exist');
+    });
+
+    test('Return 406 when there is no note with that public id', async () => {
+      /* id of non-existent note*/
+      const nonExistentId = 'ishvm5qH84';
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${nonExistentId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(406);
+
+      expect(response?.json().message).toStrictEqual('Note not found');
+    });
+
+    test('Return 401 when user not authorized', async () => {
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note*/
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test note relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(401);
+
+      expect(response?.json()).toStrictEqual({ message: 'You must be authenticated to access this resource' });
+    });
+
+    test('Return 403 when user in team with read role', async () => {
+      /* create second user, who will be the creator of the note */
+      const creator = await global.db.insertUser();
+
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /* create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /* create test note relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      /* create test team for child note */
+      await global.db.insertNoteTeam({
+        noteId: childNote.id,
+        userId: user.id,
+        role: MemberRole.Read,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toStrictEqual('Permission denied');
+    });
+
+    test('Returns 200 and true when note was successfully unlinked by user in team with edit role', async () => {
+      /* create second user, who will be the creator of the note */
+      const creator = await global.db.insertUser();
+
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /* create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /* create test note relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      /* create test team for child note */
+      await global.db.insertNoteTeam({
+        noteId: childNote.id,
+        userId: user.id,
+        role: MemberRole.Write,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().isDeleted).toBe(true);
 
       response = await global.api?.fakeRequest({
         method: 'GET',
