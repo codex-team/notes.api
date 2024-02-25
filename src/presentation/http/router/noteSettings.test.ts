@@ -133,7 +133,7 @@ describe('NoteSettings API', () => {
       expect(response?.json()).toStrictEqual({ message: 'Permission denied' });
     });
 
-    test('Returns 403 when public access is disabled, user is not creator of the note', async () => {
+    test('Returns 403 when public access is disabled, user is not in the team', async () => {
       /** create test user */
       const creator = await global.db.insertUser({
         email: 'a@a.com',
@@ -580,7 +580,7 @@ describe('NoteSettings API', () => {
       expect(response?.body).toBe('1');
     });
 
-    test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
+    test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a team member exists', async () => {
       /** create test user */
       const user = await global.db.insertUser();
 

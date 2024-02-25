@@ -7,8 +7,6 @@ describe('Note API', () => {
   });
   describe('GET note/resolve-hostname/:hostname ', () => {
     test('Returns note by specified hostname', async () => {
-      await global.db.truncateTables();
-
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -54,8 +52,6 @@ describe('Note API', () => {
 
   describe('GET note/:notePublicId ', () => {
     test('Returns note with access rights by public id with 200 status when note is publicly available', async () => {
-      await global.db.truncateTables();
-
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -87,8 +83,6 @@ describe('Note API', () => {
     });
 
     test('Returns note by public id with 200 status when access is disabled, but user is in team', async () => {
-      await global.db.truncateTables();
-
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -342,16 +336,7 @@ describe('Note API', () => {
   });
 
   describe('PATCH note/:notePublicId ', () => {
-    beforeEach(async () => {
-      /**
-       * Truncate all tables, which are needed
-       * restart autoincrement sequences for data to start with id 1
-       *
-       * @todo get rid of restarting database data in tests (move to beforeEach)
-       */
-      await global.db.truncateTables();
-    });
-    test('Update note by public id with 200 status, user is creator of the note', async () => {
+    test('Update note by public id with 200 status, user is in team with role write', async () => {
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -380,8 +365,6 @@ describe('Note API', () => {
     });
 
     test('Returns status 401 when the user is not authorized', async () => {
-      await global.db.truncateTables();
-
       const user = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -464,8 +447,6 @@ describe('Note API', () => {
       await global.db.truncateTables();
     });
     test('Should correctly save relation to parent note if parentId passed', async () => {
-      await global.db.truncateTables();
-
       const user = await global.db.insertUser();
 
       const parentNote = await global.db.insertNote({
