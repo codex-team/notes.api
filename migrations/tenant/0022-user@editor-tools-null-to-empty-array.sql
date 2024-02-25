@@ -1,1 +1,1 @@
-UPDATE public.users SET "editor_tools" = '[]'::jsonb WHERE "editor_tools" = null
+UPDATE public.users SET "editor_tools" = COALESCE(editor_tools, '[]'::jsonb)
