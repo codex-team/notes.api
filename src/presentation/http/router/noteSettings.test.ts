@@ -81,7 +81,7 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 200 and team by public id, user is a member of the team with Write role', async () => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
       /** Create test note */
@@ -167,7 +167,7 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when public access is disabled, user is not in the team', async () => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
       /** Create test user */
@@ -202,7 +202,7 @@ describe('NoteSettings API', () => {
 
   describe('GET /note-settings/:notePublicId/team ', () => {
     test('Returns the team if user is in team with role write', async () => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
       /** Create test note for created user */
@@ -287,10 +287,10 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns 403 when user is authorized, but is not member of the team', async () => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
-      /** Create another test user */
+      /** Create test user */
       const user = await global.db.insertUser();
 
       /** Create test note */
@@ -331,10 +331,10 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 401 },
     ])
     ('Update note settings by public id, user is anon or not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
-      /** Create another test user */
+      /** Create test user */
       const user = await global.db.insertUser();
 
       /** Create test note for created user */
@@ -432,10 +432,10 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 401 },
     ])
     ('Generation of new invitation hash. User is anon, not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
-      /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
-      /** Create another test user */
+      /** Create test user */
       const user = await global.db.insertUser();
 
       /** Create test note */
@@ -542,7 +542,7 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 401 },
     ])
     ('Update team member role by user id and note id. Update is done by user who is anon, is not in team or in team with different roles', async ({ role, isAuthorized, expectedStatusCode }) => {
-    /** Create test user */
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
       const user = await global.db.insertUser();
@@ -589,7 +589,7 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 404 and "User does not belong to Note\'s team" message if no such a note exists', async () => {
-    /** Create test user */
+      /** Create test user */
       const user = await global.db.insertUser();
 
       /** Create test note for created user */
@@ -740,8 +740,10 @@ describe('NoteSettings API', () => {
     });
 
     test('Returns status code 403 and message "You can\'t delete from the team creator of the note" when you are deleting creator from the team', async () => {
+      /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
+      /** Create test note */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
