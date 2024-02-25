@@ -178,7 +178,7 @@ export default class NoteRelationsSequelizeStorage {
     /**
      * We need to delete only one relation because note can only have one parent
      */
-    return affectedRows == 1;
+    return affectedRows === 1;
   }
 
   /**

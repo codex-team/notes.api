@@ -133,7 +133,7 @@ export default class DatabaseHelpers {
    */
   public async insertUser(user?: UserMockCreationAttributes): Promise<User> {
     const randomPartSize = 6;
-    const randomPart = await nanoid(randomPartSize);
+    const randomPart = nanoid(randomPartSize);
     const editorTools = user?.editorTools ?? '[]';
     const name = user?.name ?? `CodeX-${randomPart}`;
     const email = user?.email ?? `${randomPart}@codexmail.com`;
