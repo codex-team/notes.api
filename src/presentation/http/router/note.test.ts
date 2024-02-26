@@ -84,17 +84,19 @@ describe('Note API', () => {
         isPublic: false,
         isAuthorized: true,
         expectedStatusCode: 403,
+        expectedMessage: 'Permission denied',
       },
 
-      /** Returns 403 if user is not authorized */
+      /** Returns 401 if user is not authorized */
       {
         role: null,
         isPublic: false,
         isAuthorized: false,
-        expectedStatusCode: 403,
+        expectedStatusCode: 401,
+        expectedMessage: 'You must be authenticated to access this resource',
       },
     ])
-    ('Returns note with access rights by public id', async ({ role, isPublic, isAuthorized, expectedStatusCode }) => {
+    ('Returns note with access rights by public id', async ({ role, isPublic, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Only if user has a Write role, he can edit the note */
       const canEdit = role === MemberRole.Write;
 
@@ -152,7 +154,7 @@ describe('Note API', () => {
         });
       } else {
         expect(response?.json()).toStrictEqual({
-          message: 'Permission denied',
+          message: expectedMessage,
         });
       }
     });
