@@ -85,10 +85,7 @@ describe('Join API', () => {
       /** create test user */
       const creator = await global.db.insertUser();
 
-      const randomGuy = await global.db.insertUser({
-        email: 'randomGuy@CodeXmail.com',
-        name: 'random guy',
-      });
+      const randomGuy = await global.db.insertUser();
 
 
       /** create test note for created user */
