@@ -59,7 +59,7 @@ describe('Note API', () => {
         role: MemberRole.Read,
         isPublic: false,
         isAuthorized: true,
-        expectedStatusCode: 200
+        expectedStatusCode: 200,
       },
 
       /** Returns 200 if user is team member with a Write role */
@@ -67,7 +67,7 @@ describe('Note API', () => {
         role: MemberRole.Write,
         isPublic: false,
         isAuthorized: true,
-        expectedStatusCode: 200
+        expectedStatusCode: 200,
       },
 
       /** Returns 200 if note is public */
@@ -75,7 +75,7 @@ describe('Note API', () => {
         role: null,
         isPublic: true,
         isAuthorized: false,
-        expectedStatusCode: 200
+        expectedStatusCode: 200,
       },
 
       /** Returns 403 if user is not in the team */
@@ -83,7 +83,7 @@ describe('Note API', () => {
         role: null,
         isPublic: false,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 403 if user is not authorized */
@@ -91,7 +91,7 @@ describe('Note API', () => {
         role: null,
         isPublic: false,
         isAuthorized: false,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
     ])
     ('Returns note with access rights by public id', async ({ role, isPublic, isAuthorized, expectedStatusCode }) => {
@@ -338,7 +338,11 @@ describe('Note API', () => {
 
       /** Create test note */
       const note = await global.db.insertNote({
-        publicId: 'juiKow8wlZ',
+        creatorId: creator.id,
+      });
+
+      /** Create test parent note */
+      const parentNote = await global.db.insertNote({
         creatorId: creator.id,
       });
 
@@ -366,31 +370,29 @@ describe('Note API', () => {
         },
         url: `/note/${note.publicId}`,
         body: {
-          content: { new: 'content added' },
+          content: {blocks: [{id: "qxnjUh9muR", type: "header", data: {text: "sample text", level: 1}}]},
         },
       });
 
       expect(response?.statusCode).toBe(200);
 
-      // response = await global.api?.fakeRequest({
-      //   method: 'GET',
-      //   headers: {
-      //     authorization: `Bearer ${accessToken}`,
-      //   },
-      //   url: `/note/${note.publicId}`,
-      // });
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+      });
 
-      // expect(response?.json()).toMatchObject({
-      //   note: {
-      //     id: note.publicId,
-      //     content: {
-      //       new: 'content added',
-      //     },
-      //   },
-      //   accessRights: {
-      //     canEdit: true,
-      //   },
-      // });
+      expect(response?.json()).toMatchObject({
+        note: {
+          id: note.publicId,
+          content: {blocks: [{id: "qxnjUh9muR", type: "header", data: {text: "sample text", level: 1}}]},
+        },
+        accessRights: {
+          canEdit: true,
+        },
+      });
     });
 
     test('Return 403 when user has Read role', async () => {
