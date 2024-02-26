@@ -13,41 +13,38 @@ describe('NoteSettings API', () => {
   });
   describe('GET /note-settings/:notePublicId ', () => {
     test.each([
-      /** Returns 200 when the note public */
+      /** Returns 401 when the user is not authorized */
       {
         role: null,
         isAuthorized: false,
-        isPublic: true,
-        expectedStatusCode: 200,
+        expectedStatusCode: 401,
+        expectedMessage: 'You must be authenticated to access this resource',
       },
 
-      /** Returns 200 if the note is private and user is a team member */
+      /** Returns 200 if user is a team member with a Write role */
       {
         role: MemberRole.Write,
         isAuthorized: true,
-        isPublic: false,
         expectedStatusCode: 200,
       },
 
-      /** Returns 403 when the note is private and user is not authorized */
+      /** Returns 403 when user is a team member with a Read role */
       {
-        role: null,
-        isAuthorized: false,
-        isPublic: false,
+        role: MemberRole.Read,
+        isAuthorized: true,
         expectedStatusCode: 403,
         expectedMessage: 'Permission denied',
       },
 
-      /** Returns 403 when the note is private but user is not in the team */
+      /** Returns 403 when user is not in the team */
       {
         role: null,
         isAuthorized: true,
-        isPublic: false,
         expectedStatusCode: 403,
         expectedMessage: 'Permission denied',
       },
     ])
-    ('Get note settings and team by public id', async ({ role, isAuthorized, isPublic, expectedStatusCode, expectedMessage }) => {
+    ('Get note settings and team by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -62,7 +59,7 @@ describe('NoteSettings API', () => {
       /** Create test note settings */
       const noteSettings = await global.db.insertNoteSetting({
         noteId: note.id,
-        isPublic: isPublic,
+        isPublic: false,
       });
 
       /** Create test team */
@@ -92,62 +89,37 @@ describe('NoteSettings API', () => {
       expect(response?.statusCode).toBe(expectedStatusCode);
 
       if (expectedStatusCode === 200) {
-        /** If user is in team, we expect to get team with creator and user */
-        if (role === MemberRole.Write) {
-          expect(response?.json()).toMatchObject(
-            {
-              isPublic: isPublic,
-              invitationHash: noteSettings.invitationHash,
-              team:
-                [
-                  {
-                    id: 1,
-                    role: MemberRole.Write,
-                    user: {
-                      id: creator.id,
-                      email: creator.email,
-                      name: creator.name,
-                      photo: '',
-                    },
+        expect(response?.json()).toMatchObject(
+          {
+            isPublic: false,
+            invitationHash: noteSettings.invitationHash,
+            team:
+              [
+                {
+                  id: 1,
+                  role: MemberRole.Write,
+                  user: {
+                    id: creator.id,
+                    email: creator.email,
+                    name: creator.name,
+                    photo: '',
                   },
+                },
 
-                  {
-                    id: 2,
-                    role: role,
-                    user: {
-                      id: user.id,
-                      email: user.email,
-                      name: user.name,
-                      photo: '',
-                    },
+                {
+                  id: 2,
+                  role: role,
+                  user: {
+                    id: user.id,
+                    email: user.email,
+                    name: user.name,
+                    photo: '',
                   },
-                ],
+                },
+              ],
 
-            }
-          );
-        } else {
-          /** Otherwise, we expect to get team with creator only */
-          expect(response?.json()).toMatchObject(
-            {
-              isPublic: isPublic,
-              invitationHash: noteSettings.invitationHash,
-              team:
-                [
-                  {
-                    id: 1,
-                    role: MemberRole.Write,
-                    user: {
-                      id: creator.id,
-                      email: creator.email,
-                      name: creator.name,
-                      photo: '',
-                    },
-                  },
-                ],
-
-            }
-          );
-        }
+          }
+        );
       } else {
         expect(response?.json()).toStrictEqual(
           {
