@@ -9,7 +9,6 @@ import type { TeamMember } from '@domain/entities/team.ts';
 import type EditorTool from '@domain/entities/editorTools.ts';
 import { nanoid } from 'nanoid';
 
-
 /**
  * default type for note mock creation attributes
  */
