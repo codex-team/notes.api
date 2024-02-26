@@ -1,6 +1,5 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { MemberRole } from '@domain/entities/team.js';
-import { InvitationHash } from '../../../domain/entities/noteSettings';
 
 describe('NoteSettings API', () => {
   beforeEach(async () => {
@@ -124,7 +123,7 @@ describe('NoteSettings API', () => {
                   },
                 ],
 
-            },
+            }
           );
         } else {
           /** Otherwise, we expect to get team with creator only */
@@ -146,7 +145,7 @@ describe('NoteSettings API', () => {
                   },
                 ],
 
-            },
+            }
           );
         }
       } else {

@@ -341,11 +341,6 @@ describe('Note API', () => {
         creatorId: creator.id,
       });
 
-      /** Create test parent note */
-      const parentNote = await global.db.insertNote({
-        creatorId: creator.id,
-      });
-
       /** Create test note settings */
       await global.db.insertNoteSetting({
         noteId: note.id,
@@ -370,7 +365,10 @@ describe('Note API', () => {
         },
         url: `/note/${note.publicId}`,
         body: {
-          content: {blocks: [{id: "qxnjUh9muR", type: "header", data: {text: "sample text", level: 1}}]},
+          content: { blocks: [ { id: 'qxnjUh9muR',
+            type: 'header',
+            data: { text: 'sample text',
+              level: 1 } } ] },
         },
       });
 
@@ -387,7 +385,10 @@ describe('Note API', () => {
       expect(response?.json()).toMatchObject({
         note: {
           id: note.publicId,
-          content: {blocks: [{id: "qxnjUh9muR", type: "header", data: {text: "sample text", level: 1}}]},
+          content: { blocks: [ { id: 'qxnjUh9muR',
+            type: 'header',
+            data: { text: 'sample text',
+              level: 1 } } ] },
         },
         accessRights: {
           canEdit: true,
