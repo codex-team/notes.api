@@ -365,10 +365,18 @@ describe('Note API', () => {
         },
         url: `/note/${note.publicId}`,
         body: {
-          content: { blocks: [ { id: 'qxnjUh9muR',
-            type: 'header',
-            data: { text: 'sample text',
-              level: 1 } } ] },
+          content: {
+            blocks: [
+              {
+                id: 'qxnjUh9muR',
+                type: 'header',
+                data: {
+                  text: 'sample text',
+                  level: 1,
+                },
+              },
+            ],
+          },
         },
       });
 
@@ -385,10 +393,18 @@ describe('Note API', () => {
       expect(response?.json()).toMatchObject({
         note: {
           id: note.publicId,
-          content: { blocks: [ { id: 'qxnjUh9muR',
-            type: 'header',
-            data: { text: 'sample text',
-              level: 1 } } ] },
+          content: {
+            blocks: [
+              {
+                id: 'qxnjUh9muR',
+                type: 'header',
+                data: {
+                  text: 'sample text',
+                  level: 1,
+                },
+              },
+            ],
+          },
         },
         accessRights: {
           canEdit: true,
