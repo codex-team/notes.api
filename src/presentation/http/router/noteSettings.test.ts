@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { MemberRole } from '@domain/entities/team.js';
+import { InvitationHash } from '../../../domain/entities/noteSettings';
 
 describe('NoteSettings API', () => {
   beforeEach(async () => {
@@ -20,7 +21,7 @@ describe('NoteSettings API', () => {
         isPublic: true,
         expectedStatusCode: 200,
       },
-      
+
       /** Returns 200 if the note is private and user is a team member */
       {
         role: MemberRole.Write,
@@ -37,7 +38,7 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 403,
         expectedMessage: 'Permission denied',
       },
-      
+
       /** Returns 403 when the note is private but user is not in the team */
       {
         role: null,
@@ -45,7 +46,7 @@ describe('NoteSettings API', () => {
         isPublic: false,
         expectedStatusCode: 403,
         expectedMessage: 'Permission denied',
-      }
+      },
     ])
     ('Get note settings and team by public id', async ({ role, isAuthorized, isPublic, expectedStatusCode, expectedMessage }) => {
       /** Create test user - creator of a note */
@@ -60,7 +61,7 @@ describe('NoteSettings API', () => {
       });
 
       /** Create test note settings */
-      await global.db.insertNoteSetting({
+      const noteSettings = await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: isPublic,
       });
@@ -73,12 +74,6 @@ describe('NoteSettings API', () => {
           role: role,
         });
       }
-
-      /** Create test note settings */
-      const noteSettings = await global.db.insertNoteSetting({
-        noteId: note.id,
-        isPublic: true,
-      });
 
       /** If user is not authorized, the access token is empty */
       let accessToken = '';
@@ -100,30 +95,59 @@ describe('NoteSettings API', () => {
       if (expectedStatusCode === 200) {
         /** If user is in team, we expect to get team with creator and user */
         if (role === MemberRole.Write) {
-          expect(response?.json().team).toMatchObject([
+          expect(response?.json()).toMatchObject(
             {
-              'role': MemberRole.Write,
-              'user': {
-                'id': creator.id,
-              },
+              isPublic: isPublic,
+              invitationHash: noteSettings.invitationHash,
+              team:
+                [
+                  {
+                    id: 1,
+                    role: MemberRole.Write,
+                    user: {
+                      id: creator.id,
+                      email: creator.email,
+                      name: creator.name,
+                      photo: '',
+                    },
+                  },
+
+                  {
+                    id: 2,
+                    role: role,
+                    user: {
+                      id: user.id,
+                      email: user.email,
+                      name: user.name,
+                      photo: '',
+                    },
+                  },
+                ],
+
             },
-            {
-              'role': role,
-              'user': {
-                id: user.id,
-              }
-            }
-          ]);
+          );
         } else {
           /** Otherwise, we expect to get team with creator only */
-          expect(response?.json().team).toMatchObject([
+          expect(response?.json()).toMatchObject(
             {
-              'role': MemberRole.Write,
-              'user': {
-                'id': creator.id,
-              },
+              isPublic: isPublic,
+              invitationHash: noteSettings.invitationHash,
+              team:
+                [
+                  {
+                    id: 1,
+                    role: MemberRole.Write,
+                    user: {
+                      id: creator.id,
+                      email: creator.email,
+                      name: creator.name,
+                      photo: '',
+                    },
+                  },
+                ],
+
             },
-          ]);
+          );
         }
       } else {
         expect(response?.json()).toStrictEqual(
@@ -184,14 +208,14 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 401,
         expectedMessage: 'You must be authenticated to access this resource',
       },
-      
+
       /** Returns 403 when the the user is not in the team */
       {
         role: null,
         isAuthorized: true,
         expectedStatusCode: 403,
         expectedMessage: 'Permission denied',
-      }
+      },
     ])
     ('Get note team by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Create test user - creator of a note */
@@ -242,7 +266,7 @@ describe('NoteSettings API', () => {
             noteId: note.id,
             role: MemberRole.Write,
             userId: user.id,
-          }]);
+          } ]);
       } else {
         expect(response?.json()).toStrictEqual(
           {
@@ -292,28 +316,28 @@ describe('NoteSettings API', () => {
       {
         role: MemberRole.Write,
         isAuthorized: true,
-        expectedStatusCode: 200
+        expectedStatusCode: 200,
       },
 
       /** Returns 403 if user is a team member with a Read role */
       {
         role: MemberRole.Read,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 403 if user is not in the team */
       {
         role: null,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 401 if user is not authorized */
       {
         role: null,
         isAuthorized: false,
-        expectedStatusCode: 401
+        expectedStatusCode: 401,
       },
     ])
     ('Update note settings by public id', async ({ role, isAuthorized, expectedStatusCode }) => {
@@ -362,7 +386,7 @@ describe('NoteSettings API', () => {
       });
 
       expect(response?.statusCode).toBe(expectedStatusCode);
-      
+
       if (expectedStatusCode === 200) {
         expect(response?.json().isPublic).toBe(false);
       }
@@ -409,28 +433,28 @@ describe('NoteSettings API', () => {
       {
         role: MemberRole.Write,
         isAuthorized: true,
-        expectedStatusCode: 200
+        expectedStatusCode: 200,
       },
 
       /** Returns 403 if user is a team member with a Read role */
       {
         role: MemberRole.Read,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 403 if user is not in the team */
       {
         role: null,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 401 if user is not authorized */
       {
         role: null,
         isAuthorized: false,
-        expectedStatusCode: 401
+        expectedStatusCode: 401,
       },
     ])
     ('Generate invitation hash', async ({ role, isAuthorized, expectedStatusCode }) => {
@@ -531,28 +555,28 @@ describe('NoteSettings API', () => {
       {
         role: MemberRole.Write,
         isAuthorized: true,
-        expectedStatusCode: 200
+        expectedStatusCode: 200,
       },
 
       /** Returns 403 if user is a team member with a Read role */
       {
         role: MemberRole.Read,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 403 if user is not in the team */
       {
         role: null,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 401 if user is not authorized */
       {
         role: null,
         isAuthorized: false,
-        expectedStatusCode: 401
+        expectedStatusCode: 401,
       },
     ])
     ('Update team member role by user id and note id', async ({ role, isAuthorized, expectedStatusCode }) => {
@@ -669,28 +693,28 @@ describe('NoteSettings API', () => {
       {
         role: MemberRole.Write,
         isAuthorized: true,
-        expectedStatusCode: 200
+        expectedStatusCode: 200,
       },
 
       /** Returns 403 if user is a team member with a Read role */
       {
         role: MemberRole.Read,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 403 if user is not in the team */
       {
         role: null,
         isAuthorized: true,
-        expectedStatusCode: 403
+        expectedStatusCode: 403,
       },
 
       /** Returns 401 if user is not authorized */
       {
         role: null,
         isAuthorized: false,
-        expectedStatusCode: 401
+        expectedStatusCode: 401,
       },
     ])
     ('Delete user from the team', async ( { role, isAuthorized, expectedStatusCode } ) => {
