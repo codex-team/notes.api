@@ -452,7 +452,8 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(403);
       expect(response?.json()).toStrictEqual({
-        message: 'Permission denied' });
+        message: 'Permission denied'
+      });
     });
   });
 

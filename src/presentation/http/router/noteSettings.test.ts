@@ -165,11 +165,19 @@ describe('NoteSettings API', () => {
 
   describe('GET /note-settings/:notePublicId/team ', () => {
     test.each([
-      /** Returns 200 if user is a team member */
+      /** Returns 200 if user is a team member with a Write role */
       {
         role: MemberRole.Write,
         isAuthorized: true,
         expectedStatusCode: 200,
+      },
+
+      /** Returns 403 if user is a team member with a Read role */
+      {
+        role: MemberRole.Read,
+        isAuthorized: true,
+        expectedStatusCode: 403,
+        expectedMessage: 'Permission denied',
       },
 
       /** Returns 401 when the user is not authorized */
