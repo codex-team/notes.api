@@ -936,7 +936,7 @@ describe('Note API', () => {
     });
   });
 
-  test.todo('Tests with access rights');
+  test.todo('Refactor tests for team rights. Make it use test.each method');
 
   test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 });
