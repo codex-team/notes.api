@@ -761,7 +761,7 @@ describe('NoteSettings API', () => {
       }
     });
 
-    test('Returns status code 403 and message "You can\'t delete from the team creator of the note" when you are deleting creator from the team', async () => {
+    test('Returns status code 403 and message "You can\'t remove note\'s creator from the team" when you are trying to remove creator from the team', async () => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -785,12 +785,12 @@ describe('NoteSettings API', () => {
 
       expect(response?.statusCode).toBe(403);
 
-      expect(response?.json().message).toBe('You can\'t delete from the team ccreator of the note');
+      expect(response?.json().message).toBe('You can\'t remove note\'s creator from the team');
     });
   });
 
   describe('DELETE /:notePublicId/team', () => {
-    test('User is deleted from the team by team member with role write', async () => {
+    test('User is removed from the team by a team member with a Write role', async () => {
       const creator = await global.db.insertUser();
 
       const RandomGuy = await global.db.insertUser({
@@ -842,7 +842,7 @@ describe('NoteSettings API', () => {
       ]);
     });
 
-    test('Returns status code 403 and message "You can\'t delete from the team creator of the note" when you are deleting creator from the team', async () => {
+    test('Returns status code 403 and message "You can\'t remove note\'s creator from the team" when you are trying to remove creator from the team', async () => {
       const creator = await global.db.insertUser();
 
       const note = await global.db.insertNote({
@@ -864,7 +864,7 @@ describe('NoteSettings API', () => {
 
       expect(response?.statusCode).toBe(403);
 
-      expect(response?.json().message).toBe('You can\'t delete from the team ccreator of the note');
+      expect(response?.json().message).toBe('You can\'t remove note\'s creator from the team');
     });
   });
 });
