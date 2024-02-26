@@ -207,7 +207,7 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns 404 when the id does not exist', async () => {
+    test('Returns 404 when the note does not exist', async () => {
       const nonexistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
@@ -358,9 +358,7 @@ describe('Note API', () => {
 
       const accessToken = global.auth(user.id);
 
-      let response;
-
-      response = await global.api?.fakeRequest({
+      let response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${accessToken}`,
