@@ -1,4 +1,3 @@
-import { MemberRole } from '@domain/entities/team';
 import { isEmpty } from '@infrastructure/utils/empty.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
 import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
