@@ -1,3 +1,4 @@
+import { MemberRole } from '@domain/entities/team';
 import { isEmpty } from '@infrastructure/utils/empty.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
 import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
@@ -34,7 +35,13 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
    * If note is public, everyone can access it
    * If note is private, only team member can access it
    */
-  if (isPublic === false && isEmpty(memberRole)) {
-    return await reply.forbidden();
+  if (isPublic === false) {
+    /** If user is unathorized we return 401 unauthorized */
+    if (isEmpty(userId)) {
+      return await reply.unauthorized();
+    /** If user is authorized, but is not in the team, we return 403 forbidden */
+    } else if (isEmpty(memberRole)) {
+      return await reply.forbidden();
+    }
   }
 }
