@@ -96,24 +96,16 @@ describe('NoteSettings API', () => {
             team:
               [
                 {
-                  id: 1,
                   role: MemberRole.Write,
                   user: {
                     id: creator.id,
-                    email: creator.email,
-                    name: creator.name,
-                    photo: '',
                   },
                 },
 
                 {
-                  id: 2,
                   role: role,
                   user: {
                     id: user.id,
-                    email: user.email,
-                    name: user.name,
-                    photo: '',
                   },
                 },
               ],
