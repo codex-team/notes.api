@@ -190,7 +190,7 @@ export default class DatabaseHelpers {
   /**
    * Inserts note team mock to then db
    *
-   * @param noteTeam - noteTam object which contain all info about noteTeam
+   * @param noteTeam - object that contains all info about noteTeam
    */
   public async insertNoteTeam(noteTeam: NoteTeamMockCreationAttributes): Promise<NoteTeamMockCreationAttributes> {
     await this.orm.connection.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (${noteTeam.userId}, ${noteTeam.noteId}, ${noteTeam.role})`);
