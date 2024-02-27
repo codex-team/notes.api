@@ -38,7 +38,7 @@ export interface RequestParams {
   method: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH',
 
   /**
-   * Request urk
+   * Request url
    */
   url: string,
 

@@ -326,6 +326,58 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   });
 
   /**
+   * Delete parent relation
+   */
+  fastify.delete<{
+    Params: {
+      notePublicId: NotePublicId,
+    },
+    Reply: {
+      isDeleted: boolean,
+    }
+  }>('/:notePublicId/relation', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            isDeleted: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
+    },
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+
+    const isDeleted = await noteService.unlinkParent(noteId);
+
+    /**
+     * Check if parent relation was successfully deleted
+     */
+    if (!isDeleted) {
+      return reply.notAcceptable('Parent note does not exist');
+    }
+
+    return reply.send({ isDeleted });
+  });
+
+  /**
    * Get note by custom hostname
    */
   fastify.get<{

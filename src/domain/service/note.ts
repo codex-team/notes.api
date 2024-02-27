@@ -107,6 +107,15 @@ export default class NoteService {
   }
 
   /**
+   * Unlink parent note from the current note
+   *
+   * @param noteId - id of note to unlink parent
+   */
+  public async unlinkParent(noteId: NoteInternalId): Promise<boolean> {
+    return this.noteRelationsRepository.unlinkParent(noteId);
+  }
+
+  /**
    * Returns note by id
    *
    * @param id - note internal id
