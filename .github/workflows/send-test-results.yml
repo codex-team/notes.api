@@ -1,4 +1,4 @@
-name: Send check results to CodeX chat
+name: Send check results to CodeX chat.
 
 on:
   push:
