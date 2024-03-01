@@ -256,7 +256,7 @@ describe('Note API', () => {
         role: MemberRole.Read,
         isAuthorized: true,
         expectedStatusCode: 403,
-        expectedMessage: 'Permission denied'
+        expectedMessage: 'Permission denied',
       },
 
       /** Returns 403 if user is not in the team */
@@ -275,7 +275,7 @@ describe('Note API', () => {
         expectedMessage: 'You must be authenticated to access this resource',
       },
     ])
-    ('Patch note by public id', async ({role, isAuthorized, expectedStatusCode, expectedMessage}) => {
+    ('Patch note by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Only if user has a Write role, he can edit the note */
       const canEdit = role === MemberRole.Write;
 
@@ -337,7 +337,7 @@ describe('Note API', () => {
       });
 
       expect(response?.statusCode).toBe(expectedStatusCode);
-      
+
       if (expectedStatusCode === 200) {
         response = await global.api?.fakeRequest({
           method: 'GET',
@@ -460,7 +460,7 @@ describe('Note API', () => {
         role: MemberRole.Read,
         isAuthorized: true,
         expectedStatusCode: 403,
-        expectedMessage: 'Permission denied'
+        expectedMessage: 'Permission denied',
       },
 
       /** Returns 403 if user is not in the team */
@@ -479,7 +479,7 @@ describe('Note API', () => {
         expectedMessage: 'You must be authenticated to access this resource',
       },
     ])
-    ('Delete note by public id', async ({role, isAuthorized, expectedStatusCode, expectedMessage}) => {
+    ('Delete note by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Create test user - creator of note */
       const creator = await global.db.insertUser();
 
@@ -675,7 +675,7 @@ describe('Note API', () => {
         role: MemberRole.Read,
         isAuthorized: true,
         expectedStatusCode: 403,
-        expectedMessage: 'Permission denied'
+        expectedMessage: 'Permission denied',
       },
 
       /** Returns 403 if user is not in the team */
@@ -694,7 +694,7 @@ describe('Note API', () => {
         expectedMessage: 'You must be authenticated to access this resource',
       },
     ])
-    ('Unlink any parent from note by it\'s public id', async ({role, isAuthorized, expectedStatusCode, expectedMessage}) => {
+    ('Unlink any parent from note by it\'s public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /* Create second user, who will be the creator of the note */
       const creator = await global.db.insertUser();
 
@@ -755,8 +755,7 @@ describe('Note API', () => {
           message: expectedMessage,
         });
       }
-
-      });
+    });
 
     test('Returns 200 and true when note was successfully unlinked', async () => {
       /* create test child note */
