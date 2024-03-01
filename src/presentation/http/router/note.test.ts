@@ -724,10 +724,8 @@ describe('Note API', () => {
       }
 
       /** If user is not authorized, the access token is empty */
-      let accessToken = '';
-
-      if (isAuthorized) {
-        accessToken = global.auth(user.id);
+      if (!isAuthorized) {
+        accessToken = '';
       }
 
       let response = await global.api?.fakeRequest({
