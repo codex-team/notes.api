@@ -14,6 +14,12 @@ jobs:
   tests:
     runs-on: ubuntu-22.04
     
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
+
     services:
       postgres:
         image: postgres
@@ -52,5 +58,10 @@ jobs:
         run: yarn install
 
       - name: Run tests
-        run: yarn test
+        run: yarn coverage
+
+      - name: Report coverage
+        # if: always() is set to generate the report even if tests are failing
+        if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
 

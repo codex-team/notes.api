@@ -5,6 +5,10 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     setupFiles: [ 'src/tests/utils/setup.ts' ],
+    coverage: {
+      reporter: ['text', 'json-summary', 'json'],
+      reportOnFailure: true,
+    },
   },
   resolve: {
     alias: {
