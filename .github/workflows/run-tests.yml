@@ -13,6 +13,11 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        branch:
+          - ${{ github.head_ref }}
+          - "main"
     
     permissions:
       # Required to checkout the code
@@ -47,7 +52,9 @@ jobs:
         run: sudo chmod -R 777 database
 
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -60,8 +67,32 @@ jobs:
       - name: Run tests
         run: yarn coverage
 
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.branch }}
+          path: coverage
+      
+
+  report-coverage:
+    needs: tests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download coverage artifacts for the current branch
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-${{ github.head_ref }}
+          path: coverage
+          
+      - name: Download coverage artifacts for the main branch
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-main
+          path: coverage-main
+
       - name: Report coverage
         # if: always() is set to generate the report even if tests are failing
         if: always()
         uses: davelosert/vitest-coverage-report-action@v2
-
+        with:
+          json-summary-compare-path: coverage-main/coverage-summary.json
