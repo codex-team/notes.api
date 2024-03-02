@@ -18,13 +18,17 @@ jobs:
     env:
       API_URL: "https://api.github.com/repos/${{ github.repository }}/actions/runs"
     steps:
-      - name: Set commit_sha to pull request head sha
+      - name: Set commit_sha to pull request head sha and ref to pull request
         if: ${{ github.event_name == 'pull_request' }}
-        run: echo "COMMIT_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+        run: |
+          echo "COMMIT_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+          echo "REF=[${{ github.event.pull_request.title }}](${{ github.event.pull_request.url }})" >> $GITHUB_ENV
 
-      - name: Set commit_sha to pushed commit sha
+      - name: Set commit_sha to pushed commit sha and ref to branch name
         if: ${{ github.event_name == 'push' }}
-        run: echo "COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+        run: |
+          echo "COMMIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "REF=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Wait for other checks to succeed
         uses: lewagon/wait-on-check-action@v1.3.1
@@ -37,11 +41,9 @@ jobs:
 
         # Find results of the actions with the same SHA as this action via github api and set them to env variable
       - name: Get actions results
-        env:
-          TRIGGERED_COMMIT_URL: https://github.com/${{ github.repository }}/commit/${{ env.COMMIT_SHA }}
         run: |
           echo 'ACTIONS_RESULTS<<0x0a' >> $GITHUB_ENV
-          echo -e "👏 Checks triggered by ${{ github.triggering_actor }}'s [commit]($TRIGGERED_COMMIT_URL)\n" >> $GITHUB_ENV
+          echo -e "👏 ${{ github.triggering_actor }}:\n${{ env.REF }}\n" >> $GITHUB_ENV
           curl -s -X GET -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}"\
            "$API_URL" | jq -r '.workflow_runs[] | select(((.head_sha=="${{ env.COMMIT_SHA }}") and (.id != ${{ github.run_id }}))
             and ((.conclusion == "success") or (.conclusion == "failure"))) | "\(.conclusion) [\(.name)](\(.html_url))" |
