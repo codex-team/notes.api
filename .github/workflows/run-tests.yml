@@ -49,7 +49,7 @@ jobs:
           time: '20s'
 
       - name: Set permissions for database directory
-        run: sudo chmod -R 755 database
+        run: sudo chmod -R u+wX database
 
       - name: Checkout Repository
         uses: actions/checkout@v4
