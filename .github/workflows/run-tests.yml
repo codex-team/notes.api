@@ -49,7 +49,7 @@ jobs:
           time: '20s'
 
       - name: Make runner the owner of database folder
-        run: sudo chown $USER database
+        run: sudo chown -R $USER database
 
       - name: Checkout Repository
         uses: actions/checkout@v4
