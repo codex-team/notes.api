@@ -81,6 +81,11 @@ jobs:
     needs: tests
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
       - name: Get a name of the artifact
         run: echo ARTIFACT_NAME="coverage-${{ github.head_ref }}" | tr -d ":<>|*?\r\n\/\\" >> $GITHUB_ENV
 
