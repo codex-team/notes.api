@@ -28,6 +28,7 @@ import { EditorToolSchema } from './schema/EditorTool.js';
 import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import TeamResponse from './schema/Team.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -282,6 +283,7 @@ export default class HttpApi implements Api {
     this.server?.addSchema(NoteSettingsSchema);
     this.server?.addSchema(JoinSchemaParams);
     this.server?.addSchema(JoinSchemaResponse);
+    this.server?.addSchema(TeamResponse);
   }
 
   /**

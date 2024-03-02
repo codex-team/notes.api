@@ -53,7 +53,7 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
   }, async (_, reply) => {
     const tools = await editorToolsService.getTools();
 
-    return reply.status(StatusCodes.OK).send({
+    return reply.send({
       data: tools,
     });
   });

@@ -34,7 +34,17 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
   /**
    * Callback for Google oauth2. Google redirects to this endpoint after user authentication.
    */
-  fastify.get('/google/callback', async (request, reply) => {
+  fastify.get('/google/callback', {
+    schema: {
+      response: {
+        '2xx': {
+          type: 'object',
+          description: 'Google oauth response',
+          $ref: 'UserSchema',
+        },
+      },
+    },
+  }, async (request, reply) => {
     /**
      * Get referer from request headers
      */

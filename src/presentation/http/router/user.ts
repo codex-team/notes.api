@@ -2,7 +2,6 @@ import type { FastifyPluginCallback } from 'fastify';
 import type UserService from '@domain/service/user.js';
 import type User from '@domain/entities/user.js';
 import type EditorToolsService from '@domain/service/editorTools';
-import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the user router
@@ -46,7 +45,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     schema: {
       response: {
         '2xx': {
-          $ref: 'User',
+          $ref: 'UserSchema',
         },
       },
     },
@@ -59,7 +58,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
       return reply.notFound('User not found');
     }
 
-    return reply.status(StatusCodes.OK).send(user);
+    return reply.send(user);
   });
 
   /**
@@ -95,10 +94,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
 
     const tools = await userService.getUserEditorTools(userId);
 
-    return reply
-      .status(StatusCodes.OK).send({
-        data: tools,
-      });
+    return reply.send({ data: tools });
   });
 
   /**

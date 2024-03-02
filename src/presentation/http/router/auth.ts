@@ -1,7 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
-import { StatusCodes } from 'http-status-codes';
 import type AuthSession from '@domain/entities/authSession.js';
 
 /**
@@ -39,7 +38,24 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
   fastify.post<{
     Body: AuthOptions;
     Reply: AuthSession | ErrorResponse;
-  }>('/', async (request, reply) => {
+  }>('/', {
+    schema: {
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            accessToken: {
+              type: 'string',
+            },
+
+            refreshToken: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
     const { token } = request.body;
     const userSession = await opts.authService.verifyRefreshToken(token);
 
@@ -55,7 +71,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     await opts.authService.removeSessionByRefreshToken(token);
     const refreshToken = await opts.authService.signRefreshToken(userSession.userId);
 
-    return reply.status(StatusCodes.OK).send({
+    return reply.send({
       accessToken,
       refreshToken,
     });
@@ -67,10 +83,23 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
   fastify.delete<{
     Body: AuthOptions;
     Reply: { ok: boolean }
-  }>('/', async (request, reply) => {
+  }>('/', {
+    schema: {
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            ok: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
     await opts.authService.removeSessionByRefreshToken(request.body.token);
 
-    return reply.status(StatusCodes.OK).send({
+    return reply.send({
       ok: true,
     });
   });

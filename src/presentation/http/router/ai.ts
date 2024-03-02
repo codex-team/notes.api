@@ -34,7 +34,13 @@ const AIRouter: FastifyPluginCallback<AIRouterOptions> = (fastify, opts, done) =
       result: string;
     },
   }>('/complete', {
-
+    schema: {
+      response: {
+        '2xx': {
+          type: 'string',
+        },
+      },
+    },
   }, async (request, reply) => {
     const { content } = request.body as GetCompletionOptions;
 

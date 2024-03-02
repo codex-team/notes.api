@@ -2,7 +2,7 @@
  * User entity used for validation and serialization
  */
 export const UserSchema  = {
-  $id: 'User',
+  $id: 'UserSchema',
   type: 'object',
   required: ['email', 'name'],
   properties: {

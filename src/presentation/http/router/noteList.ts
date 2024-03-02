@@ -2,7 +2,6 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteListService from '@domain/service/noteList.js';
 import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
 import type { NoteListPublic } from '@domain/entities/noteList';
-import { StatusCodes } from 'http-status-codes';
 
 
 /**
@@ -47,6 +46,24 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
           maximum: 30,
         },
       },
+
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            queryString: {
+              page: {
+                type: 'object',
+                minimum: 'number',
+                maximum: 'number',
+              },
+            },
+          },
+          data: {
+            $ref: 'NoteSchema',
+          },
+        },
+      },
     },
   }, async (request, reply) => {
     const userId = request.userId as number;
@@ -64,9 +81,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     };
 
 
-    return reply
-      .status(StatusCodes.OK)
-      .send(noteListPublic);
+    return reply.send(noteListPublic);
   });
 
   done();

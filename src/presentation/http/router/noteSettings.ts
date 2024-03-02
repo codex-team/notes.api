@@ -9,7 +9,6 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import type { NotePublicId } from '@domain/entities/note.js';
 import type { Team, MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
-import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the note settings router.
@@ -90,7 +89,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettingsPublic = definePublicNoteSettings(noteSettings);
 
-    return reply.status(StatusCodes.OK).send(noteSettingsPublic);
+    return reply.send(noteSettingsPublic);
   });
 
   /**
@@ -118,6 +117,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           $ref: 'NoteSchema#/properties/id',
         },
       },
+
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -130,7 +135,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('User does not belong to Note\'s team');
     }
 
-    return reply.status(StatusCodes.OK).send(newRole);
+    return reply.send(newRole);
   });
 
   /**
@@ -183,7 +188,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const noteSettingsPublic = definePublicNoteSettings(updatedNoteSettings);
 
-    return reply.status(StatusCodes.OK).send(noteSettingsPublic);
+    return reply.send(noteSettingsPublic);
   });
 
   /**
@@ -207,6 +212,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           $ref: 'NoteSchema#/properties/id',
         },
       },
+
+      response: {
+        '2xx': {
+          $ref: 'TeamSchema',
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -216,7 +227,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const team = await noteSettingsService.getTeamByNoteId(noteId);
 
-    return reply.status(StatusCodes.OK).send(team);
+    return reply.send(team);
   });
 
   /**
@@ -262,7 +273,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
 
     const updatedNoteSettings = await noteSettingsService.regenerateInvitationHash(noteId);
 
-    return reply.status(StatusCodes.OK).send({
+    return reply.send({
       invitationHash: updatedNoteSettings.invitationHash,
     });
   });

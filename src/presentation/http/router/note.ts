@@ -6,7 +6,7 @@ import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
-import { MemberRole } from '@domain/entities/team';
+import { MemberRole } from '@domain/entities/team.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
 import { StatusCodes } from 'http-status-codes';
 
@@ -158,6 +158,17 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           $ref: 'NoteSchema#/properties/id',
         },
       },
+
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            isDeleted: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
     },
     config: {
       policy: [
@@ -175,9 +186,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if note does not exist
      */
-    return reply
-      .status(StatusCodes.OK)
-      .send({ isDeleted : isDeleted });
+    return reply.send({ isDeleted });
   });
 
   /**
@@ -198,6 +207,19 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         'authRequired',
       ],
     },
+
+    schema: {
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
   }, async (request, reply) => {
     /**
      * @todo Validate request query
@@ -213,11 +235,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     await noteSettingsService.addNoteSettings(addedNote.id);
 
-    return reply
-      .status(StatusCodes.OK)
-      .send({
-        id: addedNote.publicId,
-      });
+    return reply.send({
+      id: addedNote.publicId,
+    });
   });
 
   /**
@@ -246,6 +266,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           $ref: 'NoteSchema#/properties/content',
         },
       },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            updatedAt: {
+              type: 'string',
+            },
+          },
+        },
+      },
     },
     config: {
       policy: [
@@ -264,10 +294,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const note = await noteService.updateNoteContentById(noteId, content, parentId);
 
-    return reply
-      .status(StatusCodes.OK).send({
-        updatedAt: note.updatedAt,
-      });
+    return reply.send({
+      updatedAt: note.updatedAt,
+    });
   });
 
 
@@ -343,7 +372,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       canEdit = memberRole === MemberRole.Write || note.creatorId == request.userId;
     }
 
-    return reply.status(StatusCodes.OK).send({
+    return reply.send({
       note: notePublic,
       accessRights: { canEdit: canEdit },
     });
