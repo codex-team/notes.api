@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Get a name of the artifact
-        run: echo ARTIFACT_NAME="coverage-${{ matrix.branch }}" | tr -d ":<>|*?\r\n\/\\" >> $GITHUB_ENV
+        run: echo ARTIFACT_NAME="coverage-${{ github.head_ref }}" | tr -d ":<>|*?\r\n\/\\" >> $GITHUB_ENV
 
       - name: Download coverage artifacts for the current branch
         uses: actions/download-artifact@v4
