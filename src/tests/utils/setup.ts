@@ -57,7 +57,7 @@ beforeAll(async () => {
     .start();
 
   const orm = await initORM({ dsn: postgresContainer.getConnectionUri() });
-  const repositories = await initRepositories(orm);
+  const repositories = await initRepositories(orm, config.s3);
   const domainServices = initDomainServices(repositories, config);
   const api = new API(config.httpApi);
 
