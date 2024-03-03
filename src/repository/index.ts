@@ -92,6 +92,9 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   const noteSettingsStorage = new NoteSettingsStorage(orm);
   const noteRelationshipStorage = new NoteRelationshipStorage(orm);
   const teamStorage = new TeamStorage(orm);
+  /**
+   * @todo remove ignoring of eslint rule after implementing file uploader repository
+   */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const s3Storage = new S3Storage(s3Config.accessKeyId, s3Config.secretAccessKey, s3Config.region, s3Config.endpoint);
 
