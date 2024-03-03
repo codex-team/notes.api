@@ -648,7 +648,7 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${note.publicId}/team`,
         body: {
           userId: creator.id,
-          newRole: 0,
+          newRole: MemberRole.Read,
         },
       });
 
