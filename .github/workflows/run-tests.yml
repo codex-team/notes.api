@@ -13,6 +13,9 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-22.04
+    permissions:
+      # Required to checkout the code
+      contents: read
     strategy:
       # If set to true, Github will cancel all other jobs if one of the jobs fails
       fail-fast: false
@@ -20,12 +23,6 @@ jobs:
         branch:
           - ${{ github.head_ref }}
           - "main"
-    
-    permissions:
-      # Required to checkout the code
-      contents: read
-      # Required to put a comment into the pull-request
-      pull-requests: write
 
     services:
       postgres:
@@ -82,6 +79,11 @@ jobs:
   report-coverage:
     needs: tests
     runs-on: ubuntu-22.04
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
