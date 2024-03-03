@@ -424,6 +424,18 @@ describe('Note API', () => {
         url: `/note`,
         body: {
           parentId: parentNote.publicId,
+          content: {
+            blocks: [
+              {
+                id: 'qxnjUh9muR',
+                type: 'header',
+                data: {
+                  text: 'sample text',
+                  level: 1,
+                },
+              },
+            ],
+          },
         },
       });
 
