@@ -11,7 +11,7 @@ import { initORM, init as initRepositories } from '@repository/index.js';
 const start = async (): Promise<void> => {
   try {
     const orm = await initORM(config.database);
-    const repositories = await initRepositories(orm);
+    const repositories = await initRepositories(orm, config.s3);
     const domainServices = initDomainServices(repositories, config);
     const api = new API(config.httpApi);
 

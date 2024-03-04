@@ -1,4 +1,4 @@
-import type { DatabaseConfig } from '@infrastructure/config/index.js';
+import type { DatabaseConfig, S3StorageConfig } from '@infrastructure/config/index.js';
 import NoteStorage from './storage/note.storage.js';
 import NoteSettingsStorage from './storage/noteSettings.storage.js';
 import NoteRelationshipStorage from './storage/noteRelations.storage.js';
@@ -17,6 +17,7 @@ import EditorToolsRepository from '@repository/editorTools.repository.js';
 import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
 import NoteRelationsRepository from '@repository/noteRelations.repository.js';
+import { S3Storage } from './storage/s3/index.js';
 
 /**
  * Interface for initiated repositories
@@ -79,8 +80,9 @@ export async function initORM(databaseConfig: DatabaseConfig): Promise<Orm> {
  * Initiate repositories
  *
  * @param orm - ORM instance
+ * @param s3Config - S3 storage config
  */
-export async function init(orm: Orm): Promise<Repositories> {
+export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Repositories> {
   /**
    * Create storage instances
    */
@@ -90,6 +92,11 @@ export async function init(orm: Orm): Promise<Repositories> {
   const noteSettingsStorage = new NoteSettingsStorage(orm);
   const noteRelationshipStorage = new NoteRelationshipStorage(orm);
   const teamStorage = new TeamStorage(orm);
+  /**
+   * @todo remove ignoring of eslint rule after implementing file uploader repository
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  const s3Storage = new S3Storage(s3Config.accessKeyId, s3Config.secretAccessKey, s3Config.region, s3Config.endpoint);
 
   /**
    * Create associations between note and note settings
