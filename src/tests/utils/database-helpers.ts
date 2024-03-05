@@ -7,7 +7,7 @@ import type UserSession from '@domain/entities/userSession.ts';
 import type NoteSettings from '@domain/entities/noteSettings.ts';
 import type { TeamMember } from '@domain/entities/team.ts';
 import type EditorTool from '@domain/entities/editorTools.ts';
-
+import { nanoid } from 'nanoid';
 
 /**
  * default type for note mock creation attributes
@@ -91,6 +91,7 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts note mock to then db
+   * Automatically adds note creator to note team
    *
    * @param note - note object which contain all info about note
    *
@@ -102,8 +103,8 @@ export default class DatabaseHelpers {
     const publicId = note.publicId ?? createPublicId();
 
     // eslint-disable-next-line
-    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id") 
-    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}') 
+    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id")
+    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}')
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,
@@ -111,6 +112,12 @@ export default class DatabaseHelpers {
     });
 
     const createdNote = results[0];
+
+    await this.insertNoteTeam({
+      userId: createdNote.creatorId,
+      noteId: createdNote.id,
+      role: 1,
+    });
 
     return createdNote;
   }
@@ -125,9 +132,11 @@ export default class DatabaseHelpers {
    * If editorTools is not passed, it's value in database would be []
    */
   public async insertUser(user?: UserMockCreationAttributes): Promise<User> {
+    const randomPartSize = 6;
+    const randomPart = nanoid(randomPartSize);
     const editorTools = user?.editorTools ?? '[]';
-    const name = user?.name ?? 'CodeX';
-    const email = user?.email ?? 'test@codexmail.com';
+    const name = user?.name ?? `CodeX-${randomPart}`;
+    const email = user?.email ?? `${randomPart}@codexmail.com`;
 
     // eslint-disable-next-line
     const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
@@ -181,7 +190,7 @@ export default class DatabaseHelpers {
   /**
    * Inserts note team mock to then db
    *
-   * @param noteTeam - noteTam object which contain all info about noteTeam
+   * @param noteTeam - object that contains all info about noteTeam
    */
   public async insertNoteTeam(noteTeam: NoteTeamMockCreationAttributes): Promise<NoteTeamMockCreationAttributes> {
     await this.orm.connection.query(`INSERT INTO public.note_teams ("user_id", "note_id", "role") VALUES (${noteTeam.userId}, ${noteTeam.noteId}, ${noteTeam.role})`);

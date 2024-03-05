@@ -19,6 +19,9 @@ export const NoteSettingsSchema = {
       maxLength: 10,
       minLength: 10,
     },
+    cover: {
+      type: 'string',
+    },
     team: {
       type: 'array',
       items: {

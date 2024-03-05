@@ -131,7 +131,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if current user can edit the note
      */
-    const canEdit = memberRole === MemberRole.Write || note.creatorId == request.userId;
+    const canEdit = memberRole === MemberRole.Write;
 
 
     return reply.status(StatusCodes.OK).send({
@@ -235,6 +235,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     await noteSettingsService.addNoteSettings(addedNote.id);
 
+    /**
+     * Creates TeamMember with write priveleges
+     */
+    await noteSettingsService.createTeamMember({
+      noteId: addedNote.id,
+      userId: userId as number,
+      role: MemberRole.Write,
+    });
+
     return reply.send({
       id: addedNote.publicId,
     });
@@ -299,6 +308,57 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     });
   });
 
+  /**
+   * Delete parent relation
+   */
+  fastify.delete<{
+    Params: {
+      notePublicId: NotePublicId,
+    },
+    Reply: {
+      isDeleted: boolean,
+    }
+  }>('/:notePublicId/relation', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            isDeleted: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
+    },
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+
+    const isDeleted = await noteService.unlinkParent(noteId);
+
+    /**
+     * Check if parent relation was successfully deleted
+     */
+    if (!isDeleted) {
+      return reply.notAcceptable('Parent note does not exist');
+    }
+
+    return reply.send({ isDeleted });
+  });
 
   /**
    * Get note by custom hostname
@@ -369,7 +429,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       /**
        * Check if current user can edit the note
        */
-      canEdit = memberRole === MemberRole.Write || note.creatorId == request.userId;
+      canEdit = memberRole === MemberRole.Write;
     }
 
     return reply.send({

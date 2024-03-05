@@ -13,7 +13,17 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-22.04
-    
+    permissions:
+      # Required to checkout the code
+      contents: read
+    strategy:
+      # If set to true, Github will cancel all other jobs if one of the jobs fails
+      fail-fast: false
+      matrix:
+        branch:
+          - ${{ github.head_ref }}
+          - "main"
+
     services:
       postgres:
         image: postgres
@@ -37,11 +47,13 @@ jobs:
         with:
           time: '20s'
 
-      - name: Set permissions for database directory
-        run: sudo chmod -R 777 database
+      - name: Make runner the owner of database folder
+        run: sudo chown -R $USER database
 
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -52,5 +64,50 @@ jobs:
         run: yarn install
 
       - name: Run tests
-        run: yarn test
+        run: yarn coverage
+        
+      - name: Get an appropriate name for an artifact
+        run: echo "ARTIFACT_NAME=coverage-${{ matrix.branch }}" | tr -d ':<>|*?\r\n\/\\' >> $GITHUB_ENV
 
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: coverage
+      
+
+  report-coverage:
+    needs: tests
+    runs-on: ubuntu-22.04
+    permissions:
+      # Required to checkout the code
+      contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Get a name of the artifact
+        run: echo ARTIFACT_NAME="coverage-${{ github.head_ref }}" | tr -d ":<>|*?\r\n\/\\" >> $GITHUB_ENV
+
+      - name: Download coverage artifacts for the current branch
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: coverage
+          
+      - name: Download coverage artifacts for the main branch
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-main
+          path: coverage-main
+
+      - name: Report coverage
+        # if: always() is set to generate the report even if tests are failing
+        if: always()
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          json-summary-compare-path: coverage-main/coverage-summary.json

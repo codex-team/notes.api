@@ -29,6 +29,10 @@ export const EditorToolSchema = {
       description: 'Is plugin included by default in the editor',
       default: false,
     },
+    userId: {
+      type: ['number', 'null'],
+      description: 'User id that added the tool to the marketplace',
+    },
     source: {
       type: 'object',
       properties: {

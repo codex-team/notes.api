@@ -19,7 +19,6 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
     return await reply.notAcceptable('Note not found');
   };
 
-  const { creatorId } = request.note;
   const { isPublic } = request.noteSettings;
   let memberRole;
 
@@ -28,14 +27,20 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
    * If note is public, we don't need to check for the role
    */
   if (notEmpty(userId) && isPublic === false) {
-    memberRole = domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, request.note.id);
+    memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, request.note.id);
   }
 
   /**
    * If note is public, everyone can access it
-   * If note is private, only team member and creator can access it
+   * If note is private, only team member can access it
    */
-  if (isPublic === false && creatorId !== userId && isEmpty(memberRole)) {
-    return await reply.forbidden();
+  if (isPublic === false) {
+    /** If user is unathorized we return 401 unauthorized */
+    if (isEmpty(userId)) {
+      return await reply.unauthorized();
+    /** If user is authorized, but is not in the team, we return 403 forbidden */
+    } else if (isEmpty(memberRole)) {
+      return await reply.forbidden();
+    }
   }
 }
