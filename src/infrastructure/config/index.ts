@@ -54,6 +54,18 @@ const OpenAIConfig = z.object({
   token: z.string(),
 });
 
+/**
+ * S3 storage configuration
+ */
+const S3StorageConfig = z.object({
+  accessKeyId: z.string(),
+  secretAccessKey: z.string(),
+  region: z.optional(z.string()),
+  endpoint: z.optional(z.string()),
+});
+
+export type S3StorageConfig = z.infer<typeof S3StorageConfig>;
+
 export type DatabaseConfig = z.infer<typeof DatabaseConfig>;
 
 /**
@@ -107,6 +119,7 @@ const AppConfig = z.object({
   database: DatabaseConfig,
   auth: AuthConfig,
   openai: OpenAIConfig,
+  s3: S3StorageConfig,
 });
 
 export type AppConfig = z.infer<typeof AppConfig>;
@@ -147,6 +160,10 @@ const defaultConfig: AppConfig = {
   },
   database: {
     dsn: 'postgres://user:pass@postgres/codex-notes',
+  },
+  s3: {
+    accessKeyId: '',
+    secretAccessKey: '',
   },
   openai: {
     token: '',
