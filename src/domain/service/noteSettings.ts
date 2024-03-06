@@ -137,16 +137,17 @@ export default class NoteSettingsService {
   public async getTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
     let team = await this.teamRepository.getTeamByNoteId(noteId);
     let parentId = await this.shared.note.getParentNoteIdByNoteId(noteId);
-    // let parentId = null;
 
-    while ((team.length === 1) && (parentId !== null)) {
+    /**
+     * team.length === 1 means that team contains only creator or owner, it means that team is not spesified by user
+     * parentId === null means that note has no parent to inherit its team
+     */
+    while (team.length === 1 && parentId !== null) {
       team = await this.teamRepository.getTeamByNoteId(parentId);
       parentId = await this.shared.note.getParentNoteIdByNoteId(parentId);
     }
-    console.log('alloooooo' + team);
 
     return team;
-    // return await this.teamRepository.getTeamByNoteId(noteId);
   }
 
   /**
