@@ -872,13 +872,19 @@ describe('Note API', () => {
         creatorId: user.id,
       });
 
+      /* create note settings for child note*/
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
       /* create test relation */
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
       });
 
-      const response = await global.api?.fakeRequest({
+      let response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${accessToken}`,
@@ -892,6 +898,16 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json().isUpdated).toBe(true);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.json().parentNote.id).toBe(newParentNote.publicId);
     });
 
     test('Returns 400 when parent is the same as child', async () => {
