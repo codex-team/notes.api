@@ -884,7 +884,7 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          parentId: newParentNote.publicId,
+          parentNoteId: newParentNote.publicId,
         },
         url: `/note/${childNote.publicId}/relation`,
       });
@@ -917,7 +917,7 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          parentId: childNote.publicId,
+          parentNoteId: childNote.publicId,
         },
         url: `/note/${childNote.publicId}/relation`,
       });
@@ -940,7 +940,7 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          parentId: nonExistentParentId,
+          parentNoteId: nonExistentParentId,
         },
         url: `/note/${childNote.publicId}/relation`,
       });
@@ -950,8 +950,4 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual('Incorrect parent note');
     });
   });
-
-  test.todo('Refactor tests for team rights. Make it use test.each method');
-
-  test.todo('API should not return internal id and "publicId".  It should return only "id" which is public id.');
 });

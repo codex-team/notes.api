@@ -279,7 +279,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId: NotePublicId,
     },
     Body: {
-      parentId: NotePublicId,
+      parentNoteId: NotePublicId,
     },
     Reply: {
       isUpdated: boolean,
@@ -292,7 +292,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         },
       },
       body: {
-        parentPublicId: {
+        parentNoteId: {
           $ref: 'NoteSchema#/properties/id',
         },
       },
@@ -318,9 +318,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
-    const parentId = request.body.parentId;
+    const parentNoteId = request.body.parentNoteId;
 
-    const isUpdated = await noteService.updateNoteRelation(noteId, parentId);
+    const isUpdated = await noteService.updateNoteRelation(noteId, parentNoteId);
 
     return reply.send({ isUpdated });
   });
