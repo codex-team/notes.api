@@ -769,7 +769,7 @@ describe('Note API', () => {
       }
     });
 
-    test('Returns 200 and true when note was successfully unlinked', async () => {
+    test('Returns 200 and isUpdated=true when note was successfully unlinked', async () => {
       /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
