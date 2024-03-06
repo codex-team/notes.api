@@ -35,7 +35,7 @@ export default interface UploadedFile {
   uploadedAt: Date;
 
   /**
-   * File name (e.g. `image.png`)
+   * File name (e.g. `image`)
    */
   name: string;
 

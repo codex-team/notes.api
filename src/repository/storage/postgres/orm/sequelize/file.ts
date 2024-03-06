@@ -33,7 +33,7 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   public declare uploadedAt: UploadedFile['uploadedAt'];
 
   /**
-   * File name (e.g. `image.png`)
+   * File name (e.g. `image`)
    */
   public declare name: UploadedFile['name'];
 
