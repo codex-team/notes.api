@@ -8,6 +8,7 @@ import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import type { SharedDomainMethods } from './shared';
 
 /**
  * Service responsible for Note Settings
@@ -25,8 +26,9 @@ export default class NoteSettingsService {
    *
    * @param noteSettingsRepository - note settings repository
    * @param teamRepository - team repository
+   * @param shared shared domains
    */
-  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository) {
+  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository, private readonly shared: SharedDomainMethods) {
     this.noteSettingsRepository = noteSettingsRepository;
     this.teamRepository = teamRepository;
   }
@@ -121,7 +123,9 @@ export default class NoteSettingsService {
    * @param noteId - note id where user should have role
    */
   public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
-    return await this.teamRepository.getUserRoleByUserIdAndNoteId(userId, noteId);
+    const team = await this.getTeamByNoteId(noteId);
+
+    return team.find(teamMember => teamMember.userId === userId)?.role;
   }
 
   /**
@@ -131,7 +135,18 @@ export default class NoteSettingsService {
    * @returns team members
    */
   public async getTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
-    return await this.teamRepository.getByNoteId(noteId);
+    let team = await this.teamRepository.getTeamByNoteId(noteId);
+    let parentId = await this.shared.note.getParentNoteIdByNoteId(noteId);
+    // let parentId = null;
+
+    while ((team.length === 1) && (parentId !== null)) {
+      team = await this.teamRepository.getTeamByNoteId(parentId);
+      parentId = await this.shared.note.getParentNoteIdByNoteId(parentId);
+    }
+    console.log('alloooooo' + team);
+
+    return team;
+    // return await this.teamRepository.getTeamByNoteId(noteId);
   }
 
   /**

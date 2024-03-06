@@ -57,7 +57,6 @@ export interface DomainServices {
  * @param appConfig - app config
  */
 export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
-  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository);
   const noteListService = new NoteListService(repositories.noteRepository);
   const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository);
 
@@ -74,6 +73,16 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     /**
      * @todo find a way how to resolve circular dependency
      */
+
+    note: noteService,
+  });
+  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, {
+    editorTools: editorToolsService,
+    /**
+     * @todo find a way how to resolve circular dependency
+     */
+
+    note: noteService,
     editorTools: editorToolsService,
   });
   const aiService = new AIService(repositories.aiRepository);
