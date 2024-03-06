@@ -18,6 +18,7 @@ import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
 import NoteRelationsRepository from '@repository/noteRelations.repository.js';
 import { S3Storage } from './storage/s3/index.js';
+import FileStorage from './storage/file.storage.js';
 
 /**
  * Interface for initiated repositories
@@ -92,9 +93,12 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   const noteSettingsStorage = new NoteSettingsStorage(orm);
   const noteRelationshipStorage = new NoteRelationshipStorage(orm);
   const teamStorage = new TeamStorage(orm);
+
   /**
-   * @todo remove ignoring of eslint rule after implementing file uploader repository
+   * @todo remove ignoring of eslint rules after implementing file uploader repository
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  const fileStorage = new FileStorage(orm);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   const s3Storage = new S3Storage(s3Config.accessKeyId, s3Config.secretAccessKey, s3Config.region, s3Config.endpoint);
 
