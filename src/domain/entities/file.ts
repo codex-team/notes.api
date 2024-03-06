@@ -55,7 +55,7 @@ export default interface UploadedFile {
   size: number;
 
   /**
-   * In case if file is a part of note, note id to indetify permissions to access
+   * In case if file is a part of note, note id to identify permissions to access
    */
   noteId?: Note['id'];
 }
