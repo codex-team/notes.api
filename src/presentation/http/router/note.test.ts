@@ -1,6 +1,7 @@
 import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
+import { memberRightsTestData } from '@tests/utils/team-rights';
 
 describe('Note API', () => {
   beforeEach(async () => {
@@ -243,38 +244,7 @@ describe('Note API', () => {
   });
 
   describe('PATCH note/:notePublicId ', () => {
-    test.each([
-      /** Returns 200 if user is team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
-
-      /** Returns 403 if user is team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-
-      /** Returns 403 if user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-
-      /** Returns 401 if user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-        expectedMessage: 'You must be authenticated to access this resource',
-      },
-    ])
+    test.each(memberRightsTestData)
     ('Patch note by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Only if user has a Write role, he can edit the note */
       const canEdit = role === MemberRole.Write;
@@ -459,38 +429,7 @@ describe('Note API', () => {
   });
 
   describe('DELETE /note/:notePublicId', () => {
-    test.each([
-      /** Returns 200 if user is team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
-
-      /** Returns 403 if user is team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-
-      /** Returns 403 if user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-
-      /** Returns 401 if user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-        expectedMessage: 'You must be authenticated to access this resource',
-      },
-    ])
+    test.each(memberRightsTestData)
     ('Delete note by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Create test user - creator of note */
       const creator = await global.db.insertUser();
@@ -674,38 +613,7 @@ describe('Note API', () => {
 
       accessToken = global.auth(user.id);
     });
-    test.each([
-      /** Returns 200 if user is team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
-
-      /** Returns 403 if user is team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-
-      /** Returns 403 if user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-
-      /** Returns 401 if user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-        expectedMessage: 'You must be authenticated to access this resource',
-      },
-    ])
+    test.each(memberRightsTestData)
     ('Unlink any parent from note by it\'s public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /* Create second user, who will be the creator of the note */
       const creator = await global.db.insertUser();
