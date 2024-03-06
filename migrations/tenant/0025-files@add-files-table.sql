@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS public.files (
     id integer NOT NULL,
-    user_id integer NOT NULL,
+    user_id integer,
     note_id integer,
     name character varying(255) NOT NULL,
     key character varying(255) NOT NULL UNIQUE,

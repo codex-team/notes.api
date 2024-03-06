@@ -27,7 +27,7 @@ export default interface UploadedFile {
   /**
    * User who uploaded the file
    */
-  userId: User['id'];
+  userId?: User['id'];
 
   /**
    * File uploaded at

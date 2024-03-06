@@ -25,7 +25,7 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   /**
    * User who uploaded the file
    */
-  public declare userId: User['id'];
+  public declare userId: CreationOptional<User['id']>;
 
   /**
    * File uploaded at
@@ -97,7 +97,7 @@ export default class FileSequelizeStorage {
         },
         userId: {
           type: DataTypes.INTEGER,
-          allowNull: false,
+          allowNull: true,
           references: {
             model: UserModel,
             key: 'id',
