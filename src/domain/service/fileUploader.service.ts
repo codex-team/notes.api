@@ -8,6 +8,7 @@ import type ObjectRepository from '@repository/object.repository.js';
 import type NoteSettingsSharedMethods from './shared/noteSettings.js';
 import { MemberRole } from '@domain/entities/team';
 import { DomainError } from '@domain/entities/DomainError.js';
+import { SharedDomainMethods } from './shared/index.js';
 
 /**
  * File data for upload
@@ -61,19 +62,19 @@ export default class FileUploaderService {
   private readonly fileRepository: FileRepository;
 
   /**
-   * Note settings shared methods
+   * Shared domain methods
    */
-  private readonly noteSettingsSharedMethods: NoteSettingsSharedMethods;
+  private readonly sharedDomainMethods: SharedDomainMethods;
 
   /**
    * File uploader service constructor
    *
    * @param objectRepository - repository for objects
    * @param fileRepository - repository for files data
-   * @param noteSettingsSharedMethods - note settings shared methods
+   * @param sharedDomainMethods - shared domain methods
    */
-  constructor(objectRepository: ObjectRepository, fileRepository: FileRepository, noteSettingsSharedMethods: NoteSettingsSharedMethods) {
-    this.noteSettingsSharedMethods = noteSettingsSharedMethods;
+  constructor(objectRepository: ObjectRepository, fileRepository: FileRepository, sharedDomainMethods: SharedDomainMethods) {
+    this.sharedDomainMethods = sharedDomainMethods;
     this.objectRepository = objectRepository;
     this.fileRepository = fileRepository;
   }
@@ -176,7 +177,7 @@ export default class FileUploaderService {
       /**
        * If file is public, everyone can access it
        */
-      const noteSettings = await this.noteSettingsSharedMethods.getNoteSettingsByNoteId(noteId);
+      const noteSettings = await this.sharedDomainMethods.noteSettings.getNoteSettingsByNoteId(noteId);
 
       if (noteSettings?.isPublic === true) {
         return true;
@@ -192,7 +193,7 @@ export default class FileUploaderService {
       /**
        * If user is a member of note, he can access file
        */
-      const userRole = await this.noteSettingsSharedMethods.getUserRoleByUserIdAndNoteId(userId, noteId);
+      const userRole = await this.sharedDomainMethods.noteSettings.getUserRoleByUserIdAndNoteId(userId, noteId);
 
       if (userRole !== undefined) {
         return true;
@@ -211,7 +212,7 @@ export default class FileUploaderService {
     /**
      * If user is a member of note, check if he has needed role
      */
-    const userRole = await this.noteSettingsSharedMethods.getUserRoleByUserIdAndNoteId(userId, noteId);
+    const userRole = await this.sharedDomainMethods.noteSettings.getUserRoleByUserIdAndNoteId(userId, noteId);
 
     if (userRole === neededRole) {
       return true;
