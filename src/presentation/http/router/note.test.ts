@@ -1,7 +1,7 @@
 import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
-import { memberRightsTestData } from '@tests/utils/team-rights';
+import { memberRight } from '@tests/utils/team-rights';
 
 describe('Note API', () => {
   beforeEach(async () => {
@@ -244,7 +244,7 @@ describe('Note API', () => {
   });
 
   describe('PATCH note/:notePublicId ', () => {
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Patch note by public id', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
@@ -432,7 +432,7 @@ describe('Note API', () => {
   });
 
   describe('DELETE /note/:notePublicId', () => {
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Delete note by public id', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
@@ -619,7 +619,7 @@ describe('Note API', () => {
 
       accessToken = global.auth(user.id);
     });
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Unlink any parent from note by it\'s public id', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;

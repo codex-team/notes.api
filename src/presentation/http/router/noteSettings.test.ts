@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { MemberRole } from '@domain/entities/team.js';
-import { memberRightsTestData } from '@tests/utils/team-rights';
+import { memberRight } from '@tests/utils/team-rights';
 
 describe('NoteSettings API', () => {
   beforeEach(async () => {
@@ -13,7 +13,7 @@ describe('NoteSettings API', () => {
     await global.db.truncateTables();
   });
   describe('GET /note-settings/:notePublicId ', () => {
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Get note settings and team by public id', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
@@ -129,7 +129,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('GET /note-settings/:notePublicId/team ', () => {
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Get note team by public id', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
@@ -227,7 +227,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-settings/:notePublicId ', () => {
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Update note settings by public id', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode } = testContext;
@@ -319,7 +319,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-settings/:notePublicId/invitation-hash ', () => {
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Generate invitation hash', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode } = testContext;
@@ -416,7 +416,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Update team member role by user id and note id', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode } = testContext;
@@ -529,7 +529,7 @@ describe('NoteSettings API', () => {
   });
 
   describe('DELETE /:notePublicId/team', () => {
-    test.each(memberRightsTestData)
+    test.each(memberRight)
     ('Delete user from the team', async ({ testContext }) => {
       /** Get data from context */
       const { role, isAuthorized, expectedStatusCode } = testContext;

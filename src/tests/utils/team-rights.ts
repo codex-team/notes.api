@@ -1,6 +1,6 @@
 import { MemberRole } from '@domain/entities/team.js';
 
-export const memberRightsTestData = [
+export const memberRight = [
   /** Returns 200 if user is team member with a Write role */
   {
     testContext: {
