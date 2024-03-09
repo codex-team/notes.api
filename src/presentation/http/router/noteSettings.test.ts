@@ -130,30 +130,31 @@ describe('NoteSettings API', () => {
         roleInParentTeam: MemberRole.Write,
         expectedStatusCode: 403,
         rootTeamInherits: 0,
-        expectedMessage: { message: 'Permission denied' },
+        expectedMessage: 'Permission denied',
       },
       {
         roleInParentTeam: MemberRole.Read,
-        expectedStatusCode: 200,
+        expectedStatusCode: 403,
         rootTeamInherits: 1,
+        expectedMessage: 'Permission denied',
       },
       {
         roleInParentTeam: MemberRole.Read,
         expectedStatusCode: 403,
         rootTeamInherits: 0,
-        expectedMessage: { message: 'Permission denied' },
+        expectedMessage: 'Permission denied',
       },
       {
         roleInParentTeam: null,
         expectedStatusCode: 403,
         rootTeamInherits: 1,
-        expectedMessage: { message: 'Permission denied' },
+        expectedMessage: 'Permission denied',
       },
       {
         roleInParentTeam: null,
         expectedStatusCode: 403,
         rootTeamInherits: 0,
-        expectedMessage: { message: 'Permission denied' },
+        expectedMessage: 'Permission denied',
       },
     ])
     ('GET note settings by public id', async ({ roleInParentTeam, expectedStatusCode, rootTeamInherits, expectedMessage }) => {
