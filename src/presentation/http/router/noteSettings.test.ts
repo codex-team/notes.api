@@ -14,7 +14,10 @@ describe('NoteSettings API', () => {
   });
   describe('GET /note-settings/:notePublicId ', () => {
     test.each(memberRightsTestData)
-    ('Get note settings and team by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
+    ('Get note settings and team by public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
+
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -127,7 +130,10 @@ describe('NoteSettings API', () => {
 
   describe('GET /note-settings/:notePublicId/team ', () => {
     test.each(memberRightsTestData)
-    ('Get note team by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
+    ('Get note team by public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
+
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -222,7 +228,10 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId ', () => {
     test.each(memberRightsTestData)
-    ('Update note settings by public id', async ({ role, isAuthorized, expectedStatusCode }) => {
+    ('Update note settings by public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode } = testContext;
+
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -311,7 +320,10 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/invitation-hash ', () => {
     test.each(memberRightsTestData)
-    ('Generate invitation hash', async ({ role, isAuthorized, expectedStatusCode }) => {
+    ('Generate invitation hash', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode } = testContext;
+
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -405,7 +417,10 @@ describe('NoteSettings API', () => {
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
     test.each(memberRightsTestData)
-    ('Update team member role by user id and note id', async ({ role, isAuthorized, expectedStatusCode }) => {
+    ('Update team member role by user id and note id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode } = testContext;
+
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -515,7 +530,10 @@ describe('NoteSettings API', () => {
 
   describe('DELETE /:notePublicId/team', () => {
     test.each(memberRightsTestData)
-    ('Delete user from the team', async ( { role, isAuthorized, expectedStatusCode } ) => {
+    ('Delete user from the team', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode } = testContext;
+
       const creator = await global.db.insertUser();
 
       const user = await global.db.insertUser();

@@ -245,7 +245,10 @@ describe('Note API', () => {
 
   describe('PATCH note/:notePublicId ', () => {
     test.each(memberRightsTestData)
-    ('Patch note by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
+    ('Patch note by public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
+
       /** Only if user has a Write role, he can edit the note */
       const canEdit = role === MemberRole.Write;
 
@@ -430,7 +433,10 @@ describe('Note API', () => {
 
   describe('DELETE /note/:notePublicId', () => {
     test.each(memberRightsTestData)
-    ('Delete note by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
+    ('Delete note by public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
+
       /** Create test user - creator of note */
       const creator = await global.db.insertUser();
 
@@ -614,7 +620,10 @@ describe('Note API', () => {
       accessToken = global.auth(user.id);
     });
     test.each(memberRightsTestData)
-    ('Unlink any parent from note by it\'s public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
+    ('Unlink any parent from note by it\'s public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
+
       /* Create second user, who will be the creator of the note */
       const creator = await global.db.insertUser();
 
