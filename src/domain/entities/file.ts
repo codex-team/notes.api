@@ -1,13 +1,16 @@
-import type { Note } from './note.js';
+import type { NoteInternalId } from './note.js';
 import type User from './user.js';
+import type { Buffer } from 'buffer';
 
 /**
  * File types for storing in object storage
  */
 export enum FileTypes {
   /**
-   * @todo define types
+   * @todo define real types
    */
+  avatar = 'avatar',
+  noteInternalFile = 'noteInternalFile',
 }
 
 /**
@@ -35,14 +38,14 @@ export default interface UploadedFile {
   uploadedAt: Date;
 
   /**
-   * File name (e.g. `image`)
+   * File name
    */
   name: string;
 
   /**
-   * File extension (e.g. `png`)
+   * File mimetype (e.g. `image/png`)
    */
-  extension: string;
+  mimetype: string;
 
   /**
    * File type, using to store in object storage
@@ -57,10 +60,15 @@ export default interface UploadedFile {
   /**
    * In case if file is a part of note, note id to identify permissions to access
    */
-  noteId?: Note['id'];
+  noteId?: NoteInternalId;
 }
 
 /**
  * File creation attributes
  */
-export type FileCreationAttributes = Omit<UploadedFile, 'id'>;
+export type FileCreationAttributes = Omit<UploadedFile, 'id' | 'uploadedAt'>;
+
+/**
+ * File data
+ */
+export type FileData = Buffer;
