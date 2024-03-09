@@ -23,8 +23,8 @@ class DomainA implements DomainASharedMethods {
 }
 
 class DomainB {
-  constructor(private readonly sharedDomainA: SharedDomainMethods.domainA) {
-    this.sharedDomainA.someMethodA(); // here we call method of Domain A, but without direct dependency
+  constructor(private readonly shared: SharedDomainMethods) {
+    this.shared.domainA.someMethodA(); // here we call method of Domain A, but without direct dependency
   }
 }
 ```

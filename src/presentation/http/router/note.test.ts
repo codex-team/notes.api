@@ -159,6 +159,53 @@ describe('Note API', () => {
       }
     });
 
+    test('Returns 200 if user is team member of parent note with Write role', async () => {
+      const creator = await global.db.insertUser();
+
+      const randomGuy = await global.db.insertUser();
+
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: note.id,
+        parentId: parentNote.id,
+      });
+
+      await global.db.insertNoteTeam({
+        noteId: parentNote.id,
+        userId: randomGuy.id,
+        role: 1,
+      });
+
+      const accessToken = await global.auth(randomGuy.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().note).toMatchObject({
+        id: note.publicId,
+        content: note.content,
+      });
+    });
+
     test('Returns note and parent note by note public id with 200 status', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
