@@ -20,10 +20,10 @@ export default class FileRepository {
   /**
    * Get file data by key
    *
-   * @param key - file key
+   * @param objectKey - unique file key in storage
    */
-  public async getByKey(key: string): Promise<UploadedFile | null> {
-    return this.storage.getFileDataByKey(key);
+  public async getByKey(objectKey: string): Promise<UploadedFile | null> {
+    return this.storage.getFileDataByKey(objectKey);
   }
 
   /**

@@ -105,10 +105,10 @@ export default class FileUploaderService {
   /**
    * Get file data by key
    *
-   * @param key - file key
+   * @param objectKey - unique file key in object storage
    */
-  public async getFileDataByKey(key: string): Promise<FileData> {
-    const file = await this.fileRepository.getByKey(key);
+  public async getFileDataByKey(objectKey: string): Promise<FileData> {
+    const file = await this.fileRepository.getByKey(objectKey);
 
     if (file === null) {
       throw new DomainError('File not found');
