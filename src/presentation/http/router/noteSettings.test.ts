@@ -160,7 +160,7 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteTeam({
         noteId: parentNote2.id,
         userId: randomGuy.id,
-        role: 1,
+        role: MemberRole.Write,
       });
 
       const accessToken = await global.auth(randomGuy.id);
@@ -223,14 +223,14 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteTeam({
         noteId: parentNote2.id,
         userId: randomGuy.id,
-        role: 1,
+        role: MemberRole.Write,
       });
 
       /** specify team for parentNote1 (randomGuy is not in this specified team) */
       await global.db.insertNoteTeam({
         noteId: parentNote1.id,
         userId: randomGuy2.id,
-        role: 1,
+        role: MemberRole.Write,
       });
 
       const accessToken = await global.auth(randomGuy.id);
@@ -738,7 +738,7 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteTeam({
         noteId: note.id,
         userId: user.id,
-        role: 1,
+        role: MemberRole.Write,
       });
 
       const accessToken = await global.auth(user.id);
@@ -933,7 +933,7 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteTeam({
         noteId: note.id,
         userId: RandomGuy.id,
-        role: 1,
+        role: MemberRole.Write,
       });
 
       const accessToken = await global.auth(creator.id);

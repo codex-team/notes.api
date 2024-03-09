@@ -185,7 +185,7 @@ describe('Note API', () => {
       await global.db.insertNoteTeam({
         noteId: parentNote.id,
         userId: randomGuy.id,
-        role: 1,
+        role: MemberRole.Write,
       });
 
       const accessToken = await global.auth(randomGuy.id);
