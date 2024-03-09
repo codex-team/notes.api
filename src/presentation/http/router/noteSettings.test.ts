@@ -120,6 +120,134 @@ describe('NoteSettings API', () => {
       }
     });
 
+    test('GET note settings by public id if user is in team of the 2nd parent note (other teams are contain only creator)', async () => {
+      /** create two users */
+      const creator = await global.db.insertUser();
+
+      const randomGuy = await global.db.insertUser();
+
+      /** create three notes */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const parentNote1 = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const parentNote2 = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /** create noteSettings for the note */
+      const noteSettings = await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      /** create note relations */
+      await global.db.insertNoteRelation({
+        noteId: note.id,
+        parentId: parentNote1.id,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: parentNote1.id,
+        parentId: parentNote2.id,
+      });
+
+      /** specify team for root note */
+      await global.db.insertNoteTeam({
+        noteId: parentNote2.id,
+        userId: randomGuy.id,
+        role: 1,
+      });
+
+      const accessToken = await global.auth(randomGuy.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        invitationHash: noteSettings.invitationHash,
+        isPublic: noteSettings.isPublic,
+      });
+    });
+
+    test('Returns status code 403 and message : \'you can not access this note if user is not in specified team of parent notes\'', async () => {
+      /** create three users */
+      const creator = await global.db.insertUser();
+
+      const randomGuy = await global.db.insertUser();
+
+      const randomGuy2 = await global.db.insertUser();
+
+      /** create three notes */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const parentNote1 = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const parentNote2 = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /** create noteSettings for the note */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      /** create note relations */
+      await global.db.insertNoteRelation({
+        noteId: note.id,
+        parentId: parentNote1.id,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: parentNote1.id,
+        parentId: parentNote2.id,
+      });
+
+      /** specify team for root note (randomGuy is in root team) */
+      await global.db.insertNoteTeam({
+        noteId: parentNote2.id,
+        userId: randomGuy.id,
+        role: 1,
+      });
+
+      /** specify team for parentNote1 (randomGuy is not in this specified team) */
+      await global.db.insertNoteTeam({
+        noteId: parentNote1.id,
+        userId: randomGuy2.id,
+        role: 1,
+      });
+
+      const accessToken = await global.auth(randomGuy.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toBe('Permission denied');
+    });
+
     test('Returns 404 when note settings with specified note public id do not exist', async () => {
       const nonexistentId = 'ishvm5qH84';
 
