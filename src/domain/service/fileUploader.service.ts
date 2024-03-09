@@ -31,6 +31,9 @@ interface FileToUpload {
   type: FileTypes;
 }
 
+/**
+ * File upload details, contains user id, who uploaded the file and note id, in case if file is a part of note
+ */
 interface FileUploadDetails {
   /**
    * User who uploaded the file
