@@ -181,7 +181,7 @@ describe('NoteSettings API', () => {
       });
     });
 
-    test('Returns status code 403 and message : \'you can not access this note if user is not in specified team of parent notes\'', async () => {
+    test('Returns status code 403 and message : \'Permission denied\'', async () => {
       /** create three users */
       const creator = await global.db.insertUser();
 
