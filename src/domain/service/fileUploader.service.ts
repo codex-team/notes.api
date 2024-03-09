@@ -5,10 +5,7 @@ import type User from '@domain/entities/user.js';
 import { createFileId } from '@infrastructure/utils/id';
 import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
-import type NoteSettingsSharedMethods from './shared/noteSettings.js';
-import { MemberRole } from '@domain/entities/team';
 import { DomainError } from '@domain/entities/DomainError.js';
-import { SharedDomainMethods } from './shared/index.js';
 
 /**
  * File data for upload
@@ -62,19 +59,13 @@ export default class FileUploaderService {
   private readonly fileRepository: FileRepository;
 
   /**
-   * Shared domain methods
-   */
-  private readonly sharedDomainMethods: SharedDomainMethods;
-
-  /**
    * File uploader service constructor
    *
    * @param objectRepository - repository for objects
    * @param fileRepository - repository for files data
    * @param sharedDomainMethods - shared domain methods
    */
-  constructor(objectRepository: ObjectRepository, fileRepository: FileRepository, sharedDomainMethods: SharedDomainMethods) {
-    this.sharedDomainMethods = sharedDomainMethods;
+  constructor(objectRepository: ObjectRepository, fileRepository: FileRepository) {
     this.objectRepository = objectRepository;
     this.fileRepository = fileRepository;
   }
@@ -87,21 +78,6 @@ export default class FileUploaderService {
    */
   public async uploadFile(fileData: FileToUpload, details?: FileUploadDetails): Promise<string> {
     const key = createFileId();
-
-    let hasPermissions: boolean;
-
-    /**
-     * If file is a part of note, check if user has permissions to access file
-     */
-    if (details?.noteId !== undefined) {
-      hasPermissions = await this.hasPermissionsToAccessFileInNote(details.noteId, MemberRole.Write, details.userId);
-    } else {
-      hasPermissions = true;
-    }
-
-    if (hasPermissions === false) {
-      throw new DomainError('User has no permissions to access file');
-    }
 
     const bucket = this.defineBucketByFileType(fileData.type);
 
@@ -130,28 +106,12 @@ export default class FileUploaderService {
    * Get file data by key
    *
    * @param key - file key
-   * @param userId - user id to check permissions
    */
-  public async getFileDataByKey(key: string, userId?: User['id']): Promise<FileData> {
+  public async getFileDataByKey(key: string): Promise<FileData> {
     const file = await this.fileRepository.getByKey(key);
 
     if (file === null) {
       throw new DomainError('File not found');
-    }
-
-    let hasPermissions: boolean;
-
-    /**
-     * If file is a part of note, check if user has permissions to access file
-     */
-    if (file.noteId !== undefined) {
-      hasPermissions = await this.hasPermissionsToAccessFileInNote(file.noteId, MemberRole.Read, userId);
-    } else {
-      hasPermissions = true;
-    }
-
-    if (hasPermissions === false) {
-      throw new DomainError('User has no permissions to access file');
     }
 
     const bucket = this.defineBucketByFileType(file.type);
@@ -163,62 +123,6 @@ export default class FileUploaderService {
     }
 
     return fileData;
-  }
-
-  /**
-   * Check if user has permissions to access file in note
-   *
-   * @param noteId - note id where file is located
-   * @param neededRole - needed role to access file
-   * @param userId - user id
-   */
-  private async hasPermissionsToAccessFileInNote(noteId: NoteInternalId, neededRole: MemberRole, userId?: User['id']): Promise<boolean> {
-    if (neededRole === MemberRole.Read) {
-      /**
-       * If file is public, everyone can access it
-       */
-      const noteSettings = await this.sharedDomainMethods.noteSettings.getNoteSettingsByNoteId(noteId);
-
-      if (noteSettings?.isPublic === true) {
-        return true;
-      }
-
-      /**
-       * If user id is not defined, user has no permissions to access file, because file is not public
-       */
-      if (userId === undefined) {
-        return false;
-      }
-
-      /**
-       * If user is a member of note, he can access file
-       */
-      const userRole = await this.sharedDomainMethods.noteSettings.getUserRoleByUserIdAndNoteId(userId, noteId);
-
-      if (userRole !== undefined) {
-        return true;
-      }
-
-      return false;
-    }
-
-    /**
-     * If user id is not defined, user has no permissions to access file
-     */
-    if (userId === undefined) {
-      return false;
-    }
-
-    /**
-     * If user is a member of note, check if he has needed role
-     */
-    const userRole = await this.sharedDomainMethods.noteSettings.getUserRoleByUserIdAndNoteId(userId, noteId);
-
-    if (userRole === neededRole) {
-      return true;
-    }
-
-    return false;
   }
 
   /**

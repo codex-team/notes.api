@@ -8,7 +8,7 @@ import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
 import FileUploaderService from './service/fileUploader.service.js';
-import { SharedDomainMethods } from './service/shared/index.js';
+import type { SharedDomainMethods } from './service/shared/index.js';
 
 /**
  * Interface for initiated services
@@ -81,7 +81,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   const userService = new UserService(repositories.userRepository, sharedDomainMethods);
   const aiService = new AIService(repositories.aiRepository);
 
-  const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository, sharedDomainMethods);
+  const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository);
 
   return {
     fileUploaderService,
