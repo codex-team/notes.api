@@ -160,14 +160,17 @@ describe('Note API', () => {
     });
 
     test.each([
+      /** returns 200 if user in actual team of the note with role write */
       {
         roleInParentTeam: MemberRole.Write,
         expectedStatusCode: 200,
       },
+      /** returns 200 if user in actual team of the note with role read */
       {
         roleInParentTeam: MemberRole.Read,
         expectedStatusCode: 200,
       },
+      /** returns 403 and 'Permission denied' message if user is not in actual team of the note */
       {
         roleInParentTeam: null,
         expectedStatusCode: 403,

@@ -121,43 +121,49 @@ describe('NoteSettings API', () => {
     });
 
     test.each([
+      /** returns note note settings with 200 status if user is in actual team with role write */
       {
-        roleInParentTeam: MemberRole.Write,
+        roleInRootTeam: MemberRole.Write,
         expectedStatusCode: 200,
-        rootTeamInherits: 1,
+        intermidiateTeamDefined: 0,
       },
+      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
-        roleInParentTeam: MemberRole.Write,
+        roleInRootTeam: MemberRole.Write,
         expectedStatusCode: 403,
-        rootTeamInherits: 0,
+        intermidiateTeamDefined: 1,
         expectedMessage: 'Permission denied',
       },
+      /** returns 403 and 'Permission denied' message if user is in actual team with role read */
       {
-        roleInParentTeam: MemberRole.Read,
+        roleInRootTeam: MemberRole.Read,
         expectedStatusCode: 403,
-        rootTeamInherits: 1,
+        intermidiateTeamDefined: 0,
         expectedMessage: 'Permission denied',
       },
+      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
-        roleInParentTeam: MemberRole.Read,
+        roleInRootTeam: MemberRole.Read,
         expectedStatusCode: 403,
-        rootTeamInherits: 0,
+        intermidiateTeamDefined: 1,
         expectedMessage: 'Permission denied',
       },
+      /** returns 403 and 'Permission denied' message if user is not in actual team of the note */
       {
-        roleInParentTeam: null,
+        roleInRootTeam: null,
         expectedStatusCode: 403,
-        rootTeamInherits: 1,
+        intermidiateTeamDefined: 0,
         expectedMessage: 'Permission denied',
       },
+      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
-        roleInParentTeam: null,
+        roleInRootTeam: null,
         expectedStatusCode: 403,
-        rootTeamInherits: 0,
+        intermidiateTeamDefined: 1,
         expectedMessage: 'Permission denied',
       },
     ])
-    ('GET note settings by public id', async ({ roleInParentTeam, expectedStatusCode, rootTeamInherits, expectedMessage }) => {
+    ('GET note settings by public id', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, expectedMessage }) => {
       /** create three users */
       const creator = await global.db.insertUser();
 
@@ -196,16 +202,16 @@ describe('NoteSettings API', () => {
       });
 
       /** specify team for root note (randomGuy is in root team) */
-      if (roleInParentTeam !== null) {
+      if (roleInRootTeam !== null) {
         await global.db.insertNoteTeam({
           noteId: parentNote2.id,
           userId: randomGuy.id,
-          role: roleInParentTeam,
+          role: roleInRootTeam,
         });
       }
 
       /** specify team for parentNote1 (randomGuy is not in this specified team) */
-      if (!rootTeamInherits) {
+      if (!intermidiateTeamDefined) {
         await global.db.insertNoteTeam({
           noteId: parentNote1.id,
           userId: randomGuy2.id,
