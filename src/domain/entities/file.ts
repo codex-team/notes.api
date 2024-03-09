@@ -9,8 +9,7 @@ export enum FileTypes {
   /**
    * @todo define real types
    */
-  avatar = 'avatar',
-  noteInternalFile = 'noteInternalFile',
+  test = 'test',
 }
 
 /**

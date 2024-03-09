@@ -227,10 +227,8 @@ export default class FileUploaderService {
    */
   private defineBucketByFileType(fileType: FileTypes): string {
     switch (fileType) {
-      case FileTypes.avatar:
-        return 'avatars';
-      case FileTypes.noteInternalFile:
-        return 'noteInternalFiles';
+      case FileTypes.test:
+        return 'test';
       default:
         throw new Error('Unknown file type');
     }
