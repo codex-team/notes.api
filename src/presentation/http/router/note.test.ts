@@ -159,7 +159,22 @@ describe('Note API', () => {
       }
     });
 
-    test('Returns 200 if user is team member of parent note with Write role', async () => {
+    test.each([
+      {
+        roleInParentTeam: MemberRole.Write,
+        expectedStatusCode: 200,
+      },
+      {
+        roleInParentTeam: MemberRole.Read,
+        expectedStatusCode: 200,
+      },
+      {
+        roleInParentTeam: null,
+        expectedStatusCode: 403,
+        expectedMessage: { message: 'Permission denied' },
+      },
+    ])
+    ('Returns note by public id', async ({ roleInParentTeam, expectedStatusCode, expectedMessage }) => {
       const creator = await global.db.insertUser();
 
       const randomGuy = await global.db.insertUser();
@@ -182,11 +197,13 @@ describe('Note API', () => {
         parentId: parentNote.id,
       });
 
-      await global.db.insertNoteTeam({
-        noteId: parentNote.id,
-        userId: randomGuy.id,
-        role: MemberRole.Write,
-      });
+      if (roleInParentTeam !== null) {
+        await global.db.insertNoteTeam({
+          noteId: parentNote.id,
+          userId: randomGuy.id,
+          role: roleInParentTeam,
+        });
+      }
 
       const accessToken = await global.auth(randomGuy.id);
 
@@ -198,12 +215,16 @@ describe('Note API', () => {
         url: `/note/${note.publicId}`,
       });
 
-      expect(response?.statusCode).toBe(200);
+      expect(response?.statusCode).toBe(expectedStatusCode);
 
-      expect(response?.json().note).toMatchObject({
-        id: note.publicId,
-        content: note.content,
-      });
+      if (expectedMessage !== undefined) {
+        expect(response?.json()).toStrictEqual(expectedMessage);
+      } else {
+        expect(response?.json().note).toMatchObject({
+          id: note.publicId,
+          content: note.content,
+        });
+      }
     });
 
     test('Returns note and parent note by note public id with 200 status', async () => {

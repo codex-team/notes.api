@@ -1,4 +1,4 @@
-import type { Note, NoteInternalId } from '@domain/entities/note';
+import type { NoteInternalId } from '@domain/entities/note';
 
 /**
  * Which methods of Domain can be used by other domains
@@ -11,5 +11,5 @@ export default interface NoteServiceSharedMethods {
    *
    * @param noteId - id of the current note
    */
-  getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<Note['id'] | null>;
+  getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null>;
 }

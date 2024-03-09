@@ -23,10 +23,6 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
   let memberRole;
 
   /**
-   * Get team of the actual note
-   */
-
-  /**
    * If user is not authorized, we can't check his role
    * If note is public, we don't need to check for the role
    */

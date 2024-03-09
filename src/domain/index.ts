@@ -68,16 +68,16 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
 
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
 
-  const userService = new UserService(repositories.userRepository, {
+  const sharedServices = {
     editorTools: editorToolsService,
-
     note: noteService,
-  });
-  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, {
-    editorTools: editorToolsService,
+    /**
+     * @todo find a way how to resolve circular dependency
+     */
+  };
 
-    note: noteService,
-  });
+  const userService = new UserService(repositories.userRepository, sharedServices);
+  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, sharedServices);
   const aiService = new AIService(repositories.aiRepository);
 
   const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository);
