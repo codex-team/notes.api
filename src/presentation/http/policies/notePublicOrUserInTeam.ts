@@ -25,7 +25,6 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
   /**
    * Get team of the actual note
    */
-  // let team = await domainServices.noteSettingsService.getTeamByNoteId(request.note.id);
 
   /**
    * If user is not authorized, we can't check his role

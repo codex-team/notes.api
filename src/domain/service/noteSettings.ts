@@ -139,7 +139,7 @@ export default class NoteSettingsService {
     let parentId = await this.noteSharedService.getParentNoteIdByNoteId(noteId);
 
     /**
-     * team.length === 1 means that team contains only creator or owner, it means that team is not spesified by user
+     * team.length === 1 means that team contains only creator or owner, it means that team is not specified by user
      * parentId === null means that note has no parent to inherit its team
      */
     while (team.length === 1 && parentId !== null) {
