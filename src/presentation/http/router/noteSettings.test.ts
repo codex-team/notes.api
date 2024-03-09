@@ -121,49 +121,59 @@ describe('NoteSettings API', () => {
     });
 
     test.each([
-      /** returns note note settings with 200 status if user is in actual team with role write */
+      /** returns note note settings with 200 status if user is in inherited team with role write */
       {
         roleInRootTeam: MemberRole.Write,
+        intermidiateTeamDefined: false,
         expectedStatusCode: 200,
-        intermidiateTeamDefined: 0,
       },
       /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
         roleInRootTeam: MemberRole.Write,
-        expectedStatusCode: 403,
-        intermidiateTeamDefined: 1,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: undefined,
         expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
       },
-      /** returns 403 and 'Permission denied' message if user is in actual team with role read */
+      /** returns 403 and 'Permission denied' message if user is in inherited team with role read */
       {
         roleInRootTeam: MemberRole.Read,
-        expectedStatusCode: 403,
-        intermidiateTeamDefined: 0,
+        intermidiateTeamDefined: false,
         expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
       },
       /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
         roleInRootTeam: MemberRole.Read,
-        expectedStatusCode: 403,
-        intermidiateTeamDefined: 1,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: undefined,
         expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
       },
-      /** returns 403 and 'Permission denied' message if user is not in actual team of the note */
+      /** returns 403 and 'Permission denied' message if user is not in inherited team of the note */
       {
         roleInRootTeam: null,
-        expectedStatusCode: 403,
-        intermidiateTeamDefined: 0,
+        intermidiateTeamDefined: false,
         expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
       },
       /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
         roleInRootTeam: null,
-        expectedStatusCode: 403,
-        intermidiateTeamDefined: 1,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: undefined,
         expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
+      },
+      /** returns 200 and note if user in inherited team with write role, even if root team have no such a user */
+      {
+        roleInRootTeam: null,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: MemberRole.Write,
+        expectedStatusCode: 200,
       },
     ])
-    ('GET note settings by public id', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, expectedMessage }) => {
+    ('Get note settings by public id', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
       /** create three users */
       const creator = await global.db.insertUser();
 
@@ -210,12 +220,19 @@ describe('NoteSettings API', () => {
         });
       }
 
-      /** specify team for parentNote1 (randomGuy is not in this specified team) */
-      if (!intermidiateTeamDefined) {
+      /** specify team for parentNote1 */
+      if (intermidiateTeamDefined) {
         await global.db.insertNoteTeam({
           noteId: parentNote1.id,
           userId: randomGuy2.id,
           role: MemberRole.Write,
+        });
+      }
+      if (roleInIntermidiateTeam !== undefined) {
+        await global.db.insertNoteTeam({
+          noteId: parentNote1.id,
+          userId: randomGuy.id,
+          role: roleInIntermidiateTeam,
         });
       }
 
@@ -234,10 +251,28 @@ describe('NoteSettings API', () => {
       if (expectedMessage !== undefined) {
         expect(response?.json().message).toBe(expectedMessage);
       } else {
-        expect(response?.json()).toMatchObject({
-          invitationHash: noteSettings.invitationHash,
-          isPublic: noteSettings.isPublic,
-        });
+        expect(response?.json()).toMatchObject(
+          {
+            isPublic: false,
+            invitationHash: noteSettings.invitationHash,
+            team:
+              [
+                {
+                  role: MemberRole.Write,
+                  user: {
+                    id: creator.id,
+                  },
+                },
+
+                {
+                  role: MemberRole.Write,
+                  user: {
+                    id: randomGuy.id,
+                  },
+                },
+              ],
+
+          });
       }
     });
 

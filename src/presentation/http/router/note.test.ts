@@ -160,52 +160,127 @@ describe('Note API', () => {
     });
 
     test.each([
-      /** returns 200 if user in actual team of the note with role write */
+      /** returns 200 and note with accessRights if user is in inherited team with role write */
       {
-        roleInParentTeam: MemberRole.Write,
+        roleInRootTeam: MemberRole.Write,
+        intermidiateTeamDefined: false,
         expectedStatusCode: 200,
       },
-      /** returns 200 if user in actual team of the note with role read */
+      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
-        roleInParentTeam: MemberRole.Read,
-        expectedStatusCode: 200,
-      },
-      /** returns 403 and 'Permission denied' message if user is not in actual team of the note */
-      {
-        roleInParentTeam: null,
+        roleInRootTeam: MemberRole.Write,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: undefined,
+        expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
-        expectedMessage: { message: 'Permission denied' },
+      },
+      /** returns 200 and note with accessRights if user is in inherited team with role read */
+      {
+        roleInRootTeam: MemberRole.Read,
+        intermidiateTeamDefined: false,
+        expectedStatusCode: 200,
+      },
+      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
+      {
+        roleInRootTeam: MemberRole.Read,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: undefined,
+        expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
+      },
+      /** returns 403 and 'Permission denied' message if user is not in inherited team of the note */
+      {
+        roleInRootTeam: null,
+        intermidiateTeamDefined: false,
+        expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
+      },
+      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
+      {
+        roleInRootTeam: null,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: undefined,
+        expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
+      },
+      /** returns 200 and note if user in inherited team with write role, even if root team have no such a user */
+      {
+        roleInRootTeam: null,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: MemberRole.Write,
+        expectedStatusCode: 200,
       },
     ])
-    ('Returns note by public id', async ({ roleInParentTeam, expectedStatusCode, expectedMessage }) => {
+    ('Returns note by public id', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
+      /** create three users */
       const creator = await global.db.insertUser();
 
       const randomGuy = await global.db.insertUser();
 
+      const randomGuy2 = await global.db.insertUser();
+
+      /** create three notes */
       const note = await global.db.insertNote({
         creatorId: creator.id,
       });
 
+      const intermidiateNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const rootNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /** create noteSettings for the note */
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: false,
       });
 
-      const parentNote = await global.db.insertNote({
-        creatorId: creator.id,
+      /** create note relations */
+      await global.db.insertNoteRelation({
+        noteId: note.id,
+        parentId: intermidiateNote.id,
       });
 
       await global.db.insertNoteRelation({
-        noteId: note.id,
-        parentId: parentNote.id,
+        noteId: intermidiateNote.id,
+        parentId: rootNote.id,
       });
 
-      if (roleInParentTeam !== null) {
+      /** specify team for root note (randomGuy is in root team) */
+      if (roleInRootTeam !== null) {
         await global.db.insertNoteTeam({
-          noteId: parentNote.id,
+          noteId: rootNote.id,
           userId: randomGuy.id,
-          role: roleInParentTeam,
+          role: roleInRootTeam,
         });
+      }
+
+      /** specify team for intermidiateNote */
+      if (intermidiateTeamDefined) {
+        await global.db.insertNoteTeam({
+          noteId: intermidiateNote.id,
+          userId: randomGuy2.id,
+          role: MemberRole.Write,
+        });
+      }
+      if (roleInIntermidiateTeam !== undefined) {
+        await global.db.insertNoteTeam({
+          noteId: intermidiateNote.id,
+          userId: randomGuy.id,
+          role: roleInIntermidiateTeam,
+        });
+      }
+
+      /** Compute canEdit variable */
+      let canEdit;
+
+      if ((intermidiateTeamDefined === true && roleInIntermidiateTeam === MemberRole.Write) || (intermidiateTeamDefined === false && roleInRootTeam === MemberRole.Write)) {
+        canEdit = true;
+      } else {
+        canEdit = false;
       }
 
       const accessToken = await global.auth(randomGuy.id);
@@ -221,11 +296,14 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(expectedStatusCode);
 
       if (expectedMessage !== undefined) {
-        expect(response?.json()).toStrictEqual(expectedMessage);
+        expect(response?.json().message).toStrictEqual(expectedMessage);
       } else {
-        expect(response?.json().note).toMatchObject({
-          id: note.publicId,
-          content: note.content,
+        expect(response?.json()).toMatchObject({ 'note': {
+          'id': note.publicId,
+        },
+        'accessRights': {
+          'canEdit': canEdit,
+        },
         });
       }
     });
