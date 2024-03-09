@@ -30,7 +30,7 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   /**
    * File uploaded at
    */
-  public declare uploadedAt: UploadedFile['uploadedAt'];
+  public declare createdAt: CreationOptional<UploadedFile['createdAt']>;
 
   /**
    * File name (e.g. `image`)
@@ -38,9 +38,9 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   public declare name: UploadedFile['name'];
 
   /**
-   * File extension (e.g. `png`)
+   * File extension (e.g. `image/png`)
    */
-  public declare extension: UploadedFile['extension'];
+  public declare mimetype: UploadedFile['mimetype'];
 
   /**
    * File type, using to store in object storage
@@ -103,11 +103,8 @@ export default class FileSequelizeStorage {
             key: 'id',
           },
         },
-        uploadedAt: {
-          type: DataTypes.DATE,
-          allowNull: false,
-        },
-        extension: {
+        createdAt: DataTypes.DATE,
+        mimetype: {
           type: DataTypes.STRING,
           allowNull: false,
         },

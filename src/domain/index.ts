@@ -7,6 +7,7 @@ import type { AppConfig } from '@infrastructure/config/index.js';
 import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
+import FileUploaderService from './service/fileUploader.service.js';
 
 /**
  * Interface for initiated services
@@ -42,6 +43,11 @@ export interface DomainServices {
    */
   aiService: AIService
   editorToolsService: EditorToolsService,
+
+  /**
+   * File uploader service instance
+   */
+  fileUploaderService: FileUploaderService
 }
 
 /**
@@ -63,15 +69,19 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   );
 
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
+
   const userService = new UserService(repositories.userRepository, {
-    editorTools: editorToolsService,
     /**
      * @todo find a way how to resolve circular dependency
      */
+    editorTools: editorToolsService,
   });
   const aiService = new AIService(repositories.aiRepository);
 
+  const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository);
+
   return {
+    fileUploaderService,
     noteService,
     noteListService,
     noteSettingsService,

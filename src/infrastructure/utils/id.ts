@@ -19,3 +19,12 @@ export function createPublicId(length: number = 10): string {
 export function createEditorToolId(length: number = 8): string {
   return nanoid(length);
 }
+
+/**
+ * Create unique identifier for file
+ *
+ * @param length - id length
+ */
+export function createFileId(length: number = 8): string {
+  return nanoid(length);
+}
