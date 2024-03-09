@@ -173,7 +173,7 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 200,
       },
     ])
-    ('Get note settings by public id', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
+    ('Get note settings by public id with recursive access check', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
       /** create three users */
       const creator = await global.db.insertUser();
 

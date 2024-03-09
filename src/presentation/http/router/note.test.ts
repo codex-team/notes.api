@@ -211,7 +211,7 @@ describe('Note API', () => {
         expectedStatusCode: 200,
       },
     ])
-    ('Returns note by public id', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
+    ('Returns note by public id with recursive access check', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
       /** create three users */
       const creator = await global.db.insertUser();
 
