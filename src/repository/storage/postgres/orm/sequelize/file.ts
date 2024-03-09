@@ -30,7 +30,7 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   /**
    * File uploaded at
    */
-  public declare uploadedAt: UploadedFile['uploadedAt'];
+  public declare createdAt: CreationOptional<UploadedFile['createdAt']>;
 
   /**
    * File name (e.g. `image`)
@@ -103,10 +103,7 @@ export default class FileSequelizeStorage {
             key: 'id',
           },
         },
-        uploadedAt: {
-          type: DataTypes.DATE,
-          allowNull: false,
-        },
+        createdAt: DataTypes.DATE,
         mimetype: {
           type: DataTypes.STRING,
           allowNull: false,
@@ -145,8 +142,7 @@ export default class FileSequelizeStorage {
    * @param fileData - File data
    */
   public async insertFile(fileData: FileCreationAttributes): Promise<UploadedFile> {
-    return await this.model.create({ ...fileData,
-      uploadedAt: new Date() });
+    return await this.model.create(fileData);
   }
 
   /**

@@ -32,11 +32,6 @@ export default interface UploadedFile {
   userId?: User['id'];
 
   /**
-   * File uploaded at
-   */
-  uploadedAt: Date;
-
-  /**
    * File name
    */
   name: string;
@@ -57,6 +52,11 @@ export default interface UploadedFile {
   size: number;
 
   /**
+   * File creation date
+   */
+  createdAt: Date;
+
+  /**
    * In case if file is a part of note, note id to identify permissions to access
    */
   noteId?: NoteInternalId;
@@ -65,7 +65,7 @@ export default interface UploadedFile {
 /**
  * File creation attributes
  */
-export type FileCreationAttributes = Omit<UploadedFile, 'id' | 'uploadedAt'>;
+export type FileCreationAttributes = Omit<UploadedFile, 'id' | 'createdAt'>;
 
 /**
  * File data
