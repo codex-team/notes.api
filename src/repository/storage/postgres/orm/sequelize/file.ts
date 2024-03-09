@@ -145,8 +145,10 @@ export default class FileSequelizeStorage {
    * @param fileData - File data
    */
   public async insertFile(fileData: FileCreationAttributes): Promise<UploadedFile> {
-    return await this.model.create({ ...fileData,
-      uploadedAt: new Date() });
+    return await this.model.create({
+      ...fileData,
+      uploadedAt: new Date()
+    });
   }
 
   /**
