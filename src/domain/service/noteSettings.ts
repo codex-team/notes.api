@@ -8,7 +8,7 @@ import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { DomainError } from '@domain/entities/DomainError.js';
-import type { SharedDomainMethods } from './shared';
+import type NoteServiceSharedMethods from './shared/note.js';
 
 /**
  * Service responsible for Note Settings
@@ -26,9 +26,9 @@ export default class NoteSettingsService {
    *
    * @param noteSettingsRepository - note settings repository
    * @param teamRepository - team repository
-   * @param shared shared domains
+   * @param noteSharedService - shared methods of noteService
    */
-  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository, private readonly shared: SharedDomainMethods) {
+  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository, private readonly noteSharedService: NoteServiceSharedMethods) {
     this.noteSettingsRepository = noteSettingsRepository;
     this.teamRepository = teamRepository;
   }
@@ -136,7 +136,7 @@ export default class NoteSettingsService {
    */
   public async getTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
     let team = await this.teamRepository.getTeamByNoteId(noteId);
-    let parentId = await this.shared.note.getParentNoteIdByNoteId(noteId);
+    let parentId = await this.noteSharedService.getParentNoteIdByNoteId(noteId);
 
     /**
      * team.length === 1 means that team contains only creator or owner, it means that team is not spesified by user
@@ -144,7 +144,7 @@ export default class NoteSettingsService {
      */
     while (team.length === 1 && parentId !== null) {
       team = await this.teamRepository.getTeamByNoteId(parentId);
-      parentId = await this.shared.note.getParentNoteIdByNoteId(parentId);
+      parentId = await this.noteSharedService.getParentNoteIdByNoteId(parentId);
     }
 
     return team;

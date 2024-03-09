@@ -7,7 +7,7 @@ import type { AppConfig } from '@infrastructure/config/index.js';
 import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
-import FileUploaderService from './service/fileUploader.service.js';
+import type { SharedDomainMethods } from './service/shared/index.js';
 
 /**
  * Interface for initiated services
@@ -68,23 +68,17 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   );
 
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
-
-  const userService = new UserService(repositories.userRepository, {
-    /**
-     * @todo find a way how to resolve circular dependency
-     */
-
-    note: noteService,
-  });
-  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, {
+  const sharedServices: SharedDomainMethods = {
     editorTools: editorToolsService,
     /**
      * @todo find a way how to resolve circular dependency
      */
 
     note: noteService,
-    editorTools: editorToolsService,
-  });
+  };
+
+  const userService = new UserService(repositories.userRepository, sharedServices.editorTools);
+  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, sharedServices.note);
   const aiService = new AIService(repositories.aiRepository);
 
   const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository);

@@ -2,7 +2,7 @@ import type UserRepository from '@repository/user.repository.js';
 import { Provider } from '@repository/user.repository.js';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools';
-import type { SharedDomainMethods } from './shared/index.js';
+import type EditorToolSharedMethods from './shared/editorTools.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 
 export {
@@ -22,9 +22,9 @@ export default class UserService {
    * User service constructor
    *
    * @param repository - user repository instance
-   * @param shared - shared domains
+   * @param editorToolsSharedService - shared methods of editorToolService
    */
-  constructor(repository: UserRepository, private readonly shared: SharedDomainMethods) {
+  constructor(repository: UserRepository, private readonly editorToolsSharedService: EditorToolSharedMethods) {
     this.repository = repository;
   }
 
@@ -62,9 +62,9 @@ export default class UserService {
     }
 
     const userToolsIds = user.editorTools ?? [];
-    const defaultTools = await this.shared.editorTools.getDefaultTools();
+    const defaultTools = await this.editorToolsSharedService.getDefaultTools();
     const uniqueDefaultEditorTools = defaultTools.filter(({ id }) => !userToolsIds.includes(id));
-    const userTools = await this.shared.editorTools.getToolsByIds(userToolsIds) ?? [];
+    const userTools = await this.editorToolsSharedService.getToolsByIds(userToolsIds) ?? [];
 
     /**
      * Combine user tools and default tools
@@ -86,7 +86,7 @@ export default class UserService {
     userId: User['id'],
     toolId: EditorTool['id'],
   }): Promise<EditorTool> {
-    const toolToAdd =  await this.shared.editorTools.getToolById(toolId);
+    const toolToAdd =  await this.editorToolsSharedService.getToolById(toolId);
 
     if (toolToAdd === null) {
       throw new DomainError('Editor tool not found');
