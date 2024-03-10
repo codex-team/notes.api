@@ -109,7 +109,6 @@ describe('NoteSettings API', () => {
                   },
                 },
               ],
-
           }
         );
       } else {
@@ -174,6 +173,8 @@ describe('NoteSettings API', () => {
       },
     ])
     ('Get note settings by public id with recursive access check', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
+      roleInIntermidiateTeam = roleInIntermidiateTeam ?? undefined;
+
       /** create three users */
       const creator = await global.db.insertUser();
 
@@ -186,11 +187,11 @@ describe('NoteSettings API', () => {
         creatorId: creator.id,
       });
 
-      const parentNote1 = await global.db.insertNote({
+      const intermidiateNote = await global.db.insertNote({
         creatorId: creator.id,
       });
 
-      const parentNote2 = await global.db.insertNote({
+      const rootNote = await global.db.insertNote({
         creatorId: creator.id,
       });
 
@@ -203,34 +204,35 @@ describe('NoteSettings API', () => {
       /** create note relations */
       await global.db.insertNoteRelation({
         noteId: note.id,
-        parentId: parentNote1.id,
+        parentId: intermidiateNote.id,
       });
 
       await global.db.insertNoteRelation({
-        noteId: parentNote1.id,
-        parentId: parentNote2.id,
+        noteId: intermidiateNote.id,
+        parentId: rootNote.id,
       });
 
       /** specify team for root note (randomGuy is in root team) */
       if (roleInRootTeam !== null) {
         await global.db.insertNoteTeam({
-          noteId: parentNote2.id,
+          noteId: rootNote.id,
           userId: randomGuy.id,
           role: roleInRootTeam,
         });
       }
 
-      /** specify team for parentNote1 */
-      if (intermidiateTeamDefined) {
+      /** specify team for intermidiateNote */
+      if (intermidiateTeamDefined && roleInIntermidiateTeam === undefined) {
         await global.db.insertNoteTeam({
-          noteId: parentNote1.id,
+          noteId: intermidiateNote.id,
           userId: randomGuy2.id,
           role: MemberRole.Write,
         });
       }
+
       if (roleInIntermidiateTeam !== undefined) {
         await global.db.insertNoteTeam({
-          noteId: parentNote1.id,
+          noteId: intermidiateNote.id,
           userId: randomGuy.id,
           role: roleInIntermidiateTeam,
         });
@@ -246,12 +248,14 @@ describe('NoteSettings API', () => {
         url: `/note-settings/${note.publicId}`,
       });
 
+      const body = response?.json();
+
       expect(response?.statusCode).toBe(expectedStatusCode);
 
       if (expectedMessage !== undefined) {
-        expect(response?.json().message).toBe(expectedMessage);
+        expect(body.message).toMatchObject(expectedMessage);
       } else {
-        expect(response?.json()).toMatchObject(
+        expect(body).toMatchObject(
           {
             isPublic: false,
             invitationHash: noteSettings.invitationHash,
@@ -271,7 +275,6 @@ describe('NoteSettings API', () => {
                   },
                 },
               ],
-
           });
       }
     });

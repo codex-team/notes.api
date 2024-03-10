@@ -78,7 +78,7 @@ export default class NoteSettingsService {
       throw new DomainError(`Note settings not found`);
     }
 
-    noteSettings.team = await this.teamRepository.getTeamMembersByNoteId(id);
+    noteSettings.team = await this.getTeamMembersByNoteId(id);
 
     return noteSettings;
   }
@@ -149,6 +149,31 @@ export default class NoteSettingsService {
 
     return team;
   }
+
+  /**
+   *
+   * @param noteId - note internal id
+   */
+  public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
+    let inheritedParentId = noteId;
+    let team = await this.teamRepository.getTeamByNoteId(inheritedParentId);
+    let parentId = await this.shared.note.getParentNoteIdByNoteId(noteId);
+
+    /**
+     * team.length === 1 means that team contains only creator or owner, it means that team is not specified by user
+     * parentId === null means that note has no parent to inherit its team
+     */
+    while (team.length === 1 && parentId !== null) {
+      inheritedParentId = parentId;
+      team = await this.teamRepository.getTeamByNoteId(parentId);
+      parentId = await this.shared.note.getParentNoteIdByNoteId(parentId);
+    }
+
+    team = await this.teamRepository.getTeamMembersByNoteId(inheritedParentId);
+
+    return team;
+  }
+
 
   /**
    * Remove team member by userId and noteId

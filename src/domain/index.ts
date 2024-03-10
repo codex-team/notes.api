@@ -7,6 +7,7 @@ import type { AppConfig } from '@infrastructure/config/index.js';
 import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
+import FileUploaderService from './service/fileUploader.service.js';
 
 /**
  * Interface for initiated services
