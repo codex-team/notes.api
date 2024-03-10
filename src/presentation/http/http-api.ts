@@ -77,6 +77,7 @@ export default class HttpApi implements Api {
     await this.addOpenapiUI();
     await this.addOauth2();
     await this.addCORS();
+    await this.addMultiPart();
 
     this.addCommonMiddlewares(domainServices);
 
@@ -189,23 +190,23 @@ export default class HttpApi implements Api {
   }
 
   /**
+   * Adds support for multipart requests
+   */
+  private async addMultiPart(): Promise<void> {
+    await this.server?.register(fastifyMultipart, {
+      limits: {
+        fieldSize: this.config.fileSizeLimit,
+      },
+      attachFieldsToBody: true,
+    });
+  }
+
+  /**
    * Registers all routers
    *
    * @param domainServices - instances of domain services
    */
   private async addApiRoutes(domainServices: DomainServices): Promise<void> {
-    await this.server?.register(fastifyMultipart, {
-      limits: {
-        fieldNameSize: 100, // 100 bytes
-        fieldSize: 10000000, // 1MB
-        fields: 10,
-        fileSize: 10000000, // 1MB
-        files: 1,
-        parts: 10,
-        headerPairs: 2000,
-      },
-      attachFieldsToBody: true,
-    });
     await this.server?.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
