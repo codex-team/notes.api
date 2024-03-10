@@ -62,6 +62,38 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
   });
 
   /**
+   * Get user name by id
+   */
+  fastify.get<{
+    Params: {
+      userId: number;
+    },
+    Reply: Pick <User, 'name'>
+  }>('/:userId', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+    schema: {
+      response: {
+        '2xx': {
+          $ref: 'UserSchema',
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const userId = request.params.userId;
+    const user = await userService.getUserById(userId);
+
+    if (user === null) {
+      return reply.notFound('User not found');
+    }
+
+    return reply.send({ name: user.name });
+  });
+
+  /**
    * Get user editor tools
    */
   fastify.get('/editor-tools', {
