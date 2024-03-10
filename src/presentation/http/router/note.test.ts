@@ -160,13 +160,13 @@ describe('Note API', () => {
     });
 
     test.each([
-      /** returns 200 and note with accessRights if user is in inherited team with role write */
+      /** Returns 200 and note with accessRights if user is in inherited team with role write */
       {
         roleInRootTeam: MemberRole.Write,
         intermidiateTeamDefined: false,
         expectedStatusCode: 200,
       },
-      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
+      /** Returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
         roleInRootTeam: MemberRole.Write,
         intermidiateTeamDefined: true,
@@ -174,13 +174,13 @@ describe('Note API', () => {
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
-      /** returns 200 and note with accessRights if user is in inherited team with role read */
+      /** Returns 200 and note with accessRights if user is in inherited team with role read */
       {
         roleInRootTeam: MemberRole.Read,
         intermidiateTeamDefined: false,
         expectedStatusCode: 200,
       },
-      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
+      /** Returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
         roleInRootTeam: MemberRole.Read,
         intermidiateTeamDefined: true,
@@ -188,14 +188,14 @@ describe('Note API', () => {
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
-      /** returns 403 and 'Permission denied' message if user is not in inherited team of the note */
+      /** Returns 403 and 'Permission denied' message if user is not in inherited team of the note */
       {
         roleInRootTeam: null,
         intermidiateTeamDefined: false,
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
-      /** returns 403 and 'Permission denied' message if intermediate team without user was inherited */
+      /** Returns 403 and 'Permission denied' message if intermediate team without user was inherited */
       {
         roleInRootTeam: null,
         intermidiateTeamDefined: true,
@@ -203,7 +203,7 @@ describe('Note API', () => {
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
-      /** returns 200 and note if user in inherited team with write role, even if root team have no such a user */
+      /** Returns 200 and note if user in inherited team with write role, even if root team have no such a user */
       {
         roleInRootTeam: null,
         intermidiateTeamDefined: true,
