@@ -170,7 +170,7 @@ describe('Note API', () => {
       {
         roleInRootTeam: MemberRole.Write,
         intermidiateTeamDefined: true,
-        roleInIntermidiateTeam: undefined,
+        roleInIntermidiateTeam: null,
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
@@ -184,7 +184,7 @@ describe('Note API', () => {
       {
         roleInRootTeam: MemberRole.Read,
         intermidiateTeamDefined: true,
-        roleInIntermidiateTeam: undefined,
+        roleInIntermidiateTeam: null,
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
@@ -199,7 +199,7 @@ describe('Note API', () => {
       {
         roleInRootTeam: null,
         intermidiateTeamDefined: true,
-        roleInIntermidiateTeam: undefined,
+        roleInIntermidiateTeam: null,
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
@@ -212,6 +212,8 @@ describe('Note API', () => {
       },
     ])
     ('Returns note by public id with recursive access check', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
+      roleInIntermidiateTeam = roleInIntermidiateTeam ?? undefined;
+
       /** create three users */
       const creator = await global.db.insertUser();
 
@@ -275,13 +277,8 @@ describe('Note API', () => {
       }
 
       /** Compute canEdit variable */
-      let canEdit;
 
-      if ((intermidiateTeamDefined === true && roleInIntermidiateTeam === MemberRole.Write) || (intermidiateTeamDefined === false && roleInRootTeam === MemberRole.Write)) {
-        canEdit = true;
-      } else {
-        canEdit = false;
-      }
+      const canEdit = (intermidiateTeamDefined === true && roleInIntermidiateTeam === MemberRole.Write) || (intermidiateTeamDefined === false && roleInRootTeam === MemberRole.Write);
 
       const accessToken = await global.auth(randomGuy.id);
 

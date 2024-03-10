@@ -130,7 +130,7 @@ describe('NoteSettings API', () => {
       {
         roleInRootTeam: MemberRole.Write,
         intermidiateTeamDefined: true,
-        roleInIntermidiateTeam: undefined,
+        roleInIntermidiateTeam: null,
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
@@ -145,7 +145,7 @@ describe('NoteSettings API', () => {
       {
         roleInRootTeam: MemberRole.Read,
         intermidiateTeamDefined: true,
-        roleInIntermidiateTeam: undefined,
+        roleInIntermidiateTeam: null,
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
@@ -160,7 +160,7 @@ describe('NoteSettings API', () => {
       {
         roleInRootTeam: null,
         intermidiateTeamDefined: true,
-        roleInIntermidiateTeam: undefined,
+        roleInIntermidiateTeam: null,
         expectedMessage: 'Permission denied',
         expectedStatusCode: 403,
       },
