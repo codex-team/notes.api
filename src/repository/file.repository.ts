@@ -1,7 +1,7 @@
 import type UploadedFile from '@domain/entities/file.js';
 import type { FileCreationAttributes } from '@domain/entities/file.js';
 import type FileStorage from './storage/file.storage.js';
-import { NoteInternalId } from '@domain/entities/note.js';
+import type { NoteInternalId } from '@domain/entities/note.js';
 
 /**
  * File repository

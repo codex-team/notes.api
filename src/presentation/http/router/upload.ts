@@ -62,7 +62,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
     },
     preHandler: [
       softNoteResolverForUploadFileRequest,
-    ]
+    ],
   }, async (request, reply) => {
     const { userId } = request;
     const { note } = request;
@@ -100,7 +100,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
           'userCanReadFileData',
         ],
       },
-    },async (request, reply) => {
+    }, async (request, reply) => {
       const fileData = await fileUploaderService.getFileDataByKey(request.params.key);
 
       return reply.send(fileData);

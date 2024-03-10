@@ -64,7 +64,6 @@ export default class FileUploaderService {
    *
    * @param objectRepository - repository for objects
    * @param fileRepository - repository for files data
-   * @param sharedDomainMethods - shared domain methods
    */
   constructor(objectRepository: ObjectRepository, fileRepository: FileRepository) {
     this.objectRepository = objectRepository;
