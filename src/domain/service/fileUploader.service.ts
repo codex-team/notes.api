@@ -79,6 +79,9 @@ export default class FileUploaderService {
   public async uploadFile(fileData: FileToUpload, details?: FileUploadDetails): Promise<string> {
     const fileHash = createFileId();
 
+    /**
+     * Extension can be null if file mime type is unknown or not supported
+     */
     const fileExtension = mime.getExtension(fileData.mimetype);
 
     if (fileExtension === null) {
