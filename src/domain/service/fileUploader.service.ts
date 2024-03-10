@@ -2,10 +2,11 @@ import type { FileData } from '@domain/entities/file.js';
 import { FileTypes } from '@domain/entities/file.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
 import type User from '@domain/entities/user.js';
-import { createFileId } from '@infrastructure/utils/id';
+import { createFileId } from '@infrastructure/utils/id.js';
 import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import mime from 'mime';
 
 /**
  * File data for upload
@@ -77,7 +78,15 @@ export default class FileUploaderService {
    * @param details - file upload details (e.g. user id, note id)
    */
   public async uploadFile(fileData: FileToUpload, details?: FileUploadDetails): Promise<string> {
-    const key = createFileId();
+    const fileHash = createFileId();
+
+    const fileExtension = mime.getExtension(fileData.mimetype);
+
+    if (fileExtension === null) {
+      throw new DomainError('Unknown file extension');
+    }
+
+    const key = `${fileHash}.${fileExtension}`;
 
     const bucket = this.defineBucketByFileType(fileData.type);
 
@@ -123,6 +132,15 @@ export default class FileUploaderService {
     }
 
     return fileData;
+  }
+
+  /**
+   * Get note id by file key, if file is a part of note
+   *
+   * @param objectKey - unique file key in object storage
+   */
+  public async getNoteIdByFileKey(objectKey: string): Promise<NoteInternalId | null> {
+    return this.fileRepository.getNoteIdByFileKey(objectKey);
   }
 
   /**

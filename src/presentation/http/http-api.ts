@@ -28,6 +28,8 @@ import { EditorToolSchema } from './schema/EditorTool.js';
 import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import fastifyMultipart from '@fastify/multipart';
+import UploadRouter from './router/upload.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -192,6 +194,18 @@ export default class HttpApi implements Api {
    * @param domainServices - instances of domain services
    */
   private async addApiRoutes(domainServices: DomainServices): Promise<void> {
+    await this.server?.register(fastifyMultipart, {
+      limits: {
+        fieldNameSize: 100, // 100 bytes
+        fieldSize: 10000000, // 1MB
+        fields: 10,
+        fileSize: 10000000, // 1MB
+        files: 1,
+        parts: 10,
+        headerPairs: 2000,
+      },
+      attachFieldsToBody: true,
+    });
     await this.server?.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
@@ -240,6 +254,12 @@ export default class HttpApi implements Api {
     await this.server?.register(EditorToolsRouter, {
       prefix: '/editor-tools',
       editorToolsService: domainServices.editorToolsService,
+    });
+
+    await this.server?.register(UploadRouter, {
+      prefix: '/upload',
+      fileUploaderService: domainServices.fileUploaderService,
+      noteService: domainServices.noteService,
     });
   }
 

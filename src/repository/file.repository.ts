@@ -1,6 +1,7 @@
 import type UploadedFile from '@domain/entities/file.js';
 import type { FileCreationAttributes } from '@domain/entities/file.js';
 import type FileStorage from './storage/file.storage.js';
+import { NoteInternalId } from '@domain/entities/note.js';
 
 /**
  * File repository
@@ -33,5 +34,14 @@ export default class FileRepository {
    */
   public async insert(fileData: FileCreationAttributes): Promise<UploadedFile> {
     return await this.storage.insertFile(fileData);
+  }
+
+  /**
+   * Get note id by file key
+   *
+   * @param objectKey - unique file key in storage
+   */
+  public async getNoteIdByFileKey(objectKey: string): Promise<NoteInternalId | null> {
+    return await this.storage.getNoteIdByFileKey(objectKey);
   }
 }
