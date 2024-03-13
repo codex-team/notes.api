@@ -22,7 +22,7 @@ export default class UserService {
    * User service constructor
    *
    * @param repository - user repository instance
-   * @param shared - shared domains
+   * @param shared - shared domain methods
    */
   constructor(repository: UserRepository, private readonly shared: SharedDomainMethods) {
     this.repository = repository;

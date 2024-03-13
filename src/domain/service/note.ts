@@ -160,7 +160,7 @@ export default class NoteService {
    *
    * @param noteId - id of the current note
    */
-  public async getParentNoteIdByNoteId(noteId: Note['id']): Promise<number | null> {
+  public async getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null> {
     return await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
   }
 

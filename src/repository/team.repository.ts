@@ -43,23 +43,12 @@ export default class TeamRepository {
   }
 
   /**
-   * Get user role in note by user id and note id
-   * If user is not a member of note, return null
-   *
-   * @param userId - user id to check his role
-   * @param noteId - note id where user should have role
-   */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
-    return await this.storage.getUserRoleByUserIdAndNoteId(userId, noteId);
-  }
-
-  /**
    * Get all team members by note id
    *
    * @param noteId - note id to get all team members
    * @returns team relations
    */
-  public async getByNoteId(noteId: NoteInternalId): Promise<Team> {
+  public async getInheritedTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
     return await this.storage.getMembersByNoteId(noteId);
   }
 
@@ -70,7 +59,7 @@ export default class TeamRepository {
    * @returns team with additional info
    */
   public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
-    return  await this.storage.getTeamMembersByNoteId(noteId);
+    return  await this.storage.getTeamMembersWithUserInfoByNoteId(noteId);
   };
 
   /**
