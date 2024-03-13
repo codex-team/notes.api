@@ -47,8 +47,6 @@ interface Location {
   noteId?: NoteInternalId;
 }
 
-
-
 /**
  * File uploader service
  */

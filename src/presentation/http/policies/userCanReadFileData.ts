@@ -31,18 +31,16 @@ export default async function userCanReadFileData(context: PolicyContext): Promi
   if (notEmpty(noteId)) {
     const noteSettings = await domainServices.noteSettingsService.getNoteSettingsByNoteId(noteId);
 
-    if (noteSettings.isPublic) {
-      return;
-    }
+    if (noteSettings.isPublic === false) {
+      if (isEmpty(userId)) {
+        return await reply.unauthorized();
+      }
 
-    if (isEmpty(userId)) {
-      return await reply.unauthorized();
-    }
+      const memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, noteId);
 
-    const memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, noteId);
-
-    if (isEmpty(memberRole)) {
-      return await reply.forbidden();
+      if (isEmpty(memberRole)) {
+        return await reply.forbidden();
+      }
     }
   }
 }
