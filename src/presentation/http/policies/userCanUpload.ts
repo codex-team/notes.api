@@ -1,4 +1,4 @@
-import { isEmpty } from '@infrastructure/utils/empty.js';
+import { isEmpty, notEmpty } from '@infrastructure/utils/empty.js';
 import type { PolicyContext } from '../types/PolicyContext.js';
 import { MemberRole } from '@domain/entities/team.js';
 
@@ -24,7 +24,7 @@ export default async function userCanUploadFileToNote(context: PolicyContext): P
   /**
    * If note is resolved, we need to check permissions, because file is a part of note
    */
-  if (!isEmpty(note)) {
+  if (notEmpty(note)) {
     const memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, note.id);
 
     if (memberRole !== MemberRole.Write) {
