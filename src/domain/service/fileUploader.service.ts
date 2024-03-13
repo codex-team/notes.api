@@ -6,11 +6,13 @@ import { createFileId } from '@infrastructure/utils/id.js';
 import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import mime from 'mime';
+import { isEmpty } from '@infrastructure/utils/empty';
 
 /**
  * File data for upload
  */
-interface FileToUpload {
+interface UploadFileData {
   /**
    * File data
    */
@@ -23,23 +25,24 @@ interface FileToUpload {
    * Mimetype of the file
    */
   mimetype: string;
-  /**
-   * File type
-   */
-  type: FileTypes;
 }
 
 /**
- * File upload details, contains user id, who uploaded the file and note id, in case if file is a part of note
+ * File upload metadata
  */
-interface FileUploadDetails {
+interface Metadata {
   /**
-   * User who uploaded the file
+   * User id who uploaded the file
    */
   userId?: User['id'];
+}
 
+/**
+ * File upload location, for now only note id, if file is a part of note
+ */
+interface Location {
   /**
-   * In case if file is a part of note, note id to identify permissions to access
+   * Note id
    */
   noteId?: NoteInternalId;
 }
@@ -72,13 +75,36 @@ export default class FileUploaderService {
   /**
    * Upload file
    *
-   * @param fileData - file data to upload (e.g. buffer, name, mimetype)
-   * @param details - file upload details (e.g. user id, note id)
+   * @param type - file type
+   * @param fileData - file data, including file data, name and mimetype
+   * @param location - file location, for now only note id, if file is a part of note
+   * @param metadata - file metadata, including user id who uploaded the file
    */
-  public async uploadFile(fileData: FileToUpload, details?: FileUploadDetails): Promise<string> {
-    const key = createFileId();
+  public async uploadFile(type: FileTypes, fileData: UploadFileData, location: Location, metadata: Metadata): Promise<string> {
+    const fileHash = createFileId();
 
-    const bucket = this.defineBucketByFileType(fileData.type);
+    /**
+     * Note id is required for note attachment
+     */
+    if (type === FileTypes.noteAttachment && isEmpty(location.noteId)) {
+      throw new DomainError('Note id is required for note attachment');
+    }
+
+    /**
+     * Extension can be null if file mime type is unknown or not supported
+     */
+    const fileExtension = mime.getExtension(fileData.mimetype);
+
+    if (fileExtension === null) {
+      throw new DomainError('Unknown file extension');
+    }
+
+    /**
+     * Key is a combination of file hash and file extension, separated by dot, e.g. `HgduSDGmsdrs.png`
+     */
+    const key = `${fileHash}.${fileExtension}`;
+
+    const bucket = this.defineBucketByFileType(type);
 
     const uploaded = await this.objectRepository.insert(fileData.data, key, bucket);
 
@@ -88,14 +114,15 @@ export default class FileUploaderService {
 
     const file = await this.fileRepository.insert({
       ...fileData,
+      type,
       key,
-      userId: details?.userId,
-      noteId: details?.noteId,
+      userId: metadata?.userId,
+      noteId: location?.noteId,
       size: fileData.data.length,
     });
 
     if (file === null) {
-      throw new Error('File was not uploaded');
+      throw new DomainError('File was not uploaded');
     }
 
     return file.key;
@@ -125,6 +152,16 @@ export default class FileUploaderService {
   }
 
   /**
+   * Get note id by file key, if file is a part of note
+   *
+   * @param objectKey - unique file key in object storage
+   * @param type - file type
+   */
+  public async getNoteIdByFileKeyAndType(objectKey: string, type: FileTypes): Promise<NoteInternalId | null> {
+    return this.fileRepository.getNoteIdByFileKeyAndType(objectKey, type);
+  }
+
+  /**
    * Define bucket name by file type
    *
    * @param fileType - file type
@@ -133,8 +170,10 @@ export default class FileUploaderService {
     switch (fileType) {
       case FileTypes.test:
         return 'test';
+      case FileTypes.noteAttachment:
+        return 'note-attachment';
       default:
-        throw new Error('Unknown file type');
+        throw new DomainError('Unknown file type');
     }
   }
 }
