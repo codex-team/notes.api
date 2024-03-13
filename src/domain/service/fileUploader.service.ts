@@ -101,6 +101,9 @@ export default class FileUploaderService {
       throw new DomainError('Unknown file extension');
     }
 
+    /**
+     * Key is a combination of file hash and file extension, separated by dot, e.g. `HgduSDGmsdrs.png`
+     */
     const key = `${fileHash}.${fileExtension}`;
 
     const bucket = this.defineBucketByFileType(type);
