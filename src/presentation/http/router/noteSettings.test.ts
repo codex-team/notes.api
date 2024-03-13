@@ -268,13 +268,6 @@ describe('NoteSettings API', () => {
                     id: creator.id,
                   },
                 },
-
-                {
-                  role: MemberRole.Write,
-                  user: {
-                    id: randomGuy.id,
-                  },
-                },
               ],
           });
       }
