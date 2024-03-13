@@ -27,7 +27,7 @@ export default async function userCanReadFileData(context: PolicyContext): Promi
   /**
    * If note id is not resolved, we have no need to check permissions
    */
-  if (!isEmpty(noteId)) {
+  if (notEmpty(noteId)) {
     const noteSettings = await domainServices.noteSettingsService.getNoteSettingsByNoteId(noteId);
 
     if (noteSettings.isPublic) {

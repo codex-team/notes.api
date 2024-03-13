@@ -5,7 +5,6 @@ import { StatusCodes } from 'http-status-codes';
 import hasProperty from '@infrastructure/utils/hasProperty.js';
 import { getLogger } from '@infrastructure/logging/index.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
-import type { MultipartValue } from '@fastify/multipart';
 
 /**
  * Add middleware for resolve Note by public id and add it to request
@@ -19,15 +18,6 @@ export default function useNoteResolver(noteService: NoteService): {
    * Use this middleware as "preHandler" hook with a particular route
    */
   noteResolver: preHandlerHookHandler;
-
-  /**
-   * Resolve Note by public id and add it to request
-   *
-   * Use this middleware as "preHandler" hook with a particular route
-   * This middleware is used for soft note resolving, so it doesn't return 404 if note not found
-   * It uses for upload file request, where note is not required and note public id is in body
-   */
-  softNoteResolverForUploadFileRequest: preHandlerHookHandler;
 } {
   /**
    * Get logger instance
@@ -47,19 +37,6 @@ export default function useNoteResolver(noteService: NoteService): {
       const publicId = requestData.notePublicId as NotePublicId;
 
       return await noteService.getNoteByPublicId(publicId);
-    }
-  }
-
-  /**
-   * Search for Note by public id in passed body in upload file request and resolves a note by it
-   *
-   * @param requestData - fastify request data. Can be query, params or body
-   */
-  async function resolveNoteByMultipartValueInUploadFileBody(requestData: FastifyRequest['body']): Promise<Note | undefined> {
-    if (hasProperty(requestData, 'notePublicId') && notEmpty(requestData.notePublicId)) {
-      const publicId = requestData.notePublicId as MultipartValue<NotePublicId>;
-
-      return await noteService.getNoteByPublicId(publicId.value);
     }
   }
 
@@ -96,13 +73,6 @@ export default function useNoteResolver(noteService: NoteService): {
           .send({
             message: 'Note not found',
           });
-      }
-    },
-    softNoteResolverForUploadFileRequest: async function softNoteIdResolver(request) {
-      const note = await resolveNoteByMultipartValueInUploadFileBody(request.body);
-
-      if (note) {
-        request.note = note;
       }
     },
   };

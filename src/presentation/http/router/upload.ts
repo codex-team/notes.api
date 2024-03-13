@@ -1,10 +1,10 @@
 import type { FileTypes } from '@domain/entities/file';
-import type { NotePublicId } from '@domain/entities/note.js';
+import type { Note, NotePublicId } from '@domain/entities/note.js';
 import type FileUploaderService from '@domain/service/fileUploader.service.js';
 import type { MultipartFile, MultipartValue } from '@fastify/multipart';
 import type { FastifyPluginCallback } from 'fastify';
-import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type NoteService from '@domain/service/note.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Interface for upload router options
@@ -21,38 +21,27 @@ interface UploadRouterOptions {
   noteService: NoteService;
 }
 
-/**
- * Interface for upload file body
- */
-interface UploadFileBody {
-  /**
-   * File to upload
-   */
-  file: MultipartFile;
-
-  /**
-   * File type
-   */
-  type: MultipartValue<FileTypes>;
-
-  /**
-   * Note public id, if file is related to a note
-   */
-  notePublicId?: MultipartValue<NotePublicId>;
-}
-
 const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts, done) => {
   const { fileUploaderService } = opts;
   const { noteService } = opts;
 
-  /**
-   * Prepare note id resolver middleware
-   * It should be used in routes that accepts note public id
-   */
-  const { softNoteResolverForUploadFileRequest } = useNoteResolver(noteService);
-
   fastify.post<{
-    Body: UploadFileBody;
+    Body: {
+      /**
+       * File to upload
+       */
+      file: MultipartFile;
+
+      /**
+       * File type
+       */
+      type: MultipartValue<FileTypes>;
+
+      /**
+       * Note public id, if file is related to a note
+       */
+      noteId?: MultipartValue<NotePublicId>;
+    }
   }>('/', {
     config: {
       policy: [
@@ -60,12 +49,20 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
         'userCanUpload',
       ],
     },
-    preHandler: [
-      softNoteResolverForUploadFileRequest,
-    ],
   }, async (request, reply) => {
     const { userId } = request;
-    const { note } = request;
+
+    /**
+     * Get note id from request body
+     * If note id is not provided, it means that file is not related to any note
+     */
+    const noteId = request.body.noteId?.value;
+
+    let note: Note | undefined;
+
+    if (notEmpty(noteId)) {
+      note = await noteService.getNoteByPublicId(noteId);
+    }
 
     const uploadedFileKey = await fileUploaderService.uploadFile({
       data: await request.body.file.toBuffer(),
