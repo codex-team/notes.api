@@ -10,6 +10,11 @@ export enum FileTypes {
    * @todo define real types
    */
   test = 'test',
+
+  /**
+   * File is a part of note
+   */
+  noteAttachment = 'noteAttachment',
 }
 
 /**

@@ -64,15 +64,20 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
       note = await noteService.getNoteByPublicId(noteId);
     }
 
-    const uploadedFileKey = await fileUploaderService.uploadFile({
-      data: await request.body.file.toBuffer(),
-      type: request.body.type.value,
-      mimetype: request.body.file.mimetype,
-      name: request.body.file.filename,
-    }, {
-      userId: userId as number,
-      noteId: note?.id as number,
-    });
+    const uploadedFileKey = await fileUploaderService.uploadFile(
+      request.body.type.value,
+      {
+        data: await request.body.file.toBuffer(),
+        mimetype: request.body.file.mimetype,
+        name: request.body.file.filename,
+      },
+      {
+        noteId: note?.id as number,
+      },
+      {
+        userId: userId as number,
+      }
+    );
 
     /**
      * Get current protocol, host and url
