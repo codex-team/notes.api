@@ -48,7 +48,7 @@ export default class TeamRepository {
    * @param noteId - note id to get all team members
    * @returns team relations
    */
-  public async getTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
+  public async getInheritedTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
     return await this.storage.getMembersByNoteId(noteId);
   }
 
@@ -59,7 +59,7 @@ export default class TeamRepository {
    * @returns team with additional info
    */
   public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
-    return  await this.storage.getTeamMembersByNoteId(noteId);
+    return  await this.storage.getTeamMembersWithUserInfoByNoteId(noteId);
   };
 
   /**

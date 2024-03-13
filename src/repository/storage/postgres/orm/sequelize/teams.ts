@@ -195,7 +195,7 @@ export default class TeamsSequelizeStorage {
    * @param noteId - note id to get all team members
    * @returns team with additional info
    */
-  public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
+  public async getTeamMembersWithUserInfoByNoteId(noteId: NoteInternalId): Promise<Team> {
     if (!this.userModel) {
       throw new DomainError('User model not initialized');
     }

@@ -273,7 +273,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
 
-    const team = await noteSettingsService.getTeamByNoteId(noteId);
+    const team = await noteSettingsService.getInheritedTeamByNoteId(noteId);
 
     return reply.send(team);
   });

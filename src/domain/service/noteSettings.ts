@@ -123,7 +123,7 @@ export default class NoteSettingsService {
    * @param noteId - note id where user should have role
    */
   public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
-    const team = await this.getTeamByNoteId(noteId);
+    const team = await this.getInheritedTeamByNoteId(noteId);
 
     return team.find(teamMember => teamMember.userId === userId)?.role;
   }
@@ -134,8 +134,8 @@ export default class NoteSettingsService {
    * @param noteId - note id to get all team members
    * @returns team members
    */
-  public async getTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
-    let team = await this.teamRepository.getTeamByNoteId(noteId);
+  public async getInheritedTeamByNoteId(noteId: NoteInternalId): Promise<Team> {
+    let team = await this.teamRepository.getInheritedTeamByNoteId(noteId);
     let parentId = await this.shared.note.getParentNoteIdByNoteId(noteId);
 
     /**
@@ -143,7 +143,7 @@ export default class NoteSettingsService {
      * parentId === null means that note has no parent to inherit its team
      */
     while (team.length === 1 && parentId !== null) {
-      team = await this.teamRepository.getTeamByNoteId(parentId);
+      team = await this.teamRepository.getInheritedTeamByNoteId(parentId);
       parentId = await this.shared.note.getParentNoteIdByNoteId(parentId);
     }
 
