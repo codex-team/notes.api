@@ -352,6 +352,8 @@ export default class HttpApi implements Api {
       if (error instanceof DomainError) {
         this.log.error(error);
         void reply.domainError(error.message);
+
+        return;
       }
 
       /**
