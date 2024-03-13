@@ -221,7 +221,7 @@ describe('NoteSettings API', () => {
         });
       }
 
-      /** specify team for intermidiateNote */
+      /** specify team for intermidiateNote if randomGuy is not in it*/
       if (intermidiateTeamDefined && roleInIntermidiateTeam === undefined) {
         await global.db.insertNoteTeam({
           noteId: intermidiateNote.id,
@@ -230,7 +230,8 @@ describe('NoteSettings API', () => {
         });
       }
 
-      if (roleInIntermidiateTeam !== undefined) {
+      /** specify team for intermidiateNote if randomGuy is in it*/
+      if (intermidiateTeamDefined && roleInIntermidiateTeam !== undefined) {
         await global.db.insertNoteTeam({
           noteId: intermidiateNote.id,
           userId: randomGuy.id,
