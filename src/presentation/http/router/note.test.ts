@@ -769,7 +769,7 @@ describe('Note API', () => {
       }
     });
 
-    test('Returns 200 and true when note was successfully unlinked', async () => {
+    test('Returns 200 and isUpdated=true when note was successfully unlinked', async () => {
       /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
@@ -843,6 +843,127 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(406);
 
       expect(response?.json().message).toStrictEqual('Note not found');
+    });
+  });
+
+  describe('PATCH /note/:notePublicId/relation', () => {
+    let accessToken = '';
+    let user: User;
+
+    beforeEach(async () => {
+      /** create test user */
+      user = await global.db.insertUser();
+
+      accessToken = global.auth(user.id);
+    });
+    test('Returns 200 and isUpdated=true when parent was successfully updated', async () => {
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test note, that will be new parent for the child note */
+      const newParentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create note settings for child note*/
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      /* create test relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: newParentNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().isUpdated).toBe(true);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.json().parentNote.id).toBe(newParentNote.publicId);
+    });
+
+    test('Returns 400 when parent is the same as child', async () => {
+      /* create test child note*/
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note*/
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test note relation*/
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: childNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual('Parent note is the same as the child note');
+    });
+
+    test('Return 400 when parent note does not exist', async () => {
+      const nonExistentParentId = '47L43yY7dp';
+
+      const childNote= await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: nonExistentParentId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual('Incorrect parent note');
     });
   });
 });

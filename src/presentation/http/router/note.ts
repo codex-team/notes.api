@@ -233,7 +233,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Body: {
       content: JSON;
-      parentId?: NotePublicId;
     },
     Reply: {
       updatedAt: Note['updatedAt'],
@@ -264,13 +263,66 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content as JSON;
-    const parentId = request.body.parentId;
 
-    const note = await noteService.updateNoteContentById(noteId, content, parentId);
+    const note = await noteService.updateNoteContentById(noteId, content);
 
     return reply.send({
       updatedAt: note.updatedAt,
     });
+  });
+
+  /**
+   * Update note relation by id.
+   */
+  fastify.patch<{
+    Params: {
+      notePublicId: NotePublicId,
+    },
+    Body: {
+      parentNoteId: NotePublicId,
+    },
+    Reply: {
+      isUpdated: boolean,
+    }
+  }>('/:notePublicId/relation', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      body: {
+        parentNoteId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            isUpdated: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
+    },
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+    const parentNoteId = request.body.parentNoteId;
+
+    const isUpdated =  await noteService.updateNoteRelation(noteId, parentNoteId);
+
+    return reply.send({ isUpdated });
   });
 
   /**
