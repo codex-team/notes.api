@@ -46,7 +46,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
     config: {
       policy: [
         'authRequired',
-        'userCanUpload',
+        'userCanUploadFileToNote',
       ],
     },
   }, async (request, reply) => {

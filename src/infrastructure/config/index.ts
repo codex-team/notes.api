@@ -127,7 +127,7 @@ export type AppConfig = z.infer<typeof AppConfig>;
 
 const defaultConfig: AppConfig = {
   httpApi: {
-    fileSizeLimit: 10000000, // 10mb
+    fileSizeLimit: 10000, // 10mb
     host: '0.0.0.0',
     port: 3000,
     cookieSecret: 'cookieSecret',
