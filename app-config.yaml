@@ -29,9 +29,9 @@ logging:
   database: info
 
 s3:
-  accessKeyId: ''
-  secretAccessKey: ''
-  endpoint: ''
+  accessKeyId: 'secret'
+  secretAccessKey: 'secret'
+  endpoint: 'http://localhost:9000'
 
 database:
   dsn: 'postgres://codex:postgres@postgres:5432/notes'
