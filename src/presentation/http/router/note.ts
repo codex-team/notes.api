@@ -8,7 +8,6 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 import { MemberRole } from '@domain/entities/team.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
-import { DomainError } from '@domain/entities/DomainError.js';
 
 /**
  * Interface for the note router.
@@ -320,16 +319,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const parentNoteId = request.body.parentNoteId;
-    let isUpdated: boolean | null = null;
 
-    try {
-      isUpdated = await noteService.updateNoteRelation(noteId, parentNoteId);
-    } catch (error: unknown) {
-      if (error instanceof DomainError) {
-        return reply.domainError(error.message);
-      }
-      throw error;
-    }
+    const isUpdated =  await noteService.updateNoteRelation(noteId, parentNoteId);
 
     return reply.send({ isUpdated });
   });
