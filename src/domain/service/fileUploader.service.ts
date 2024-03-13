@@ -157,9 +157,10 @@ export default class FileUploaderService {
    * Get note id by file key, if file is a part of note
    *
    * @param objectKey - unique file key in object storage
+   * @param type - file type
    */
-  public async getNoteIdByFileKey(objectKey: string): Promise<NoteInternalId | null> {
-    return this.fileRepository.getNoteIdByFileKey(objectKey);
+  public async getNoteIdByFileKeyAndType(objectKey: string, type: FileTypes): Promise<NoteInternalId | null> {
+    return this.fileRepository.getNoteIdByFileKeyAndType(objectKey, type);
   }
 
   /**

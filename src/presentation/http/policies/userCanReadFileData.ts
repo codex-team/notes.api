@@ -2,6 +2,7 @@ import hasProperty from '@infrastructure/utils/hasProperty.js';
 import type { PolicyContext } from '../types/PolicyContext.js';
 import { isEmpty, notEmpty } from '@infrastructure/utils/empty.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
+import { FileTypes } from '@domain/entities/file.js';
 
 /**
  * Policy to check does user have permission to access file data,
@@ -19,7 +20,7 @@ export default async function userCanReadFileData(context: PolicyContext): Promi
    * Get note id by file key if file is a part of note
    */
   if (hasProperty(request.params, 'key') && notEmpty(request.params.key)) {
-    noteId = await domainServices.fileUploaderService.getNoteIdByFileKey(request.params.key as string);
+    noteId = await domainServices.fileUploaderService.getNoteIdByFileKeyAndType(request.params.key as string, FileTypes.noteAttachment);
   } else {
     return await reply.notAcceptable('Key not provided');
   }

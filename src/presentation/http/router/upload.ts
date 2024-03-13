@@ -79,15 +79,8 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
       }
     );
 
-    /**
-     * Get current protocol, host and url
-     */
-    const currentProtocol = request.protocol;
-    const currentHost = request.hostname;
-    const currentUrl = request.url;
-
     return reply.send({
-      url: `${currentProtocol}://${currentHost}${currentUrl}/${uploadedFileKey}`,
+      key: uploadedFileKey,
     });
   });
 

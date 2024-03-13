@@ -163,11 +163,13 @@ export default class FileSequelizeStorage {
    * Get note id by file key, if file is a part of note
    *
    * @param key - File key
+   * @param type - File type
    */
-  public async getNoteIdByFileKey(key: string): Promise<NoteInternalId | null> {
+  public async getNoteIdByFileKey(key: string, type: FileTypes): Promise<NoteInternalId | null> {
     const file = await this.model.findOne({
       where: {
         key,
+        type,
       },
     });
 
