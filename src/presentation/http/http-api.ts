@@ -70,6 +70,8 @@ export default class HttpApi implements Api {
      *
      * @see https://fastify.dev/docs/latest/Guides/Getting-Started#loading-order-of-your-plugins
      */
+    this.domainErrorHandler();
+
     await this.addCookies();
     await this.addOpenapiDocs();
     await this.addOpenapiUI();
@@ -83,8 +85,6 @@ export default class HttpApi implements Api {
 
     await this.addPoliciesCheckHook(domainServices);
     await this.addApiRoutes(domainServices);
-
-    this.domainErrorHandler();
   }
 
 
@@ -352,7 +352,14 @@ export default class HttpApi implements Api {
       if (error instanceof DomainError) {
         this.log.error(error);
         void reply.domainError(error.message);
+
+        return;
       }
+
+      /**
+       * If error is not a domain error, we route it to the default error handler
+       */
+      throw error;
     });
   }
 }
