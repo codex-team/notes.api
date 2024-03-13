@@ -856,7 +856,7 @@ describe('Note API', () => {
 
       accessToken = global.auth(user.id);
     });
-    test('Returns 200 and true when parent was successfully updated', async () => {
+    test('Returns 200 and isUpdated=true when parent was successfully updated', async () => {
       /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
