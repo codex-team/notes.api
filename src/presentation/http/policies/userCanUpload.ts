@@ -11,6 +11,7 @@ import { MemberRole } from '@domain/entities/team.js';
 export default async function userCanUploadFileToNote(context: PolicyContext): Promise<void> {
   const { request, reply, domainServices } = context;
   const { userId } = request;
+  const { note } = request;
 
   /**
    * User must be authorized to upload files
@@ -18,8 +19,6 @@ export default async function userCanUploadFileToNote(context: PolicyContext): P
   if (isEmpty(userId)) {
     return await reply.unauthorized();
   }
-
-  const { note } = request;
 
   /**
    * If note is resolved, we need to check permissions, because file is a part of note
