@@ -1086,7 +1086,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(400);
 
-      expect(response?.json().message).toStrictEqual('Parent note is the same as the child note');
+      expect(response?.json().message).toStrictEqual(`Note with ID ${childNote.id} cannot be a child of Note with ID ${childNote.id}`);
     });
 
     test('Return 400 when parent note does not exist', async () => {
@@ -1110,6 +1110,37 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual('Incorrect parent note');
+    });
+
+    test('Return 400 when circular reference occurs', async () => {
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: childNote.publicId,
+        },
+        url: `/note/${parentNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual(`Note with ID ${parentNote.id} cannot be a child of Note with ID ${childNote.id}`);
     });
   });
 });
