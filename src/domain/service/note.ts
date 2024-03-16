@@ -182,9 +182,9 @@ export default class NoteService {
     /**
      * This loop checks for cyclic reference when updating a note's parent.
      */
-    while (parentNoteId != null) {
+    while (parentNoteId !== null) {
       if (parentNoteId === noteId) {
-        throw new DomainError(`Note with ID ${noteId} cannot be a child of Note with ID ${parentNote.id}`);
+        throw new DomainError(`Forbidden relation. Note can't be a child of own child`);
       }
 
       parentNoteId = await this.noteRelationsRepository.getParentNoteIdByNoteId(parentNoteId);

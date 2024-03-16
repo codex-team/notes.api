@@ -1086,7 +1086,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(400);
 
-      expect(response?.json().message).toStrictEqual(`Note with ID ${childNote.id} cannot be a child of Note with ID ${childNote.id}`);
+      expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
     });
 
     test('Return 400 when parent note does not exist', async () => {
@@ -1140,7 +1140,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(400);
 
-      expect(response?.json().message).toStrictEqual(`Note with ID ${parentNote.id} cannot be a child of Note with ID ${childNote.id}`);
+      expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
     });
   });
 });
