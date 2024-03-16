@@ -14,7 +14,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "test:dev": "vitest",
     "test": "vitest run --no-threads",
-    "coverage": "vitest run --coverage",
+    "coverage": "vitest run --coverage --no-threads",
     "typecheck": "tsc --noEmit -p ."
   },
   "author": "",
