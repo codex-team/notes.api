@@ -1121,7 +1121,6 @@ describe('Note API', () => {
         creatorId: user.id,
       });
 
-
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
