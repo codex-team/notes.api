@@ -1,4 +1,4 @@
-name: Build check
+name: Build and start
 
 on:
   push:
@@ -29,4 +29,7 @@ jobs:
 
       - name: Build
         run: yarn build
+
+      - name: Start
+        run: node dist/index.js
 
