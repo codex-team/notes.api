@@ -39,7 +39,7 @@ jobs:
           time: '20s'
 
       - name: Make runner the owner of database folder
-        run: sudo chown -R $POSTGRES_USER database
+        run: sudo chown -R user database
 
       - name: Checkout Repository
         uses: actions/checkout@v3
