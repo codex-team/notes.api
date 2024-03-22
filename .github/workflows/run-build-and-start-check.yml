@@ -19,9 +19,9 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: codex
-          POSTGRES_DB: notes
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: user
+          POSTGRES_DB: codex-notes
+          POSTGRES_PASSWORD: pass
         ports:
           - 127.0.0.1:5432:5432
         options: >-
