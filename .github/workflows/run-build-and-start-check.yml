@@ -40,7 +40,7 @@ jobs:
 
       - name: Make runner the owner of database folder
         run: |
-          sudo chown -R 999:999 ./database  # Change ownership to the PostgreSQL user in the container
+          sudo chown -R $USER:999 ./database  # Change ownership to the PostgreSQL user in the container
           sudo chmod -R 700 ./database      # Set appropriate permissions
 
       - name: Checkout Repository
