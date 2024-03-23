@@ -4,10 +4,8 @@
 
 CREATE TABLE IF NOT EXISTS public.note_views (
     id SERIAL PRIMARY KEY,
-    user_id integer NOT NULL REFERENCES public.users(id)
-    ON UPDATE CASCADE ON DELETE CASCADE,
-    note_id integer NOT NULL REFERENCES public.notes(id)
-    ON UPDATE CASCADE ON DELETE CASCADE,
+    user_id integer NOT NULL REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    note_id integer NOT NULL REFERENCES public.notes(id) ON UPDATE CASCADE ON DELETE CASCADE,
     "visited_at" timestamp with time zone NOT NULL
 );
 
