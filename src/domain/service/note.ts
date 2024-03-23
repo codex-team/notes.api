@@ -182,7 +182,7 @@ export default class NoteService {
     }
 
     /**
-     * @todo: add check, that new parent is not in childNotes to avoid circular references
+     * @todo add check, that new parent is not in childNotes to avoid circular references
      */
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
