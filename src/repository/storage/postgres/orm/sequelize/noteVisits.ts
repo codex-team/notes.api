@@ -24,7 +24,7 @@ export class NoteVisitsModel extends Model<InferAttributes<NoteVisitsModel>, Inf
 /**
  *
  */
-export default class NoteViewsSequelizeStorage {
+export default class NoteVisitsSequelizeStorage {
   public model: typeof NoteVisitsModel;
 
   public userModel: typeof UserModel | null = null;
@@ -33,7 +33,7 @@ export default class NoteViewsSequelizeStorage {
 
   private readonly database: Sequelize;
 
-  private readonly tableName = 'note_views';
+  private readonly tableName = 'note_visits';
 
   /**
    *

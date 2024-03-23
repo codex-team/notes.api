@@ -4,31 +4,31 @@ import type NoteVisit from '@domain/entities/noteVisit.js';
 import type NoteVisitsRepository from '@repository/noteVisits.repository';
 
 /**
- * Note views service, which will store latest note visit
+ * Note Visits service, which will store latest note visit
  * it is used to display recent notes for each user
  */
 export default class NoteVisitsService {
   /**
-   * Note views repository
+   * Note Visits repository
    */
-  public noteViewsRepository: NoteVisitsRepository;
+  public noteVisitsRepository: NoteVisitsRepository;
 
   /**
-   * NoteViews service constructor
+   * NoteVisits service constructor
    *
-   * @param noteViewRepository - note views repository
+   * @param noteVisitRepository - note Visits repository
    */
-  constructor(noteViewRepository: NoteVisitsRepository) {
-    this.noteViewsRepository = noteViewRepository;
+  constructor(noteVisitRepository: NoteVisitsRepository) {
+    this.noteVisitsRepository = noteVisitRepository;
   }
 
   /**
-   * Updates existing noteView's visitedAt or creates new record if user opens note for the first time
+   * Updates existing noteVisit's visitedAt or creates new record if user opens note for the first time
    *
    * @param noteId - note internal id
    * @param userId - id of the user
    */
   public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteVisit> {
-    return await this.noteViewsRepository.saveVisit(noteId, userId);
+    return await this.noteVisitsRepository.saveVisit(noteId, userId);
   };
 }
