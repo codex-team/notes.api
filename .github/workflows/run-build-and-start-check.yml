@@ -49,6 +49,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Modify app-config.yaml
+        run: sed -i "s/@postgres/@localhost/" app-config.yaml
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
