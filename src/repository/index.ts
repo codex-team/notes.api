@@ -21,8 +21,8 @@ import { S3Storage } from './storage/s3/index.js';
 import FileStorage from './storage/file.storage.js';
 import FileRepository from './file.repository.js';
 import ObjectStorageRepository from './object.repository.js';
-import NoteViewsRepository from './noteView.repository.js';
-import NoteViewsStorage from './storage/noteView.storage.js';
+import NoteViewsRepository from './noteVisits.repository.js';
+import NoteViewsStorage from './storage/noteVisits.storage.js';
 
 /**
  * Interface for initiated repositories

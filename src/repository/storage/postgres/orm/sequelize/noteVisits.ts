@@ -1,4 +1,4 @@
-import type NoteView from '@domain/entities/noteView.js';
+import type NoteVisit from '@domain/entities/noteVisit.js';
 import type User from '@domain/entities/user.js';
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional, ModelStatic } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
@@ -11,21 +11,21 @@ import type { NoteInternalId } from '@domain/entities/note.js';
 /**
  *
  */
-export class NoteViewsModel extends Model<InferAttributes<NoteViewsModel>, InferCreationAttributes<NoteViewsModel>> {
-  public declare id: CreationOptional<NoteView['id']>;
+export class NoteVisitsModel extends Model<InferAttributes<NoteVisitsModel>, InferCreationAttributes<NoteVisitsModel>> {
+  public declare id: CreationOptional<NoteVisit['id']>;
 
-  public declare noteId: NoteView['noteId'];
+  public declare noteId: NoteVisit['noteId'];
 
-  public declare userId: NoteView['userId'];
+  public declare userId: NoteVisit['userId'];
 
-  public declare visitedAt: NoteView['visitedAt'];
+  public declare visitedAt: NoteVisit['visitedAt'];
 }
 
 /**
  *
  */
 export default class NoteViewsSequelizeStorage {
-  public model: typeof NoteViewsModel;
+  public model: typeof NoteVisitsModel;
 
   public userModel: typeof UserModel | null = null;
 
@@ -42,7 +42,7 @@ export default class NoteViewsSequelizeStorage {
   constructor({ connection }: Orm) {
     this.database = connection;
 
-    this.model = NoteViewsModel.init({
+    this.model = NoteVisitsModel.init({
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -103,13 +103,13 @@ export default class NoteViewsSequelizeStorage {
   }
 
   /**
-   * Updates existing noteView's vizitedAt or creates new record if user opens note for the first time
+   * Updates existing noteVisit's vizitedAt or creates new record if user opens note for the first time
    *
    * @param noteId - note internal id
    * @param userId - id of the user
-   * @returns created or updated NoteView
+   * @returns created or updated NoteVisit
    */
-  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
+  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteVisit> {
     /**
      * If user has already visited note, than existing record will be updated
      * If user is visiting note for the first time, new record will be created

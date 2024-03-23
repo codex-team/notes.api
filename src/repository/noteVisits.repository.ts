@@ -1,20 +1,20 @@
 import type { NoteInternalId } from '@domain/entities/note.js';
-import type NoteView from '@domain/entities/noteView.js';
+import type NoteVisit from '@domain/entities/noteVisit.js';
 import type User from '@domain/entities/user.js';
-import type NoteViewsStorage from '@repository/storage/noteView.storage.js';
+import type NoteVisitsStorage from '@repository/storage/noteVisits.storage.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level
  */
 export default class NoteViewsRepository {
-  public storage: NoteViewsStorage;
+  public storage: NoteVisitsStorage;
 
   /**
    * Note Views repository constructor
    *
    * @param storage - storage for note views
    */
-  constructor(storage: NoteViewsStorage) {
+  constructor(storage: NoteVisitsStorage) {
     this.storage = storage;
   }
   /**
@@ -24,7 +24,7 @@ export default class NoteViewsRepository {
    * @param userId - id of the user
    * @returns updated or created NoteView
    */
-  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
+  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteVisit> {
     return await this.storage.saveVisit(noteId, userId);
   }
 }

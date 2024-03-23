@@ -4,7 +4,7 @@ import type User from '@domain/entities/user.ts';
 /**
  * NoteView is used to store data about the last interaction between the user and the note
  */
-export default interface NoteView {
+export default interface NoteVisit {
   /**
    * Unique property identifier
    */

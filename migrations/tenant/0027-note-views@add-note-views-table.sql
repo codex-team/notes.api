@@ -2,7 +2,7 @@
 -- Name: note_views; Type: TABLE; Schema: public; Owner: codex
 --
 
-CREATE TABLE IF NOT EXISTS public.note_views (
+CREATE TABLE IF NOT EXISTS public.note_visits (
     id SERIAL PRIMARY KEY,
     user_id integer NOT NULL REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE,
     note_id integer NOT NULL REFERENCES public.notes(id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -12,6 +12,6 @@ CREATE TABLE IF NOT EXISTS public.note_views (
 --
 -- Name note_views note_views_user_id_idx; Type: INDEX; Schema: public; Owner: codex 
 --
-CREATE UNIQUE INDEX note_views_user_id_idx ON public.note_views (user_id);
+CREATE UNIQUE INDEX note_views_user_id_idx ON public.note_visits (user_id);
 
-ALTER TABLE public.note_views OWNER TO codex;
+ALTER TABLE public.note_visits OWNER TO codex;
