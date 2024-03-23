@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.note_views (
     ON UPDATE CASCADE ON DELETE CASCADE,
     note_id integer NOT NULL REFERENCES public.notes(id)
     ON UPDATE CASCADE ON DELETE CASCADE,
-    "vizited_at" timestamp with time zone NOT NULL
+    "visited_at" timestamp with time zone NOT NULL
 );
 
 --
