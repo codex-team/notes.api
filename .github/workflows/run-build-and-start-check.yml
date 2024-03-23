@@ -14,37 +14,12 @@ jobs:
   build-and-start:
     name: Build and start the app
     runs-on: ubuntu-22.04
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: codex
-          POSTGRES_DB: notes
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 127.0.0.1:5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        volumes:
-          - ./database:/var/lib/postgresql/data
-
     steps:
-      - name: Wait for PostgreSQL
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '20s'
-
-      - name: Make runner the owner of database folder
+      - name: Start PostgreSQL
         run: |
-          sudo chmod -R 777 ./database
-
-      - name: Restart postgres service
-        run: |
-          sudo service postgresql restart
+          sudo systemctl start postgresql.service
+          pg_isready
+          sudo -u postgres createuser -s -d -r -w runner
 
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -52,7 +27,6 @@ jobs:
       - name: Change database address
         run: |
           sed -i "s/@postgres/@localhost/" app-config.yaml
-          sed -i 's#//codex#//runner#g' app-config.yaml
 
       - name: Create runner user in Postgresql
         run: sudo -u postgres createuser -s -d -r -w runner
@@ -67,11 +41,6 @@ jobs:
 
       - name: Build
         run: yarn build
-
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
-        with:
-          limit-access-to-actor: true
 
       - name: Start
         run: node dist/index.js -c app-config.yaml
