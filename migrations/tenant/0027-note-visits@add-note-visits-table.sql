@@ -1,5 +1,5 @@
 --
--- Name: note_views; Type: TABLE; Schema: public; Owner: codex
+-- Name: note_visits; Type: TABLE; Schema: public; Owner: codex
 --
 
 CREATE TABLE IF NOT EXISTS public.note_visits (
@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS public.note_visits (
 );
 
 --
--- Name note_views note_views_user_id_idx; Type: INDEX; Schema: public; Owner: codex 
+-- Name note_visits note_visits_user_id_idx; Type: INDEX; Schema: public; Owner: codex 
 --
-CREATE UNIQUE INDEX note_views_user_id_idx ON public.note_visits (user_id);
+CREATE UNIQUE INDEX note_visits_user_id_idx ON public.note_visits (user_id);
 
 ALTER TABLE public.note_visits OWNER TO codex;
