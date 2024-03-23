@@ -28,9 +28,6 @@ jobs:
         run: |
           sed -i "s/@postgres/@localhost/" app-config.yaml
 
-      - name: Create runner user in Postgresql
-        run: sudo -u postgres createuser -s -d -r -w runner
-
       - name: Setup node
         uses: actions/setup-node@v3
         with:
