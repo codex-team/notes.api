@@ -103,11 +103,13 @@ export default class NoteViewsSequelizeStorage {
   }
 
   /**
+   * Updates existing noteView's vizitedAt or creates new record if user opens note for the first time
    *
    * @param noteId - note internal id
    * @param userId - id of the user
+   * @returns created or updated NoteView
    */
-  public async addOrUpdateNoteView(noteId: NoteInternalId, userId: User['id']): Promise<NoteView | null> {
+  public async addOrUpdateNoteView(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
     const recentVisit = await this.model.findOne({
       where: {
         noteId,
@@ -115,8 +117,12 @@ export default class NoteViewsSequelizeStorage {
       },
     });
 
+    /**
+     * If user has already visited note, than existing record will be updated
+     */
     if (recentVisit !== null) {
-      const [affectedRowsCount, affectedRows] = await this.model.update({
+      /* eslint-disable-next-line */
+      const [_, affectedRows] = await this.model.update({
         visitedAt: 'CURRENT TIME',
       }, {
         where: {
@@ -126,13 +132,12 @@ export default class NoteViewsSequelizeStorage {
         returning: true,
       });
 
-      if (affectedRowsCount !== 1) {
-        return null;
-      }
-
       return affectedRows[0];
     }
 
+    /**
+     * If user is visiting note for the first time, new record will be created
+     */
     return await this.model.create({
       noteId,
       userId,
