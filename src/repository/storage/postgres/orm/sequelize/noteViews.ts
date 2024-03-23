@@ -109,7 +109,7 @@ export default class NoteViewsSequelizeStorage {
    * @param userId - id of the user
    * @returns created or updated NoteView
    */
-  public async addOrUpdateNoteView(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
+  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
     const recentVisit = await this.model.findOne({
       where: {
         noteId,

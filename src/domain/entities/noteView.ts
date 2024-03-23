@@ -1,24 +1,27 @@
 import type { NoteInternalId } from '@domain/entities/note.ts';
 import type User from '@domain/entities/user.ts';
 
+/**
+ * NoteView is used to store data about the last interaction between the user and the note
+ */
 export default interface NoteView {
-    /**
-     * Unique property identifier
-     */
-    id: number,
+  /**
+   * Unique property identifier
+   */
+  id: number,
 
-    /**
-     * NoteInternalId
-     */
-    noteId: NoteInternalId,
+  /**
+   * NoteInternalId
+   */
+  noteId: NoteInternalId,
 
-    /**
-     * Id of the user
-     */
-    userId: User['id'],
+  /**
+   * Id of the user
+   */
+  userId: User['id'],
 
-    /**
-     * Time when note was visited
-     */
-    visitedAt: string,
+  /**
+   * Time when note was visited for the last time (timestamp with timezone)
+   */
+  visitedAt: string,
 }

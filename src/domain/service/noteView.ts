@@ -4,9 +4,10 @@ import type NoteView from '@domain/entities/noteView.js';
 import type NoteViewsRepository from '@repository/noteView.repository';
 
 /**
- * Note views service
+ * Note views service, which will store latest note visit
+ * it is used to display recent notes for each user
  */
-export default class noteViewsService {
+export default class NoteViewsService {
   /**
    * Note views repository
    */
@@ -27,7 +28,7 @@ export default class noteViewsService {
    * @param noteId - note internal id
    * @param userId - id of the user
    */
-  public async addOrCreateNoteView(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
-    return await this.noteViewsRepository.addOrUpdateNoteView(noteId, userId);
+  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
+    return await this.noteViewsRepository.saveVisit(noteId, userId);
   };
 }

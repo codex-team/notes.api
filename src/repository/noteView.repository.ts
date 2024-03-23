@@ -24,7 +24,7 @@ export default class NoteViewsRepository {
    * @param userId - id of the user
    * @returns updated or created NoteView
    */
-  public async addOrUpdateNoteView(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
-    return await this.storage.addOrUpdateNoteView(noteId, userId);
+  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
+    return await this.storage.saveVisit(noteId, userId);
   }
 }
