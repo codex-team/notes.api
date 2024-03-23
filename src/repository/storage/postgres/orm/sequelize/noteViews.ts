@@ -110,38 +110,23 @@ export default class NoteViewsSequelizeStorage {
    * @returns created or updated NoteView
    */
   public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteView> {
-    const recentVisit = await this.model.findOne({
-      where: {
-        noteId,
-        userId,
-      },
-    });
-
     /**
      * If user has already visited note, than existing record will be updated
-     */
-    if (recentVisit !== null) {
-      /* eslint-disable-next-line */
-      const [_, affectedRows] = await this.model.update({
-        visitedAt: 'CURRENT TIME',
-      }, {
-        where: {
-          noteId,
-          userId,
-        },
-        returning: true,
-      });
-
-      return affectedRows[0];
-    }
-
-    /**
      * If user is visiting note for the first time, new record will be created
      */
-    return await this.model.create({
+    /* eslint-disable-next-line */
+    const [recentVisit, _] = await this.model.upsert({
       noteId,
       userId,
       visitedAt: 'CURRENT TIME',
+    }, {
+      conflictWhere: {
+        noteId,
+        userId,
+      },
+      returning: true,
     });
+
+    return recentVisit;
   }
 }
