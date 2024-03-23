@@ -14,7 +14,7 @@ export default class NoteVisitsService {
   public noteViewsRepository: NoteVisitsRepository;
 
   /**
-   * NoteVeiws service constructor
+   * NoteViews service constructor
    *
    * @param noteViewRepository - note views repository
    */
@@ -23,7 +23,7 @@ export default class NoteVisitsService {
   }
 
   /**
-   * Updates existing noteView's vizitedAt or creates new record if user opens note for the first time
+   * Updates existing noteView's visitedAt or creates new record if user opens note for the first time
    *
    * @param noteId - note internal id
    * @param userId - id of the user

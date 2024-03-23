@@ -37,7 +37,7 @@ export default class NoteViewsSequelizeStorage {
 
   /**
    *
-   * @param ormInstance - ORM instanse
+   * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
     this.database = connection;
@@ -103,7 +103,7 @@ export default class NoteViewsSequelizeStorage {
   }
 
   /**
-   * Updates existing noteVisit's vizitedAt or creates new record if user opens note for the first time
+   * Updates existing noteVisit's visitedAt or creates new record if user opens note for the first time
    *
    * @param noteId - note internal id
    * @param userId - id of the user
@@ -111,7 +111,7 @@ export default class NoteViewsSequelizeStorage {
    */
   public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteVisit> {
     /**
-     * If user has already visited note, than existing record will be updated
+     * If user has already visited note, then existing record will be updated
      * If user is visiting note for the first time, new record will be created
      */
     /* eslint-disable-next-line */

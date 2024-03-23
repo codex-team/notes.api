@@ -55,7 +55,7 @@ export interface DomainServices {
   fileUploaderService: FileUploaderService,
 
   /**
-   * Note veiws service instance
+   * Note views service instance
    */
   noteViewsService: NoteViewsService
 }

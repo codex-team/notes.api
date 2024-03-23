@@ -11,7 +11,7 @@ export default interface NoteVisit {
   id: number,
 
   /**
-   * NoteInternalId
+   * Internal id of the note
    */
   noteId: NoteInternalId,
 
