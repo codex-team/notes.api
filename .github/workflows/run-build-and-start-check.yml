@@ -12,7 +12,7 @@ on:
 
 jobs:
   build-and-start:
-    name: Run yarn build
+    name: Build and start the app
     runs-on: ubuntu-22.04
 
     services:
@@ -40,8 +40,7 @@ jobs:
 
       - name: Make runner the owner of database folder
         run: |
-
-          sudo chmod -R 777 ./database      # Set appropriate permissions      
+          sudo chmod -R 777 ./database
 
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -56,6 +55,11 @@ jobs:
 
       - name: Build
         run: yarn build
+
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+        with:
+          limit-access-to-actor: true
 
       - name: Start
         run: node dist/index.js -c app-config.yaml
