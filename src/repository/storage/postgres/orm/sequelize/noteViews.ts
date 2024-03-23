@@ -1,11 +1,11 @@
-import type NoteView from '@domain/entities/noteView';
-import type User from '@domain/entities/user';
+import type NoteView from '@domain/entities/noteView.js';
+import type User from '@domain/entities/user.js';
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional, ModelStatic } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import { NoteModel } from './note';
-import { UserModel } from './user';
-import type { NoteInternalId } from '@domain/entities/note';
+import { NoteModel } from './note.js';
+import { UserModel } from './user.js';
+import type { NoteInternalId } from '@domain/entities/note.js';
 
 
 /**
