@@ -21,6 +21,8 @@ import { S3Storage } from './storage/s3/index.js';
 import FileStorage from './storage/file.storage.js';
 import FileRepository from './file.repository.js';
 import ObjectStorageRepository from './object.repository.js';
+import NoteVisitsRepository from './noteVisits.repository.js';
+import NoteVisitsStorage from './storage/noteVisits.storage.js';
 
 /**
  * Interface for initiated repositories
@@ -55,6 +57,10 @@ export interface Repositories {
    * AI repository instance
    */
   aiRepository: AIRepository
+
+  /**
+   * Editor tools repository instance
+   */
   editorToolsRepository: EditorToolsRepository,
 
   /**
@@ -71,6 +77,11 @@ export interface Repositories {
    * Object repository instance
    */
   objectStorageRepository: ObjectStorageRepository,
+
+  /**
+   * Note Visits repository instance
+   */
+  noteVisitsRepository: NoteVisitsRepository,
 }
 
 /**
@@ -107,6 +118,8 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   const teamStorage = new TeamStorage(orm);
   const fileStorage = new FileStorage(orm);
   const s3Storage = new S3Storage(s3Config.accessKeyId, s3Config.secretAccessKey, s3Config.region, s3Config.endpoint);
+  const editorToolsStorage = new EditorToolsStorage(orm);
+  const noteVisitsStorage = new NoteVisitsStorage(orm);
 
   /**
    * Create associations between note and note settings
@@ -125,7 +138,12 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
    */
   noteRelationshipStorage.createAssociationWithNoteModel(noteStorage.model);
 
-  const editorToolsStorage = new EditorToolsStorage(orm);
+  /**
+   * Create associations between note and noteVisit, user and noteVisit
+   */
+  noteVisitsStorage.createAssociationWithNoteModel(noteStorage.model);
+  noteVisitsStorage.createAssociationWithUserModel(userStorage.model);
+
 
   /**
    * Prepare db structure
@@ -137,6 +155,7 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   await userSessionStorage.model.sync();
   await editorToolsStorage.model.sync();
   await noteRelationshipStorage.model.sync();
+  await noteVisitsStorage.model.sync();
 
   /**
    * Create transport instances
@@ -157,6 +176,7 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   const teamRepository = new TeamRepository(teamStorage);
   const fileRepository = new FileRepository(fileStorage);
   const objectStorageRepository = new ObjectStorageRepository(s3Storage);
+  const noteVisitsRepository = new NoteVisitsRepository(noteVisitsStorage);
 
   return {
     noteRepository,
@@ -169,5 +189,6 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
     teamRepository,
     fileRepository,
     objectStorageRepository,
+    noteVisitsRepository,
   };
 }

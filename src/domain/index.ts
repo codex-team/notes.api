@@ -8,6 +8,7 @@ import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
 import FileUploaderService from './service/fileUploader.service.js';
+import NoteVisitsService from '@domain/service/noteVisits.js';
 
 /**
  * Interface for initiated services
@@ -42,12 +43,21 @@ export interface DomainServices {
    * AI service instance
    */
   aiService: AIService
+
+  /**
+   * Editor tools service instance
+   */
   editorToolsService: EditorToolsService,
 
   /**
    * File uploader service instance
    */
-  fileUploaderService: FileUploaderService
+  fileUploaderService: FileUploaderService,
+
+  /**
+   * Note Visits service instance
+   */
+  noteVisitsService: NoteVisitsService
 }
 
 /**
@@ -59,6 +69,7 @@ export interface DomainServices {
 export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
   const noteListService = new NoteListService(repositories.noteRepository);
   const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository);
+  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
 
   const authService = new AuthService(
     appConfig.auth.accessSecret,
@@ -92,5 +103,6 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     authService,
     aiService,
     editorToolsService,
+    noteVisitsService,
   };
 }
