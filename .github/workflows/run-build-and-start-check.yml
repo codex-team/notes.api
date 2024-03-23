@@ -19,7 +19,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: runner
+          POSTGRES_USER: codex
           POSTGRES_DB: notes
           POSTGRES_PASSWORD: postgres
         ports:
@@ -49,10 +49,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Change database address and username
+      - name: Change database address
         run: |
           sed -i "s/@postgres/@localhost/" app-config.yaml
-          sed -i 's#//codex#//runner#g' app-config.yaml
+
+      - name: Switch to postgres user
+        run: sudo su - postgres
 
       - name: Setup node
         uses: actions/setup-node@v3
