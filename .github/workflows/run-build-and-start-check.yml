@@ -30,28 +30,6 @@ jobs:
     name: Build and start the app
     runs-on: ubuntu-22.04
     steps:
-      - name: Start PostgreSQL
-        run: |
-          sudo systemctl start postgresql.service
-          pg_isready
-          sudo -u postgres createuser -s -d -r -w runner
-
-          - name: Install postgresql-client (psql)
-          run: |
-            apt update -y
-            apt install -y postgresql-client
-            psql --version
-  
-      - name: Check DB connection
-        run: |
-          psql "postgres://codex:postgres@localhost:5432/notes" <<EOF
-            CREATE TABLE test (id INT);
-            INSERT INTO test (id) VALUES (123);
-            INSERT INTO test (id) VALUES (456);
-            INSERT INTO test (id) VALUES (789);
-            SELECT * FROM test;
-          EOF
-
       - name: Checkout Repository
         uses: actions/checkout@v3
 
