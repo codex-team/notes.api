@@ -48,6 +48,11 @@ jobs:
       - name: Build
         run: yarn build
 
+      # Start an app in the background
       - name: Start
-        run: node dist/index.js -c app-config.yaml
-        timeout-minutes: 1
+        run: node dist/index.js -c app-config.yaml &
+
+      - name: Check if the app is running
+        run: |
+          sleep 5
+          curl http://localhost:1337
