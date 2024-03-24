@@ -13,8 +13,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test:dev": "vitest",
-    "test": "vitest run --no-threads",
-    "coverage": "vitest run --coverage --no-threads",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit -p ."
   },
   "author": "",
