@@ -1,4 +1,4 @@
-import type { GetCompletionResponsePayload } from './GetCompletionResponsePayload';
+import type { GetCompletionResponsePayload } from './GetCompletionResponsePayload.js';
 
 /**
  * Payload of the OpenAI API responses

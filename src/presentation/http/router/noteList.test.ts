@@ -1,4 +1,4 @@
-import type User from '@domain/entities/user';
+import type User from '@domain/entities/user.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 
 let accessToken = '';

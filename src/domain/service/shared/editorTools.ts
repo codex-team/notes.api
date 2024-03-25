@@ -1,4 +1,4 @@
-import type EditorTool from '@domain/entities/editorTools';
+import type EditorTool from '@domain/entities/editorTools.js';
 
 /**
  * Which methods of Domain can be used by other domains

@@ -1,7 +1,7 @@
 import type TeamStorage from '@repository/storage/team.storage.js';
 import type { Team, TeamMember, TeamMemberCreationAttributes, MemberRole } from '@domain/entities/team.js';
-import type { NoteInternalId } from '@domain/entities/note';
-import type User from '@domain/entities/user';
+import type { NoteInternalId } from '@domain/entities/note.js';
+import type User from '@domain/entities/user.js';
 
 /**
  * Repository allows accessing data from business-logic (domain) level

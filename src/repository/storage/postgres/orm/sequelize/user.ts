@@ -3,7 +3,7 @@ import { literal } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type User from '@domain/entities/user.js';
-import type EditorTool from '@domain/entities/editorTools';
+import type EditorTool from '@domain/entities/editorTools.js';
 
 /**
  * Query options for getting user
