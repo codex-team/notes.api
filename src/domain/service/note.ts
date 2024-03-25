@@ -177,13 +177,19 @@ export default class NoteService {
       throw new DomainError(`Incorrect parent note`);
     }
 
-    if (parentNote.id === noteId) {
-      throw new DomainError(`Parent note is the same as the child note`);
-    }
+    let parentNoteId: number | null = parentNote.id;
 
     /**
-     * @todo add check, that new parent is not in childNotes to avoid circular references
+     * This loop checks for cyclic reference when updating a note's parent.
      */
+    while (parentNoteId !== null) {
+      if (parentNoteId === noteId) {
+        throw new DomainError(`Forbidden relation. Note can't be a child of own child`);
+      }
+
+      parentNoteId = await this.noteRelationsRepository.getParentNoteIdByNoteId(parentNoteId);
+    }
+
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
 }
