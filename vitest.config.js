@@ -4,6 +4,12 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
     setupFiles: [ 'src/tests/utils/setup.ts' ],
     coverage: {
       reporter: ['text', 'json-summary', 'json'],
@@ -12,7 +18,7 @@ export default defineConfig({
         lines: 80,
         branches: 80,
         functions: 80,
-        statements: 80
+        statements: 80,
       },
     },
   },
