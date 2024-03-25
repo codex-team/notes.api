@@ -55,4 +55,12 @@ jobs:
       - name: Check if the app is running
         run: |
           sleep 5
-          curl http://localhost:1337
+          response=$(curl -s http://localhost:9090/health)
+          echo "$response"
+          message=$(echo "$response" | jq -r '.message')
+          if [ "$message" = "ok" ]; then
+            echo "Application is healthy"
+          else
+            echo "Application is not healthy"
+            exit 1
+          fi
