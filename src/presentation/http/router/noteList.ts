@@ -46,6 +46,24 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
           maximum: 30,
         },
       },
+
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            queryString: {
+              page: {
+                type: 'object',
+                minimum: 'number',
+                maximum: 'number',
+              },
+            },
+          },
+          data: {
+            $ref: 'NoteSchema',
+          },
+        },
+      },
     },
   }, async (request, reply) => {
     const userId = request.userId as number;
@@ -56,6 +74,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
      * Wrapping Notelist for public use
      */
     const noteListItemsPublic: NotePublic[] = noteList.items.map(definePublicNote);
+
 
     const noteListPublic: NoteListPublic = {
       items: noteListItemsPublic,

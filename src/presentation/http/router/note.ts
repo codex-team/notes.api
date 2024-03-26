@@ -8,6 +8,7 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 import { MemberRole } from '@domain/entities/team.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the note router.
@@ -133,7 +134,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const canEdit = memberRole === MemberRole.Write;
 
 
-    return reply.send({
+    return reply.status(StatusCodes.OK).send({
       note: notePublic,
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
@@ -157,6 +158,17 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           $ref: 'NoteSchema#/properties/id',
         },
       },
+
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            isDeleted: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
     },
     config: {
       policy: [
@@ -174,7 +186,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if note does not exist
      */
-    return reply.send({ isDeleted : isDeleted });
+    return reply.send({ isDeleted });
   });
 
   /**
@@ -194,6 +206,19 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       policy: [
         'authRequired',
       ],
+    },
+
+    schema: {
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+        },
+      },
     },
   }, async (request, reply) => {
     /**
@@ -247,6 +272,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       body: {
         content: {
           $ref: 'NoteSchema#/properties/content',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            updatedAt: {
+              type: 'string',
+            },
+          },
         },
       },
     },

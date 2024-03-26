@@ -4,9 +4,7 @@
 export const NoteSchema = {
   $id: 'NoteSchema',
   type: 'object',
-  required: [
-    'content',
-  ],
+  required: [ 'content' ],
   properties: {
     id: {
       type: 'string',

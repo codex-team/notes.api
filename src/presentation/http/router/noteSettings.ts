@@ -52,7 +52,8 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
 
   /**
-   * Returns Note settings by note id. Note public id is passed in route params, and it converted to internal id via middleware
+   * Returns Note settings by note id. Note public id is passed in route params,
+   * and it converted to internal id via middleware
    */
   fastify.get<{
     Params: {
@@ -115,6 +116,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       params: {
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
+        },
+      },
+
+      response: {
+        '2xx': {
+          $ref: 'NoteSettingsSchema',
         },
       },
     },
@@ -264,6 +271,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       params: {
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
+        },
+      },
+
+      response: {
+        '2xx': {
+          $ref: 'TeamSchema',
         },
       },
     },

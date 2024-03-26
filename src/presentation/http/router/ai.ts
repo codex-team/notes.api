@@ -26,12 +26,29 @@ interface GetCompletionOptions {
  * @param done - done callback
  */
 const AIRouter: FastifyPluginCallback<AIRouterOptions> = (fastify, opts, done) => {
-  fastify.post('/complete', async (request, reply) => {
+  fastify.post<{
+    Body: {
+      content: string;
+    },
+    Reply: {
+      result: string;
+    },
+  }>('/complete', {
+    schema: {
+      response: {
+        '2xx': {
+          type: 'string',
+        },
+      },
+    },
+  }, async (request, reply) => {
     const { content } = request.body as GetCompletionOptions;
 
     const result = await opts.aiService.getCompletion(content);
 
-    return reply.send({ result });
+    return reply.send({
+      result,
+    });
   });
 
   done();

@@ -1,7 +1,7 @@
 import type User from '@domain/entities/user';
 import { describe, test, expect, beforeEach } from 'vitest';
 
-let accessToken = '';
+let accessToken: string = '';
 let user: User;
 
 describe('NoteList API', () => {
@@ -19,6 +19,7 @@ describe('NoteList API', () => {
 
     accessToken = global.auth(user.id);
   });
+
   describe('GET /notes?page', () => {
     test('Returns noteList with specified length (not for last page)', async () => {
       const portionSize = 30;
@@ -99,7 +100,7 @@ describe('NoteList API', () => {
       expect(response?.statusCode).toBe(400);
     });
 
-    test('Returns 400 when page is too large (maximum page numbrer is 30 by default)', async () => {
+    test('Returns 400 when page is too large (maximum page numbers is 30 by default)', async () => {
       const pageNumber = 31;
 
       const response = await global.api?.fakeRequest({

@@ -7,7 +7,7 @@ import type { ApiResponse } from '../google-api/types/ApiResponse';
  */
 export default class OpenAIApi extends Transport {
   /**
-   * Constructs OpenAI api tranport instance
+   * Constructs OpenAI api transport instance
    *
    * @param baseUrl - Base url for the api
    */

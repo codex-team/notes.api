@@ -94,9 +94,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
 
     const tools = await userService.getUserEditorTools(userId);
 
-    return reply.send({
-      data: tools,
-    });
+    return reply.send({ data: tools });
   });
 
   /**
@@ -191,7 +189,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     });
 
     return reply.send({
-      removedId: toolId,
+      data: toolId,
     });
   });
 
