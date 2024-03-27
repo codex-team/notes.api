@@ -7,7 +7,6 @@ import { NoteModel } from './note.js';
 import { UserModel } from './user.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
 
-
 /**
  *
  */
@@ -18,7 +17,7 @@ export class NoteVisitsModel extends Model<InferAttributes<NoteVisitsModel>, Inf
 
   public declare userId: NoteVisit['userId'];
 
-  public declare visitedAt: NoteVisit['visitedAt'];
+  public declare visitedAt: CreationOptional<NoteVisit['visitedAt']>;
 }
 
 /**
@@ -118,7 +117,6 @@ export default class NoteVisitsSequelizeStorage {
     const [recentVisit, _] = await this.model.upsert({
       noteId,
       userId,
-      visitedAt: 'CURRENT TIME',
     }, {
       conflictWhere: {
         noteId,

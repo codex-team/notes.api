@@ -3,6 +3,8 @@ import type NoteRepository from '@repository/note.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
+import type User from '@domain/entities/user.js';
+import type { NoteList } from '@domain/entities/noteList.js';
 
 /**
  * Note service
@@ -17,6 +19,11 @@ export default class NoteService {
    * Note relationship repository
    */
   public noteRelationsRepository: NoteRelationsRepository;
+
+  /**
+   * Number of the notes to be displayed on one page
+   */
+  private readonly portionSize = 30;
 
   /**
    * Note service constructor
@@ -56,7 +63,6 @@ export default class NoteService {
 
     return note;
   }
-
 
   /**
    * @todo Build a note tree and delete all descendants of a deleted note
@@ -162,6 +168,21 @@ export default class NoteService {
    */
   public async getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null> {
     return await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
+  }
+
+  /**
+   * Returns note list by creator id
+   *
+   * @param userId - id of the user
+   * @param page - number of current page
+   * @returns list of the notes ordered by time of last visit
+   */
+  public async getNoteListByUserId(userId: User['id'], page: number): Promise<NoteList> {
+    const offset = (page - 1) * this.portionSize;
+
+    return {
+      items: await this.noteRepository.getNoteListByUserId(userId, offset, this.portionSize),
+    };
   }
 
   /**

@@ -4,7 +4,8 @@ import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
-import { NoteList } from '@domain/entities/noteList.js';
+import type { NoteVisitsModel } from './noteVisits.js';
+import { DomainError } from '@domain/entities/DomainError.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -57,6 +58,11 @@ export default class NoteSequelizeStorage {
    * Notes settings model in database
    */
   public settingsModel: typeof NoteSettingsModel | null = null;
+
+  /**
+   * Note visits model in database
+   */
+  public visitsModel: typeof NoteVisitsModel | null = null;
 
   /**
    * Database instance
@@ -122,6 +128,23 @@ export default class NoteSequelizeStorage {
       as: 'noteSettings',
     });
   }
+
+  /**
+   * create association with note cisits model
+   *
+   * @param model - initialized note visits model
+   */
+  public createAssociationWithNoteVisitsModel(model: ModelStatic<NoteVisitsModel>): void {
+    this.visitsModel = model;
+
+    /**
+     * Create association with note visits, one-to-many
+     */
+    this.model.hasMany(this.visitsModel, {
+      foreignKey: 'noteId',
+      as: 'noteViews',
+    });
+  };
 
   /**
    * Insert note to database
@@ -195,20 +218,31 @@ export default class NoteSequelizeStorage {
   /**
    * Gets note list by creator id
    *
-   * @param creatorId - note creator id
+   * @param userId - id of certain user
    * @param offset - number of skipped notes
    * @param limit - number of notes to get
-   * @returns { Promise<NoteList> } note
+   * @returns list of the notes
    */
-  public async getNoteListByCreatorId(creatorId: number, offset: number, limit: number): Promise<Note[]> {
+  public async getNoteListByUserId(userId: number, offset: number, limit: number): Promise<Note[]> {
+    if (this.visitsModel === null) {
+      throw new DomainError('NoteVisit model should be defined');
+    }
+
     return await this.model.findAll({
       offset: offset,
       limit: limit,
       where: {
-        creatorId,
+        '$visits.userId$': userId,
       },
+      include: [ {
+        model: this.visitsModel,
+        as: 'visits',
+      } ],
+      order: [ ['$visits.visitedAt$', 'DESC'] ],
     });
   }
+
+
   /**
    * Gets note by id
    *
