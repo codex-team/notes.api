@@ -1,4 +1,4 @@
-import type User from './user';
+import type User from './user.js';
 
 /**
  * Plugin that connects to the editor based on user settings

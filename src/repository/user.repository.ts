@@ -2,8 +2,8 @@ import type User from '@domain/entities/user.js';
 import type UserStorage from '@repository/storage/user.storage.js';
 import type GoogleApiTransport from '@repository/transport/google-api/index.js';
 import type GetUserInfoResponsePayload from '@repository/transport/google-api/types/GetUserInfoResponsePayload.js';
-import type { AddUserToolOptions } from '@repository/storage/postgres/orm/sequelize/user';
-import type EditorTool from '@domain/entities/editorTools';
+import type { AddUserToolOptions } from '@repository/storage/postgres/orm/sequelize/user.js';
+import type EditorTool from '@domain/entities/editorTools.js';
 
 /**
  * OAuth provider

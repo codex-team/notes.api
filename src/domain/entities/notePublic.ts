@@ -1,4 +1,4 @@
-import type { Note } from '@domain/entities/note';
+import type { Note } from '@domain/entities/note.js';
 
 type NotePublicProperties = 'content' | 'createdAt' | 'updatedAt'| 'creatorId';
 

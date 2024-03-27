@@ -1,6 +1,6 @@
 import Transport from '@repository/transport/index.js';
 import appConfig from '@infrastructure/config/index.js'; // @todo get rid of import from infrastructure
-import type { ApiResponse } from '../google-api/types/ApiResponse';
+import type { ApiResponse } from '../google-api/types/ApiResponse.js';
 
 /**
  * OpenAI transport

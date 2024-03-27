@@ -1,6 +1,6 @@
 import { notEmpty } from '@infrastructure/utils/empty.js';
-import type OpenAIApi from './transport/openai-api';
-import type { GetCompletionResponsePayload } from './transport/openai-api/types/GetCompletionResponsePayload';
+import type OpenAIApi from './transport/openai-api/index.js';
+import type { GetCompletionResponsePayload } from './transport/openai-api/types/GetCompletionResponsePayload.js';
 
 /**
  * Repository that establishes access to data from business logic

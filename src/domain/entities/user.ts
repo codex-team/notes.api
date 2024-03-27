@@ -1,4 +1,4 @@
-import type EditorTool from './editorTools';
+import type EditorTool from './editorTools.js';
 
 /**
  * User entity

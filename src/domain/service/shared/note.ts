@@ -1,4 +1,4 @@
-import type { NoteInternalId } from '@domain/entities/note';
+import type { NoteInternalId } from '@domain/entities/note.js';
 
 /**
  * Which methods of Domain can be used by other domains

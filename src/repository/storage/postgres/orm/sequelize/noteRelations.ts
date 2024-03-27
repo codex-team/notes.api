@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
-import type { Note } from '@domain/entities/note';
+import type { Note } from '@domain/entities/note.js';
 import { Model, DataTypes } from 'sequelize';
 
 /**

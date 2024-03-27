@@ -1,4 +1,4 @@
-import type AIRepository from '@repository/ai.repository';
+import type AIRepository from '@repository/ai.repository.js';
 
 /**
  * AI service

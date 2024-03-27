@@ -1,4 +1,4 @@
-import type AIService from '@domain/service/ai';
+import type AIService from '@domain/service/ai.js';
 import type { FastifyPluginCallback } from 'fastify';
 
 /**

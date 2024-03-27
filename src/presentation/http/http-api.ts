@@ -5,7 +5,7 @@ import fastify from 'fastify';
 import type Api from '@presentation/api.interface.js';
 import type { DomainServices } from '@domain/index.js';
 import cors from '@fastify/cors';
-import fastifyOauth2 from '@fastify/oauth2';
+import { fastifyOauth2 } from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
