@@ -233,11 +233,14 @@ export default class DatabaseHelpers {
   }
 
   /**
+   * Inserts note visit mock into db
    *
-   * @param visit
+   * @param visit object which contain all info about noteVisit (visitedAt is optional)
+   *
+   * if no visitedAt passed, then visited_at would have CURRENT_DATE value
    */
   public async insertNoteVisit(visit: NoteVisitCreationAttributes): Promise<NoteVisit> {
-    const visitedAt = visit.visitedAt ?? 'CURRENT TIME';
+    const visitedAt = visit.visitedAt ?? 'CURRENT_DATE';
 
     // eslint-disable-next-line
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.note_visits ("user_id", "note_id", "visited_at")
