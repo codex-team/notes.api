@@ -7,6 +7,7 @@ import type UserSession from '@domain/entities/userSession.ts';
 import type NoteSettings from '@domain/entities/noteSettings.ts';
 import type { TeamMember } from '@domain/entities/team.ts';
 import type EditorTool from '@domain/entities/editorTools.ts';
+import type NoteVisit from '@domain/entities/noteVisit.js';
 import { nanoid } from 'nanoid';
 
 /**
@@ -63,6 +64,8 @@ type NoteRelationMockCreationAttributes = {
  * default type for editor tool mock creation attributes
  */
 type EditorToolMockCreationAttributes = Omit<EditorTool, 'id'>;
+
+type NoteVisitCreationAttributes = NoteVisit;
 
 /**
  * class with database helper functions which are inserting mocks into database
@@ -227,6 +230,27 @@ export default class DatabaseHelpers {
     const addedToolData = result[0];
 
     return String(addedToolData.id);
+  }
+
+  /**
+   *
+   * @param visit
+   */
+  public async insertNoteVisit(visit: NoteVisitCreationAttributes): Promise<NoteVisit> {
+    const visitedAt = visit.visitedAt ?? 'CURRENT TIME';
+
+    // eslint-disable-next-line
+    const [results, _] = await this.orm.connection.query(`INSERT INTO public.note_visits ("user_id", "note_id", "visited_at")
+    VALUES (${visit.noteId}, ${visit.userId}, ${visitedAt})
+    RETURNING "user_id" AS "userId", "note_id" AS "noteId", "visited_at" AS "visitedAt"`,
+    {
+      type: QueryTypes.INSERT,
+      returning: true,
+    });
+
+    const createdVisit = results[0];
+
+    return createdVisit;
   }
 
   /**
