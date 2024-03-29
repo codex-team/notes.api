@@ -8,7 +8,6 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 import { MemberRole } from '@domain/entities/team.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
-import type { NoteListPublic } from '@domain/entities/noteList.js';
 
 /**
  * Interface for the note router.
@@ -139,46 +138,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
     });
-  });
-
-  /**
-   * Get note list ordered by time of last visit
-   */
-  fastify.get<{
-    Querystring: {
-      page: number;
-    },
-  }>('/note-list/', {
-    config: {
-      policy: [
-        'authRequired',
-      ],
-    },
-    schema: {
-      querystring: {
-        page: {
-          type: 'number',
-          minimum: 1,
-          maximum: 30,
-        },
-      },
-    },
-  }, async (request, reply) => {
-    const userId = request.userId as number;
-    const page = request.query.page;
-
-    const noteList = await noteService.getNoteListByUserId(userId, page);
-    /**
-     * Wrapping Notelist for public use
-     */
-    const noteListItemsPublic: NotePublic[] = noteList.items.map(definePublicNote);
-
-    const noteListPublic: NoteListPublic = {
-      items: noteListItemsPublic,
-    };
-
-
-    return reply.send(noteListPublic);
   });
 
   /**
