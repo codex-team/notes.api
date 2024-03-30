@@ -1,7 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
 
-
 let accessToken = '';
 let user: User;
 
@@ -111,5 +110,28 @@ describe('GET /note/note-list?page', () => {
     });
 
     expect(response?.statusCode).toBe(400);
+  });
+
+  test('Returns list of visited notes ordered by date of last vist if user is authorized', async () => {
+    const portionSize = 30;
+    const pageNumber = 1;
+    let note;
+    /** Random guy that has access to all notes */
+    const randomGuy = await global.db.insertUser();
+
+    /**
+     * Create test notes for created user
+     * and then add visits for randomGuy
+     */
+    for (let i = 0; i < portionSize + 1; i++) {
+      note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteVisit({
+        userId: randomGuy.id,
+        noteId: note.id,
+      });
+    }
   });
 });

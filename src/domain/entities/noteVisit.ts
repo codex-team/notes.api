@@ -8,7 +8,7 @@ export default interface NoteVisit {
   /**
    * Unique property identifier
    */
-  id: number,
+  id?: number,
 
   /**
    * Internal id of the note

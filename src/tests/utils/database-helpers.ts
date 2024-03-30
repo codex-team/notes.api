@@ -65,7 +65,14 @@ type NoteRelationMockCreationAttributes = {
  */
 type EditorToolMockCreationAttributes = Omit<EditorTool, 'id'>;
 
-type NoteVisitCreationAttributes = NoteVisit;
+/**
+ * default type for note visit mock creation attributes
+ */
+type NoteVisitCreationAttributes = {
+  noteId: NoteVisit['noteId'],
+  userId: NoteVisit['userId'],
+  visitedAt?: NoteVisit['visitedAt'],
+};
 
 /**
  * class with database helper functions which are inserting mocks into database
@@ -240,7 +247,7 @@ export default class DatabaseHelpers {
    * if no visitedAt passed, then visited_at would have CURRENT_DATE value
    */
   public async insertNoteVisit(visit: NoteVisitCreationAttributes): Promise<NoteVisit> {
-    const visitedAt = visit.visitedAt ?? 'CURRENT_DATE';
+    const visitedAt = visit.visitedAt ?? 'NOW()';
 
     // eslint-disable-next-line
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.note_visits ("user_id", "note_id", "visited_at")
@@ -249,6 +256,7 @@ export default class DatabaseHelpers {
     {
       type: QueryTypes.INSERT,
       returning: true,
+      omitNull: true,
     });
 
     const createdVisit = results[0];
