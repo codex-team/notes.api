@@ -22,6 +22,7 @@ export default class NoteService {
 
   /**
    * Number of the notes to be displayed on one page
+   * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
   private readonly portionSize = 30;
 

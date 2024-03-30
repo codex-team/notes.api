@@ -69,7 +69,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     appConfig.auth.refreshExpiresIn,
     repositories.userSessionRepository
   );
-  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository, repositories.noteRepository);
+  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
 
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
 

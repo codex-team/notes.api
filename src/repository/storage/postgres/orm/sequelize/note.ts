@@ -234,7 +234,14 @@ export default class NoteSequelizeStorage {
       where: {
         '$noteVisits.user_id$': userId,
       },
-      // order: [ ['$noteVisits.visited_at$', 'DESC'] ],
+      order: [ [
+        {
+          model: this.visitsModel,
+          as: 'noteVisits',
+        },
+        'visited_at',
+        'DESC',
+      ] ],
       include: [ {
         model: this.visitsModel,
         as: 'noteVisits',
