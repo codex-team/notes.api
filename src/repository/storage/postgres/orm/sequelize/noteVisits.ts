@@ -70,6 +70,7 @@ export default class NoteVisitsSequelizeStorage {
     }, {
       tableName: this.tableName,
       sequelize: this.database,
+      timestamps: false,
     });
   };
 

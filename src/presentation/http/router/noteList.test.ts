@@ -22,11 +22,17 @@ describe('GET /note/note-list?page', () => {
   test('Returns noteList with specified length (not for last page)', async () => {
     const portionSize = 30;
     const pageNumber = 1;
+    let note;
 
     /** create test notes for created user */
     for (let i = 0; i < portionSize + 1; i++) {
-      await global.db.insertNote({
+      note = await global.db.insertNote({
         creatorId: user.id,
+      });
+
+      await global.db.insertNoteVisit({
+        userId: user.id,
+        noteId: note.id,
       });
     }
 
@@ -46,11 +52,17 @@ describe('GET /note/note-list?page', () => {
   test('Returns noteList with specified length (for last page)', async () => {
     const portionSize = 19;
     const pageNumber = 2;
+    let note;
 
     /** create test notes for created user */
     for (let i = 0; i < portionSize + 30; i++) {
-      await global.db.insertNote({
+      note = await global.db.insertNote({
         creatorId: user.id,
+      });
+
+      await global.db.insertNoteVisit({
+        userId: user.id,
+        noteId: note.id,
       });
     }
 
@@ -114,7 +126,7 @@ describe('GET /note/note-list?page', () => {
 
   test('Returns list of visited notes ordered by date of last vist if user is authorized', async () => {
     const portionSize = 30;
-    const pageNumber = 1;
+    // const pageNumber = 1;
     let note;
     /** Random guy that has access to all notes */
     const randomGuy = await global.db.insertUser();

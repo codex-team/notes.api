@@ -23,6 +23,7 @@ import { NoteSettingsSchema } from './schema/NoteSettings.js';
 import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
+import NoteListRouter from '@presentation/http/router/noteList.js';
 import { EditorToolSchema } from './schema/EditorTool.js';
 import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
@@ -197,6 +198,11 @@ export default class HttpApi implements Api {
       noteSettingsService: domainServices.noteSettingsService,
     });
 
+    await this.server?.register(NoteListRouter, {
+      prefix: '/notes',
+      noteService: domainServices.noteService,
+    });
+
     await this.server?.register(JoinRouter, {
       prefix: '/join',
       noteSettings: domainServices.noteSettingsService,
@@ -357,4 +363,3 @@ export default class HttpApi implements Api {
     });
   }
 }
-

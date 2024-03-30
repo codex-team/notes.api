@@ -142,7 +142,7 @@ export default class NoteSequelizeStorage {
      */
     this.model.hasMany(this.visitsModel, {
       foreignKey: 'noteId',
-      as: 'noteViews',
+      as: 'noteVisits',
     });
   };
 
@@ -228,18 +228,22 @@ export default class NoteSequelizeStorage {
       throw new DomainError('NoteVisit model should be defined');
     }
 
-    return await this.model.findAll({
+    const reply = await this.model.findAll({
       offset: offset,
       limit: limit,
       where: {
-        '$visits.userId$': userId,
+        '$noteVisits.user_id$': userId,
       },
+      // order: [ ['$noteVisits.visited_at$', 'DESC'] ],
       include: [ {
         model: this.visitsModel,
-        as: 'visits',
+        as: 'noteVisits',
+        required: true,
+        duplicating: false,
       } ],
-      order: [ ['$visits.visitedAt$', 'DESC'] ],
     });
+
+    return reply;
   }
 
 

@@ -251,7 +251,7 @@ export default class DatabaseHelpers {
 
     // eslint-disable-next-line
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.note_visits ("user_id", "note_id", "visited_at")
-    VALUES (${visit.noteId}, ${visit.userId}, ${visitedAt})
+    VALUES (${visit.userId}, ${visit.noteId}, ${visitedAt})
     RETURNING "user_id" AS "userId", "note_id" AS "noteId", "visited_at" AS "visitedAt"`,
     {
       type: QueryTypes.INSERT,
