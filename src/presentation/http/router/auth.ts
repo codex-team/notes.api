@@ -22,7 +22,12 @@ interface AuthRouterOptions {
   /**
    * Auth service instance
    */
-  authService: AuthService;
+  authService: AuthService,
+
+  /**
+   * Cookie domain for refresh and access tokens
+   */
+  cookieDomain: string,
 }
 
 /**
@@ -78,6 +83,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
       await opts.authService.removeSessionByRefreshToken(token);
       const { refreshToken, expiresAt } = await opts.authService.signRefreshToken(userSession.userId);
 
+<<<<<<< HEAD
       return reply
         .setCookie('refreshToken', refreshToken, {
           path: '/auth',
@@ -89,6 +95,23 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
           refreshToken,
         });
     });
+=======
+    await opts.authService.removeSessionByRefreshToken(token);
+    const { refreshToken, expiresAt } = await opts.authService.signRefreshToken(userSession.userId);
+
+    return reply
+      .setCookie('refreshToken', refreshToken, {
+        path: '/auth',
+        httpOnly: true,
+        expires: expiresAt,
+        domain: opts.cookieDomain,
+      })
+      .send({
+        accessToken,
+        refreshToken,
+      });
+  });
+>>>>>>> 084b0b1 (Add domain property to refresh token cookie)
 
   /**
    * Route for logout, removes session from database by refresh token
@@ -123,10 +146,9 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     await opts.authService.removeSessionByRefreshToken(request.body.token);
 
     return reply
-      .setCookie('refreshToken', '', {
+      .clearCookie('refreshToken', {
         path: '/auth',
-        httpOnly: true,
-        expires: new Date(0),
+        domain: opts.cookieDomain,
       })
       .status(StatusCodes.OK)
       .send({

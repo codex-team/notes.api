@@ -74,6 +74,7 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
         path: '/auth',
         httpOnly: true,
         expires: expiresAt,
+        domain: opts.cookieDomain,
       })
       .type('text/html')
       .send(`

@@ -229,6 +229,7 @@ export default class HttpApi implements Api {
     await this.server?.register(AuthRouter, {
       prefix: '/auth',
       authService: domainServices.authService,
+      cookieDomain: this.config.cookieDomain,
     });
 
     await this.server?.register(UserRouter, {
