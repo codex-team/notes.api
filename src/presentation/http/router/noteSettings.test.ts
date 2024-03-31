@@ -1,5 +1,6 @@
 import { describe, test, expect, beforeEach } from 'vitest';
 import { MemberRole } from '@domain/entities/team.js';
+import { memberRight } from '@tests/utils/team-rights';
 
 describe('NoteSettings API', () => {
   beforeEach(async () => {
@@ -12,39 +13,11 @@ describe('NoteSettings API', () => {
     await global.db.truncateTables();
   });
   describe('GET /note-settings/:notePublicId ', () => {
-    test.each([
-      /** Returns 401 when the user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-        expectedMessage: 'You must be authenticated to access this resource',
-      },
+    test.each(memberRight)
+    ('Get note settings and team by public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
 
-      /** Returns 200 if user is a team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
-
-      /** Returns 403 when user is a team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-
-      /** Returns 403 when user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-    ])
-    ('Get note settings and team by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -309,39 +282,11 @@ describe('NoteSettings API', () => {
   });
 
   describe('GET /note-settings/:notePublicId/team ', () => {
-    test.each([
-      /** Returns 200 if user is a team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
+    test.each(memberRight)
+    ('Get note team by public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode, expectedMessage } = testContext;
 
-      /** Returns 403 if user is a team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-
-      /** Returns 401 when the user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-        expectedMessage: 'You must be authenticated to access this resource',
-      },
-
-      /** Returns 403 when the the user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-        expectedMessage: 'Permission denied',
-      },
-    ])
-    ('Get note team by public id', async ({ role, isAuthorized, expectedStatusCode, expectedMessage }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -435,36 +380,11 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-settings/:notePublicId ', () => {
-    test.each([
-      /** Returns 200 if user is a team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
+    test.each(memberRight)
+    ('Update note settings by public id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode } = testContext;
 
-      /** Returns 403 if user is a team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-      },
-
-      /** Returns 403 if user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-      },
-
-      /** Returns 401 if user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-      },
-    ])
-    ('Update note settings by public id', async ({ role, isAuthorized, expectedStatusCode }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -552,36 +472,11 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-settings/:notePublicId/invitation-hash ', () => {
-    test.each([
-      /** Returns 200 if user is a team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
+    test.each(memberRight)
+    ('Generate invitation hash', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode } = testContext;
 
-      /** Returns 403 if user is a team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-      },
-
-      /** Returns 403 if user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-      },
-
-      /** Returns 401 if user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-      },
-    ])
-    ('Generate invitation hash', async ({ role, isAuthorized, expectedStatusCode }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -674,36 +569,11 @@ describe('NoteSettings API', () => {
   });
 
   describe('PATCH /note-settings/:notePublicId/team', () => {
-    test.each([
-      /** Returns 200 if user is a team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
+    test.each(memberRight)
+    ('Update team member role by user id and note id', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode } = testContext;
 
-      /** Returns 403 if user is a team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-      },
-
-      /** Returns 403 if user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-      },
-
-      /** Returns 401 if user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-      },
-    ])
-    ('Update team member role by user id and note id', async ({ role, isAuthorized, expectedStatusCode }) => {
       /** Create test user - creator of a note */
       const creator = await global.db.insertUser();
 
@@ -812,36 +682,11 @@ describe('NoteSettings API', () => {
   });
 
   describe('DELETE /:notePublicId/team', () => {
-    test.each([
-      /** Returns 200 if user is a team member with a Write role */
-      {
-        role: MemberRole.Write,
-        isAuthorized: true,
-        expectedStatusCode: 200,
-      },
+    test.each(memberRight)
+    ('Delete user from the team', async ({ testContext }) => {
+      /** Get data from context */
+      const { role, isAuthorized, expectedStatusCode } = testContext;
 
-      /** Returns 403 if user is a team member with a Read role */
-      {
-        role: MemberRole.Read,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-      },
-
-      /** Returns 403 if user is not in the team */
-      {
-        role: null,
-        isAuthorized: true,
-        expectedStatusCode: 403,
-      },
-
-      /** Returns 401 if user is not authorized */
-      {
-        role: null,
-        isAuthorized: false,
-        expectedStatusCode: 401,
-      },
-    ])
-    ('Delete user from the team', async ( { role, isAuthorized, expectedStatusCode } ) => {
       const creator = await global.db.insertUser();
 
       const user = await global.db.insertUser();
