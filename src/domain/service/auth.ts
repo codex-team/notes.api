@@ -67,7 +67,7 @@ export default class AuthService {
    * @param userId - user to sign refresh token for
    * @returns refresh token
    */
-  public async signRefreshToken(userId: number): Promise<string> {
+  public async signRefreshToken(userId: number): Promise<{ refreshToken: string; expiresAt: Date }> {
     const tokenSize = 10;
 
     /**
@@ -77,7 +77,10 @@ export default class AuthService {
 
     const userSession = await this.userSessionRepository.addUserSession(userId, token, new Date(Date.now() + this.refreshExpiresIn));
 
-    return userSession.refreshToken;
+    return {
+      refreshToken: userSession.refreshToken,
+      expiresAt: userSession.refreshTokenExpiresAt,
+    };
   }
 
   /**

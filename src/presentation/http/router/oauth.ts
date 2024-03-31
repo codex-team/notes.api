@@ -63,12 +63,20 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
      * Generate tokens
      */
     const accessToken = opts.authService.signAccessToken({ id: user.id });
-    const refreshToken = await opts.authService.signRefreshToken(user.id);
+    const { refreshToken, expiresAt } = await opts.authService.signRefreshToken(user.id);
 
     /**
      * Show page with script passing parent window postMessage with tokens
+     * Set refresh token as http-only cookie
      */
-    return reply.type('text/html').send(`
+    return reply
+      .setCookie('refreshToken', refreshToken, {
+        path: '/auth',
+        httpOnly: true,
+        expires: expiresAt,
+      })
+      .type('text/html')
+      .send(`
       <html>
         <head>
           <script>

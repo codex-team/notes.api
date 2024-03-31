@@ -75,16 +75,19 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
       if (!userSession) {
         return await reply.unauthorized('Session is not valid');
       }
-
-      const accessToken = opts.authService.signAccessToken({ id: userSession.userId });
-
       await opts.authService.removeSessionByRefreshToken(token);
-      const refreshToken = await opts.authService.signRefreshToken(userSession.userId);
+      const { refreshToken, expiresAt } = await opts.authService.signRefreshToken(userSession.userId);
 
-      return reply.send({
-        accessToken,
-        refreshToken,
-      });
+      return reply
+        .setCookie('refreshToken', refreshToken, {
+          path: '/auth',
+          httpOnly: true,
+          expires: expiresAt,
+        })
+        .send({
+          accessToken,
+          refreshToken,
+        });
     });
 
   /**
@@ -119,9 +122,16 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     await opts.authService.removeSessionByRefreshToken(request.body.token);
 
-    return reply.status(StatusCodes.OK).send({
-      ok: true,
-    });
+    return reply
+      .setCookie('refreshToken', '', {
+        path: '/auth',
+        httpOnly: true,
+        expires: new Date(0),
+      })
+      .status(StatusCodes.OK)
+      .send({
+        ok: true,
+      });
   });
   done();
 };
