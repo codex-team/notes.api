@@ -9,12 +9,12 @@ export enum FileTypes {
   /**
    * Type for testing uploads
    */
-  Test = 'test',
+  Test = 0,
 
   /**
    * File is a part of note
    */
-  NoteAttachment = 'noteAttachment',
+  NoteAttachment = 1,
 }
 
 /**
