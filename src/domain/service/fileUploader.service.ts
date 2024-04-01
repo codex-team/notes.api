@@ -1,13 +1,11 @@
-import type { FileData } from '@domain/entities/file.js';
+import type { FileData, FileLocation } from '@domain/entities/file.js';
 import { FileTypes } from '@domain/entities/file.js';
-import type { NoteInternalId } from '@domain/entities/note.js';
 import type User from '@domain/entities/user.js';
 import { createFileId } from '@infrastructure/utils/id.js';
 import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import mime from 'mime';
-import { isEmpty } from '@infrastructure/utils/empty';
 
 /**
  * File data for upload
@@ -35,16 +33,6 @@ interface Metadata {
    * User id who uploaded the file
    */
   userId?: User['id'];
-}
-
-/**
- * File upload location, for now only note id, if file is a part of note
- */
-interface Location {
-  /**
-   * Note id
-   */
-  noteId?: NoteInternalId;
 }
 
 /**
@@ -80,15 +68,8 @@ export default class FileUploaderService {
    * @param location - file location, for now only note id, if file is a part of note
    * @param metadata - file metadata, including user id who uploaded the file
    */
-  public async uploadFile(type: FileTypes, fileData: UploadFileData, location: Location, metadata: Metadata): Promise<string> {
+  public async uploadFile(type: FileTypes, fileData: UploadFileData, location: FileLocation, metadata: Metadata): Promise<string> {
     const fileHash = createFileId();
-
-    /**
-     * Note id is required for note attachment
-     */
-    if (type === FileTypes.NoteAttachment && isEmpty(location.noteId)) {
-      throw new DomainError('Note id is required for note attachment');
-    }
 
     /**
      * Extension can be null if file mime type is unknown or not supported
@@ -117,7 +98,7 @@ export default class FileUploaderService {
       type,
       key,
       userId: metadata?.userId,
-      noteId: location?.noteId,
+      location: location,
       size: fileData.data.length,
     });
 
@@ -149,16 +130,6 @@ export default class FileUploaderService {
     }
 
     return fileData;
-  }
-
-  /**
-   * Get note id by file key, if file is a part of note
-   *
-   * @param objectKey - unique file key in object storage
-   * @param type - file type
-   */
-  public async getNoteIdByFileKeyAndType(objectKey: string, type: FileTypes): Promise<NoteInternalId | null> {
-    return this.fileRepository.getNoteIdByFileKeyAndType(objectKey, type);
   }
 
   /**

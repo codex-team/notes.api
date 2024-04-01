@@ -1,10 +1,8 @@
-import type { FileTypes } from '@domain/entities/file';
-import type { Note, NotePublicId } from '@domain/entities/note.js';
+import type { FileLocation, FileTypes } from '@domain/entities/file';
 import type FileUploaderService from '@domain/service/fileUploader.service.js';
 import type { MultipartFile, MultipartValue } from '@fastify/multipart';
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
-import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Interface for upload router options
@@ -23,7 +21,6 @@ interface UploadRouterOptions {
 
 const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts, done) => {
   const { fileUploaderService } = opts;
-  const { noteService } = opts;
 
   fastify.post<{
     Body: {
@@ -40,7 +37,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
       /**
        * Note public id, if file is related to a note
        */
-      noteId?: MultipartValue<NotePublicId>;
+      location: MultipartValue<FileLocation>;
     }
   }>('/', {
     config: {
@@ -52,17 +49,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
   }, async (request, reply) => {
     const { userId } = request;
 
-    /**
-     * Get note id from request body
-     * If note id is not provided, it means that file is not related to any note
-     */
-    const noteId = request.body.noteId?.value;
-
-    let note: Note | undefined;
-
-    if (notEmpty(noteId)) {
-      note = await noteService.getNoteByPublicId(noteId);
-    }
+    const { location } = request.body;
 
     const uploadedFileKey = await fileUploaderService.uploadFile(
       request.body.type.value,
@@ -71,9 +58,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
         mimetype: request.body.file.mimetype,
         name: request.body.file.filename,
       },
-      {
-        noteId: note?.id as number,
-      },
+      location,
       {
         userId: userId as number,
       }

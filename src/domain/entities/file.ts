@@ -79,9 +79,9 @@ export default interface UploadedFile {
   createdAt: Date;
 
   /**
-   * In case if file is a part of note, note id to identify permissions to access
+   * Object, which stores information about file location
    */
-  noteId?: NoteInternalId;
+  location: FileLocation;
 }
 
 /**

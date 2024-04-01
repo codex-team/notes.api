@@ -3,9 +3,7 @@ import { DataTypes, Model } from 'sequelize';
 import type User from '@domain/entities/user.js';
 import { UserModel } from './user.js';
 import type UploadedFile from '@domain/entities/file.js';
-import type { FileCreationAttributes, FileTypes } from '@domain/entities/file.js';
-import type { Note, NoteInternalId } from '@domain/entities/note.js';
-import { NoteModel } from './note.js';
+import type { FileCreationAttributes, FileLocation, FileTypes } from '@domain/entities/file.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 
 /**
@@ -53,9 +51,9 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   public declare size: UploadedFile['size'];
 
   /**
-   * In case if file is a part of note, note id to indetify permissions to access
+   * Object, which stores information about file location
    */
-  public declare noteId: CreationOptional<Note['id']>;
+  public declare location: FileLocation;
 }
 
 /**
@@ -116,13 +114,8 @@ export default class FileSequelizeStorage {
           type: DataTypes.INTEGER,
           allowNull: false,
         },
-        noteId: {
-          type: DataTypes.INTEGER,
-          references: {
-            model: NoteModel,
-            key: 'id',
-          },
-          allowNull: true,
+        location: {
+          type: DataTypes.JSONB,
         },
         name: {
           type: DataTypes.STRING,
@@ -157,26 +150,5 @@ export default class FileSequelizeStorage {
         key,
       },
     });
-  }
-
-  /**
-   * Get note id by file key, if file is a part of note
-   *
-   * @param key - File key
-   * @param type - File type
-   */
-  public async getNoteIdByFileKey(key: string, type: FileTypes): Promise<NoteInternalId | null> {
-    const file = await this.model.findOne({
-      where: {
-        key,
-        type,
-      },
-    });
-
-    if (file === null) {
-      return null;
-    }
-
-    return file.noteId;
   }
 }
