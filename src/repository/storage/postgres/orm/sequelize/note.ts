@@ -228,6 +228,14 @@ export default class NoteSequelizeStorage {
       throw new DomainError('NoteVisit model should be defined');
     }
 
+    const rep = await this.visitsModel.findAll({
+      where: {
+        userId,
+      },
+    });
+
+    console.log('rrrep: ', rep);
+
     const reply = await this.model.findAll({
       offset: offset,
       limit: limit,
@@ -245,10 +253,12 @@ export default class NoteSequelizeStorage {
       include: [ {
         model: this.visitsModel,
         as: 'noteVisits',
-        required: true,
         duplicating: false,
       } ],
     });
+
+    console.log('=============================================');
+    console.log(reply);
 
     return reply;
   }

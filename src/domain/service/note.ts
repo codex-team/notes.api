@@ -24,7 +24,7 @@ export default class NoteService {
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
-  private readonly portionSize = 30;
+  private readonly noteListPortionSize = 30;
 
   /**
    * Note service constructor
@@ -179,10 +179,10 @@ export default class NoteService {
    * @returns list of the notes ordered by time of last visit
    */
   public async getNoteListByUserId(userId: User['id'], page: number): Promise<NoteList> {
-    const offset = (page - 1) * this.portionSize;
+    const offset = (page - 1) * this.noteListPortionSize;
 
     return {
-      items: await this.noteRepository.getNoteListByUserId(userId, offset, this.portionSize),
+      items: await this.noteRepository.getNoteListByUserId(userId, offset, this.noteListPortionSize),
     };
   }
 

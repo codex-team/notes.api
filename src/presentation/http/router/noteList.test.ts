@@ -22,11 +22,10 @@ describe('GET /note/note-list?page', () => {
   test('Returns noteList with specified length (not for last page)', async () => {
     const portionSize = 30;
     const pageNumber = 1;
-    let note;
 
     /** create test notes for created user */
     for (let i = 0; i < portionSize + 1; i++) {
-      note = await global.db.insertNote({
+      const note = await global.db.insertNote({
         creatorId: user.id,
       });
 
@@ -92,8 +91,10 @@ describe('GET /note/note-list?page', () => {
 
     expect(response?.statusCode).toBe(200);
 
-    expect(response?.json()).toEqual( { items : [] } );
-    expect(response?.json().items).toHaveLength(0);
+    const noteList = response?.json();
+
+    expect(noteList).toEqual( { items : [] } );
+    expect(noteList.items).toHaveLength(0);
   });
 
   test('Returns 400 when page < 0', async () => {
@@ -124,19 +125,20 @@ describe('GET /note/note-list?page', () => {
     expect(response?.statusCode).toBe(400);
   });
 
-  test('Returns list of visited notes ordered by date of last vist if user is authorized', async () => {
+  test('Returns list of visited notes ordered by date of last visit of the certain user', async () => {
     const portionSize = 30;
-    // const pageNumber = 1;
-    let note;
+    const pageNumber = 1;
+
     /** Random guy that has access to all notes */
     const randomGuy = await global.db.insertUser();
+    const RandomGuyAccessToken = await global.auth(randomGuy.id);
 
     /**
      * Create test notes for created user
      * and then add visits for randomGuy
      */
     for (let i = 0; i < portionSize + 1; i++) {
-      note = await global.db.insertNote({
+      const note = await global.db.insertNote({
         creatorId: user.id,
       });
 
@@ -145,5 +147,17 @@ describe('GET /note/note-list?page', () => {
         noteId: note.id,
       });
     }
+
+    const response = await global.api?.fakeRequest({
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${RandomGuyAccessToken}`,
+      },
+      url: `/notes?page=${pageNumber}`,
+    });
+
+    expect(response?.statusCode).toBe(200);
+
+    expect(response?.json().items).toHaveLength(portionSize);
   });
 });

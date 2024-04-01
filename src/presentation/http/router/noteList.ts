@@ -8,7 +8,7 @@ import type { NoteListPublic } from '@domain/entities/noteList.js';
  */
 interface NoteListRouterOptions {
   /**
-   * Note list service instance
+   * Note service instance
    */
   noteService: NoteService,
 
@@ -59,7 +59,6 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     const noteListPublic: NoteListPublic = {
       items: noteListItemsPublic,
     };
-
 
     return reply.send(noteListPublic);
   });
