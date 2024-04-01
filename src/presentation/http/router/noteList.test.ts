@@ -78,7 +78,7 @@ describe('GET /note/note-list?page', () => {
     expect(response?.json().items).toHaveLength(portionSize);
   });
 
-  test('Returns noteList with no items if it has no notes', async () => {
+  test('Returns noteList with no items if there are no notes', async () => {
     const pageNumber = 3;
 
     const response = await global.api?.fakeRequest({
