@@ -18,6 +18,23 @@ export enum FileTypes {
 }
 
 /**
+ * File location for testing uploads, there is no defined location
+ */
+export type TestFileLocation = Record<never, never>;
+
+/**
+ * File location, when it is a part of note
+ */
+export type NoteAttachmentFileLocation = {
+  noteId: NoteInternalId,
+};
+
+/**
+ * Possible file location
+ */
+export type FileLocation = TestFileLocation | NoteAttachmentFileLocation;
+
+/**
  * Interface representing a file entity
  */
 export default interface UploadedFile {
