@@ -86,7 +86,7 @@ export default class FileUploaderService {
     /**
      * Note id is required for note attachment
      */
-    if (type === FileTypes.noteAttachment && isEmpty(location.noteId)) {
+    if (type === FileTypes.NoteAttachment && isEmpty(location.noteId)) {
       throw new DomainError('Note id is required for note attachment');
     }
 
@@ -168,9 +168,9 @@ export default class FileUploaderService {
    */
   private defineBucketByFileType(fileType: FileTypes): string {
     switch (fileType) {
-      case FileTypes.test:
+      case FileTypes.Test:
         return 'test';
-      case FileTypes.noteAttachment:
+      case FileTypes.NoteAttachment:
         return 'note-attachment';
       default:
         throw new DomainError('Unknown file type');

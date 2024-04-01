@@ -7,14 +7,14 @@ import type { Buffer } from 'buffer';
  */
 export enum FileTypes {
   /**
-   * @todo define real types
+   * Type for testing uploads
    */
-  test = 'test',
+  Test = 'test',
 
   /**
    * File is a part of note
    */
-  noteAttachment = 'noteAttachment',
+  NoteAttachment = 'noteAttachment',
 }
 
 /**
