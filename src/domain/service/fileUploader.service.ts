@@ -28,7 +28,7 @@ interface UploadFileData {
 }
 
 /**
- * File upload metadata
+ * Additional data about the uploaded file
  */
 interface Metadata {
   /**
