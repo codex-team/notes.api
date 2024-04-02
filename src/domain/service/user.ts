@@ -1,7 +1,7 @@
 import type UserRepository from '@repository/user.repository.js';
 import { Provider } from '@repository/user.repository.js';
 import type User from '@domain/entities/user.js';
-import type EditorTool from '@domain/entities/editorTools';
+import type EditorTool from '@domain/entities/editorTools.js';
 import type { SharedDomainMethods } from './shared/index.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 
@@ -22,7 +22,7 @@ export default class UserService {
    * User service constructor
    *
    * @param repository - user repository instance
-   * @param shared - shared domains
+   * @param shared - shared domain methods
    */
   constructor(repository: UserRepository, private readonly shared: SharedDomainMethods) {
     this.repository = repository;

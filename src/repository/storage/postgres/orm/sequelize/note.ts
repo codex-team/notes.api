@@ -3,8 +3,8 @@ import { DataTypes, Model } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
-import type { NoteSettingsModel } from './noteSettings';
-import { NoteList } from '@domain/entities/noteList';
+import type { NoteSettingsModel } from './noteSettings.js';
+import { NoteList } from '@domain/entities/noteList.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 

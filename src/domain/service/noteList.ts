@@ -1,5 +1,5 @@
-import type NoteRepository from '@repository/note.repository';
-import type { NoteList } from '@domain/entities/noteList';
+import type NoteRepository from '@repository/note.repository.js';
+import type { NoteList } from '@domain/entities/noteList.js';
 
 /**
  * Note list service

@@ -1,4 +1,4 @@
-import type { DomainServices } from '@domain/index';
+import type { DomainServices } from '@domain/index.js';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 /**

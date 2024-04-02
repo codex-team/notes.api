@@ -1,4 +1,4 @@
-import type { FileTypes, Location } from '@domain/entities/file';
+import type { FileTypes, Location } from '@domain/entities/file.js';
 import type FileUploaderService from '@domain/service/fileUploader.service.js';
 import type { MultipartFile, MultipartValue } from '@fastify/multipart';
 import type { FastifyPluginCallback } from 'fastify';

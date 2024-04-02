@@ -1,5 +1,5 @@
-import { createInvitationHash } from '@infrastructure/utils/invitationHash';
-import { createPublicId } from '@infrastructure/utils/id';
+import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
+import { createPublicId } from '@infrastructure/utils/id.js';
 import { QueryTypes } from 'sequelize';
 import type User from '@domain/entities/user.ts';
 import type { Note } from '@domain/entities/note.ts';

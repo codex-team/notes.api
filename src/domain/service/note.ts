@@ -95,23 +95,12 @@ export default class NoteService {
    *
    * @param id - note internal id
    * @param content - new content
-   * @param parentPublicId - parent note if exist
    */
-  public async updateNoteContentById(id: NoteInternalId, content: Note['content'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
+  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note> {
     const updatedNote = await this.noteRepository.updateNoteContentById(id, content);
 
     if (updatedNote === null) {
       throw new DomainError(`Note with id ${id} was not updated`);
-    }
-
-    if (parentPublicId !== undefined) {
-      const parentNote = await this.getNoteByPublicId(parentPublicId);
-
-      if (parentNote === null) {
-        throw new DomainError(`Incorrect parent note`);
-      }
-
-      await this.noteRelationsRepository.updateNoteRelationById(updatedNote.id, parentNote.id);
     }
 
     return updatedNote;
@@ -171,7 +160,36 @@ export default class NoteService {
    *
    * @param noteId - id of the current note
    */
-  public async getParentNoteIdByNoteId(noteId: Note['id']): Promise<number | null> {
+  public async getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null> {
     return await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
   }
+
+  /**
+   * Update note relation
+   *
+   * @param noteId - id of the current note
+   * @param parentPublicId - id of the new parent note
+   */
+  public async updateNoteRelation(noteId: NoteInternalId, parentPublicId: NotePublicId): Promise<boolean> {
+    const parentNote = await this.noteRepository.getNoteByPublicId(parentPublicId);
+
+    if (parentNote === null) {
+      throw new DomainError(`Incorrect parent note`);
+    }
+
+    let parentNoteId: number | null = parentNote.id;
+
+    /**
+     * This loop checks for cyclic reference when updating a note's parent.
+     */
+    while (parentNoteId !== null) {
+      if (parentNoteId === noteId) {
+        throw new DomainError(`Forbidden relation. Note can't be a child of own child`);
+      }
+
+      parentNoteId = await this.noteRelationsRepository.getParentNoteIdByNoteId(parentNoteId);
+    }
+
+    return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
+  };
 }

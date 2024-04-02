@@ -1,0 +1,66 @@
+name: Build and start
+
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - 'v*'
+
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-and-start:
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: codex
+          POSTGRES_DB: notes
+        ports:
+            - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    name: Build and start the app
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Change database address
+        run: |
+          sed -i "s/@postgres/@localhost/" app-config.yaml
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build
+        run: yarn build
+
+      # Start an app in the background
+      - name: Start
+        run: node dist/index.js -c app-config.yaml &
+
+      - name: Check if the app is running
+        run: |
+          sleep 5
+          response=$(curl -s http://localhost:9090/health)
+          echo "$response"
+          message=$(echo "$response" | jq -r '.message')
+          if [ "$message" = "ok" ]; then
+            echo "Application is healthy"
+          else
+            echo "Application is not healthy"
+            exit 1
+          fi

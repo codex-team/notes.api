@@ -2,15 +2,15 @@ import path from 'path';
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { insertData } from './insert-data';
+import { insertData } from './insert-data.js';
 import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import config from '@infrastructure/config/index.js';
-import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate';
+import { runTenantMigrations } from '@repository/storage/postgres/migrations/migrate.js';
 import API from '@presentation/index.js';
 
 import { beforeAll, afterAll } from 'vitest';
-import type Api from '@presentation/api.interface';
+import type Api from '@presentation/api.interface.js';
 
 import DatabaseHelpers from './database-helpers.js';
 

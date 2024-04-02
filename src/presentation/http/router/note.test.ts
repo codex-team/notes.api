@@ -159,6 +159,152 @@ describe('Note API', () => {
       }
     });
 
+    test.each([
+      /** Returns 200 and note with accessRights if user is in inherited team with role write */
+      {
+        roleInRootTeam: MemberRole.Write,
+        intermidiateTeamDefined: false,
+        expectedStatusCode: 200,
+      },
+      /** Returns 403 and 'Permission denied' message if intermediate team without user was inherited */
+      {
+        roleInRootTeam: MemberRole.Write,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: null,
+        expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
+      },
+      /** Returns 200 and note with accessRights if user is in inherited team with role read */
+      {
+        roleInRootTeam: MemberRole.Read,
+        intermidiateTeamDefined: false,
+        expectedStatusCode: 200,
+      },
+      /** Returns 403 and 'Permission denied' message if intermediate team without user was inherited */
+      {
+        roleInRootTeam: MemberRole.Read,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: null,
+        expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
+      },
+      /** Returns 403 and 'Permission denied' message if user is not in inherited team of the note */
+      {
+        roleInRootTeam: null,
+        intermidiateTeamDefined: false,
+        expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
+      },
+      /** Returns 403 and 'Permission denied' message if intermediate team without user was inherited */
+      {
+        roleInRootTeam: null,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: null,
+        expectedMessage: 'Permission denied',
+        expectedStatusCode: 403,
+      },
+      /** Returns 200 and note if user in inherited team with write role, even if root team have no such a user */
+      {
+        roleInRootTeam: null,
+        intermidiateTeamDefined: true,
+        roleInIntermidiateTeam: MemberRole.Write,
+        expectedStatusCode: 200,
+      },
+    ])
+    ('Returns note by public id with recursive access check', async ({ roleInRootTeam, expectedStatusCode, intermidiateTeamDefined, roleInIntermidiateTeam, expectedMessage }) => {
+      roleInIntermidiateTeam = roleInIntermidiateTeam ?? undefined;
+
+      /** create three users */
+      const creator = await global.db.insertUser();
+
+      const randomGuy = await global.db.insertUser();
+
+      const randomGuy2 = await global.db.insertUser();
+
+      /** create three notes */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const intermidiateNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      const rootNote = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /** create noteSettings for the note */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      /** create note relations */
+      await global.db.insertNoteRelation({
+        noteId: note.id,
+        parentId: intermidiateNote.id,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: intermidiateNote.id,
+        parentId: rootNote.id,
+      });
+
+      /** specify team for root note (randomGuy is in root team) */
+      if (roleInRootTeam !== null) {
+        await global.db.insertNoteTeam({
+          noteId: rootNote.id,
+          userId: randomGuy.id,
+          role: roleInRootTeam,
+        });
+      }
+
+      /** specify team for intermidiateNote */
+      if (intermidiateTeamDefined) {
+        await global.db.insertNoteTeam({
+          noteId: intermidiateNote.id,
+          userId: randomGuy2.id,
+          role: MemberRole.Write,
+        });
+      }
+      if (roleInIntermidiateTeam !== undefined) {
+        await global.db.insertNoteTeam({
+          noteId: intermidiateNote.id,
+          userId: randomGuy.id,
+          role: roleInIntermidiateTeam,
+        });
+      }
+
+      /** Compute canEdit variable */
+
+      const canEdit = (intermidiateTeamDefined === true && roleInIntermidiateTeam === MemberRole.Write) || (intermidiateTeamDefined === false && roleInRootTeam === MemberRole.Write);
+
+      const accessToken = await global.auth(randomGuy.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(expectedStatusCode);
+
+      if (expectedMessage !== undefined) {
+        expect(response?.json().message).toStrictEqual(expectedMessage);
+      } else {
+        expect(response?.json()).toMatchObject({ 'note': {
+          'id': note.publicId,
+        },
+        'accessRights': {
+          'canEdit': canEdit,
+        },
+        });
+      }
+    });
+
     test('Returns note and parent note by note public id with 200 status', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
@@ -769,7 +915,7 @@ describe('Note API', () => {
       }
     });
 
-    test('Returns 200 and true when note was successfully unlinked', async () => {
+    test('Returns 200 and isUpdated=true when note was successfully unlinked', async () => {
       /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
@@ -843,6 +989,157 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(406);
 
       expect(response?.json().message).toStrictEqual('Note not found');
+    });
+  });
+
+  describe('PATCH /note/:notePublicId/relation', () => {
+    let accessToken = '';
+    let user: User;
+
+    beforeEach(async () => {
+      /** create test user */
+      user = await global.db.insertUser();
+
+      accessToken = global.auth(user.id);
+    });
+    test('Returns 200 and isUpdated=true when parent was successfully updated', async () => {
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test note, that will be new parent for the child note */
+      const newParentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create note settings for child note*/
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      /* create test relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: newParentNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().isUpdated).toBe(true);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.json().parentNote.id).toBe(newParentNote.publicId);
+    });
+
+    test('Returns 400 when parent is the same as child', async () => {
+      /* create test child note*/
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note*/
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test note relation*/
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: childNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
+    });
+
+    test('Return 400 when parent note does not exist', async () => {
+      const nonExistentParentId = '47L43yY7dp';
+
+      const childNote= await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: nonExistentParentId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual('Incorrect parent note');
+    });
+
+    test('Return 400 when circular reference occurs', async () => {
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: childNote.publicId,
+        },
+        url: `/note/${parentNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
     });
   });
 });

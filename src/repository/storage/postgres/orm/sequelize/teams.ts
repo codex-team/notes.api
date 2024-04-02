@@ -176,24 +176,6 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
-   * Get user role by user id and note id
-   * If user is not a member of note, return null
-   *
-   * @param userId - user id to check his role
-   * @param noteId - note id where user should have role
-   */
-  public async getUserRoleByUserIdAndNoteId(userId: User['id'], noteId: NoteInternalId): Promise<MemberRole | undefined> {
-    const res = await this.model.findOne({
-      where: {
-        userId,
-        noteId,
-      },
-    });
-
-    return res?.role ?? undefined;
-  }
-
-  /**
    * Get all team members by note id
    *
    * @param noteId - note id to get all team members
@@ -213,7 +195,7 @@ export default class TeamsSequelizeStorage {
    * @param noteId - note id to get all team members
    * @returns team with additional info
    */
-  public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
+  public async getTeamMembersWithUserInfoByNoteId(noteId: NoteInternalId): Promise<Team> {
     if (!this.userModel) {
       throw new DomainError('User model not initialized');
     }

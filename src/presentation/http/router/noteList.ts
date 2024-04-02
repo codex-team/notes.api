@@ -1,7 +1,7 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteListService from '@domain/service/noteList.js';
 import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
-import type { NoteListPublic } from '@domain/entities/noteList';
+import type { NoteListPublic } from '@domain/entities/noteList.js';
 
 
 /**
