@@ -1,7 +1,7 @@
 import hasProperty from '@infrastructure/utils/hasProperty.js';
 import type { PolicyContext } from '../types/PolicyContext.js';
 import { isEmpty, notEmpty } from '@infrastructure/utils/empty.js';
-import type { NoteInternalId } from '@domain/entities/note.js';
+import type UploadedFile from '@domain/entities/file.js';
 import { FileTypes } from '@domain/entities/file.js';
 
 /**
@@ -14,29 +14,37 @@ export default async function userCanReadFileData(context: PolicyContext): Promi
   const { request, reply, domainServices } = context;
   const { userId } = request;
 
-  let noteId: NoteInternalId | null = null;
+  let fileType: FileTypes;
+  let key: UploadedFile['key'];
 
   /**
-   * Get note id by file key if file is a part of note
+   * Check that key and type are provided
    */
-  if (hasProperty(request.params, 'key') && notEmpty(request.params.key) ) {
-    noteId = await domainServices.fileUploaderService.getNoteIdByFileKeyAndType(request.params.key as string, FileTypes.noteAttachment);
+  if (hasProperty(request.params, 'key') && notEmpty(request.params.key) && hasProperty(request.params, 'type') && notEmpty(request.params.key)) {
+    fileType = request.params.type as FileTypes;
+    key = request.params.key as UploadedFile['key'];
   } else {
-    return await reply.notAcceptable('Key not provided');
+    return await reply.notAcceptable('Key or type not provided');
   }
 
   /**
-   * If note id is not resolved, we have no need to check permissions
+   * Check if passed type is note attachement and check user rights
    */
-  if (notEmpty(noteId)) {
-    const noteSettings = await domainServices.noteSettingsService.getNoteSettingsByNoteId(noteId);
+  if (fileType === FileTypes.NoteAttachment) {
+    const fileLocation = await domainServices.fileUploaderService.getFileLocationByKey(fileType, key);
+
+    if (fileLocation === null) {
+      return await reply.notFound('File with such key and type not found');
+    }
+
+    const noteSettings = await domainServices.noteSettingsService.getNoteSettingsByNoteId(fileLocation.noteId);
 
     if (noteSettings.isPublic === false) {
       if (isEmpty(userId)) {
         return await reply.unauthorized();
       }
 
-      const memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, noteId);
+      const memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(userId, fileLocation.noteId);
 
       if (isEmpty(memberRole)) {
         return await reply.forbidden();

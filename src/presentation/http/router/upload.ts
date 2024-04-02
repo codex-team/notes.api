@@ -71,9 +71,10 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
 
   fastify.get<{
     Params: {
+      type: string;
       key: string;
     }
-    }>('/:key', {
+    }>('/:type/:key', {
       config: {
         policy: [
           'authRequired',

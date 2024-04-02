@@ -7,7 +7,7 @@ import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import mime from 'mime';
-import { isEmpty } from '@infrastructure/utils/empty';
+import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * File data for upload
@@ -115,18 +115,13 @@ export default class FileUploaderService {
 
   /**
    * Get file location by key and type
+   * Returns null if where is no such file
    *
    * @param type - file type
    * @param key - file unique key
    */
-  public async getFileLocationByKey<T extends FileTypes>(type: T, key: UploadedFile['key']): Promise<ComputedLocation<T>> {
-    const location = await this.fileRepository.getFileLocationByKey(type, key);
-
-    if (isEmpty(location)) {
-      throw new DomainError('There is not file with passed key and type');
-    }
-
-    return location;
+  public async getFileLocationByKey<T extends FileTypes>(type: T, key: UploadedFile['key']): Promise<ComputedLocation<T> | null> {
+    return await this.fileRepository.getFileLocationByKey(type, key);
   }
 
   /**
