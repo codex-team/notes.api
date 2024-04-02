@@ -28,7 +28,7 @@ interface UploadFileData {
 }
 
 /**
- * File upload metadata
+ * Additional data about the uploaded file
  */
 interface Metadata {
   /**
@@ -67,7 +67,7 @@ export default class FileUploaderService {
    *
    * @param type - file type
    * @param fileData - file data, including file data, name and mimetype
-   * @param location - file location, for now only note id, if file is a part of note
+   * @param location - file location depending on type
    * @param metadata - file metadata, including user id who uploaded the file
    */
   public async uploadFile<Type extends FileTypes>(type: Type, fileData: UploadFileData, location: ComputedLocation<Type>, metadata: Metadata): Promise<string> {
