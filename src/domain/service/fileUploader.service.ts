@@ -1,4 +1,4 @@
-import type { FileData, ComputedLocation } from '@domain/entities/file.js';
+import type { FileData, ComputedLocation, Location, NoteAttachmentFileLocation } from '@domain/entities/file.js';
 import { FileTypes } from '@domain/entities/file.js';
 import type User from '@domain/entities/user.js';
 import { createFileId } from '@infrastructure/utils/id.js';
@@ -6,6 +6,8 @@ import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import mime from 'mime';
+import { Location } from 'aws-sdk';
+import { isEmpty } from '@infrastructure/utils/empty';
 
 /**
  * File data for upload
@@ -69,6 +71,8 @@ export default class FileUploaderService {
    * @param metadata - file metadata, including user id who uploaded the file
    */
   public async uploadFile<Type extends FileTypes>(type: Type, fileData: UploadFileData, location: ComputedLocation<Type>, metadata: Metadata): Promise<string> {
+    this.validateLocation(type, location);
+
     const fileHash = createFileId();
 
     /**
@@ -130,6 +134,25 @@ export default class FileUploaderService {
     }
 
     return fileData;
+  }
+
+
+  /**
+   * Validate file location due to passed file type
+   *
+   * @param type - passed file type
+   * @param location - location object to check
+   */
+  private validateLocation(type: FileTypes, location: Location): void {
+    switch (type) {
+      /**
+       * Check location, if file is note attachment, noteId is required
+       */
+      case FileTypes.NoteAttachment:
+        if (isEmpty((location as NoteAttachmentFileLocation).noteId)) {
+          throw new DomainError('Invalid location for passed file type');
+        }
+    };
   }
 
   /**
