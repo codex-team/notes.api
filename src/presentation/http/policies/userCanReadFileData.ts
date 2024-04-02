@@ -20,7 +20,7 @@ export default async function userCanReadFileData(context: PolicyContext): Promi
   /**
    * Check that key and type are provided
    */
-  if (hasProperty(request.params, 'key') && notEmpty(request.params.key) && hasProperty(request.params, 'type') && notEmpty(request.params.key)) {
+  if (hasProperty(request.params, 'key') && notEmpty(request.params.key) && hasProperty(request.params, 'type') && notEmpty(request.params.type)) {
     fileType = request.params.type as FileTypes;
     key = request.params.key as UploadedFile['key'];
   } else {
