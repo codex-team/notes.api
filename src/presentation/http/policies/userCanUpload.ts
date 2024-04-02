@@ -8,7 +8,7 @@ import { MemberRole } from '@domain/entities/team.js';
  *
  * @param context - Context object, containing Fatify request, Fastify reply and domain services
  */
-export default async function userCanUploadFileToNote(context: PolicyContext): Promise<void> {
+export default async function userCanUploadFile(context: PolicyContext): Promise<void> {
   const { request, reply, domainServices } = context;
   const { userId } = request;
   const { note } = request;
