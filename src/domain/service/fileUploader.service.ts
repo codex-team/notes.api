@@ -1,4 +1,4 @@
-import type { FileData, FileLocation } from '@domain/entities/file.js';
+import type { FileData, ComputedLocation } from '@domain/entities/file.js';
 import { FileTypes } from '@domain/entities/file.js';
 import type User from '@domain/entities/user.js';
 import { createFileId } from '@infrastructure/utils/id.js';
@@ -68,7 +68,7 @@ export default class FileUploaderService {
    * @param location - file location, for now only note id, if file is a part of note
    * @param metadata - file metadata, including user id who uploaded the file
    */
-  public async uploadFile(type: FileTypes, fileData: UploadFileData, location: FileLocation, metadata: Metadata): Promise<string> {
+  public async uploadFile<Type extends FileTypes>(type: Type, fileData: UploadFileData, location: ComputedLocation<Type>, metadata: Metadata): Promise<string> {
     const fileHash = createFileId();
 
     /**

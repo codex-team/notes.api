@@ -32,7 +32,12 @@ export type NoteAttachmentFileLocation = {
 /**
  * Possible file location
  */
-export type FileLocation = TestFileLocation | NoteAttachmentFileLocation;
+export type Location = TestFileLocation | NoteAttachmentFileLocation;
+
+/**
+ * File location type, wich depends on file type
+ */
+export type ComputedLocation<Type extends FileTypes> = Type extends FileTypes.NoteAttachment ? NoteAttachmentFileLocation : TestFileLocation;
 
 /**
  * Interface representing a file entity
@@ -81,7 +86,7 @@ export default interface UploadedFile {
   /**
    * Object, which stores information about file location
    */
-  location: FileLocation;
+  location: Location;
 }
 
 /**
