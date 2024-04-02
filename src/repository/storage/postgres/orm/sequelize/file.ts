@@ -3,7 +3,7 @@ import { DataTypes, Model } from 'sequelize';
 import type User from '@domain/entities/user.js';
 import { UserModel } from './user.js';
 import type UploadedFile from '@domain/entities/file.js';
-import type { FileCreationAttributes, FileLocation, FileTypes } from '@domain/entities/file.js';
+import type { ComputedLocation, FileCreationAttributes, FileTypes, Location } from '@domain/entities/file.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 
 /**
@@ -53,7 +53,7 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   /**
    * Object, which stores information about file location
    */
-  public declare location: FileLocation;
+  public declare location: Location;
 }
 
 /**
@@ -150,5 +150,26 @@ export default class FileSequelizeStorage {
         key,
       },
     });
+  }
+
+  /**
+   * Get file location by key and type
+   *
+   * @param type - file type
+   * @param key - file unique key
+   */
+  public async getFileLocationByKey<T extends FileTypes>(type: T, key: UploadedFile['key']): Promise<ComputedLocation<T> | null> {
+    const res = await this.model.findOne({
+      where: {
+        key,
+        type,
+      },
+    });
+
+    if (res === null) {
+      return null;
+    }
+
+    return res.location as ComputedLocation<T>;
   }
 }

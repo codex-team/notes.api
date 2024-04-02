@@ -1,4 +1,5 @@
 import type { FileData, ComputedLocation, Location, NoteAttachmentFileLocation } from '@domain/entities/file.js';
+import type UploadedFile from '@domain/entities/file.js';
 import { FileTypes } from '@domain/entities/file.js';
 import type User from '@domain/entities/user.js';
 import { createFileId } from '@infrastructure/utils/id.js';
@@ -6,7 +7,6 @@ import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import mime from 'mime';
-import { Location } from 'aws-sdk';
 import { isEmpty } from '@infrastructure/utils/empty';
 
 /**
@@ -111,6 +111,22 @@ export default class FileUploaderService {
     }
 
     return file.key;
+  }
+
+  /**
+   * Get file location by key and type
+   *
+   * @param type - file type
+   * @param key - file unique key
+   */
+  public async getFileLocationByKey<T extends FileTypes>(type: T, key: UploadedFile['key']): Promise<ComputedLocation<T>> {
+    const location = await this.fileRepository.getFileLocationByKey(type, key);
+
+    if (isEmpty(location)) {
+      throw new DomainError('There is not file with passed key and type');
+    }
+
+    return location;
   }
 
   /**

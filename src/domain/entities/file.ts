@@ -1,4 +1,4 @@
-import type { NoteInternalId } from './note.js';
+import type { NotePublicId } from './note.js';
 import type User from './user.js';
 import type { Buffer } from 'buffer';
 
@@ -26,7 +26,7 @@ export type TestFileLocation = Record<never, never>;
  * File location, when it is a part of note
  */
 export type NoteAttachmentFileLocation = {
-  noteId: NoteInternalId,
+  noteId: NotePublicId,
 };
 
 /**

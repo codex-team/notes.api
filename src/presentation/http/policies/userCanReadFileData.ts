@@ -19,7 +19,7 @@ export default async function userCanReadFileData(context: PolicyContext): Promi
   /**
    * Get note id by file key if file is a part of note
    */
-  if (hasProperty(request.params, 'key') && notEmpty(request.params.key)) {
+  if (hasProperty(request.params, 'key') && notEmpty(request.params.key) ) {
     noteId = await domainServices.fileUploaderService.getNoteIdByFileKeyAndType(request.params.key as string, FileTypes.noteAttachment);
   } else {
     return await reply.notAcceptable('Key not provided');

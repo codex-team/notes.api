@@ -1,5 +1,5 @@
 import type UploadedFile from '@domain/entities/file.js';
-import type { FileCreationAttributes } from '@domain/entities/file.js';
+import type { ComputedLocation, FileCreationAttributes, FileTypes } from '@domain/entities/file.js';
 import type FileStorage from './storage/file.storage.js';
 
 /**
@@ -34,4 +34,14 @@ export default class FileRepository {
   public async insert(fileData: FileCreationAttributes): Promise<UploadedFile> {
     return await this.storage.insertFile(fileData);
   }
+
+  /**
+   * Get file location by key and type
+   *
+   * @param type - file type
+   * @param key - file unique key
+   */
+  public async getFileLocationByKey<T extends FileTypes>(type: T, key: UploadedFile['key']): Promise<ComputedLocation<T> | null> {
+    return await this.storage.getFileLocationByKey(type, key);
+  };
 }
