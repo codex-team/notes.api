@@ -1,6 +1,6 @@
 import type { FileLocation, FileType } from '@domain/entities/file.js';
 import type FileUploaderService from '@domain/service/fileUploader.service.js';
-import type { MultipartFile, MultipartValue } from '@fastify/multipart';
+import { fastifyMultipart, type MultipartFile, type MultipartValue } from '@fastify/multipart';
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 
@@ -17,10 +17,22 @@ interface UploadRouterOptions {
    * Note service instance
    */
   noteService: NoteService;
+
+  /**
+   * Limit for uploaded files size
+   */
+  fileSizeLimit: number;
 }
 
 const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts, done) => {
   const { fileUploaderService } = opts;
+
+  void fastify.register(fastifyMultipart, {
+    limits: {
+      fieldSize: opts.fileSizeLimit,
+    },
+    attachFieldsToBody: true,
+  });
 
   fastify.post<{
     Body: {

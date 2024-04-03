@@ -28,7 +28,6 @@ import { EditorToolSchema } from './schema/EditorTool.js';
 import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
 import { DomainError } from '@domain/entities/DomainError.js';
-import fastifyMultipart from '@fastify/multipart';
 import UploadRouter from './router/upload.js';
 
 
@@ -79,7 +78,6 @@ export default class HttpApi implements Api {
     await this.addOpenapiUI();
     await this.addOauth2();
     await this.addCORS();
-    await this.addMultiPart();
 
     this.addCommonMiddlewares(domainServices);
 
@@ -190,18 +188,6 @@ export default class HttpApi implements Api {
   }
 
   /**
-   * Adds support for multipart requests
-   */
-  private async addMultiPart(): Promise<void> {
-    await this.server?.register(fastifyMultipart, {
-      limits: {
-        fieldSize: this.config.fileSizeLimit,
-      },
-      attachFieldsToBody: true,
-    });
-  }
-
-  /**
    * Registers all routers
    *
    * @param domainServices - instances of domain services
@@ -261,6 +247,7 @@ export default class HttpApi implements Api {
       prefix: '/upload',
       fileUploaderService: domainServices.fileUploaderService,
       noteService: domainServices.noteService,
+      fileSizeLimit: this.config.fileSizeLimit,
     });
   }
 
