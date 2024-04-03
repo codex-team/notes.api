@@ -160,7 +160,7 @@ export default class FileUploaderService {
        * Check location, if file is note attachment, noteId is required
        */
       case FileTypes.NoteAttachment:
-        if (isEmpty((location as NoteAttachmentFileLocation).noteId)) {
+        if (isEmpty(location.noteId)) {
           throw new DomainError('Invalid location for passed file type');
         }
     };

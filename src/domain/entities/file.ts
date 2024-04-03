@@ -5,7 +5,7 @@ import type { Buffer } from 'buffer';
 /**
  * File types for storing in object storage
  */
-export enum FileTypes {
+export enum FileType {
   /**
    * Type for testing uploads
    */
@@ -32,7 +32,7 @@ export type NoteAttachmentFileLocation = {
 /**
  * Possible file location
  */
-export type Location = TestFileLocation | NoteAttachmentFileLocation;
+export type FileLocation = TestFileLocation | NoteAttachmentFileLocation;
 
 /**
  * File location type, wich depends on file type
