@@ -2,7 +2,7 @@ import hasProperty from '@infrastructure/utils/hasProperty.js';
 import type { PolicyContext } from '../types/PolicyContext.js';
 import { isEmpty, notEmpty } from '@infrastructure/utils/empty.js';
 import type UploadedFile from '@domain/entities/file.js';
-import { FileTypes } from '@domain/entities/file.js';
+import { FileType } from '@domain/entities/file.js';
 
 /**
  * Policy to check does user have permission to access file data,
@@ -14,14 +14,14 @@ export default async function userCanReadFileData(context: PolicyContext): Promi
   const { request, reply, domainServices } = context;
   const { userId } = request;
 
-  let fileType: FileTypes;
+  let fileType: FileType;
   let key: UploadedFile['key'];
 
   /**
    * Check that key and type are provided
    */
   if (hasProperty(request.params, 'key') && notEmpty(request.params.key) && hasProperty(request.params, 'type') && notEmpty(request.params.type)) {
-    fileType = request.params.type as FileTypes;
+    fileType = request.params.type as FileType;
     key = request.params.key as UploadedFile['key'];
   } else {
     return await reply.notAcceptable('Key or type not provided');
@@ -30,7 +30,7 @@ export default async function userCanReadFileData(context: PolicyContext): Promi
   /**
    * Check if passed type is note attachement and check user rights
    */
-  if (fileType === FileTypes.NoteAttachment) {
+  if (fileType === FileType.NoteAttachment) {
     const fileLocation = await domainServices.fileUploaderService.getFileLocationByKey(fileType, key);
 
     if (fileLocation === null) {

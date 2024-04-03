@@ -1,6 +1,6 @@
-import type { FileData, ComputedLocation, Location, NoteAttachmentFileLocation } from '@domain/entities/file.js';
+import type { FileData, NoteAttachmentFileLocation, FileLocationByType } from '@domain/entities/file.js';
 import type UploadedFile from '@domain/entities/file.js';
-import { FileTypes } from '@domain/entities/file.js';
+import { FileType } from '@domain/entities/file.js';
 import type User from '@domain/entities/user.js';
 import { createFileId } from '@infrastructure/utils/id.js';
 import type FileRepository from '@repository/file.repository.js';
@@ -70,7 +70,7 @@ export default class FileUploaderService {
    * @param location - file location depending on type
    * @param metadata - file metadata, including user id who uploaded the file
    */
-  public async uploadFile<Type extends FileTypes>(type: Type, fileData: UploadFileData, location: ComputedLocation<Type>, metadata: Metadata): Promise<string> {
+  public async uploadFile<Type extends FileType>(type: Type, fileData: UploadFileData, location: FileLocationByType[Type], metadata: Metadata): Promise<string> {
     this.validateLocation(type, location);
 
     const fileHash = createFileId();
@@ -120,7 +120,7 @@ export default class FileUploaderService {
    * @param type - file type
    * @param key - file unique key
    */
-  public async getFileLocationByKey<T extends FileTypes>(type: T, key: UploadedFile['key']): Promise<ComputedLocation<T> | null> {
+  public async getFileLocationByKey<T extends FileType>(type: T, key: UploadedFile['key']): Promise<FileLocationByType[T] | null> {
     return await this.fileRepository.getFileLocationByKey(type, key);
   }
 
@@ -154,13 +154,15 @@ export default class FileUploaderService {
    * @param type - passed file type
    * @param location - location object to check
    */
-  private validateLocation<Type extends FileType>(type: Type, location: FileLocationByType<Type>): void {
+  private validateLocation<Type extends FileType>(type: Type, location: FileLocationByType[Type]): void {
     switch (type) {
       /**
        * Check location, if file is note attachment, noteId is required
        */
-      case FileTypes.NoteAttachment:
-        if (isEmpty(location.noteId)) {
+      case FileType.NoteAttachment:
+        const noteAttachmentLocation = location as NoteAttachmentFileLocation;
+
+        if (isEmpty(noteAttachmentLocation.noteId)) {
           throw new DomainError('Invalid location for passed file type');
         }
     };
@@ -171,11 +173,11 @@ export default class FileUploaderService {
    *
    * @param fileType - file type
    */
-  private defineBucketByFileType(fileType: FileTypes): string {
+  private defineBucketByFileType(fileType: FileType): string {
     switch (fileType) {
-      case FileTypes.Test:
+      case FileType.Test:
         return 'test';
-      case FileTypes.NoteAttachment:
+      case FileType.NoteAttachment:
         return 'note-attachment';
       default:
         throw new DomainError('Unknown file type');

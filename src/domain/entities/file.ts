@@ -37,7 +37,10 @@ export type FileLocation = TestFileLocation | NoteAttachmentFileLocation;
 /**
  * File location type, wich depends on file type
  */
-export type ComputedLocation<Type extends FileTypes> = Type extends FileTypes.NoteAttachment ? NoteAttachmentFileLocation : TestFileLocation;
+export interface FileLocationByType {
+  [FileType.Test]: TestFileLocation,
+  [FileType.NoteAttachment]: NoteAttachmentFileLocation,
+}
 
 /**
  * Interface representing a file entity
@@ -71,7 +74,7 @@ export default interface UploadedFile {
   /**
    * File type, using to store in object storage
    */
-  type: FileTypes;
+  type: FileType;
 
   /**
    * File size in bytes
@@ -86,7 +89,7 @@ export default interface UploadedFile {
   /**
    * Object, which stores information about file location
    */
-  location: Location;
+  location: FileLocation;
 }
 
 /**

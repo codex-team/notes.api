@@ -1,4 +1,4 @@
-import type { FileTypes, Location } from '@domain/entities/file.js';
+import type { FileLocation, FileType } from '@domain/entities/file.js';
 import type FileUploaderService from '@domain/service/fileUploader.service.js';
 import type { MultipartFile, MultipartValue } from '@fastify/multipart';
 import type { FastifyPluginCallback } from 'fastify';
@@ -32,12 +32,12 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
       /**
        * File type
        */
-      type: MultipartValue<FileTypes>;
+      type: MultipartValue<FileType>;
 
       /**
        * Note public id, if file is related to a note
        */
-      location: MultipartValue<Location>;
+      location: MultipartValue<FileLocation>;
     }
   }>('/', {
     config: {
