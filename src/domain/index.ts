@@ -1,5 +1,4 @@
 import NoteService from '@domain/service/note.js';
-import NoteListService from '@domain/service/noteList.js';
 import NoteSettingsService from './service/noteSettings.js';
 import type { Repositories } from '@repository/index.js';
 import AuthService from '@domain/service/auth.js';
@@ -18,11 +17,6 @@ export interface DomainServices {
    * Note service instance
    */
   noteService: NoteService,
-
-  /**
-   * Note List service instance
-   */
-  noteListService: NoteListService,
 
   /**
    * Note settings service instance
@@ -67,9 +61,7 @@ export interface DomainServices {
  * @param appConfig - app config
  */
 export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
-  const noteListService = new NoteListService(repositories.noteRepository);
   const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository);
-  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
 
   const authService = new AuthService(
     appConfig.auth.accessSecret,
@@ -77,6 +69,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     appConfig.auth.refreshExpiresIn,
     repositories.userSessionRepository
   );
+  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
 
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
 
@@ -97,7 +90,6 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   return {
     fileUploaderService,
     noteService,
-    noteListService,
     noteSettingsService,
     userService,
     authService,

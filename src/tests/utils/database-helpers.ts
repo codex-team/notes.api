@@ -7,6 +7,7 @@ import type UserSession from '@domain/entities/userSession.ts';
 import type NoteSettings from '@domain/entities/noteSettings.ts';
 import type { TeamMember } from '@domain/entities/team.ts';
 import type EditorTool from '@domain/entities/editorTools.ts';
+import type NoteVisit from '@domain/entities/noteVisit.js';
 import { nanoid } from 'nanoid';
 
 /**
@@ -65,6 +66,15 @@ type NoteRelationMockCreationAttributes = {
 type EditorToolMockCreationAttributes = Omit<EditorTool, 'id'>;
 
 /**
+ * default type for note visit mock creation attributes
+ */
+type NoteVisitCreationAttributes = {
+  noteId: NoteVisit['noteId'],
+  userId: NoteVisit['userId'],
+  visitedAt?: NoteVisit['visitedAt'],
+};
+
+/**
  * class with database helper functions which are inserting mocks into database
  */
 export default class DatabaseHelpers {
@@ -102,8 +112,7 @@ export default class DatabaseHelpers {
     const content = note.content ?? '{}';
     const publicId = note.publicId ?? createPublicId();
 
-    // eslint-disable-next-line
-    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id")
+    const [results, _] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id")
     VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}')
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
@@ -138,8 +147,7 @@ export default class DatabaseHelpers {
     const name = user?.name ?? `CodeX-${randomPart}`;
     const email = user?.email ?? `${randomPart}@codexmail.com`;
 
-    // eslint-disable-next-line
-    const [results, metadata] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
+    const [results, _] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
     VALUES ('${email}', '${name}', CURRENT_DATE, '${editorTools}'::jsonb)
     RETURNING "id", "email", "name", "editor_tools" AS "editorTools", "created_at" AS "createdAt", "photo"`,
     {
@@ -219,7 +227,7 @@ export default class DatabaseHelpers {
   public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorTool['id']> {
     const isDefault = editorTool.isDefault ?? false;
 
-    // eslint-disable-next-line
+
     const [result, _] = await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default")
     VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${JSON.stringify(editorTool.source)}', ${isDefault})
     RETURNING "id"`);
@@ -227,6 +235,31 @@ export default class DatabaseHelpers {
     const addedToolData = result[0];
 
     return String(addedToolData.id);
+  }
+
+  /**
+   * Inserts note visit mock into db
+   *
+   * @param visit object which contain all info about noteVisit (visitedAt is optional)
+   *
+   * if no visitedAt passed, then visited_at would have CURRENT_DATE value
+   */
+  public async insertNoteVisit(visit: NoteVisitCreationAttributes): Promise<NoteVisit> {
+    const visitedAt = visit.visitedAt ?? 'NOW()';
+
+
+    const [results, _] = await this.orm.connection.query(`INSERT INTO public.note_visits ("user_id", "note_id", "visited_at")
+    VALUES (${visit.userId}, ${visit.noteId}, ${visitedAt})
+    RETURNING "user_id" AS "userId", "note_id" AS "noteId", "visited_at" AS "visitedAt"`,
+    {
+      type: QueryTypes.INSERT,
+      returning: true,
+      omitNull: true,
+    });
+
+    const createdVisit = results[0];
+
+    return createdVisit;
   }
 
   /**

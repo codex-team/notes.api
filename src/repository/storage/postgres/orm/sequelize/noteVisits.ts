@@ -7,7 +7,6 @@ import { NoteModel } from './note.js';
 import { UserModel } from './user.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
 
-
 /**
  *
  */
@@ -18,7 +17,7 @@ export class NoteVisitsModel extends Model<InferAttributes<NoteVisitsModel>, Inf
 
   public declare userId: NoteVisit['userId'];
 
-  public declare visitedAt: NoteVisit['visitedAt'];
+  public declare visitedAt: CreationOptional<NoteVisit['visitedAt']>;
 }
 
 /**
@@ -71,6 +70,10 @@ export default class NoteVisitsSequelizeStorage {
     }, {
       tableName: this.tableName,
       sequelize: this.database,
+      /**
+       * Disable auto-generated created_at and updated_at since we use own visited_at
+       */
+      timestamps: false,
     });
   };
 
@@ -118,7 +121,6 @@ export default class NoteVisitsSequelizeStorage {
     const [recentVisit, _] = await this.model.upsert({
       noteId,
       userId,
-      visitedAt: 'CURRENT TIME',
     }, {
       conflictWhere: {
         noteId,
