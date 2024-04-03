@@ -71,8 +71,7 @@ export default class NoteVisitsSequelizeStorage {
       tableName: this.tableName,
       sequelize: this.database,
       /**
-       * Auto-generated timestamp attributes would be removed from the model
-       * (e.g. auto-generated created_at field conflicts with note.created_at when noteVisitModel is included)
+       * Disable auto-generated created_at and updated_at since we use own visited_at
        */
       timestamps: false,
     });
