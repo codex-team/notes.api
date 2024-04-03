@@ -117,7 +117,6 @@ export default class NoteVisitsSequelizeStorage {
      * If user has already visited note, then existing record will be updated
      * If user is visiting note for the first time, new record will be created
      */
-    /* eslint-disable-next-line */
     const [recentVisit, _] = await this.model.upsert({
       noteId,
       userId,
@@ -130,5 +129,24 @@ export default class NoteVisitsSequelizeStorage {
     });
 
     return recentVisit;
+  }
+
+  /**
+   * Deletes all visits of the note when a note is deleted
+   *
+   * @param noteId - note internal id
+   */
+  public async deleteNoteVisits(noteId: NoteInternalId): Promise<boolean> {
+    const deletedNoteVisits = await this.model.destroy({
+      where: {
+        noteId,
+      },
+    });
+
+    if (deletedNoteVisits) {
+      return true;
+    }
+
+    return false;
   }
 }

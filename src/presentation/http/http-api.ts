@@ -195,6 +195,7 @@ export default class HttpApi implements Api {
     await this.server?.register(NoteRouter, {
       prefix: '/note',
       noteService: domainServices.noteService,
+      noteVisitsService: domainServices.noteVisitsService,
       noteSettingsService: domainServices.noteSettingsService,
     });
 
