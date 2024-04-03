@@ -7,7 +7,7 @@ import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import mime from 'mime';
-import { isEmpty } from '@infrastructure/utils/empty.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * File data for upload
@@ -162,10 +162,11 @@ export default class FileUploaderService {
       case FileType.NoteAttachment:
         const noteAttachmentLocation = location as NoteAttachmentFileLocation;
 
-        if (isEmpty(noteAttachmentLocation.noteId)) {
-          throw new DomainError('Invalid location for passed file type');
+        if (notEmpty(noteAttachmentLocation.noteId)) {
+          return;
         }
     };
+    throw new DomainError('Invalid location for passed file type');
   }
 
   /**
