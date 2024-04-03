@@ -2,8 +2,8 @@ import { isEmpty, notEmpty } from '@infrastructure/utils/empty.js';
 import type { PolicyContext } from '../types/PolicyContext.js';
 import { MemberRole } from '@domain/entities/team.js';
 import hasProperty from '@infrastructure/utils/hasProperty.js';
-import type { Location } from '@domain/entities/file.js';
-import { FileTypes } from '@domain/entities/file.js';
+import type { FileLocation } from '@domain/entities/file.js';
+import { FileType } from '@domain/entities/file.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 
 /**
@@ -16,8 +16,8 @@ export default async function userCanUploadFile(context: PolicyContext): Promise
   const { request, reply, domainServices } = context;
   const { userId } = request;
 
-  let fileType: FileTypes;
-  let location: Location;
+  let fileType: FileType;
+  let location: FileLocation;
 
   /**
    * User must be authorized to upload files
@@ -30,8 +30,8 @@ export default async function userCanUploadFile(context: PolicyContext): Promise
    * Check that key and type are provided
    */
   if (hasProperty(request.body, 'type') && notEmpty(request.body.type) && hasProperty(request.body, 'location') && notEmpty(request.body.location)) {
-    fileType = request.body.type as FileTypes;
-    location = request.body.location as Location;
+    fileType = request.body.type as FileType;
+    location = request.body.location as FileLocation;
   } else {
     return await reply.notAcceptable('File type or location not provided');
   }
@@ -39,7 +39,7 @@ export default async function userCanUploadFile(context: PolicyContext): Promise
   /**
    * If file type is note attachement, check user permission for editing note
    */
-  if (fileType === FileTypes.NoteAttachment) {
+  if (fileType === FileType.NoteAttachment) {
     if (hasProperty(location, 'noteId')) {
       let note: Note;
 
