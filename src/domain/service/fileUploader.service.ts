@@ -154,7 +154,7 @@ export default class FileUploaderService {
    * @param type - passed file type
    * @param location - location object to check
    */
-  private validateLocation(type: FileTypes, location: Location): void {
+  private validateLocation<Type extends FileType>(type: Type, location: FileLocationByType<Type>): void {
     switch (type) {
       /**
        * Check location, if file is note attachment, noteId is required
