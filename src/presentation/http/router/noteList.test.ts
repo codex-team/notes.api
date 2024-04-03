@@ -1,8 +1,4 @@
 import { describe, test, expect, beforeEach } from 'vitest';
-import type User from '@domain/entities/user.js';
-
-let accessToken = '';
-let user: User;
 
 beforeEach(async () => {
   /**
@@ -12,152 +8,134 @@ beforeEach(async () => {
    * @todo get rid of restarting database data in tests (move to beforeEach)
    */
   await global.db.truncateTables();
-
-  /** create test user */
-  user = await global.db.insertUser();
-
-  accessToken = global.auth(user.id);
 });
-describe('GET /note/note-list?page', () => {
-  test('Returns noteList with specified length (not for last page)', async () => {
-    const portionSize = 30;
-    const pageNumber = 1;
-
-    /** create test notes for created user */
-    for (let i = 0; i < portionSize + 1; i++) {
-      const note = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
-      await global.db.insertNoteVisit({
-        userId: user.id,
-        noteId: note.id,
-      });
-    }
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      url: `/notes?page=${pageNumber}`,
-    });
-
-    expect(response?.statusCode).toBe(200);
-
-    expect(response?.json().items).toHaveLength(portionSize);
-  });
-
-  test('Returns noteList with specified length (for last page)', async () => {
-    const portionSize = 19;
-    const pageNumber = 2;
-    let note;
-
-    /** create test notes for created user */
-    for (let i = 0; i < portionSize + 30; i++) {
-      note = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
-      await global.db.insertNoteVisit({
-        userId: user.id,
-        noteId: note.id,
-      });
-    }
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      url: `/notes?page=${pageNumber}`,
-    });
-
-    expect(response?.statusCode).toBe(200);
-
-    expect(response?.json().items).toHaveLength(portionSize);
-  });
-
-  test('Returns noteList with no items if there are no notes', async () => {
-    const pageNumber = 3;
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      url: `/notes?page=${pageNumber}`,
-    });
-
-    expect(response?.statusCode).toBe(200);
-
-    const noteList = response?.json();
-
-    expect(noteList).toEqual( { items : [] } );
-    expect(noteList.items).toHaveLength(0);
-  });
-
-  test('Returns 400 when page < 0', async () => {
-    const pageNumber = 0;
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      url: `/notes?page=${pageNumber}`,
-    });
-
-    expect(response?.statusCode).toBe(400);
-  });
-
-  test('Returns 400 when page is too large (maximum page numbrer is 30 by default)', async () => {
-    const pageNumber = 31;
-
-    const response = await global.api?.fakeRequest({
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-      url: `/notes?page=${pageNumber}`,
-    });
-
-    expect(response?.statusCode).toBe(400);
-  });
-
-  test('Returns list of visited notes ordered by date of last visit of the certain user', async () => {
-    const portionSize = 30;
-    const pageNumber = 1;
-
-    /** Random guy that has access to all notes */
-    const randomGuy = await global.db.insertUser();
-    const RandomGuyAccessToken = await global.auth(randomGuy.id);
-
+describe('GET /notes?page', () => {
+  test.each([
     /**
-     * Create test notes for created user
-     * and then add visits for randomGuy
+     * Returns noteList with specified length (not for last page)
+     * User is authorized, notes are visited
      */
-    for (let i = 0; i < portionSize + 1; i++) {
+    {
+      isAuthorized: true,
+      expectedStatusCode: 200,
+      notesVisited: true,
+      expectedMessage: null,
+      expectedLength: 30,
+      pageNumber: 1,
+    },
+    /**
+     * Returns noteList with specified length (for last page)
+     * User is authorized, notes are visited
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 200,
+      notesVisited: true,
+      expectedMessage: null,
+      expectedLength: 19,
+      pageNumber: 2,
+    },
+    /**
+     * Returns noteList with no items if there are no notes for certain page
+     * User is authorized, notes are visited
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 200,
+      notesVisited: true,
+      expectedMessage: null,
+      expectedLength: 0,
+      pageNumber: 3,
+    },
+    /**
+     * Returns 'querystring/page must be >= 1' message when page < 0
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 400,
+      notesVisited: true,
+      expectedMessage: 'querystring/page must be >= 1',
+      expectedLength: 0,
+      pageNumber: -1,
+    },
+    /**
+     * Returns 'querystring/page must be <= 30' message when page is too large (maximum page numbrer is 30 by default)
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 400,
+      notesVisited: true,
+      expectedMessage: 'querystring/page must be <= 30',
+      expectedLength: 0,
+      pageNumber: 31,
+    },
+    /**
+     * Returns 'unauthorized' message when user is not authorized
+     */
+    {
+      isAuthorized: false,
+      expectedStatusCode: 401,
+      notesVisited: true,
+      expectedMessage: 'You must be authenticated to access this resource',
+      expectedLength: 0,
+      pageNumber: 1,
+    },
+    /**
+     * Returns noteList with no items if user did not visit any notes
+     * User is authorized, notes are not visited
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 200,
+      notesVisited: false,
+      expectedMessage: null,
+      expectedLength: 0,
+      pageNumber: 1,
+    },
+  ])('Get note list', async ({ isAuthorized, expectedStatusCode, notesVisited, expectedMessage, expectedLength, pageNumber }) => {
+    const portionSize = 49;
+    let accessToken;
+
+    /** Insert creator and randomGuy */
+    const creator = await global.db.insertUser();
+
+    const randomGuy = await global.db.insertUser();
+
+    if (isAuthorized) {
+      accessToken = await global.auth(randomGuy.id);
+    }
+
+    for (let i = 0; i < portionSize; i++) {
       const note = await global.db.insertNote({
-        creatorId: user.id,
+        creatorId: creator.id,
       });
 
-      await global.db.insertNoteVisit({
-        userId: randomGuy.id,
-        noteId: note.id,
-      });
+      if (notesVisited) {
+        await global.db.insertNoteVisit({
+          userId: randomGuy.id,
+          noteId: note.id,
+        });
+      }
     }
 
     const response = await global.api?.fakeRequest({
       method: 'GET',
       headers: {
-        authorization: `Bearer ${RandomGuyAccessToken}`,
+        authorization: `Bearer ${accessToken}`,
       },
       url: `/notes?page=${pageNumber}`,
     });
 
-    expect(response?.statusCode).toBe(200);
+    const body = response?.json();
 
-    expect(response?.json().items).toHaveLength(portionSize);
+    if (expectedMessage !== null) {
+      expect(response?.statusCode).toBe(expectedStatusCode);
+
+      expect(body.message).toBe(expectedMessage);
+    } else {
+      expect(response?.statusCode).toBe(expectedStatusCode);
+
+      expect(body.items).toHaveLength(expectedLength);
+    }
   });
 });
