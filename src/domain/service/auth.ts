@@ -78,7 +78,7 @@ export default class AuthService {
     const userSession = await this.userSessionRepository.addUserSession(userId, token, new Date(Date.now() + this.refreshExpiresIn));
 
     return {
-      refreshToken: userSession.refreshToken,
+      refreshToken: token,
       expiresAt: userSession.refreshTokenExpiresAt,
     };
   }
