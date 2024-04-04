@@ -1,6 +1,7 @@
 import type NoteVisit from '@domain/entities/noteVisit.js';
 import type User from '@domain/entities/user.js';
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional, ModelStatic } from 'sequelize';
+import { literal } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NoteModel } from './note.js';
@@ -120,10 +121,11 @@ export default class NoteVisitsSequelizeStorage {
     const [recentVisit, _] = await this.model.upsert({
       noteId,
       userId,
+      visitedAt: literal('CURRENT_DATE'),
     }, {
       conflictWhere: {
-        noteId,
-        userId,
+        'note_id': noteId,
+        'user_id': userId,
       },
       returning: true,
     });

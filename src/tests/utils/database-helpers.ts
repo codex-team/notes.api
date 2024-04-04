@@ -245,7 +245,7 @@ export default class DatabaseHelpers {
    * if no visitedAt passed, then visited_at would have CURRENT_DATE value
    */
   public async insertNoteVisit(visit: NoteVisitCreationAttributes): Promise<NoteVisit> {
-    const visitedAt = visit.visitedAt ?? 'NOW()';
+    const visitedAt = visit.visitedAt ?? 'CURRENT_DATE';
 
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.note_visits ("user_id", "note_id", "visited_at")
