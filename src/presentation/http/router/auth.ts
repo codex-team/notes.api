@@ -25,7 +25,7 @@ interface AuthRouterOptions {
   authService: AuthService,
 
   /**
-   * Cookie domain for refresh and access tokens
+   * Cookie domain for refresh token
    */
   cookieDomain: string,
 }
