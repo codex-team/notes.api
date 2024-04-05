@@ -188,7 +188,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteId = request.note?.id as number;
     const isDeleted = await noteService.deleteNoteById(noteId);
 
-    /** Delete all visits of the note */
+    /**
+     * Delete all visits of the note
+     */
     await noteVisitsService.deleteNoteVisits(noteId);
 
     /**
@@ -456,7 +458,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     }
 
     /**
-     * Check if user is authorized
+     * Save note visit if user is authorized
      */
     if (userId !== null) {
       await noteVisitsService.saveVisit(noteId, userId);

@@ -141,11 +141,6 @@ export default class NoteVisitsSequelizeStorage {
       });
     } else {
       [_, updatedVisits] = await this.model.update({
-        /**
-         * we should pass to model datatype respectfully to declared in NoteVisitsModel class
-         * if we will pass just 'CLOCK_TIMESTAMP()' it will be treated by orm just like a string, that is why we should use literal
-         * but model wants string, this is why we use this cast
-         */
         visitedAt: literal('CLOCK_TIMESTAMP()') as unknown as string,
       }, {
         where: {
