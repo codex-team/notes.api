@@ -118,19 +118,45 @@ export default class NoteVisitsSequelizeStorage {
      * If user has already visited note, then existing record will be updated
      * If user is visiting note for the first time, new record will be created
      */
-    const [recentVisit, _] = await this.model.upsert({
-      noteId,
-      userId,
-      visitedAt: literal('CURRENT_DATE'),
-    }, {
-      conflictWhere: {
-        'note_id': noteId,
-        'user_id': userId,
+    const existingVisit = await this.model.findOne({
+      where: {
+        noteId,
+        userId,
       },
-      returning: true,
     });
 
-    return recentVisit;
+    let updatedVisits: NoteVisit[];
+    let _;
+
+    if (existingVisit === null) {
+      return await this.model.create({
+        noteId,
+        userId,
+        /**
+         * we should pass to model datatype respectfully to declared in NoteVisitsModel class
+         * if we will pass just 'CLOCK_TIMESTAMP()' it will be treated by orm just like a string, that is why we should use literal
+         * but model wants string, this is why we use this cast
+         */
+        visitedAt: literal('CLOCK_TIMESTAMP()') as unknown as string,
+      });
+    } else {
+      [_, updatedVisits] = await this.model.update({
+        /**
+         * we should pass to model datatype respectfully to declared in NoteVisitsModel class
+         * if we will pass just 'CLOCK_TIMESTAMP()' it will be treated by orm just like a string, that is why we should use literal
+         * but model wants string, this is why we use this cast
+         */
+        visitedAt: literal('CLOCK_TIMESTAMP()') as unknown as string,
+      }, {
+        where: {
+          noteId,
+          userId,
+        },
+        returning: true,
+      });
+    }
+
+    return updatedVisits[0];
   }
 
   /**
