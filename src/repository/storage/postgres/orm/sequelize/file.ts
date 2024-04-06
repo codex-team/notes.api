@@ -1,7 +1,5 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, Sequelize } from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import type User from '@domain/entities/user.js';
-import { UserModel } from './user.js';
 import type UploadedFile from '@domain/entities/file.js';
 import type { FileCreationAttributes, FileType, FileLocation, FileLocationByType } from '@domain/entities/file.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
@@ -21,9 +19,9 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   public declare key: UploadedFile['key'];
 
   /**
-   * User who uploaded the file
+   * Additional data about uploaded file
    */
-  public declare userId: CreationOptional<User['id']>;
+  public declare metadata: UploadedFile['metadata'];
 
   /**
    * File uploaded at
@@ -93,13 +91,8 @@ export default class FileSequelizeStorage {
           type: DataTypes.STRING,
           allowNull: false,
         },
-        userId: {
-          type: DataTypes.INTEGER,
-          allowNull: true,
-          references: {
-            model: UserModel,
-            key: 'id',
-          },
+        metadata: {
+          type: DataTypes.JSONB,
         },
         createdAt: DataTypes.DATE,
         mimetype: {

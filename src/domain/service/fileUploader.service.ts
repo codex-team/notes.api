@@ -1,7 +1,6 @@
-import type { FileData, NoteAttachmentFileLocation, FileLocationByType, FileLocation } from '@domain/entities/file.js';
+import type { FileData, NoteAttachmentFileLocation, FileLocationByType, FileLocation, FileMetadata } from '@domain/entities/file.js';
 import type UploadedFile from '@domain/entities/file.js';
 import { FileType } from '@domain/entities/file.js';
-import type User from '@domain/entities/user.js';
 import { createFileId } from '@infrastructure/utils/id.js';
 import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
@@ -24,16 +23,6 @@ interface UploadFileData {
    * Mimetype of the file
    */
   mimetype: string;
-}
-
-/**
- * Additional data about the uploaded file
- */
-interface Metadata {
-  /**
-   * User id who uploaded the file
-   */
-  userId?: User['id'];
 }
 
 /**
@@ -68,7 +57,7 @@ export default class FileUploaderService {
    * @param location - file location depending on type
    * @param metadata - file metadata, including user id who uploaded the file
    */
-  public async uploadFile(fileData: UploadFileData, location: FileLocation, metadata: Metadata): Promise<string> {
+  public async uploadFile(fileData: UploadFileData, location: FileLocation, metadata: FileMetadata): Promise<string> {
     const type = this.defineFileType(location);
 
     const fileHash = createFileId();

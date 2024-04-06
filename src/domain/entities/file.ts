@@ -1,6 +1,6 @@
 import type { NoteInternalId } from './note.js';
-import type User from './user.js';
 import type { Buffer } from 'buffer';
+import type User from './user.js';
 
 /**
  * File types for storing in object storage
@@ -15,6 +15,16 @@ export enum FileType {
    * File is a part of note
    */
   NoteAttachment = 1,
+}
+
+/**
+ * Additional data about uploaded file, ex. user id, who uploaded it
+ */
+export interface FileMetadata {
+  /**
+   * User who uploaded file
+   */
+  userId: User['id'];
 }
 
 /**
@@ -57,11 +67,6 @@ export default interface UploadedFile {
   key: string;
 
   /**
-   * User who uploaded the file
-   */
-  userId?: User['id'];
-
-  /**
    * File name
    */
   name: string;
@@ -90,6 +95,11 @@ export default interface UploadedFile {
    * Object, which stores information about file location
    */
   location: FileLocation;
+
+  /**
+   * File metadata
+   */
+  metadata: FileMetadata;
 }
 
 /**
