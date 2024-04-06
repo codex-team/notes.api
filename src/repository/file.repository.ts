@@ -36,7 +36,7 @@ export default class FileRepository {
   }
 
   /**
-   * Get file location by key and type
+   * Get file location by key and type, files with different types have different locations
    *
    * @param type - file type
    * @param key - file unique key
