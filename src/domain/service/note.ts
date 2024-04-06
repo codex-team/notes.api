@@ -61,6 +61,8 @@ export default class NoteService {
       creatorId,
     });
 
+    await this.saveVisit(note.id, creatorId);
+
     if (parentPublicId !== undefined) {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
@@ -96,6 +98,10 @@ export default class NoteService {
         throw new DomainError(`Relation with noteId ${id} was not deleted`);
       }
     }
+    /**
+     * Delete all visits of this note
+     */
+    await this.deleteNoteVisits(id);
 
     const isNoteDeleted = await this.noteRepository.deleteNoteById(id);
 
@@ -165,10 +171,18 @@ export default class NoteService {
    * Gets note by custom hostname
    *
    * @param hostname - hostname
+   * @param userId - id of the user
    * @returns { Promise<Note | null> } note
    */
-  public async getNoteByHostname(hostname: string): Promise<Note | null> {
-    return await this.noteRepository.getNoteByHostname(hostname);
+  public async getNoteByHostname(hostname: string, userId: User['id'] | null): Promise<Note | null> {
+    const note =  await this.noteRepository.getNoteByHostname(hostname);
+    const noteId = note?.id as number;
+
+    if (userId !== null && noteId !== undefined) {
+      await this.saveVisit(noteId, userId);
+    }
+
+    return note;
   }
 
   /**

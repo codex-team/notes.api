@@ -124,6 +124,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     /**
      * Check if user is authorized
+     * We can not move this to noteService because this we get note from NoteResolver
+     * NoteResolver has no information about user to save noteVisit
      */
     if (userId !== null) {
       await noteService.saveVisit(noteId, userId);
@@ -182,11 +184,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const isDeleted = await noteService.deleteNoteById(noteId);
 
     /**
-     * Delete all visits of the note
-     */
-    await noteService.deleteNoteVisits(noteId);
-
-    /**
      * Check if note does not exist
      */
     return reply.send({ isDeleted : isDeleted });
@@ -219,13 +216,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const parentId = request.body.parentId;
 
     const addedNote = await noteService.addNote(content as JSON, userId as number, parentId); // "authRequired" policy ensures that userId is not null
-
-    /**
-     * Check if user is authorized
-     */
-    if (userId !== null) {
-      await noteService.saveVisit(addedNote.id, userId);
-    }
 
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
@@ -440,21 +430,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const params = request.params;
     const { userId } = request;
-    const note = await noteService.getNoteByHostname(params.hostname);
-    const noteId = note?.id as number;
+    const note = await noteService.getNoteByHostname(params.hostname, userId);
 
     /**
      * Check if note exists
      */
     if (note === null) {
       return reply.notFound('Note not found');
-    }
-
-    /**
-     * Save note visit if user is authorized
-     */
-    if (userId !== null) {
-      await noteService.saveVisit(noteId, userId);
     }
 
     /**
