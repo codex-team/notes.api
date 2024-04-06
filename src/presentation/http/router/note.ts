@@ -8,7 +8,6 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 import { MemberRole } from '@domain/entities/team.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
-import type NoteVisitsService from '@domain/service/noteVisits.js';
 
 /**
  * Interface for the note router.
@@ -23,11 +22,6 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
-
-  /**
-   * Note Visits service instanse
-   */
-  noteVisitsService: NoteVisitsService
 }
 
 /**
@@ -42,7 +36,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * Get note service from options
    */
   const noteService = opts.noteService;
-  const noteVisitsService = opts.noteVisitsService;
   const noteSettingsService = opts.noteSettingsService;
 
   /**
@@ -133,7 +126,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Check if user is authorized
      */
     if (userId !== null) {
-      await noteVisitsService.saveVisit(noteId, userId);
+      await noteService.saveVisit(noteId, userId);
     }
 
     const parentId = await noteService.getParentNoteIdByNoteId(note.id);
@@ -191,7 +184,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Delete all visits of the note
      */
-    await noteVisitsService.deleteNoteVisits(noteId);
+    await noteService.deleteNoteVisits(noteId);
 
     /**
      * Check if note does not exist
@@ -231,7 +224,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Check if user is authorized
      */
     if (userId !== null) {
-      await noteVisitsService.saveVisit(addedNote.id, userId);
+      await noteService.saveVisit(addedNote.id, userId);
     }
 
     /**
@@ -461,7 +454,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Save note visit if user is authorized
      */
     if (userId !== null) {
-      await noteVisitsService.saveVisit(noteId, userId);
+      await noteService.saveVisit(noteId, userId);
     }
 
     /**

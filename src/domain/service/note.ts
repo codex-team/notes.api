@@ -1,10 +1,12 @@
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
+import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
 import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
+import type NoteVisit from '@domain/entities/noteVisit.js';
 
 /**
  * Note service
@@ -21,6 +23,11 @@ export default class NoteService {
   public noteRelationsRepository: NoteRelationsRepository;
 
   /**
+   * Note visits repository
+   */
+  public noteVisitsRepository: NoteVisitsRepository;
+
+  /**
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
@@ -31,10 +38,12 @@ export default class NoteService {
    *
    * @param noteRepository - note repository
    * @param noteRelationsRepository - note relationship repository
+   * @param noteVisitsRepository - note visits repository
    */
-  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository) {
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository) {
     this.noteRepository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
+    this.noteVisitsRepository = noteVisitsRepository;
   }
 
   /**
@@ -214,4 +223,23 @@ export default class NoteService {
 
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
+
+  /**
+   * Updates existing noteVisit's visitedAt or creates new record if user opens note for the first time
+   *
+   * @param noteId - note internal id
+   * @param userId - id of the user
+   */
+  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteVisit> {
+    return await this.noteVisitsRepository.saveVisit(noteId, userId);
+  };
+
+  /**
+   * Deletes all visits of the note when a note is deleted
+   *
+   * @param noteId - note internal id
+   */
+  public async deleteNoteVisits(noteId: NoteInternalId): Promise<boolean> {
+    return await this.noteVisitsRepository.deleteNoteVisits(noteId);
+  }
 }
