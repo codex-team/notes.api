@@ -64,7 +64,6 @@ export default class FileUploaderService {
   /**
    * Upload file
    *
-   * @param type - file type
    * @param fileData - file data, including file data, name and mimetype
    * @param location - file location depending on type
    * @param metadata - file metadata, including user id who uploaded the file
