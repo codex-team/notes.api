@@ -98,6 +98,7 @@ export type LoggingConfig = z.infer<typeof LoggingConfig>;
  * Http API configuration
  */
 const HttpApiConfig = z.object({
+  fileSizeLimit: z.number(),
   host: z.string(),
   port: z.number(),
   cookieSecret: z.string(),
@@ -126,6 +127,7 @@ export type AppConfig = z.infer<typeof AppConfig>;
 
 const defaultConfig: AppConfig = {
   httpApi: {
+    fileSizeLimit: 10000000, // 10mb
     host: '0.0.0.0',
     port: 3000,
     cookieSecret: 'cookieSecret',

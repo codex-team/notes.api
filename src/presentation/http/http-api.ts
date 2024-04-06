@@ -28,6 +28,7 @@ import { EditorToolSchema } from './schema/EditorTool.js';
 import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import UploadRouter from './router/upload.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -240,6 +241,13 @@ export default class HttpApi implements Api {
     await this.server?.register(EditorToolsRouter, {
       prefix: '/editor-tools',
       editorToolsService: domainServices.editorToolsService,
+    });
+
+    await this.server?.register(UploadRouter, {
+      prefix: '/upload',
+      fileUploaderService: domainServices.fileUploaderService,
+      noteService: domainServices.noteService,
+      fileSizeLimit: this.config.fileSizeLimit,
     });
   }
 

@@ -1,15 +1,55 @@
 import type { NoteInternalId } from './note.js';
-import type User from './user.js';
 import type { Buffer } from 'buffer';
+import type User from './user.js';
 
 /**
  * File types for storing in object storage
  */
-export enum FileTypes {
+export enum FileType {
   /**
-   * @todo define real types
+   * Type for testing uploads
    */
-  test = 'test',
+  Test = 0,
+
+  /**
+   * File is a part of note
+   */
+  NoteAttachment = 1,
+}
+
+/**
+ * Additional data about uploaded file, ex. user id, who uploaded it
+ */
+export interface FileMetadata {
+  /**
+   * User who uploaded file
+   */
+  userId: User['id'];
+}
+
+/**
+ * File location for testing uploads, there is no defined location
+ */
+export type TestFileLocation = Record<never, never>;
+
+/**
+ * File location, when it is a part of note
+ */
+export type NoteAttachmentFileLocation = {
+  noteId: NoteInternalId,
+};
+
+/**
+ * Possible file location
+ */
+export type FileLocation = TestFileLocation | NoteAttachmentFileLocation;
+
+/**
+ * File location type, wich depends on file type
+ */
+export interface FileLocationByType {
+  [FileType.Test]: TestFileLocation,
+  [FileType.NoteAttachment]: NoteAttachmentFileLocation,
 }
 
 /**
@@ -27,11 +67,6 @@ export default interface UploadedFile {
   key: string;
 
   /**
-   * User who uploaded the file
-   */
-  userId?: User['id'];
-
-  /**
    * File name
    */
   name: string;
@@ -44,7 +79,7 @@ export default interface UploadedFile {
   /**
    * File type, using to store in object storage
    */
-  type: FileTypes;
+  type: FileType;
 
   /**
    * File size in bytes
@@ -57,9 +92,14 @@ export default interface UploadedFile {
   createdAt: Date;
 
   /**
-   * In case if file is a part of note, note id to identify permissions to access
+   * Object, which stores information about file location
    */
-  noteId?: NoteInternalId;
+  location: FileLocation;
+
+  /**
+   * File metadata
+   */
+  metadata: FileMetadata;
 }
 
 /**

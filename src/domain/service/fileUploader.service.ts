@@ -1,16 +1,16 @@
-import type { FileData } from '@domain/entities/file.js';
-import { FileTypes } from '@domain/entities/file.js';
-import type { NoteInternalId } from '@domain/entities/note.js';
-import type User from '@domain/entities/user.js';
+import type { FileData, NoteAttachmentFileLocation, FileLocationByType, FileLocation, FileMetadata } from '@domain/entities/file.js';
+import type UploadedFile from '@domain/entities/file.js';
+import { FileType } from '@domain/entities/file.js';
 import { createFileId } from '@infrastructure/utils/id.js';
 import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import mime from 'mime';
 
 /**
  * File data for upload
  */
-interface FileToUpload {
+interface UploadFileData {
   /**
    * File data
    */
@@ -23,25 +23,6 @@ interface FileToUpload {
    * Mimetype of the file
    */
   mimetype: string;
-  /**
-   * File type
-   */
-  type: FileTypes;
-}
-
-/**
- * File upload details, contains user id, who uploaded the file and note id, in case if file is a part of note
- */
-interface FileUploadDetails {
-  /**
-   * User who uploaded the file
-   */
-  userId?: User['id'];
-
-  /**
-   * In case if file is a part of note, note id to identify permissions to access
-   */
-  noteId?: NoteInternalId;
 }
 
 /**
@@ -72,13 +53,30 @@ export default class FileUploaderService {
   /**
    * Upload file
    *
-   * @param fileData - file data to upload (e.g. buffer, name, mimetype)
-   * @param details - file upload details (e.g. user id, note id)
+   * @param fileData - file data, including file data, name and mimetype
+   * @param location - file location depending on type
+   * @param metadata - file metadata, including user id who uploaded the file
    */
-  public async uploadFile(fileData: FileToUpload, details?: FileUploadDetails): Promise<string> {
-    const key = createFileId();
+  public async uploadFile(fileData: UploadFileData, location: FileLocation, metadata: FileMetadata): Promise<string> {
+    const type = this.defineFileType(location);
 
-    const bucket = this.defineBucketByFileType(fileData.type);
+    const fileHash = createFileId();
+
+    /**
+     * Extension can be null if file mime type is unknown or not supported
+     */
+    const fileExtension = mime.getExtension(fileData.mimetype);
+
+    if (fileExtension === null) {
+      throw new DomainError('Unknown file extension');
+    }
+
+    /**
+     * Key is a combination of file hash and file extension, separated by dot, e.g. `HgduSDGmsdrs.png`
+     */
+    const key = `${fileHash}.${fileExtension}`;
+
+    const bucket = this.defineBucketByFileType(type);
 
     const uploaded = await this.objectRepository.insert(fileData.data, key, bucket);
 
@@ -88,25 +86,50 @@ export default class FileUploaderService {
 
     const file = await this.fileRepository.insert({
       ...fileData,
+      type,
       key,
-      userId: details?.userId,
-      noteId: details?.noteId,
+      metadata,
+      location: location,
       size: fileData.data.length,
     });
 
     if (file === null) {
-      throw new Error('File was not uploaded');
+      throw new DomainError('File was not uploaded');
     }
 
     return file.key;
   }
 
   /**
+   * Get file location by key and type
+   * Returns null if where is no such file
+   *
+   * @param type - file type
+   * @param key - file unique key
+   */
+  public async getFileLocationByKey<T extends FileType>(type: T, key: UploadedFile['key']): Promise<FileLocationByType[T] | null> {
+    return await this.fileRepository.getFileLocationByKey(type, key);
+  }
+
+  /**
    * Get file data by key
    *
    * @param objectKey - unique file key in object storage
+   * @param location - file location
    */
-  public async getFileDataByKey(objectKey: string): Promise<FileData> {
+  public async getFileData(objectKey: string, location: FileLocation): Promise<FileData> {
+    /**
+     * If type of requested file is note attchement, we need to check if saved file location is the same of requested
+     */
+    if (this.isNoteAttachemntFileLocation(location)) {
+      const fileType = FileType.NoteAttachment;
+      const fileLocationFromStorage = await this.fileRepository.getFileLocationByKey(fileType, objectKey);
+
+      if (fileLocationFromStorage === null || location.noteId !== fileLocationFromStorage.noteId) {
+        throw new DomainError('File not found');
+      }
+    }
+
     const file = await this.fileRepository.getByKey(objectKey);
 
     if (file === null) {
@@ -124,17 +147,42 @@ export default class FileUploaderService {
     return fileData;
   }
 
+
+  /**
+   * Define file type by location
+   *
+   * @param location - file location
+   */
+  private defineFileType(location: FileLocation): FileType {
+    if (this.isNoteAttachemntFileLocation(location)) {
+      return FileType.NoteAttachment;
+    }
+
+    return FileType.Test;
+  }
+
+  /**
+   * Check if file location is note attachemnt
+   *
+   * @param location - to check
+   */
+  private isNoteAttachemntFileLocation(location: FileLocation): location is NoteAttachmentFileLocation {
+    return 'noteId' in location;
+  }
+
   /**
    * Define bucket name by file type
    *
    * @param fileType - file type
    */
-  private defineBucketByFileType(fileType: FileTypes): string {
+  private defineBucketByFileType(fileType: FileType): string {
     switch (fileType) {
-      case FileTypes.test:
+      case FileType.Test:
         return 'test';
+      case FileType.NoteAttachment:
+        return 'note-attachment';
       default:
-        throw new Error('Unknown file type');
+        throw new DomainError('Unknown file type');
     }
   }
 }

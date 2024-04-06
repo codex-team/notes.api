@@ -1,5 +1,6 @@
 httpApi:
   host: 0.0.0.0
+  fileSizeLimit: 1000000
   port: 1337
   allowedOrigins: '*'
   cookieSecret: 'secret'
@@ -26,6 +27,11 @@ logging:
   metricsServer: info
   appServer: info
   database: info
+
+s3:
+  accessKeyId: 'secret'
+  secretAccessKey: 'secret'
+  endpoint: 'http://localhost:9000'
 
 database:
   dsn: 'postgres://codex:postgres@postgres:5432/notes'

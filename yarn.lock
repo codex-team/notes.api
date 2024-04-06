@@ -288,6 +288,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/busboy@npm:^1.0.0":
+  version: 1.2.1
+  resolution: "@fastify/busboy@npm:1.2.1"
+  dependencies:
+    text-decoding: ^1.0.0
+  checksum: 6e773a2929fd7732fd8ba8f9e1c1b9d622c6165b6e0bed9268e1785f8fd5e8b0a35d6adfe86f15a701bf7783d09c629f3437b3578d34c0246eb26f973ede20f0
+  languageName: node
+  linkType: hard
+
 "@fastify/cookie@npm:^8.3.0":
   version: 8.3.0
   resolution: "@fastify/cookie@npm:8.3.0"
@@ -325,6 +334,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/error@npm:^3.0.0":
+  version: 3.4.1
+  resolution: "@fastify/error@npm:3.4.1"
+  checksum: 2c2e98c33327884c0927a73e8c3b8f162acbf1e4d058bacb68bca0c3607f36d6fde8c376fde45b2097e724d450266f8bb29134305fa24aabd200f83f087c7321
+  languageName: node
+  linkType: hard
+
 "@fastify/error@npm:^3.4.0":
   version: 3.4.0
   resolution: "@fastify/error@npm:3.4.0"
@@ -338,6 +354,20 @@ __metadata:
   dependencies:
     fast-json-stringify: ^5.7.0
   checksum: 2734afabe2539d3e15d2bd9f8dfee756d9cd969f7303dc085dd91c744ff61742bb0d3ebd3b561cf3c32be54567048a634b4962f943eb6bd9ed3fbd71cbf6a4fa
+  languageName: node
+  linkType: hard
+
+"@fastify/multipart@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "@fastify/multipart@npm:8.1.0"
+  dependencies:
+    "@fastify/busboy": ^1.0.0
+    "@fastify/deepmerge": ^1.0.0
+    "@fastify/error": ^3.0.0
+    fastify-plugin: ^4.0.0
+    secure-json-parse: ^2.4.0
+    stream-wormhole: ^1.1.0
+  checksum: 06c13b6669497d2eec55cbf4be9272f67c80947f521b9fb824a9947143fef38c1918badf2b51d67e2f8ba2193ba5a914bfeb7a6164bbb0a63acbaf1f644a6471
   languageName: node
   linkType: hard
 
@@ -4326,6 +4356,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mime@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "mime@npm:4.0.1"
+  bin:
+    mime: bin/cli.js
+  checksum: a931283bc31570cc9c63fbad24fdf178b4dd545462f93543eff634b24d2b65064585eb347cdf0720316bfa5ca0943115694672f2bc4895f8e2366d280ad481f2
+  languageName: node
+  linkType: hard
+
 "mimic-fn@npm:^4.0.0":
   version: 4.0.0
   resolution: "mimic-fn@npm:4.0.0"
@@ -4669,6 +4708,7 @@ __metadata:
     "@codex-team/config-loader": ^1.0.0
     "@fastify/cookie": ^8.3.0
     "@fastify/cors": ^8.3.0
+    "@fastify/multipart": ^8.1.0
     "@fastify/oauth2": ^7.2.1
     "@fastify/swagger": ^8.8.0
     "@fastify/swagger-ui": ^1.9.3
@@ -4685,6 +4725,7 @@ __metadata:
     fastify: ^4.17.0
     http-status-codes: ^2.2.0
     jsonwebtoken: ^9.0.0
+    mime: ^4.0.1
     nanoid: ^4.0.2
     nodemon: ^2.0.22
     pg: ^8.11.0
@@ -6131,6 +6172,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stream-wormhole@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "stream-wormhole@npm:1.1.0"
+  checksum: cc19e0235c5d031bd530fa83913c807d9525fa4ba33d51691dd822c0726b8b7ef138b34f289d063a3018cddba67d3ba7fd0ecedaa97242a0f1ed2eed3c6a2ab1
+  languageName: node
+  linkType: hard
+
 "streamx@npm:^2.15.0":
   version: 2.15.1
   resolution: "streamx@npm:2.15.1"
@@ -6387,6 +6435,13 @@ __metadata:
     tar-fs: ^3.0.4
     tmp: ^0.2.1
   checksum: ad7c7f6d1a65e7fc2593ed7212f6e79b270c6859cb18ff19de9bef654ac0affb68a65cdc1f597847030d49f445ebbd38f0261d4016c522a89004fd2bddbac252
+  languageName: node
+  linkType: hard
+
+"text-decoding@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "text-decoding@npm:1.0.0"
+  checksum: 4b2359d8efdabea72ac470304e991913e9b82a55b1c33ab5204f115d11305ac5900add80aee5f7d22b2bcf0faebaf35b193d28a10b74adf175d9ac9d63604445
   languageName: node
   linkType: hard
 

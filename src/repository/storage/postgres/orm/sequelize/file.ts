@@ -1,11 +1,7 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, Sequelize } from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
-import type User from '@domain/entities/user.js';
-import { UserModel } from './user.js';
 import type UploadedFile from '@domain/entities/file.js';
-import type { FileCreationAttributes } from '@domain/entities/file.js';
-import type { Note } from '@domain/entities/note.js';
-import { NoteModel } from './note.js';
+import type { FileCreationAttributes, FileType, FileLocation, FileLocationByType } from '@domain/entities/file.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 
 /**
@@ -23,9 +19,9 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   public declare key: UploadedFile['key'];
 
   /**
-   * User who uploaded the file
+   * Additional data about uploaded file
    */
-  public declare userId: CreationOptional<User['id']>;
+  public declare metadata: UploadedFile['metadata'];
 
   /**
    * File uploaded at
@@ -45,7 +41,7 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   /**
    * File type, using to store in object storage
    */
-  public declare type: UploadedFile['type'];
+  public declare type: FileType;
 
   /**
    * File size in bytes
@@ -53,9 +49,9 @@ export class FileModel extends Model<InferAttributes<FileModel>, InferCreationAt
   public declare size: UploadedFile['size'];
 
   /**
-   * In case if file is a part of note, note id to indetify permissions to access
+   * Object, which stores information about file location
    */
-  public declare noteId: CreationOptional<Note['id']>;
+  public declare location: FileLocation;
 }
 
 /**
@@ -95,13 +91,8 @@ export default class FileSequelizeStorage {
           type: DataTypes.STRING,
           allowNull: false,
         },
-        userId: {
-          type: DataTypes.INTEGER,
-          allowNull: true,
-          references: {
-            model: UserModel,
-            key: 'id',
-          },
+        metadata: {
+          type: DataTypes.JSONB,
         },
         createdAt: DataTypes.DATE,
         mimetype: {
@@ -116,13 +107,8 @@ export default class FileSequelizeStorage {
           type: DataTypes.INTEGER,
           allowNull: false,
         },
-        noteId: {
-          type: DataTypes.INTEGER,
-          references: {
-            model: NoteModel,
-            key: 'id',
-          },
-          allowNull: true,
+        location: {
+          type: DataTypes.JSONB,
         },
         name: {
           type: DataTypes.STRING,
@@ -130,6 +116,7 @@ export default class FileSequelizeStorage {
         },
       },
       {
+        updatedAt: false,
         sequelize: this.database,
         tableName: this.tableName,
       }
@@ -156,5 +143,26 @@ export default class FileSequelizeStorage {
         key,
       },
     });
+  }
+
+  /**
+   * Get file location by key and type
+   *
+   * @param type - file type
+   * @param key - file unique key
+   */
+  public async getFileLocationByKey<T extends FileType>(type: T, key: UploadedFile['key']): Promise<FileLocationByType[T] | null> {
+    const res = await this.model.findOne({
+      where: {
+        key,
+        type,
+      },
+    });
+
+    if (res === null) {
+      return null;
+    }
+
+    return res.location as FileLocationByType[T];
   }
 }
