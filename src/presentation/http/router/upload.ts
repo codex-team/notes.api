@@ -4,7 +4,6 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type { NoteAttachmentFileLocation } from '@domain/entities/file.js';
-import { FileType } from '@domain/entities/file.js';
 
 /**
  * Interface for upload router options
@@ -60,14 +59,11 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
   }, async (request, reply) => {
     const { userId } = request;
 
-    const fileType = FileType.NoteAttachment;
-
     const location: NoteAttachmentFileLocation = {
       noteId: request.note?.id as number,
     };
 
     const uploadedFileKey = await fileUploaderService.uploadFile(
-      fileType,
       {
         data: await request.body.file.toBuffer(),
         mimetype: request.body.file.mimetype,
@@ -97,13 +93,11 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
       },
       preHandler: [ noteResolver ],
     }, async (request, reply) => {
-      const fileType = FileType.NoteAttachment;
-
       const fileLocation: NoteAttachmentFileLocation = {
         noteId: request.note?.id as number,
       };
 
-      const fileData = await fileUploaderService.getFileData(request.params.key, fileType, fileLocation);
+      const fileData = await fileUploaderService.getFileData(request.params.key, fileLocation);
 
       return reply.send(fileData);
     });

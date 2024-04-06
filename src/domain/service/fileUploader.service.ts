@@ -1,4 +1,4 @@
-import type { FileData, NoteAttachmentFileLocation, FileLocationByType } from '@domain/entities/file.js';
+import type { FileData, NoteAttachmentFileLocation, FileLocationByType, FileLocation } from '@domain/entities/file.js';
 import type UploadedFile from '@domain/entities/file.js';
 import { FileType } from '@domain/entities/file.js';
 import type User from '@domain/entities/user.js';
@@ -7,7 +7,6 @@ import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import mime from 'mime';
-import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * File data for upload
@@ -70,8 +69,8 @@ export default class FileUploaderService {
    * @param location - file location depending on type
    * @param metadata - file metadata, including user id who uploaded the file
    */
-  public async uploadFile<Type extends FileType>(type: Type, fileData: UploadFileData, location: FileLocationByType[Type], metadata: Metadata): Promise<string> {
-    this.validateLocation(type, location);
+  public async uploadFile(fileData: UploadFileData, location: FileLocation, metadata: Metadata): Promise<string> {
+    const type = this.defineFileType(location);
 
     const fileHash = createFileId();
 
@@ -128,21 +127,17 @@ export default class FileUploaderService {
    * Get file data by key
    *
    * @param objectKey - unique file key in object storage
-   * @param fileType - type of file to get
    * @param location - file location
    */
-  public async getFileData<T extends FileType>(objectKey: string, fileType: T, location: FileLocationByType[T]): Promise<FileData> {
-    const fileLocationFromStorage = await this.fileRepository.getFileLocationByKey(fileType, objectKey);
-
-    if (fileLocationFromStorage === null) {
-      throw new DomainError('No file with provided key and type was found');
-    }
-
+  public async getFileData(objectKey: string, location: FileLocation): Promise<FileData> {
     /**
      * If type of requested file is note attchement, we need to check if saved file location is the same of requested
      */
-    if (fileType === FileType.NoteAttachment) {
-      if ((location as NoteAttachmentFileLocation).noteId !== (fileLocationFromStorage as NoteAttachmentFileLocation).noteId) {
+    if (this.isNoteAttachemntFileLocation(location)) {
+      const fileType = FileType.NoteAttachment;
+      const fileLocationFromStorage = await this.fileRepository.getFileLocationByKey(fileType, objectKey);
+
+      if ((fileLocationFromStorage === null) || (location.noteId !== fileLocationFromStorage.noteId)) {
         throw new DomainError('File not found');
       }
     }
@@ -166,24 +161,25 @@ export default class FileUploaderService {
 
 
   /**
-   * Validate file location due to passed file type
+   * Define file type by location
    *
-   * @param type - passed file type
-   * @param location - location object to check
+   * @param location - file location
    */
-  private validateLocation<Type extends FileType>(type: Type, location: FileLocationByType[Type]): void {
-    switch (type) {
-      /**
-       * Check location, if file is note attachment, noteId is required
-       */
-      case FileType.NoteAttachment:
-        const noteAttachmentLocation = location as NoteAttachmentFileLocation;
+  private defineFileType(location: FileLocation): FileType {
+    if (this.isNoteAttachemntFileLocation(location)) {
+      return FileType.NoteAttachment;
+    }
 
-        if (notEmpty(noteAttachmentLocation.noteId)) {
-          return;
-        }
-    };
-    throw new DomainError('Invalid location for passed file type');
+    return FileType.Test;
+  }
+
+  /**
+   * Check if file location is note attachemnt
+   *
+   * @param location - to check
+   */
+  private isNoteAttachemntFileLocation(location: FileLocation): location is NoteAttachmentFileLocation {
+    return 'noteId' in location;
   }
 
   /**
