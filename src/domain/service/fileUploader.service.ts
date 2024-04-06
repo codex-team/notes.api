@@ -125,7 +125,7 @@ export default class FileUploaderService {
       const fileType = FileType.NoteAttachment;
       const fileLocationFromStorage = await this.fileRepository.getFileLocationByKey(fileType, objectKey);
 
-      if ((fileLocationFromStorage === null) || (location.noteId !== fileLocationFromStorage.noteId)) {
+      if (fileLocationFromStorage === null || location.noteId !== fileLocationFromStorage.noteId) {
         throw new DomainError('File not found');
       }
     }

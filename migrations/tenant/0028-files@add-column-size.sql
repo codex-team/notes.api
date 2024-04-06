@@ -47,7 +47,7 @@ BEGIN
         ADD COLUMN location JSONB;
   END IF;
 
-  -- Remove column note_id
+  -- Remove column user_id
   IF EXISTS (
         SELECT 1
         FROM information_schema.columns
