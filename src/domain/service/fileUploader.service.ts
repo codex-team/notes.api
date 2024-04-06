@@ -128,8 +128,25 @@ export default class FileUploaderService {
    * Get file data by key
    *
    * @param objectKey - unique file key in object storage
+   * @param fileType - type of file to get
+   * @param location - file location
    */
-  public async getFileDataByKey(objectKey: string): Promise<FileData> {
+  public async getFileData<T extends FileType>(objectKey: string, fileType: T, location: FileLocationByType[T]): Promise<FileData> {
+    const fileLocationFromStorage = await this.fileRepository.getFileLocationByKey(fileType, objectKey);
+
+    if (fileLocationFromStorage === null) {
+      throw new DomainError('No file with provided key and type was found');
+    }
+
+    /**
+     * If type of requested file is note attchement, we need to check if saved file location is the same of requested
+     */
+    if (fileType === FileType.NoteAttachment) {
+      if ((location as NoteAttachmentFileLocation).noteId !== (fileLocationFromStorage as NoteAttachmentFileLocation).noteId) {
+        throw new DomainError('File not found');
+      }
+    }
+
     const file = await this.fileRepository.getByKey(objectKey);
 
     if (file === null) {
