@@ -60,7 +60,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
     const { userId } = request;
 
     const location: NoteAttachmentFileLocation = {
-      noteId: request.note?.id as number,
+      noteId: request.note!.id as number,
     };
 
     const uploadedFileKey = await fileUploaderService.uploadFile(
@@ -71,7 +71,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
       },
       location,
       {
-        userId: userId as number,
+        userId: userId!,
       }
     );
 
@@ -87,14 +87,13 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
     }>('/:notePublicId/:key', {
       config: {
         policy: [
-          'authRequired',
           'notePublicOrUserInTeam',
         ],
       },
       preHandler: [ noteResolver ],
     }, async (request, reply) => {
       const fileLocation: NoteAttachmentFileLocation = {
-        noteId: request.note?.id as number,
+        noteId: request.note!.id as number,
       };
 
       const fileData = await fileUploaderService.getFileData(request.params.key, fileLocation);

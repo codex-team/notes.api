@@ -99,7 +99,7 @@ export default class FileUploaderService {
       ...fileData,
       type,
       key,
-      userId: metadata?.userId,
+      metadata,
       location: location,
       size: fileData.data.length,
     });
