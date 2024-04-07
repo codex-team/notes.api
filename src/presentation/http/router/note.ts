@@ -229,9 +229,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      *
      * @todo use even bus to save noteVisit
      */
-    if (userId !== null) {
-      await noteVisitsService.saveVisit(addedNote.id, userId);
-    }
+
+    await noteVisitsService.saveVisit(addedNote.id, userId!);
+
     /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
      */
