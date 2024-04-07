@@ -454,7 +454,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     }
 
     /**
-     * Check if user is authorized
+     * Save note visit if user is authorized
      *
      * @todo use event bus to save note visits
      */
