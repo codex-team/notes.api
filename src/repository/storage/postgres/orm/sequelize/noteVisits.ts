@@ -1,6 +1,7 @@
 import type NoteVisit from '@domain/entities/noteVisit.js';
 import type User from '@domain/entities/user.js';
 import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional, ModelStatic } from 'sequelize';
+import { literal } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NoteModel } from './note.js';
@@ -117,18 +118,58 @@ export default class NoteVisitsSequelizeStorage {
      * If user has already visited note, then existing record will be updated
      * If user is visiting note for the first time, new record will be created
      */
-    /* eslint-disable-next-line */
-    const [recentVisit, _] = await this.model.upsert({
-      noteId,
-      userId,
-    }, {
-      conflictWhere: {
+    const existingVisit = await this.model.findOne({
+      where: {
         noteId,
         userId,
       },
-      returning: true,
     });
 
-    return recentVisit;
+    let updatedVisits: NoteVisit[];
+    let _;
+
+    if (existingVisit === null) {
+      return await this.model.create({
+        noteId,
+        userId,
+        /**
+         * we should pass to model datatype respectfully to declared in NoteVisitsModel class
+         * if we will pass just 'CLOCK_TIMESTAMP()' it will be treated by orm just like a string, that is why we should use literal
+         * but model wants string, this is why we use this cast
+         */
+        visitedAt: literal('CLOCK_TIMESTAMP()') as unknown as string,
+      });
+    } else {
+      [_, updatedVisits] = await this.model.update({
+        visitedAt: literal('CLOCK_TIMESTAMP()') as unknown as string,
+      }, {
+        where: {
+          noteId,
+          userId,
+        },
+        returning: true,
+      });
+    }
+
+    return updatedVisits[0];
+  }
+
+  /**
+   * Deletes all visits of the note when a note is deleted
+   *
+   * @param noteId - note internal id
+   */
+  public async deleteNoteVisits(noteId: NoteInternalId): Promise<boolean> {
+    const deletedNoteVisits = await this.model.destroy({
+      where: {
+        noteId,
+      },
+    });
+
+    if (deletedNoteVisits) {
+      return true;
+    }
+
+    return false;
   }
 }

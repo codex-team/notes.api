@@ -1,5 +1,6 @@
 import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
+import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
@@ -21,6 +22,11 @@ export default class NoteService {
   public noteRelationsRepository: NoteRelationsRepository;
 
   /**
+   * Note visits repository
+   */
+  public noteVisitsRepository: NoteVisitsRepository;
+
+  /**
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
@@ -31,10 +37,12 @@ export default class NoteService {
    *
    * @param noteRepository - note repository
    * @param noteRelationsRepository - note relationship repository
+   * @param noteVisitsRepository - note visits repository
    */
-  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository) {
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository) {
     this.noteRepository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
+    this.noteVisitsRepository = noteVisitsRepository;
   }
 
   /**

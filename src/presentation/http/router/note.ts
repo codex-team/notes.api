@@ -8,6 +8,7 @@ import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettings
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 import { MemberRole } from '@domain/entities/team.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
+import type NoteVisitsService from '@domain/service/noteVisits.js';
 
 /**
  * Interface for the note router.
@@ -22,6 +23,11 @@ interface NoteRouterOptions {
    * Note Settings service instance
    */
   noteSettingsService: NoteSettingsService,
+
+  /**
+   * Note visits service instance
+   */
+  noteVisitsService: NoteVisitsService;
 }
 
 /**
@@ -37,6 +43,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   const noteService = opts.noteService;
   const noteSettingsService = opts.noteSettingsService;
+  const noteVisitsService = opts.noteVisitsService;
 
   /**
    * Prepare note id resolver middleware
@@ -111,7 +118,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     ],
   }, async (request, reply) => {
     const { note } = request;
+    const noteId = request.note?.id as number;
     const { memberRole } = request;
+    const { userId } = request;
 
     /**
      * Check if note exists
@@ -119,6 +128,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     if (note === null) {
       return reply.notFound('Note not found');
     }
+
+    /**
+     * Check if user is authorized
+     *
+     * @todo use event bus to save note visits
+     */
+    if (userId !== null) {
+      await noteVisitsService.saveVisit(noteId, userId);
+    }
+
     const parentId = await noteService.getParentNoteIdByNoteId(note.id);
 
     const parentNote = parentId !== null ? definePublicNote(await noteService.getNoteById(parentId)) : undefined;
@@ -368,6 +387,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const isDeleted = await noteService.unlinkParent(noteId);
 
     /**
+     * Delete all visits of the note
+     *
+     * @todo use event bus to delete note visits
+     */
+    await noteVisitsService.deleteNoteVisits(noteId);
+
+    /**
      * Check if parent relation was successfully deleted
      */
     if (!isDeleted) {
@@ -417,7 +443,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
   }, async (request, reply) => {
     const params = request.params;
-
+    const { userId } = request;
     const note = await noteService.getNoteByHostname(params.hostname);
 
     /**
@@ -425,6 +451,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     if (note === null) {
       return reply.notFound('Note not found');
+    }
+
+    /**
+     * Save note visit if user is authorized
+     *
+     * @todo use event bus to save note visits
+     */
+    if (userId !== null) {
+      await noteVisitsService.saveVisit(note.id, userId);
     }
 
     /**

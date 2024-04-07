@@ -7,7 +7,7 @@ import UserService from '@domain/service/user.js';
 import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
 import FileUploaderService from './service/fileUploader.service.js';
-import NoteVisitsService from '@domain/service/noteVisits.js';
+import NoteVisitsService from './service/noteVisits.js';
 
 /**
  * Interface for initiated services
@@ -49,9 +49,9 @@ export interface DomainServices {
   fileUploaderService: FileUploaderService,
 
   /**
-   * Note Visits service instance
+   * Note visits service instance
    */
-  noteVisitsService: NoteVisitsService
+  noteVisitsService: NoteVisitsService;
 }
 
 /**
@@ -61,16 +61,14 @@ export interface DomainServices {
  * @param appConfig - app config
  */
 export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
-  const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository);
-
+  const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository, repositories.noteVisitsRepository);
+  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
   const authService = new AuthService(
     appConfig.auth.accessSecret,
     appConfig.auth.accessExpiresIn,
     appConfig.auth.refreshExpiresIn,
     repositories.userSessionRepository
   );
-  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
-
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
 
   const sharedServices = {

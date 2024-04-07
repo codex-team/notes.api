@@ -27,4 +27,13 @@ export default class NoteVisitsRepository {
   public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteVisit> {
     return await this.storage.saveVisit(noteId, userId);
   }
+
+  /**
+   * Deletes all visits of the note when a note is deleted
+   *
+   * @param noteId - note internal id
+   */
+  public async deleteNoteVisits(noteId: NoteInternalId): Promise<boolean> {
+    return await this.storage.deleteNoteVisits(noteId);
+  }
 }
