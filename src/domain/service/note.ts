@@ -6,7 +6,6 @@ import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
 import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
-import type NoteVisit from '@domain/entities/noteVisit.js';
 
 /**
  * Note service
@@ -61,8 +60,6 @@ export default class NoteService {
       creatorId,
     });
 
-    await this.saveVisit(note.id, creatorId);
-
     if (parentPublicId !== undefined) {
       const parentNote = await this.getNoteByPublicId(parentPublicId);
 
@@ -98,10 +95,6 @@ export default class NoteService {
         throw new DomainError(`Relation with noteId ${id} was not deleted`);
       }
     }
-    /**
-     * Delete all visits of this note
-     */
-    await this.deleteNoteVisits(id);
 
     const isNoteDeleted = await this.noteRepository.deleteNoteById(id);
 
@@ -171,18 +164,10 @@ export default class NoteService {
    * Gets note by custom hostname
    *
    * @param hostname - hostname
-   * @param userId - id of the user
    * @returns { Promise<Note | null> } note
    */
-  public async getNoteByHostname(hostname: string, userId: User['id'] | null): Promise<Note | null> {
-    const note =  await this.noteRepository.getNoteByHostname(hostname);
-    const noteId = note?.id as number;
-
-    if (userId !== null && noteId !== undefined) {
-      await this.saveVisit(noteId, userId);
-    }
-
-    return note;
+  public async getNoteByHostname(hostname: string): Promise<Note | null> {
+    return await this.noteRepository.getNoteByHostname(hostname);
   }
 
   /**
@@ -237,23 +222,4 @@ export default class NoteService {
 
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
-
-  /**
-   * Updates existing noteVisit's visitedAt or creates new record if user opens note for the first time
-   *
-   * @param noteId - note internal id
-   * @param userId - id of the user
-   */
-  public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteVisit> {
-    return await this.noteVisitsRepository.saveVisit(noteId, userId);
-  };
-
-  /**
-   * Deletes all visits of the note when a note is deleted
-   *
-   * @param noteId - note internal id
-   */
-  public async deleteNoteVisits(noteId: NoteInternalId): Promise<boolean> {
-    return await this.noteVisitsRepository.deleteNoteVisits(noteId);
-  }
 }
