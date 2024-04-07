@@ -225,6 +225,14 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const addedNote = await noteService.addNote(content as JSON, userId as number, parentId); // "authRequired" policy ensures that userId is not null
 
     /**
+     * Save note visit when note created
+     *
+     * @todo use even bus to save noteVisit
+     */
+    if (userId !== null) {
+      await noteVisitsService.saveVisit(addedNote.id, userId);
+    }
+    /**
      * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
      */
     await noteSettingsService.addNoteSettings(addedNote.id);
