@@ -32,7 +32,6 @@ import { DomainError } from '@domain/entities/DomainError.js';
 import UploadRouter from './router/upload.js';
 
 
-
 const appServerLogger = getLogger('appServer');
 
 /**
