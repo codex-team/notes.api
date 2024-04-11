@@ -20,6 +20,7 @@ import EditorToolsRouter from './router/editorTools.js';
 import { UserSchema } from './schema/User.js';
 import { NoteSchema } from './schema/Note.js';
 import { NoteSettingsSchema } from './schema/NoteSettings.js';
+import { OauthSchema } from './schema/OauthSchema.js';
 import Policies from './policies/index.js';
 import type { RequestParams, Response } from '@presentation/api.interface.js';
 import NoteSettingsRouter from './router/noteSettings.js';
@@ -29,6 +30,7 @@ import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import UploadRouter from './router/upload.js';
+
 
 
 const appServerLogger = getLogger('appServer');
@@ -291,6 +293,7 @@ export default class HttpApi implements Api {
     this.server?.addSchema(NoteSettingsSchema);
     this.server?.addSchema(JoinSchemaParams);
     this.server?.addSchema(JoinSchemaResponse);
+    this.server?.addSchema(OauthSchema);
   }
 
   /**
