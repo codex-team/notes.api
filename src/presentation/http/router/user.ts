@@ -115,8 +115,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     schema: {
       body: {
         toolId: {
-          type: 'string',
-          description: 'Unique editor tool id',
+          $ref: 'EditorToolSchema#/properties/id',
         },
       },
       response: {
@@ -162,8 +161,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
     schema: {
       body: {
         toolId: {
-          type: 'string',
-          description: 'Unique editor tool id',
+          $ref: 'EditorToolSchema#/properties/id',
         },
       },
       response: {
@@ -173,7 +171,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
             'application/json': {
               schema: {
                 removedId: {
-                  type: 'string',
+                  $ref: 'EditorToolSchema#/properties/id',
                 },
               },
             },

@@ -55,6 +55,26 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
         'userCanEdit',
       ],
     },
+    schema: {
+      body:{
+        file: {
+          type: 'string',
+          description: 'multipart file',
+        },
+      },
+
+      response: {
+        '2xx': {
+          content: {
+            schema: {
+              key: {
+                type: 'string',
+              },
+            },
+          },
+        },
+      },
+    },
     preHandler: [ noteResolver ],
   }, async (request, reply) => {
     const { userId } = request;

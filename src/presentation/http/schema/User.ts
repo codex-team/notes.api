@@ -4,6 +4,7 @@
 export const UserSchema = {
   $id: 'UserSchema',
   type: 'object',
+  required: [ 'email' ],
   properties: {
     id: { type: 'number' },
     email: { type: 'string' },

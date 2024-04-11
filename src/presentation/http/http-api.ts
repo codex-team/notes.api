@@ -84,7 +84,7 @@ export default class HttpApi implements Api {
     this.addSchema();
     this.addDecorators();
 
-    await this.addPoliciesCheckHook(domainServices);
+    this.addPoliciesCheckHook(domainServices);
     await this.addApiRoutes(domainServices);
   }
 

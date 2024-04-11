@@ -214,6 +214,30 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         'authRequired',
       ],
     },
+    schema: {
+      body: {
+        content: {
+          $ref: 'NoteSchema#/properties/content',
+        },
+        parentId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          description: 'Note fields',
+          content: {
+            'application/json':{
+              schema: {
+                id: {
+                  $ref: 'NoteSchema#/properties/id',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   }, async (request, reply) => {
     /**
      * @todo Validate request query

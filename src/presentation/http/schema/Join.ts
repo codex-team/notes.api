@@ -1,6 +1,7 @@
 export const JoinSchemaParams = {
   $id: 'JoinSchemaParams',
   type: 'object',
+  required: [ 'hash' ],
   properties: {
     hash: {
       type: 'string',
