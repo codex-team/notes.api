@@ -55,7 +55,6 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
           },
         },
 
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         '3xx': {
           code: {
             type: 'string',
@@ -66,7 +65,6 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
           },
         },
 
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         '5xx': {
           code: {
             type: 'string',
