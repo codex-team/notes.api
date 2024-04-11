@@ -39,27 +39,69 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
   fastify.post<{
     Body: AuthOptions;
     Reply: AuthSession | ErrorResponse;
-  }>('/', async (request, reply) => {
-    const { token } = request.body;
-    const userSession = await opts.authService.verifyRefreshToken(token);
+  }>('/',
+    {
+      schema: {
+        body: {
+          required: [ 'token' ],
+          properties: {
+            token: {
+              type: 'string',
+            },
+          },
+        },
 
-    /**
-     * Check if session is valid
-     */
-    if (!userSession) {
-      return await reply.unauthorized('Session is not valid');
-    }
+        response: {
+          '2xx': {
+            content: {
+              schema: {
+                accessToken: { type: 'string' },
+                refreshToken: { type: 'string' },
+              },
+            },
+          },
 
-    const accessToken = opts.authService.signAccessToken({ id: userSession.userId });
+          '4xx': {
+            content: {
+              schema: {
+                code: { type: 'string' },
+                message: { type: 'string' },
+              },
+            },
+          },
 
-    await opts.authService.removeSessionByRefreshToken(token);
-    const refreshToken = await opts.authService.signRefreshToken(userSession.userId);
+          '5xx': {
+            content: {
+              schema: {
+                code: { type: 'string' },
+                message: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const { token } = request.body;
+      const userSession = await opts.authService.verifyRefreshToken(token);
 
-    return reply.send({
-      accessToken,
-      refreshToken,
+      /**
+       * Check if session is valid
+       */
+      if (!userSession) {
+        return await reply.unauthorized('Session is not valid');
+      }
+
+      const accessToken = opts.authService.signAccessToken({ id: userSession.userId });
+
+      await opts.authService.removeSessionByRefreshToken(token);
+      const refreshToken = await opts.authService.signRefreshToken(userSession.userId);
+
+      return reply.send({
+        accessToken,
+        refreshToken,
+      });
     });
-  });
 
   /**
    * Route for logout, removes session from database by refresh token
@@ -67,7 +109,27 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
   fastify.delete<{
     Body: AuthOptions;
     Reply: { ok: boolean }
-  }>('/', async (request, reply) => {
+  }>('/', {
+    schema: {
+      body: {
+        token: {
+          type: 'string',
+        },
+      },
+
+      response: {
+        '2xx': {
+          content: {
+            schema:{
+              ok: {
+                type: 'boolean',
+              },
+            },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
     await opts.authService.removeSessionByRefreshToken(request.body.token);
 
     return reply.status(StatusCodes.OK).send({
