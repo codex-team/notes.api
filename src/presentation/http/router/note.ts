@@ -452,6 +452,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       accessRights: {
         canEdit: boolean,
       },
+      tools: EditorTool[],
     }| ErrorResponse,
   }>('/resolve-hostname/:hostname', {
     schema: {
@@ -468,6 +469,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
                 canEdit: {
                   type: 'boolean',
                 },
+              },
+            },
+            tools: {
+              type: 'array',
+              items: {
+                $ref: 'EditorToolSchema',
               },
             },
           },
@@ -518,9 +525,21 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       canEdit = memberRole === MemberRole.Write;
     }
 
+    /**
+     * Get all tools used in the note
+     */
+    const noteToolsNames = new Set<string>();
+
+    note.content.blocks.forEach((block: { type: string }) => {
+      noteToolsNames.add(block.type);
+    });
+
+    const noteTools = await editorToolsService.getToolsByNames(Array.from(noteToolsNames));
+
     return reply.send({
       note: notePublic,
       accessRights: { canEdit: canEdit },
+      tools: noteTools,
     });
   });
 

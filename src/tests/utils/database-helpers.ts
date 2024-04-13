@@ -11,6 +11,29 @@ import type NoteVisit from '@domain/entities/noteVisit.js';
 import { nanoid } from 'nanoid';
 
 /**
+ * Note content mock inserted if no content passed
+ */
+const DEFAULT_NOTE_CONTENT = {
+  blocks: [
+    {
+      id: 'mJDq8YbvqO',
+      type: 'paragraph',
+      data: {
+        text: 'text',
+      },
+    },
+    {
+      id: 'DeL0QehzGe',
+      type: 'header',
+      data: {
+        text: 'fdgsfdgfdsg',
+        level: 2,
+      },
+    },
+  ],
+};
+
+/**
  * default type for note mock creation attributes
  */
 type NoteMockCreationAttributes = {
@@ -109,7 +132,7 @@ export default class DatabaseHelpers {
    * If publicId is not passed, it's value in database would be created via `createPublicId()` method
    */
   public async insertNote(note: NoteMockCreationAttributes): Promise<Note> {
-    const content = note.content ?? '{}';
+    const content = note.content ?? DEFAULT_NOTE_CONTENT;
     const publicId = note.publicId ?? createPublicId();
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id")
