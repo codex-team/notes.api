@@ -146,6 +146,10 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     await opts.authService.removeSessionByRefreshToken(request.body.token);
 
     return reply
+      .clearCookie('refreshToken', {
+        path: '/auth',
+        domain: opts.cookieDomain,
+      })
       .status(StatusCodes.OK)
       .send({
         ok: true,
