@@ -32,7 +32,7 @@ export interface Note {
       id: string;
       type: string;
       data: unknown;
-      tunes?: {[name: string]: any}
+      tunes?: {[name: string]: unknown}
     }>
   };
 
