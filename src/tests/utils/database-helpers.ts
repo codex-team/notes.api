@@ -113,7 +113,7 @@ export default class DatabaseHelpers {
     const publicId = note.publicId ?? createPublicId();
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id")
-    VALUES ('${content}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}')
+    VALUES ('${JSON.stringify(content)}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}')
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,
@@ -265,8 +265,8 @@ export default class DatabaseHelpers {
   /**
    * Truncates all tables and restarts all autoincrement sequences
    */
-  public async truncateTables(): Promise<unknown> {
-    return await this.orm.connection.query(`DO $$
+  public async truncateTables(): Promise<void> {
+    await this.orm.connection.query(`DO $$
     DECLARE
       -- table iterator
       tbl RECORD;
@@ -292,5 +292,22 @@ export default class DatabaseHelpers {
         EXECUTE format('ALTER sequence %s RESTART WITH 1', seq.sequence_name);
       END LOOP;
     END $$ LANGUAGE plpgsql;`);
+
+
+    /** Insert default tools */
+    await this.orm.connection.query(`
+      INSERT INTO public.editor_tools (name, title, export_name, source, is_default)
+      VALUES ('header', 'Heading', 'Header', '{"cdn": "https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js"}'::json, true);
+    `);
+
+    await this.orm.connection.query(`
+      INSERT INTO public.editor_tools (name, title, export_name, source, is_default)
+      VALUES ('paragraph', 'Paragraph', 'Paragraph', '{"cdn": "https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js"}'::json, true);
+    `);
+
+    await this.orm.connection.query(`
+      INSERT INTO public.editor_tools (name, title, export_name, source, is_default)
+      VALUES ('list', 'List', 'List', '{"cdn": "https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js"}'::json, true);
+    `);
   }
 };

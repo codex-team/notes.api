@@ -53,7 +53,7 @@ describe('Note API', () => {
   });
 
   describe('GET note/:notePublicId ', () => {
-    test.each([
+    test.only.each([
       /** Returns 200 if user is team member with a Read role */
       {
         role: MemberRole.Read,
@@ -109,6 +109,39 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: creator.id,
+        content: {
+          'blocks': [
+            {
+              'id': 'mJDq8YbvqO',
+              'type': 'paragraph',
+              'data': {
+                'text': 'fdsafdfa',
+              },
+            },
+            {
+              'id': '7iZce56EVa',
+              'type': 'paragraph',
+              'data': {
+                'text': 'dgfd',
+              },
+            },
+            {
+              'id': 'DeL0QehzGe',
+              'type': 'header',
+              'data': {
+                'text': 'fdgsfdgfdsg',
+                'level': 2,
+              },
+            },
+            {
+              'id': '_lgC6VndCx',
+              'type': 'paragraph',
+              'data': {
+                'text': 'fdsaf',
+              },
+            },
+          ],
+        },
       });
 
       /** Create test note settings */
@@ -151,6 +184,20 @@ describe('Note API', () => {
           'accessRights': {
             'canEdit': canEdit,
           },
+          tools: [
+            {
+              name: 'header',
+              source: {
+                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
+              },
+            },
+            {
+              name: 'paragraph',
+              source: {
+                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
+              },
+            },
+          ],
         });
       } else {
         expect(response?.json()).toStrictEqual({
