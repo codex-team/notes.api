@@ -7,7 +7,7 @@ describe('Note API', () => {
     await global.db.truncateTables();
   });
   describe('GET note/resolve-hostname/:hostname ', () => {
-    test.only('Returns note by specified hostname', async () => {
+    test('Returns note by specified hostname', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
