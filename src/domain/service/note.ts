@@ -6,6 +6,8 @@ import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
 import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
+import EventBus from '@domain/event-bus/index.js';
+import { NoteAddedEvent } from '@domain/event-bus/events/noteAddedEvent.js';
 
 /**
  * Note service
@@ -69,6 +71,10 @@ export default class NoteService {
 
       await this.noteRelationsRepository.addNoteRelation(note.id, parentNote.id);
     }
+    /**
+     * Dispatches an event when a note is added
+     */
+    EventBus.getInstance().dispatch(new NoteAddedEvent(note.id, creatorId));
 
     return note;
   }
