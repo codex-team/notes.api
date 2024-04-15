@@ -9,6 +9,8 @@ import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleReso
 import { MemberRole } from '@domain/entities/team.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
 import type NoteVisitsService from '@domain/service/noteVisits.js';
+import EventBus from '@domain/event-bus/index.js';
+import { NoteVisitedEvent } from '@domain/event-bus/events/noteVisitedEvent.js';
 
 /**
  * Interface for the note router.
@@ -43,7 +45,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   const noteService = opts.noteService;
   const noteSettingsService = opts.noteSettingsService;
-  const noteVisitsService = opts.noteVisitsService;
 
   /**
    * Prepare note id resolver middleware
@@ -135,7 +136,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * @todo use event bus to save note visits
      */
     if (userId !== null) {
-      await noteVisitsService.saveVisit(noteId, userId);
+      EventBus.getInstance().dispatch(new NoteVisitedEvent(noteId, userId));
     }
 
     const parentId = await noteService.getParentNoteIdByNoteId(note.id);
@@ -223,28 +224,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const parentId = request.body.parentId;
 
     const addedNote = await noteService.addNote(content as JSON, userId as number, parentId); // "authRequired" policy ensures that userId is not null
-
-    /**
-     * Save note visit when note created
-     *
-     * @todo use even bus to save noteVisit
-     */
-
-    await noteVisitsService.saveVisit(addedNote.id, userId!);
-
-    /**
-     * @todo use event bus: emit 'note-added' event and subscribe to it in other modules like 'note-settings'
-     */
-    await noteSettingsService.addNoteSettings(addedNote.id);
-
-    /**
-     * Creates TeamMember with write priveleges
-     */
-    await noteSettingsService.createTeamMember({
-      noteId: addedNote.id,
-      userId: userId as number,
-      role: MemberRole.Write,
-    });
 
     return reply.send({
       id: addedNote.publicId,
@@ -391,15 +370,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
+    const userId = request.note?.creatorId as number;
 
     const isDeleted = await noteService.unlinkParent(noteId);
 
-    /**
-     * Delete all visits of the note
-     *
-     * @todo use event bus to delete note visits
-     */
-    await noteVisitsService.deleteNoteVisits(noteId);
+    EventBus.getInstance().dispatch(new NoteVisitedEvent(noteId, userId));
 
     /**
      * Check if parent relation was successfully deleted
@@ -464,10 +439,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Save note visit if user is authorized
      *
-     * @todo use event bus to save note visits
      */
     if (userId !== null) {
-      await noteVisitsService.saveVisit(note.id, userId);
+      EventBus.getInstance().dispatch(new NoteVisitedEvent(note.id, userId));
     }
 
     /**

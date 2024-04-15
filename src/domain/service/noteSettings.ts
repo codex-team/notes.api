@@ -9,6 +9,8 @@ import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type { SharedDomainMethods } from './shared/index.js';
+import EventBus from '@domain/event-bus/index.js';
+import { NOTE_ADDED_EVENT_NAME } from '@domain/event-bus/events/noteAddedEvent.js';
 
 /**
  * Service responsible for Note Settings
@@ -31,6 +33,24 @@ export default class NoteSettingsService {
   constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository, private readonly shared: SharedDomainMethods) {
     this.noteSettingsRepository = noteSettingsRepository;
     this.teamRepository = teamRepository;
+
+    /**
+     * Listen to the note related events
+     */
+    EventBus.getInstance().addEventListener(NOTE_ADDED_EVENT_NAME, async (event) => {
+      const { noteId, userId } = (event as CustomEvent<{ noteId: number; userId: number }>).detail;
+
+      try {
+        await this.addNoteSettings(noteId);
+        await this.createTeamMember({
+          noteId: noteId,
+          userId: userId,
+          role: MemberRole.Write,
+        });
+      } catch (error) {
+        throw error;
+      }
+    });
   }
 
   /**

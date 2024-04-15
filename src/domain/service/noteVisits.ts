@@ -2,6 +2,9 @@ import type { NoteInternalId } from '@domain/entities/note.js';
 import type User from '@domain/entities/user.js';
 import type NoteVisit from '@domain/entities/noteVisit.js';
 import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
+import EventBus from '@domain/event-bus/index.js';
+import { NOTE_ADDED_EVENT_NAME } from '@domain/event-bus/events/noteAddedEvent.js';
+import { NOTE_VISITED_EVENT_NAME } from '@domain/event-bus/events/noteVisitedEvent.js';
 
 /**
  * Note Visits service, which will store latest note visit
@@ -20,6 +23,29 @@ export default class NoteVisitsService {
    */
   constructor(noteVisitRepository: NoteVisitsRepository) {
     this.noteVisitsRepository = noteVisitRepository;
+
+    /**
+     * Listen to the note related events
+     */
+    EventBus.getInstance().addEventListener(NOTE_ADDED_EVENT_NAME, async (event) => {
+      const { noteId, userId } = (event as CustomEvent<{ noteId: number; userId: number }>).detail;
+
+      try {
+        return await this.noteVisitsRepository.saveVisit(noteId, userId);
+      } catch (error) {
+        throw error;
+      }
+    });
+
+    EventBus.getInstance().addEventListener(NOTE_VISITED_EVENT_NAME, async (event) => {
+      const { noteId, userId } = (event as CustomEvent<{ noteId: number; userId: number }>).detail;
+
+      try {
+        await this.noteVisitsRepository.saveVisit(noteId, userId);
+      } catch (error) {
+        console.error('Error saving note visit', error);
+      }
+    });
   }
 
   /**
