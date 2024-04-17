@@ -232,12 +232,6 @@ export default class NoteService {
    * @param noteTools - tools which are used in note
    */
   public async updateNoteToolsById(noteId: NoteInternalId, noteTools: Note['tools']): Promise<boolean> {
-    const toolsUpdated = await this.noteRepository.updateNoteToolsById(noteId, noteTools);
-
-    if (!toolsUpdated) {
-      throw new DomainError('Tools are not patched');
-    }
-
-    return toolsUpdated;
+    return await this.noteRepository.updateNoteToolsById(noteId, noteTools);
   }
 }
