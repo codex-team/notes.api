@@ -60,7 +60,10 @@ export default class HttpApi implements Api {
     this.server = fastify({
       logger: appServerLogger as FastifyBaseLogger,
       ajv: {
-        plugins: [ ajvFilePlugin ],
+        plugins: [ 
+          /** Allows to validate files in schema */
+          ajvFilePlugin 
+        ],
       },
     });
 
