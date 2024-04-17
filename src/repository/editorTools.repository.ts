@@ -45,6 +45,17 @@ export default class EditorToolsRepository {
   }
 
   /**
+   * Returns bunchh of tools by their names
+   *
+   * @param editorToolNames - unique tool names
+   */
+  public async getToolsByNames(editorToolNames: EditorTool['name'][]): Promise<EditorTool[]> {
+    const tools = await this.storage.getToolsByNames(editorToolNames);
+
+    return tools;
+  }
+
+  /**
    * Get all default tools
    */
   public async getDefaultTools(): Promise<EditorTool[]> {

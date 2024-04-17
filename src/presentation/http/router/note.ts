@@ -9,6 +9,8 @@ import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleReso
 import { MemberRole } from '@domain/entities/team.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
 import type NoteVisitsService from '@domain/service/noteVisits.js';
+import type EditorToolsService from '@domain/service/editorTools.js';
+import type EditorTool from '@domain/entities/editorTools.js';
 
 /**
  * Interface for the note router.
@@ -28,6 +30,11 @@ interface NoteRouterOptions {
    * Note visits service instance
    */
   noteVisitsService: NoteVisitsService;
+
+  /**
+   * Editor tools service instance
+   */
+  editorToolsService: EditorToolsService;
 }
 
 /**
@@ -44,6 +51,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   const noteService = opts.noteService;
   const noteSettingsService = opts.noteSettingsService;
   const noteVisitsService = opts.noteVisitsService;
+  const editorToolsService = opts.editorToolsService;
 
   /**
    * Prepare note id resolver middleware
@@ -76,6 +84,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       accessRights: {
         canEdit: boolean,
       },
+      tools: EditorTool[],
     }| ErrorResponse,
   }>('/:notePublicId', {
     config: {
@@ -106,6 +115,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
             },
             parentNote: {
               $ref: 'NoteSchema',
+            },
+            tools: {
+              type: 'array',
+              items: {
+                $ref: 'EditorToolSchema',
+              },
             },
           },
         },
@@ -139,23 +154,34 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     }
 
     const parentId = await noteService.getParentNoteIdByNoteId(note.id);
-
     const parentNote = parentId !== null ? definePublicNote(await noteService.getNoteById(parentId)) : undefined;
+
     /**
      * Wrap note for public use
      */
     const notePublic = definePublicNote(note);
 
     /**
+     * Get all tools used in the note
+     */
+    const noteToolsNames = new Set<string>();
+
+    note.content.blocks.forEach((block: { type: string }) => {
+      noteToolsNames.add(block.type);
+    });
+
+    const noteTools = await editorToolsService.getToolsByNames(Array.from(noteToolsNames));
+
+    /**
      * Check if current user can edit the note
      */
     const canEdit = memberRole === MemberRole.Write;
-
 
     return reply.send({
       note: notePublic,
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
+      tools: noteTools,
     });
   });
 
@@ -222,7 +248,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const { userId } = request;
     const parentId = request.body.parentId;
 
-    const addedNote = await noteService.addNote(content as JSON, userId as number, parentId); // "authRequired" policy ensures that userId is not null
+    const addedNote = await noteService.addNote(content as Note['content'], userId as number, parentId); // "authRequired" policy ensures that userId is not null
 
     /**
      * Save note visit when note created
@@ -259,7 +285,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId: NotePublicId,
     },
     Body: {
-      content: JSON;
+      content: Note['content'];
     },
     Reply: {
       updatedAt: Note['updatedAt'],
@@ -289,7 +315,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
-    const content = request.body.content as JSON;
+    const content = request.body.content;
 
     const note = await noteService.updateNoteContentById(noteId, content);
 
@@ -426,6 +452,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       accessRights: {
         canEdit: boolean,
       },
+      tools: EditorTool[],
     }| ErrorResponse,
   }>('/resolve-hostname/:hostname', {
     schema: {
@@ -442,6 +469,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
                 canEdit: {
                   type: 'boolean',
                 },
+              },
+            },
+            tools: {
+              type: 'array',
+              items: {
+                $ref: 'EditorToolSchema',
               },
             },
           },
@@ -492,9 +525,21 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       canEdit = memberRole === MemberRole.Write;
     }
 
+    /**
+     * Get all tools used in the note
+     */
+    const noteToolsNames = new Set<string>();
+
+    note.content.blocks.forEach((block: { type: string }) => {
+      noteToolsNames.add(block.type);
+    });
+
+    const noteTools = await editorToolsService.getToolsByNames(Array.from(noteToolsNames));
+
     return reply.send({
       note: notePublic,
       accessRights: { canEdit: canEdit },
+      tools: noteTools,
     });
   });
 

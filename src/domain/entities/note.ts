@@ -27,7 +27,14 @@ export interface Note {
   /**
    * Note content
    */
-  content: JSON;
+  content: {
+    blocks: Array<{
+      id: string;
+      type: string;
+      data: unknown;
+      tunes?: {[name: string]: unknown}
+    }>
+  };
 
   /**
    * Note creator id
