@@ -67,7 +67,6 @@ export default function useNoteResolver(noteService: NoteService): {
       } catch (error) {
         logger.error('Invalid Note public passed');
         logger.error(error);
-
         await reply
           .code(statusCode)
           .send({
