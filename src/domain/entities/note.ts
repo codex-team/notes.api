@@ -55,7 +55,7 @@ export interface Note {
   /**
    * All tools used in certain note
    */
-  tools: {[toolName: EditorTool['name']] : EditorTool['id']}[];
+  tools: Record<EditorTool['name'], EditorTool['id']>[]
 }
 
 
