@@ -51,13 +51,15 @@ export default class NoteService {
    * @param content - note content
    * @param creatorId - note creator
    * @param parentPublicId - parent note if exist
+   * @param tools - editor tools wthich are used in note
    * @returns { Note } added note object
    */
-  public async addNote(content: Note['content'], creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
+  public async addNote(content: Note['content'], creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined, tools: Note['tools']): Promise<Note> {
     const note = await this.noteRepository.addNote({
       publicId: createPublicId(),
       content,
       creatorId,
+      tools,
     });
 
     if (parentPublicId !== undefined) {
@@ -222,4 +224,14 @@ export default class NoteService {
 
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
+
+  /**
+   * Updates tools list of certain note
+   *
+   * @param noteId - internal id of the note
+   * @param noteTools - tools which are used in note
+   */
+  public async updateNoteToolsById(noteId: NoteInternalId, noteTools: Note['tools']): Promise<boolean> {
+    return await this.noteRepository.updateNoteToolsById(noteId, noteTools);
+  }
 }

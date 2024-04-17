@@ -230,6 +230,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Body: {
       content: JSON;
       parentId?: NotePublicId;
+      tools: Note['tools'];
     },
     Reply: {
       id: NotePublicId,
@@ -247,8 +248,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const content = request.body.content !== undefined ? request.body.content : {};
     const { userId } = request;
     const parentId = request.body.parentId;
+    const noteTools = request.body.tools;
 
-    const addedNote = await noteService.addNote(content as Note['content'], userId as number, parentId); // "authRequired" policy ensures that userId is not null
+    const addedNote = await noteService.addNote(content as Note['content'], userId as number, parentId, noteTools); // "authRequired" policy ensures that userId is not null
 
     /**
      * Save note visit when note created
@@ -285,7 +287,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId: NotePublicId,
     },
     Body: {
-      content: Note['content'];
+      content: Note['content'],
+      noteTools: Note['tools'],
     },
     Reply: {
       updatedAt: Note['updatedAt'],
@@ -316,8 +319,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content;
+    const noteTools = request.body.noteTools;
 
     const note = await noteService.updateNoteContentById(noteId, content);
+
+    await noteService.updateNoteToolsById(noteId, noteTools);
 
     return reply.send({
       updatedAt: note.updatedAt,

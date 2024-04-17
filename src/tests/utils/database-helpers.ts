@@ -40,6 +40,7 @@ type NoteMockCreationAttributes = {
   creatorId: Note['creatorId'],
   content?:  Note['content'],
   publicId?:  Note['publicId'],
+  tools?: Note['tools'],
 };
 
 /**
@@ -134,9 +135,10 @@ export default class DatabaseHelpers {
   public async insertNote(note: NoteMockCreationAttributes): Promise<Note> {
     const content = note.content ?? DEFAULT_NOTE_CONTENT;
     const publicId = note.publicId ?? createPublicId();
+    const tools = note.tools ?? '[]';
 
-    const [results, _] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id")
-    VALUES ('${JSON.stringify(content)}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}')
+    const [results, _] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id", "tools")
+    VALUES ('${JSON.stringify(content)}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}', ${tools})
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,

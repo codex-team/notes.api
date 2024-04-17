@@ -88,4 +88,14 @@ export default class NoteRepository {
   public async getNoteListByUserId(id: number, offset: number, limit: number): Promise<Note[]> {
     return await this.storage.getNoteListByUserId(id, offset, limit);
   }
+
+  /**
+   * Updates tools list of certain note
+   *
+   * @param noteId - internal id of the note
+   * @param noteTools - tools which are used in note
+   */
+  public async updateNoteToolsById(noteId: NoteInternalId, noteTools: Note['tools']): Promise<boolean> {
+    return await this.storage.updateNoteToolsById(noteId, noteTools);
+  };
 }

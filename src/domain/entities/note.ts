@@ -1,4 +1,5 @@
 import type User from '@domain/entities/user.js';
+import type EditorTool from './editorTools.js';
 
 /**
  * Note internal id. Used to query Note by internal API
@@ -50,10 +51,15 @@ export interface Note {
    * Last time note was updated
    */
   updatedAt: string;
+
+  /**
+   * All tools used in certain note
+   */
+  tools: {[toolName: EditorTool['name']] : EditorTool['id']}[];
 }
 
 
 /**
  * Part of note entity used to create new note
  */
-export type NoteCreationAttributes = Pick<Note, 'publicId' | 'content' | 'creatorId'>;
+export type NoteCreationAttributes = Pick<Note, 'publicId' | 'content' | 'creatorId' | 'tools'>;
