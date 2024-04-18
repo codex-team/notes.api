@@ -112,9 +112,10 @@ export default class NoteService {
    *
    * @param id - note internal id
    * @param content - new content
+   * @param noteTools - tools which are used in note
    */
-  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note> {
-    const updatedNote = await this.noteRepository.updateNoteContentById(id, content);
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools']): Promise<Note> {
+    const updatedNote = await this.noteRepository.updateNoteContentAndToolsById(id, content, noteTools);
 
     if (updatedNote === null) {
       throw new DomainError(`Note with id ${id} was not updated`);
@@ -224,14 +225,4 @@ export default class NoteService {
 
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
-
-  /**
-   * Updates tools list of certain note
-   *
-   * @param noteId - internal id of the note
-   * @param noteTools - tools which are used in note
-   */
-  public async updateNoteToolsById(noteId: NoteInternalId, noteTools: Note['tools']): Promise<boolean> {
-    return await this.noteRepository.updateNoteToolsById(noteId, noteTools);
-  }
 }

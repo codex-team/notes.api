@@ -288,7 +288,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     Body: {
       content: Note['content'],
-      noteTools: Note['tools'],
+      tools: Note['tools'],
     },
     Reply: {
       updatedAt: Note['updatedAt'],
@@ -319,11 +319,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const content = request.body.content;
-    const noteTools = request.body.noteTools;
+    const noteTools = request.body.tools;
 
-    const note = await noteService.updateNoteContentById(noteId, content);
-
-    await noteService.updateNoteToolsById(noteId, noteTools);
+    const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools);
 
     return reply.send({
       updatedAt: note.updatedAt,

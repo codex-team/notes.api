@@ -169,11 +169,13 @@ export default class NoteSequelizeStorage {
    *
    * @param id - note internal id
    * @param content - new content
+   * @param tools - tools which are used in note
    * @returns Note on success, null on failure
    */
-  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note | null> {
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], tools: Note['tools']): Promise<Note | null> {
     const [affectedRowsCount, affectedRows] = await this.model.update({
       content,
+      tools,
     }, {
       where: {
         id,
@@ -296,28 +298,5 @@ export default class NoteSequelizeStorage {
         publicId,
       },
     });
-  };
-
-  /**
-   * Updates tools list of certain note
-   *
-   * @param id - internal id of the note
-   * @param tools - tools which are used in note
-   */
-  public async updateNoteToolsById(id: NoteInternalId, tools: Note['tools']): Promise<boolean> {
-    const [affectedRowsCount, _] = await this.model.update({
-      tools,
-    }, {
-      where: {
-        id,
-      },
-      returning: true,
-    });
-
-    if (affectedRowsCount !== 1) {
-      return false;
-    }
-
-    return true;
   };
 }
