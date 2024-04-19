@@ -4,6 +4,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type { NoteAttachmentFileLocation } from '@domain/entities/file.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for upload router options
@@ -25,7 +26,7 @@ interface UploadRouterOptions {
   fileSizeLimit: number;
 }
 
-const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts, done) => {
+const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify, opts, done) => {
   const { fileUploaderService } = opts;
 
   /**
@@ -34,7 +35,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
    */
   const { noteResolver } = useNoteResolver(opts.noteService);
 
-  void fastify.register(fastifyMultipart, {
+  await fastify.register(fastifyMultipart, {
     limits: {
       fieldSize: opts.fileSizeLimit,
     },
@@ -56,28 +57,38 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
       ],
     },
     schema: {
-      body:{
-        file: {
-          type: 'string',
-          description: 'multipart file',
+      consumes: [ 'multipart/form-data' ],
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
         },
       },
-
+      body: {
+        type: 'object',
+        required: [ 'file' ],
+        properties: {
+          file: { isFile: true },
+        },
+      },
       response: {
         '2xx': {
-          content: {
-            schema: {
-              description: 'New upload key',
-              key: {
-                type: 'string',
-              },
-            },
+          type: 'object',
+          description: 'File key to get it from the API',
+          key: {
+            $ref: 'UploadSchema#/properties/key',
           },
         },
       },
     },
+    attachValidation: true,
     preHandler: [ noteResolver ],
   }, async (request, reply) => {
+    /**
+     * @todo solve trouble with crashing app, when validations is not passed
+     */
+    if (request.validationError) {
+      return reply.code(StatusCodes.BAD_REQUEST).send(request.validationError);
+    }
     const { userId } = request;
 
     const location: NoteAttachmentFileLocation = {
@@ -110,6 +121,13 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
         policy: [
           'notePublicOrUserInTeam',
         ],
+      },
+      schema: {
+        params: {
+          key: {
+            $ref: 'UploadSchema#/properties/key',
+          },
+        },
       },
       preHandler: [ noteResolver ],
     }, async (request, reply) => {

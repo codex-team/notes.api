@@ -30,6 +30,8 @@ import JoinRouter from '@presentation/http/router/join.js';
 import { JoinSchemaParams, JoinSchemaResponse } from './schema/Join.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import UploadRouter from './router/upload.js';
+import { ajvFilePlugin } from '@fastify/multipart';
+import { UploadSchema } from './schema/Upload.js';
 
 
 const appServerLogger = getLogger('appServer');
@@ -58,6 +60,12 @@ export default class HttpApi implements Api {
   public async init(domainServices: DomainServices): Promise<void> {
     this.server = fastify({
       logger: appServerLogger as FastifyBaseLogger,
+      ajv: {
+        plugins: [ 
+          /** Allows to validate files in schema */
+          ajvFilePlugin 
+        ],
+      },
     });
 
     /**
@@ -199,6 +207,7 @@ export default class HttpApi implements Api {
       noteService: domainServices.noteService,
       noteSettingsService: domainServices.noteSettingsService,
       noteVisitsService: domainServices.noteVisitsService,
+      editorToolsService: domainServices.editorToolsService,
     });
 
     await this.server?.register(NoteListRouter, {
@@ -293,6 +302,7 @@ export default class HttpApi implements Api {
     this.server?.addSchema(JoinSchemaParams);
     this.server?.addSchema(JoinSchemaResponse);
     this.server?.addSchema(OauthSchema);
+    this.server?.addSchema(UploadSchema);
   }
 
   /**
@@ -366,7 +376,6 @@ export default class HttpApi implements Api {
 
         return;
       }
-
       /**
        * If error is not a domain error, we route it to the default error handler
        */

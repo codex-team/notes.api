@@ -53,7 +53,7 @@ export default class NoteService {
    * @param parentPublicId - parent note if exist
    * @returns { Note } added note object
    */
-  public async addNote(content: JSON, creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
+  public async addNote(content: Note['content'], creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
     const note = await this.noteRepository.addNote({
       publicId: createPublicId(),
       content,

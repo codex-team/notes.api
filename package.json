@@ -39,7 +39,7 @@
     "@codex-team/config-loader": "^1.0.0",
     "@fastify/cookie": "^8.3.0",
     "@fastify/cors": "^8.3.0",
-    "@fastify/multipart": "^8.1.0",
+    "@fastify/multipart": "^8.2.0",
     "@fastify/oauth2": "^7.2.1",
     "@fastify/swagger": "^8.8.0",
     "@fastify/swagger-ui": "^1.9.3",
