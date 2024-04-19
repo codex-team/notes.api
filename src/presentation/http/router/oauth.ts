@@ -65,14 +65,14 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
           },
         },
 
-        '5xx': {
-          code: {
-            type: 'string',
-          },
-          message: {
-            type: 'string',
-          },
-        },
+        // '5xx': {
+        //   code: {
+        //     type: 'string',
+        //   },
+        //   message: {
+        //     type: 'string',
+        //   },
+        // },
       },
     },
   }, async (request, reply) => {

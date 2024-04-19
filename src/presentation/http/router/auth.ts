@@ -53,13 +53,15 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
 
         response: {
           '2xx': {
-            accessToken: { type: 'string' },
-            refreshToken: { type: 'string' },
-          },
-
-          '5xx': {
-            code: { type: 'string' },
-            message: { type: 'string' },
+            description: 'New token generated',
+            content: {
+              'application/json': {
+                schema: {
+                  accessToken: { type: 'string' },
+                  refreshToken: { type: 'string' },
+                },
+              },
+            },
           },
         },
       },

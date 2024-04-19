@@ -67,6 +67,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = (fastify, opts,
         '2xx': {
           content: {
             schema: {
+              description: 'New upload key',
               key: {
                 type: 'string',
               },
