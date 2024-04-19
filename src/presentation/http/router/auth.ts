@@ -104,10 +104,13 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
 
       response: {
         '2xx': {
+          description: 'Check for successful deletion of the token',
           content: {
-            schema:{
-              ok: {
-                type: 'boolean',
+            'application/json': {
+              schema:{
+                ok: {
+                  type: 'boolean',
+                },
               },
             },
           },
