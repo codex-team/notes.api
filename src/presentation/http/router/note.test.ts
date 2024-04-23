@@ -37,20 +37,6 @@ describe('Note API', () => {
         accessRights: {
           canEdit: false,
         },
-        tools: [
-          {
-            name: 'header',
-            source: {
-              cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
-            },
-          },
-          {
-            name: 'paragraph',
-            source: {
-              cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
-            },
-          },
-        ],
       });
     });
 
@@ -165,20 +151,6 @@ describe('Note API', () => {
           'accessRights': {
             'canEdit': canEdit,
           },
-          tools: [
-            {
-              name: 'header',
-              source: {
-                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
-              },
-            },
-            {
-              name: 'paragraph',
-              source: {
-                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
-              },
-            },
-          ],
         });
       } else {
         expect(response?.json()).toStrictEqual({
