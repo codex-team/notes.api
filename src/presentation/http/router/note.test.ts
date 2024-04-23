@@ -575,7 +575,7 @@ describe('Note API', () => {
     test.todo('Returns 400 when parentId has incorrect characters and length');
   });
 
-  describe.only('POST /note', () => {
+  describe('POST /note', () => {
     /* Should correctly save relation to parent note if parentId passed */
     test.each([
       {
