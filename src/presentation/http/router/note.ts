@@ -84,7 +84,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       accessRights: {
         canEdit: boolean,
       },
-      tools: EditorTool[],
     }| ErrorResponse,
   }>('/:notePublicId', {
     config: {
@@ -115,12 +114,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
             },
             parentNote: {
               $ref: 'NoteSchema',
-            },
-            tools: {
-              type: 'array',
-              items: {
-                $ref: 'EditorToolSchema',
-              },
             },
           },
         },
@@ -162,17 +155,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const notePublic = definePublicNote(note);
 
     /**
-     * Get all tools used in the note
-     */
-    const noteToolsNames = new Set<string>();
-
-    note.content.blocks.forEach((block: { type: string }) => {
-      noteToolsNames.add(block.type);
-    });
-
-    const noteTools = await editorToolsService.getToolsByNames(Array.from(noteToolsNames));
-
-    /**
      * Check if current user can edit the note
      */
     const canEdit = memberRole === MemberRole.Write;
@@ -181,7 +163,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       note: notePublic,
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
-      tools: noteTools,
+      //  tools: noteTools,
     });
   });
 

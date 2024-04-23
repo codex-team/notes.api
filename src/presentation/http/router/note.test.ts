@@ -576,7 +576,7 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    /* Should correctly save relation to parent note if parentId passed */
+    /* Should correctly save note tools */
     test.each([
       {
         noteTools: [
@@ -588,7 +588,7 @@ describe('Note API', () => {
         noteTools: null,
       },
     ])
-    ('Returns created note', async ({ noteTools }) => {
+    ('Saves note with note tools', async ({ noteTools }) => {
       const user = await global.db.insertUser();
 
       const parentNote = await global.db.insertNote({
@@ -1183,6 +1183,56 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
+    });
+  });
+
+  describe('PATCH /note/:notePublicId', async () => {
+    test.each([
+      {
+        noteTools: [
+          { 'header' : 1 },
+          { 'list': 3 },
+        ],
+      },
+      {
+        noteTools: null,
+      },
+    ])
+    ('Patches note tools', async ({ noteTools }) => {
+      const user = await global.db.insertUser();
+
+      const accessToken = await global.auth(user.id);
+
+      const note = await global.db.insertNote({ creatorId: user.id });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          content: {},
+          tools: noteTools,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200),
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      expect(response?.json().note.tools).toMatchObject(noteTools ?? []);
     });
   });
 });
