@@ -575,8 +575,20 @@ describe('Note API', () => {
     test.todo('Returns 400 when parentId has incorrect characters and length');
   });
 
-  describe('POST /note', () => {
-    test('Should correctly save relation to parent note if parentId passed', async () => {
+  describe.only('POST /note', () => {
+    /* Should correctly save relation to parent note if parentId passed */
+    test.each([
+      {
+        noteTools: [
+          { 'header' : 1 },
+          { 'list': 3 },
+        ],
+      },
+      {
+        noteTools: null,
+      },
+    ])
+    ('Returns created note', async ({ noteTools }) => {
       const user = await global.db.insertUser();
 
       const parentNote = await global.db.insertNote({
@@ -610,6 +622,7 @@ describe('Note API', () => {
               },
             ],
           },
+          tools: noteTools,
         },
       });
 
@@ -627,6 +640,8 @@ describe('Note API', () => {
         content: parentNote.content,
         id: parentNote.publicId,
       });
+
+      expect(response?.json().note.tools).toMatchObject(noteTools ?? []);
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
