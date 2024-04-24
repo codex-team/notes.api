@@ -548,19 +548,55 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
+    const headerNoteTool = {
+      id: 1,
+      name: 'header',
+    };
+
+    const listNoteTool = {
+      id: 3,
+      name: 'list',
+    };
+
+    const headerTool = {
+      exportName: 'Header',
+      id: '1',
+      isDefault: true,
+      name: 'header',
+      source: {
+        cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
+      },
+      title: 'Heading',
+      userId: null,
+    };
+
+    const listTool = {
+      exportName: 'List',
+      id: '3',
+      isDefault: true,
+      name: 'list',
+      source:{
+        cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js',
+      },
+      title: 'List',
+      userId: null,
+    };
+
+    const tools = [headerTool, listTool];
+
     /* Should correctly save note tools */
     test.each([
       {
         noteTools: [
-          { 'header' : 1 },
-          { 'list': 3 },
+          { [headerNoteTool.name] : headerNoteTool.id },
+          { [listNoteTool.name]: listNoteTool.id },
         ],
       },
       {
         noteTools: null,
       },
     ])
-    ('Saves note with note tools', async ({ noteTools }) => {
+    ('Should save tools that where used for note creation', async ({ noteTools }) => {
       const user = await global.db.insertUser();
 
       const parentNote = await global.db.insertNote({
@@ -594,7 +630,7 @@ describe('Note API', () => {
               },
             ],
           },
-          tools: noteTools,
+          tools: noteTools ?? [],
         },
       });
 
@@ -613,7 +649,7 @@ describe('Note API', () => {
         id: parentNote.publicId,
       });
 
-      expect(response?.json().note.tools).toMatchObject(noteTools ?? []);
+      expect(response?.json().tools).toMatchObject(noteTools ? tools : []);
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
@@ -1159,18 +1195,54 @@ describe('Note API', () => {
   });
 
   describe('PATCH /note/:notePublicId', async () => {
+    const headerNoteTool = {
+      id: 1,
+      name: 'header',
+    };
+
+    const listNoteTool = {
+      id: 3,
+      name: 'list',
+    };
+
+    const headerTool = {
+      exportName: 'Header',
+      id: '1',
+      isDefault: true,
+      name: 'header',
+      source: {
+        cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
+      },
+      title: 'Heading',
+      userId: null,
+    };
+
+    const listTool = {
+      exportName: 'List',
+      id: '3',
+      isDefault: true,
+      name: 'list',
+      source:{
+        cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js',
+      },
+      title: 'List',
+      userId: null,
+    };
+
+    const tools = [headerTool, listTool];
+
     test.each([
       {
         noteTools: [
-          { 'header' : 1 },
-          { 'list': 3 },
+          { [headerNoteTool.name] : headerNoteTool.id },
+          { [listNoteTool.name]: listNoteTool.id },
         ],
       },
       {
         noteTools: null,
       },
     ])
-    ('Patches note tools', async ({ noteTools }) => {
+    ('Should patch note tools on note update', async ({ noteTools }) => {
       const user = await global.db.insertUser();
 
       const accessToken = await global.auth(user.id);
@@ -1189,7 +1261,7 @@ describe('Note API', () => {
         },
         body: {
           content: {},
-          tools: noteTools,
+          tools: noteTools ?? [],
         },
         url: `/note/${note.publicId}`,
       });
@@ -1204,7 +1276,7 @@ describe('Note API', () => {
         url: `/note/${note.publicId}`,
       });
 
-      expect(response?.json().note.tools).toMatchObject(noteTools ?? []);
+      expect(response?.json().tools).toMatchObject(noteTools ? tools : []);
     });
   });
 });

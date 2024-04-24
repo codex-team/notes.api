@@ -84,6 +84,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       accessRights: {
         canEdit: boolean,
       },
+      tools: EditorTool[],
     }| ErrorResponse,
   }>('/:notePublicId', {
     config: {
@@ -114,6 +115,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
             },
             parentNote: {
               $ref: 'NoteSchema',
+            },
+            tools: {
+              type: 'array',
+              items: {
+                $ref: 'EditorToolSchema',
+              },
             },
           },
         },
@@ -155,6 +162,17 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const notePublic = definePublicNote(note);
 
     /**
+     * Get all tools used in the note
+     */
+    const noteToolsIds : EditorTool['id'][] = [];
+
+    note.tools.forEach((tool) => {
+      /* for each tools there would be only one value (toolId) */
+      noteToolsIds.push(Object.values(tool)[0]);
+    });
+
+    const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
+    /**
      * Check if current user can edit the note
      */
     const canEdit = memberRole === MemberRole.Write;
@@ -163,7 +181,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       note: notePublic,
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
-      //  tools: noteTools,
+      tools: noteTools,
     });
   });
 
@@ -514,13 +532,14 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Get all tools used in the note
      */
-    const noteToolsNames = new Set<string>();
+    const noteToolsIds : EditorTool['id'][] = [];
 
-    note.content.blocks.forEach((block: { type: string }) => {
-      noteToolsNames.add(block.type);
+    note.tools.forEach((tool) => {
+      /* for each tools there would be only one value (toolId) */
+      noteToolsIds.push(Object.values(tool)[0]);
     });
 
-    const noteTools = await editorToolsService.getToolsByNames(Array.from(noteToolsNames));
+    const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
 
     return reply.send({
       note: notePublic,

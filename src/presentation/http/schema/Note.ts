@@ -6,7 +6,6 @@ export const NoteSchema = {
   type: 'object',
   required: [
     'content',
-    'tools',
   ],
   properties: {
     id: {
@@ -28,9 +27,6 @@ export const NoteSchema = {
           type: 'string',
         },
       },
-    },
-    tools: {
-      type: 'array',
     },
   },
 };
