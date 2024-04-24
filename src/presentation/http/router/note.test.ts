@@ -14,6 +14,10 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: user.id,
+        tools: [
+          { 'header' : '1' },
+          { 'paragraph' : '2' },
+        ],
       });
 
       /** Create test note settings */
@@ -37,6 +41,22 @@ describe('Note API', () => {
         accessRights: {
           canEdit: false,
         },
+        tools: [
+          {
+            name: 'header',
+            exportName: 'Header',
+            source: {
+              cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
+            },
+          },
+          {
+            name: 'paragraph',
+            exportName: 'Paragraph',
+            source: {
+              cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
+            },
+          },
+        ],
       });
     });
 
@@ -109,6 +129,10 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: creator.id,
+        tools: [
+          { 'header' : '1' },
+          { 'paragraph' : '2' },
+        ],
       });
 
       /** Create test note settings */
@@ -151,6 +175,22 @@ describe('Note API', () => {
           'accessRights': {
             'canEdit': canEdit,
           },
+          tools: [
+            {
+              name: 'header',
+              exportName: 'Header',
+              source: {
+                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
+              },
+            },
+            {
+              name: 'paragraph',
+              exportName: 'Paragraph',
+              source: {
+                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
+              },
+            },
+          ],
         });
       } else {
         expect(response?.json()).toStrictEqual({
