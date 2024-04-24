@@ -44,36 +44,6 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
           $ref: 'OauthSchema#/properties/clientSecret',
         },
       },
-
-      response:{
-        '2xx': {
-          accessToken: {
-            $ref: 'OauthSchema#/properties/accessToken',
-          },
-          refreshToken: {
-            $ref: 'OauthSchema#/properties/refreshToken',
-          },
-        },
-
-        '3xx': {
-          code: {
-            type: 'string',
-          },
-
-          message: {
-            type: 'string',
-          },
-        },
-
-        // '5xx': {
-        //   code: {
-        //     type: 'string',
-        //   },
-        //   message: {
-        //     type: 'string',
-        //   },
-        // },
-      },
     },
   }, async (request, reply) => {
     /**

@@ -128,6 +128,15 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
             $ref: 'UploadSchema#/properties/key',
           },
         },
+
+        response: {
+          '2xx': {
+            description: 'Generated buffer',
+            properties: {
+              fileData: { type: 'string' },
+            },
+          },
+        },
       },
       preHandler: [ noteResolver ],
     }, async (request, reply) => {

@@ -52,5 +52,8 @@ export const NoteSettingsSchema = {
         },
       },
     },
+    role: {
+      type: 'number',
+    },
   },
 };

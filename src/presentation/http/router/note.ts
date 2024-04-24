@@ -101,6 +101,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       response: {
         '2xx': {
           type: 'object',
+          description: 'Fetch all information of the notePublicId passed',
           properties: {
             note: {
               $ref: 'NoteSchema',
@@ -202,6 +203,17 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           $ref: 'NoteSchema#/properties/id',
         },
       },
+
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            isDeleted: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
     },
     config: {
       policy: [
@@ -251,7 +263,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       },
       response: {
         '2xx': {
-          description: 'Note fields',
+          description: 'Note fields response',
           content: {
             'application/json':{
               schema: {
@@ -315,6 +327,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       updatedAt: Note['updatedAt'],
     }
   }>('/:notePublicId', {
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+
     schema: {
       params: {
         notePublicId: {
@@ -322,16 +341,21 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         },
       },
       body: {
-        content: {
-          $ref: 'NoteSchema#/properties/content',
+        updatedAt: {
+          type: 'string',
         },
       },
-    },
-    config: {
-      policy: [
-        'authRequired',
-        'userCanEdit',
-      ],
+
+      response: {
+        '2xx': {
+          description: 'Updated timestamp',
+          properties: {
+            updatedAt: {
+              type: 'string',
+            },
+          },
+        },
+      },
     },
     preHandler: [
       noteResolver,
@@ -376,6 +400,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       response: {
         '2xx': {
           type: 'object',
+          description: 'Updated note',
           properties: {
             isUpdated: {
               type: 'boolean',
@@ -483,6 +508,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       response: {
         '2xx': {
           type: 'object',
+          description: 'Custom hostname response',
           properties: {
             note: {
               $ref: 'NoteSchema',

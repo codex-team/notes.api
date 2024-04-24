@@ -118,11 +118,16 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
         },
       },
       body: {
-        userId: {
-          $ref: 'NoteSettingsSchema#/properties/team/items/properties/id',
-        },
-        newRole:{
-          $ref: 'NoteSettingsSchema#/properties/team/items/properties/role',
+        '2xx': {
+          description: 'Update notePublicId',
+          properties: {
+            userId: {
+              $ref: 'NoteSettingsSchema#/properties/team/items/properties/id',
+            },
+            newRole:{
+              $ref: 'NoteSettingsSchema#/properties/team/items/properties/role',
+            },
+          },
         },
       },
     },
@@ -272,6 +277,19 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       params: {
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
+        },
+      },
+
+      response: {
+        '2xx': {
+          type: 'array',
+          description: 'Fetch all teams associated with the notePublicId',
+          properties: {
+            id: { type: 'string' },
+            noteId: { type: 'string' },
+            role: { type: 'string' },
+            userId: { type: 'string' },
+          },
         },
       },
     },

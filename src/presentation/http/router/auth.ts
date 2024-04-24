@@ -53,7 +53,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
 
         response: {
           '2xx': {
-            description: 'New token generated',
+            description: 'New auth session generated',
             content: {
               'application/json': {
                 schema: {

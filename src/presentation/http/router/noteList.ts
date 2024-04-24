@@ -45,6 +45,21 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
           maximum: 30,
         },
       },
+
+      response: {
+        '2xx':{
+          description: 'Query notelist',
+          properties: {
+            items: {
+              id: { type: 'string' },
+              content: { type: 'string' },
+              createdAt: { type: 'string' },
+              creatorId: { type: 'string' },
+              updatedAt: { type: 'string' },
+            },
+          },
+        },
+      },
     },
   }, async (request, reply) => {
     const userId = request.userId as number;
