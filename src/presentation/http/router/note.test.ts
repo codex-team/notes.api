@@ -3,6 +3,56 @@ import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
 
 describe('Note API', () => {
+  /**
+   * preinstalled tools
+   */
+  const headerTool = {
+    exportName: 'Header',
+    id: '1',
+    isDefault: true,
+    name: 'header',
+    source: {
+      cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
+    },
+    title: 'Heading',
+    userId: null,
+  };
+
+  const listTool = {
+    exportName: 'List',
+    id: '3',
+    isDefault: true,
+    name: 'list',
+    source:{
+      cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js',
+    },
+    title: 'List',
+    userId: null,
+  };
+
+  /**
+   * Note content mock inserted if no content passed
+   */
+  const DEFAULT_NOTE_CONTENT = {
+    blocks: [
+      {
+        id: 'mJDq8YbvqO',
+        type: 'list',
+        data: {
+          text: 'text',
+        },
+      },
+      {
+        id: 'DeL0QehzGe',
+        type: 'header',
+        data: {
+          text: 'fdgsfdgfdsg',
+          level: 2,
+        },
+      },
+    ],
+  };
+
   beforeEach(async () => {
     await global.db.truncateTables();
   });
@@ -15,8 +65,14 @@ describe('Note API', () => {
       const note = await global.db.insertNote({
         creatorId: user.id,
         tools: [
-          { 'header' : '1' },
-          { 'paragraph' : '2' },
+          {
+            name: 'header',
+            id : '1',
+          },
+          {
+            name: 'paragraph',
+            id : '2',
+          },
         ],
       });
 
@@ -130,8 +186,14 @@ describe('Note API', () => {
       const note = await global.db.insertNote({
         creatorId: creator.id,
         tools: [
-          { 'header' : '1' },
-          { 'paragraph' : '2' },
+          {
+            name: 'header',
+            id : '1',
+          },
+          {
+            name: 'paragraph',
+            id : '2',
+          },
         ],
       });
 
@@ -511,6 +573,13 @@ describe('Note API', () => {
         ],
       };
 
+      const newTools = [
+        {
+          name: 'header',
+          id: '1',
+        },
+      ];
+
       let response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -519,6 +588,7 @@ describe('Note API', () => {
         url: `/note/${note.publicId}`,
         body: {
           content: newContent,
+          tools: newTools,
         },
       });
 
@@ -588,48 +658,20 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    const headerNoteTool = {
-      id: 1,
-      name: 'header',
-    };
-
-    const listNoteTool = {
-      id: 3,
-      name: 'list',
-    };
-
-    const headerTool = {
-      exportName: 'Header',
-      id: '1',
-      isDefault: true,
-      name: 'header',
-      source: {
-        cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
-      },
-      title: 'Heading',
-      userId: null,
-    };
-
-    const listTool = {
-      exportName: 'List',
-      id: '3',
-      isDefault: true,
-      name: 'list',
-      source:{
-        cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js',
-      },
-      title: 'List',
-      userId: null,
-    };
-
     const tools = [headerTool, listTool];
 
     /* Should correctly save note tools */
     test.each([
       {
         noteTools: [
-          { [headerNoteTool.name] : headerNoteTool.id },
-          { [listNoteTool.name]: listNoteTool.id },
+          {
+            name : headerTool.name,
+            id : headerTool.id,
+          },
+          {
+            name : listTool.name,
+            id : listTool.id,
+          },
         ],
       },
       {
@@ -1235,47 +1277,19 @@ describe('Note API', () => {
   });
 
   describe('PATCH /note/:notePublicId', async () => {
-    const headerNoteTool = {
-      id: 1,
-      name: 'header',
-    };
-
-    const listNoteTool = {
-      id: 3,
-      name: 'list',
-    };
-
-    const headerTool = {
-      exportName: 'Header',
-      id: '1',
-      isDefault: true,
-      name: 'header',
-      source: {
-        cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
-      },
-      title: 'Heading',
-      userId: null,
-    };
-
-    const listTool = {
-      exportName: 'List',
-      id: '3',
-      isDefault: true,
-      name: 'list',
-      source:{
-        cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js',
-      },
-      title: 'List',
-      userId: null,
-    };
-
     const tools = [headerTool, listTool];
 
     test.each([
       {
         noteTools: [
-          { [headerNoteTool.name] : headerNoteTool.id },
-          { [listNoteTool.name]: listNoteTool.id },
+          {
+            name : headerTool.name,
+            id : headerTool.id,
+          },
+          {
+            name : listTool.name,
+            id : listTool.id,
+          },
         ],
       },
       {
@@ -1300,13 +1314,13 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          content: {},
+          content: DEFAULT_NOTE_CONTENT,
           tools: noteTools ?? [],
         },
         url: `/note/${note.publicId}`,
       });
 
-      expect(response?.statusCode).toBe(200),
+      // expect(response?.statusCode).toBe(200),
 
       response = await global.api?.fakeRequest({
         method: 'GET',

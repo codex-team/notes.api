@@ -6,6 +6,7 @@ import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
 import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
+import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Note service
@@ -225,4 +226,38 @@ export default class NoteService {
 
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
+
+  /**
+   *
+   * @param tools - tools of certain note
+   * @param content - content of the note
+   */
+  public async validateNoteTools(tools : Note['tools'], content: Note['content'] | Record<string, never>): Promise<boolean> {
+    const noteToolsNames = new Set<string>();
+
+    if (isEmpty(content) && (tools.length !== 0)) {
+      return true;
+    }
+
+    if (isEmpty(content)) {
+      return false;
+    }
+
+    content.blocks.forEach((block: { type: string }) => {
+      noteToolsNames.add(block.type);
+    });
+
+
+    Array.from(tools).forEach((tool) => {
+      if (!(Array.from(noteToolsNames).includes(tool.name))) {
+        return false;
+      }
+    });
+
+    /**
+     * @todo Validate tools ids
+     */
+
+    return true;
+  }
 }

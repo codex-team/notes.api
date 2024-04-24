@@ -167,8 +167,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteToolsIds : EditorTool['id'][] = [];
 
     Array.from(note.tools).forEach((tool) => {
-      /* for each tools there would be only one value (toolId) */
-      noteToolsIds.push(Object.values(tool)[0]);
+      noteToolsIds.push(tool.id);
     });
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
     /**
@@ -249,6 +248,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const parentId = request.body.parentId;
     const noteTools = request.body.tools;
 
+    if (!(await noteService.validateNoteTools(noteTools, content))) {
+      return reply.notAcceptable('Note tools are invalid');
+    }
+
     const addedNote = await noteService.addNote(content as Note['content'], userId as number, parentId, noteTools); // "authRequired" policy ensures that userId is not null
 
     /**
@@ -319,6 +322,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteId = request.note?.id as number;
     const content = request.body.content;
     const noteTools = request.body.tools;
+
+    if (!(await noteService.validateNoteTools(noteTools, content))) {
+      return reply.notAcceptable('Note tools are invalid');
+    }
 
     const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools);
 
@@ -535,7 +542,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     Array.from(note.tools).forEach((tool) => {
       /* for each tools there would be only one value (toolId) */
-      noteToolsIds.push(Object.values(tool)[0]);
+      noteToolsIds.push(tool.id);
     });
 
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
