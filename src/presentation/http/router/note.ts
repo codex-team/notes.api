@@ -166,11 +166,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const noteToolsIds : EditorTool['id'][] = [];
 
-    note.tools.forEach((tool) => {
+    Array.from(note.tools).forEach((tool) => {
       /* for each tools there would be only one value (toolId) */
       noteToolsIds.push(Object.values(tool)[0]);
     });
-
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
     /**
      * Check if current user can edit the note
@@ -534,7 +533,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const noteToolsIds : EditorTool['id'][] = [];
 
-    note.tools.forEach((tool) => {
+    Array.from(note.tools).forEach((tool) => {
       /* for each tools there would be only one value (toolId) */
       noteToolsIds.push(Object.values(tool)[0]);
     });
