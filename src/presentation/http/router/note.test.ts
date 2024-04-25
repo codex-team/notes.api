@@ -82,8 +82,8 @@ describe('Note API', () => {
             id : headerTool.id,
           },
           {
-            name: 'paragraph',
-            id : '2',
+            name: paragraphTool.name,
+            id : paragraphTool.id,
           },
         ],
       });
@@ -184,12 +184,12 @@ describe('Note API', () => {
         creatorId: creator.id,
         tools: [
           {
-            name: 'header',
-            id : '1',
+            name: headerTool.name,
+            id : headerTool.id,
           },
           {
-            name: 'paragraph',
-            id : '2',
+            name: paragraphTool.name,
+            id : paragraphTool.id,
           },
         ],
       });
@@ -234,22 +234,7 @@ describe('Note API', () => {
           'accessRights': {
             'canEdit': canEdit,
           },
-          tools: [
-            {
-              name: 'header',
-              exportName: 'Header',
-              source: {
-                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
-              },
-            },
-            {
-              name: 'paragraph',
-              exportName: 'Paragraph',
-              source: {
-                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
-              },
-            },
-          ],
+          tools: [headerTool, paragraphTool],
         });
       } else {
         expect(response?.json()).toStrictEqual({
@@ -572,8 +557,8 @@ describe('Note API', () => {
 
       const newTools = [
         {
-          name: 'header',
-          id: '1',
+          name: headerTool.name,
+          id: headerTool.id,
         },
       ];
 
