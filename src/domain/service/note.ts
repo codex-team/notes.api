@@ -228,36 +228,42 @@ export default class NoteService {
   };
 
   /**
+   * Raise domain error if tools, that are in note content are not specified in tools array
    *
-   * @param tools - tools of certain note
+   * @param tools - editor tools that were used in a note content
    * @param content - content of the note
+   * @todo validate tool ids
    */
-  public async validateNoteTools(tools : Note['tools'], content: Note['content'] | Record<string, never>): Promise<boolean> {
-    const noteToolsNames = new Set<string>();
-
+  public async validateNoteTools(tools : Note['tools'], content: Note['content'] | Record<string, never>): Promise<void> {
     if (isEmpty(content) && (tools.length !== 0)) {
-      return true;
+      return;
     }
 
     if (isEmpty(content)) {
-      return false;
+      throw (new DomainError('Note tools, used in note are not specified'));
     }
 
-    content.blocks.forEach((block: { type: string }) => {
-      noteToolsNames.add(block.type);
-    });
-
-
-    Array.from(tools).forEach((tool) => {
-      if (!(Array.from(noteToolsNames).includes(tool.name))) {
-        return false;
-      }
-    });
+    /**
+     * Tools that are used in note
+     */
+    const noteToolNames = Array.from(content.blocks).map(block => block.type);
 
     /**
-     * @todo Validate tools ids
+     * Tools that are specified in tools array
      */
+    const specifiedNoteToolNames = Array.from(tools).map(tool => tool.name);
 
-    return true;
+    /**
+     * Check that all tools used in note are specified in noteToolNames array
+     */
+    const toolsAreSpicified = noteToolNames.every((toolName) => {
+      return (specifiedNoteToolNames.includes(toolName));
+    });
+
+    console.log('aaaaaaaaaaaaa', toolsAreSpicified, specifiedNoteToolNames, noteToolNames);
+
+    if (!toolsAreSpicified) {
+      throw (new DomainError('Note tools, used in note are not specified'));
+    }
   }
 }

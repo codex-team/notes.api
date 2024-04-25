@@ -164,11 +164,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Get all tools used in the note
      */
-    const noteToolsIds : EditorTool['id'][] = [];
+    const noteToolsIds : EditorTool['id'][] = Array.from(note.tools).map((tool) => tool.id);
 
-    Array.from(note.tools).forEach((tool) => {
-      noteToolsIds.push(tool.id);
-    });
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
     /**
      * Check if current user can edit the note
@@ -248,9 +245,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const parentId = request.body.parentId;
     const noteTools = request.body.tools;
 
-    if (!(await noteService.validateNoteTools(noteTools, content))) {
-      return reply.notAcceptable('Note tools are invalid');
-    }
+    await noteService.validateNoteTools(noteTools, content);
 
     const addedNote = await noteService.addNote(content as Note['content'], userId as number, parentId, noteTools); // "authRequired" policy ensures that userId is not null
 
@@ -323,9 +318,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const content = request.body.content;
     const noteTools = request.body.tools;
 
-    if (!(await noteService.validateNoteTools(noteTools, content))) {
-      return reply.notAcceptable('Note tools are invalid');
-    }
+    await noteService.validateNoteTools(noteTools, content);
 
     const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools);
 
@@ -538,12 +531,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Get all tools used in the note
      */
-    const noteToolsIds : EditorTool['id'][] = [];
+    const noteToolsIds : EditorTool['id'][] = Array.from(note.tools).map((tool) => tool.id);
 
-    Array.from(note.tools).forEach((tool) => {
-      /* for each tools there would be only one value (toolId) */
-      noteToolsIds.push(tool.id);
-    });
 
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
 

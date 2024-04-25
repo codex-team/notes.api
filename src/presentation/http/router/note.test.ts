@@ -658,8 +658,6 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    const tools = [headerTool, listTool];
-
     /* Should correctly save note tools */
     test.each([
       {
@@ -675,7 +673,12 @@ describe('Note API', () => {
         ],
       },
       {
-        noteTools: null,
+        noteTools: [
+          {
+            name: headerTool.name,
+            id: headerTool.id,
+          },
+        ],
       },
     ])
     ('Should save tools that where used for note creation', async ({ noteTools }) => {
@@ -712,7 +715,7 @@ describe('Note API', () => {
               },
             ],
           },
-          tools: noteTools ?? [],
+          tools: noteTools,
         },
       });
 
@@ -731,7 +734,7 @@ describe('Note API', () => {
         id: parentNote.publicId,
       });
 
-      expect(response?.json().tools).toMatchObject(noteTools ? tools : []);
+      expect(response?.json().tools).toMatchObject(noteTools);
     });
 
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
