@@ -260,8 +260,6 @@ export default class NoteService {
       return (specifiedNoteToolNames.includes(toolName));
     });
 
-    console.log('aaaaaaaaaaaaa', toolsAreSpicified, specifiedNoteToolNames, noteToolNames);
-
     if (!toolsAreSpicified) {
       throw (new DomainError('Note tools, used in note are not specified'));
     }
