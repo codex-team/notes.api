@@ -164,7 +164,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Get all tools used in the note
      */
-    const noteToolsIds : EditorTool['id'][] = Array.from(note.tools).map((tool) => tool.id);
+    const noteToolsIds : EditorTool['id'][] = note.tools.map((tool) => tool.id);
 
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
     /**
@@ -531,7 +531,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Get all tools used in the note
      */
-    const noteToolsIds : EditorTool['id'][] = Array.from(note.tools).map((tool) => tool.id);
+    const noteToolsIds : EditorTool['id'][] = note.tools.map((tool) => tool.id);
 
 
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
