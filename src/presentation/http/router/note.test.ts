@@ -18,6 +18,18 @@ describe('Note API', () => {
     userId: null,
   };
 
+  const paragraphTool = {
+    name: 'paragraph',
+    exportName: 'Paragraph',
+    id: '2',
+    isDefault: true,
+    source: {
+      cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
+    },
+    title: 'Paragraph',
+    userId: null,
+  };
+
   const listTool = {
     exportName: 'List',
     id: '3',
@@ -97,22 +109,7 @@ describe('Note API', () => {
         accessRights: {
           canEdit: false,
         },
-        tools: [
-          {
-            name: headerTool.name,
-            exportName: headerTool.exportName,
-            source: {
-              cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
-            },
-          },
-          {
-            name: 'paragraph',
-            exportName: 'Paragraph',
-            source: {
-              cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
-            },
-          },
-        ],
+        tools: [headerTool, paragraphTool],
       });
     });
 
@@ -658,8 +655,10 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
-    /* Should correctly save note tools */
     test.each([
+      /**
+       * Specified extra tools
+       */
       {
         noteTools: [
           {
@@ -671,7 +670,12 @@ describe('Note API', () => {
             id : listTool.id,
           },
         ],
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
       },
+      /**
+       * All tools specified correctly
+       */
       {
         noteTools: [
           {
@@ -679,9 +683,19 @@ describe('Note API', () => {
             id: headerTool.id,
           },
         ],
+        expectedStatusCode: 200,
+        expectedMessage: null,
+      },
+      /**
+       * Specified less tools
+       */
+      {
+        noteTools: [],
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
       },
     ])
-    ('Should save tools that where used for note creation', async ({ noteTools }) => {
+    ('Should save tools that were used for note creation', async ({ noteTools, expectedMessage, expectedStatusCode }) => {
       const user = await global.db.insertUser();
 
       const parentNote = await global.db.insertNote({
@@ -713,30 +727,42 @@ describe('Note API', () => {
                   level: 1,
                 },
               },
+              {
+                id: 'qafjG34mus',
+                type: headerTool.name,
+                data: {
+                  text: 'sample text',
+                  level: 1,
+                },
+              },
             ],
           },
           tools: noteTools,
         },
       });
 
-      expect(response?.statusCode).toBe(200);
+      if (expectedStatusCode === 200) {
+        expect(response?.statusCode).toBe(expectedStatusCode);
 
-      response = await global.api?.fakeRequest({
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/${response?.json().id}`,
-      });
+        response = await global.api?.fakeRequest({
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          url: `/note/${response?.json().id}`,
+        });
 
-      expect(response?.json().parentNote).toMatchObject({
-        content: parentNote.content,
-        id: parentNote.publicId,
-      });
+        expect(response?.json().parentNote).toMatchObject({
+          content: parentNote.content,
+          id: parentNote.publicId,
+        });
 
-      expect(response?.json().tools).toMatchObject(noteTools);
+        expect(response?.json().tools).toMatchObject(noteTools);
+      } else {
+        expect(response?.statusCode).toBe(expectedStatusCode);
+        expect(response?.json().message).toBe(expectedMessage);
+      }
     });
-
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
   });
 
@@ -1283,6 +1309,30 @@ describe('Note API', () => {
     const tools = [headerTool, listTool];
 
     test.each([
+      /**
+       * Specified extra tools
+       */
+      {
+        noteTools: [
+          {
+            name: headerTool.name,
+            id: headerTool.id,
+          },
+          {
+            name: paragraphTool.name,
+            id: paragraphTool.id,
+          },
+          {
+            name: listTool.name,
+            id: listTool.id,
+          },
+        ],
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * All tools specified correctly
+       */
       {
         noteTools: [
           {
@@ -1294,12 +1344,19 @@ describe('Note API', () => {
             id : listTool.id,
           },
         ],
+        expectedStatusCode: 200,
+        expectedMessage: null,
       },
+      /**
+       * Specified less tools
+       */
       {
-        noteTools: null,
+        noteTools: [],
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
       },
     ])
-    ('Should patch note tools on note update', async ({ noteTools }) => {
+    ('Should patch note tools on note update', async ({ noteTools, expectedStatusCode, expectedMessage }) => {
       const user = await global.db.insertUser();
 
       const accessToken = await global.auth(user.id);
@@ -1318,22 +1375,27 @@ describe('Note API', () => {
         },
         body: {
           content: DEFAULT_NOTE_CONTENT,
-          tools: noteTools ?? [],
+          tools: noteTools,
         },
         url: `/note/${note.publicId}`,
       });
 
-      // expect(response?.statusCode).toBe(200),
+      if (expectedStatusCode === 200) {
+        expect(response?.statusCode).toBe(expectedStatusCode),
 
-      response = await global.api?.fakeRequest({
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/${note.publicId}`,
-      });
+        response = await global.api?.fakeRequest({
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          url: `/note/${note.publicId}`,
+        });
 
-      expect(response?.json().tools).toMatchObject(noteTools ? tools : []);
+        expect(response?.json().tools).toMatchObject(tools);
+      } else {
+        expect(response?.statusCode).toBe(expectedStatusCode);
+        expect(response?.json().message).toBe(expectedMessage);
+      }
     });
   });
 });

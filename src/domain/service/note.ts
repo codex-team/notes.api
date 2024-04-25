@@ -235,33 +235,36 @@ export default class NoteService {
    * @todo validate tool ids
    */
   public async validateNoteTools(tools : Note['tools'], content: Note['content'] | Record<string, never>): Promise<void> {
-    if (isEmpty(content) && (tools.length !== 0)) {
+    if (isEmpty(content) && (isEmpty(tools))) {
       return;
     }
 
-    if (isEmpty(content)) {
-      throw (new DomainError('Note tools, used in note are not specified'));
-    }
-
     /**
-     * Tools that are used in note
+     * Set of the tools that are used in note
      */
-    const noteToolNames = Array.from(content.blocks).map(block => block.type);
+    const toolsInContent = Array.from(new Set(content.blocks.map(block => block.type)));
 
     /**
      * Tools that are specified in tools array
      */
-    const specifiedNoteToolNames = Array.from(tools).map(tool => tool.name);
+    const passedTools = tools.map(tool => tool.name);
 
     /**
-     * Check that all tools used in note are specified in noteToolNames array
+     * Check that all tools used in note are specified in toolsInContent array
      */
-    const toolsAreSpicified = noteToolNames.every((toolName) => {
-      return (specifiedNoteToolNames.includes(toolName));
+    const toolsAreSpicified = toolsInContent.every((toolName) => {
+      return (passedTools.includes(toolName));
     });
 
     if (!toolsAreSpicified) {
-      throw (new DomainError('Note tools, used in note are not specified'));
+      throw (new DomainError('Incorrect tools passed'));
+    }
+
+    /**
+     * Extra tools specified
+     */
+    if (tools.length !== toolsInContent.length) {
+      throw (new DomainError('Incorrect tools passed'));
     }
   }
 }
