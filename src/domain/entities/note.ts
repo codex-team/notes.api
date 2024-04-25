@@ -24,7 +24,7 @@ export type ToolUsedInNoteContent = {
    * Id of certain editor tool (nanoid)
    */
   id: EditorTool['id']
-}[];
+};
 
 /**
  * Note entity
@@ -70,7 +70,7 @@ export interface Note {
   /**
    * All tools used in certain note
    */
-  tools: ToolUsedInNoteContent;
+  tools: ToolUsedInNoteContent[];
 }
 
 
