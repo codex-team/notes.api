@@ -52,7 +52,7 @@ export default class NoteService {
    * @param content - note content
    * @param creatorId - note creator
    * @param parentPublicId - parent note if exist
-   * @param tools - editor tools wthich are used in note
+   * @param tools - editor tools that were used in a note content
    * @returns { Note } added note object
    */
   public async addNote(content: Note['content'], creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined, tools: Note['tools']): Promise<Note> {
