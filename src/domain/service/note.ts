@@ -256,18 +256,18 @@ export default class NoteService {
      * Check that all tools used in note are specified in toolsInContent array
      */
     const toolsAreSpicified = toolsInContent.every((toolName) => {
-      return (passedToolsNames.includes(toolName));
+      return passedToolsNames.includes(toolName);
     });
 
     if (!toolsAreSpicified) {
-      throw (new DomainError('Incorrect tools passed'));
+      throw new DomainError('Incorrect tools passed');
     }
 
     /**
      * Extra tools specified
      */
     if (tools.length !== toolsInContent.length) {
-      throw (new DomainError('Incorrect tools passed'));
+      throw new DomainError('Incorrect tools passed');
     }
 
     /**
@@ -276,7 +276,7 @@ export default class NoteService {
     try {
       await this.editorToolsRepository.getToolsByIds(passedToolsIds);
     } catch {
-      throw (new DomainError('Incorrect tools passed'));
+      throw new DomainError('Incorrect tools passed');
     }
   }
 }
