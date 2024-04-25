@@ -640,6 +640,62 @@ describe('Note API', () => {
   });
 
   describe('POST /note', () => {
+    test('Should correctly save relation to parent note if parentId passed', async () => {
+      const user = await global.db.insertUser();
+
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: parentNote.id,
+        isPublic: true,
+      });
+      const accessToken = global.auth(user.id);
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note`,
+        body: {
+          parentId: parentNote.publicId,
+          content: {
+            blocks: [
+              {
+                id: 'qxnjUh9muR',
+                type: 'header',
+                data: {
+                  text: 'sample text',
+                  level: 1,
+                },
+              },
+            ],
+          },
+          tools: [
+            {
+              name: headerTool.name,
+              id: headerTool.id,
+            },
+          ],
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${response?.json().id}`,
+      });
+
+      expect(response?.json().parentNote).toMatchObject({
+        content: parentNote.content,
+        id: parentNote.publicId,
+      });
+    });
     test.each([
       /**
        * Specified extra tools
@@ -809,15 +865,6 @@ describe('Note API', () => {
     ('Should save tools that were used for note creation', async ({ noteTools, noteContent, expectedMessage, expectedStatusCode }) => {
       const user = await global.db.insertUser();
 
-      const parentNote = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
-      await global.db.insertNoteSetting({
-        noteId: parentNote.id,
-        isPublic: true,
-      });
-
       const accessToken = global.auth(user.id);
 
       let response = await global.api?.fakeRequest({
@@ -827,7 +874,6 @@ describe('Note API', () => {
         },
         url: `/note`,
         body: {
-          parentId: parentNote.publicId,
           content: noteContent,
           tools: noteTools,
         },
@@ -843,12 +889,6 @@ describe('Note API', () => {
           },
           url: `/note/${response?.json().id}`,
         });
-
-        expect(response?.json().parentNote).toMatchObject({
-          content: parentNote.content,
-          id: parentNote.publicId,
-        });
-
         expect(response?.json().tools).toMatchObject(noteTools);
       } else {
         expect(response?.statusCode).toBe(expectedStatusCode);
