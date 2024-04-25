@@ -37,14 +37,14 @@ describe('Note API', () => {
     blocks: [
       {
         id: 'mJDq8YbvqO',
-        type: 'list',
+        type: listTool.name,
         data: {
           text: 'text',
         },
       },
       {
         id: 'DeL0QehzGe',
-        type: 'header',
+        type: headerTool.name,
         data: {
           text: 'fdgsfdgfdsg',
           level: 2,
@@ -66,8 +66,8 @@ describe('Note API', () => {
         creatorId: user.id,
         tools: [
           {
-            name: 'header',
-            id : '1',
+            name: headerTool.name,
+            id : headerTool.id,
           },
           {
             name: 'paragraph',
@@ -99,8 +99,8 @@ describe('Note API', () => {
         },
         tools: [
           {
-            name: 'header',
-            exportName: 'Header',
+            name: headerTool.name,
+            exportName: headerTool.exportName,
             source: {
               cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
             },
@@ -564,7 +564,7 @@ describe('Note API', () => {
         blocks: [
           {
             id: 'qxnjUh9muR',
-            type: 'header',
+            type: headerTool.name,
             data: {
               text: 'sample text',
               level: 1,
@@ -707,7 +707,7 @@ describe('Note API', () => {
             blocks: [
               {
                 id: 'qxnjUh9muR',
-                type: 'header',
+                type: headerTool.name,
                 data: {
                   text: 'sample text',
                   level: 1,
