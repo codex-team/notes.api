@@ -4,9 +4,9 @@ import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
+import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
-import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Note service
@@ -28,6 +28,11 @@ export default class NoteService {
   public noteVisitsRepository: NoteVisitsRepository;
 
   /**
+   * Edtor tools repository
+   */
+  public editorToolsRepository: EditorToolsRepository;
+
+  /**
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
@@ -39,11 +44,13 @@ export default class NoteService {
    * @param noteRepository - note repository
    * @param noteRelationsRepository - note relationship repository
    * @param noteVisitsRepository - note visits repository
+   * @param editorToolsRepository - editor tools repository
    */
-  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository) {
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository) {
     this.noteRepository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
     this.noteVisitsRepository = noteVisitsRepository;
+    this.editorToolsRepository = editorToolsRepository;
   }
 
   /**
@@ -235,10 +242,6 @@ export default class NoteService {
    * @todo validate tool ids
    */
   public async validateNoteTools(tools : Note['tools'], content: Note['content'] | Record<string, never>): Promise<void> {
-    if (isEmpty(content) && (isEmpty(tools))) {
-      return;
-    }
-
     /**
      * Set of the tools that are used in note
      */
@@ -247,13 +250,13 @@ export default class NoteService {
     /**
      * Tools that are specified in tools array
      */
-    const passedTools = tools.map(tool => tool.name);
-
+    const passedToolsNames = tools.map(tool => tool.name);
+    const passedToolsIds = tools.map(tool => tool.id);
     /**
      * Check that all tools used in note are specified in toolsInContent array
      */
     const toolsAreSpicified = toolsInContent.every((toolName) => {
-      return (passedTools.includes(toolName));
+      return (passedToolsNames.includes(toolName));
     });
 
     if (!toolsAreSpicified) {
@@ -264,6 +267,15 @@ export default class NoteService {
      * Extra tools specified
      */
     if (tools.length !== toolsInContent.length) {
+      throw (new DomainError('Incorrect tools passed'));
+    }
+
+    /**
+     * Validate tool ids
+     */
+    try {
+      await this.editorToolsRepository.getToolsByIds(passedToolsIds);
+    } catch {
       throw (new DomainError('Incorrect tools passed'));
     }
   }

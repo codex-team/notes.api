@@ -670,6 +670,26 @@ describe('Note API', () => {
             id : listTool.id,
           },
         ],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
         expectedStatusCode: 400,
         expectedMessage: 'Incorrect tools passed',
       },
@@ -683,19 +703,125 @@ describe('Note API', () => {
             id: headerTool.id,
           },
         ],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
         expectedStatusCode: 200,
         expectedMessage: null,
+      },
+      /**
+       * Specified tools with incorrect name
+       */
+      {
+        noteTools: [
+          {
+            name: 'faketool',
+            id: headerTool.id,
+          },
+        ],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * Specified tools with incorrect id
+       */
+      {
+        noteTools: [
+          {
+            name: headerTool.name,
+            id: 'fakeId',
+          },
+        ],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
       },
       /**
        * Specified less tools
        */
       {
         noteTools: [],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
         expectedStatusCode: 400,
         expectedMessage: 'Incorrect tools passed',
       },
     ])
-    ('Should save tools that were used for note creation', async ({ noteTools, expectedMessage, expectedStatusCode }) => {
+    ('Should save tools that were used for note creation', async ({ noteTools, noteContent, expectedMessage, expectedStatusCode }) => {
       const user = await global.db.insertUser();
 
       const parentNote = await global.db.insertNote({
@@ -717,26 +843,7 @@ describe('Note API', () => {
         url: `/note`,
         body: {
           parentId: parentNote.publicId,
-          content: {
-            blocks: [
-              {
-                id: 'qxnjUh9muR',
-                type: headerTool.name,
-                data: {
-                  text: 'sample text',
-                  level: 1,
-                },
-              },
-              {
-                id: 'qafjG34mus',
-                type: headerTool.name,
-                data: {
-                  text: 'sample text',
-                  level: 1,
-                },
-              },
-            ],
-          },
+          content: noteContent,
           tools: noteTools,
         },
       });
@@ -1310,7 +1417,7 @@ describe('Note API', () => {
 
     test.each([
       /**
-       * Specified extra tools
+       * Specified more tools than used in note content
        */
       {
         noteTools: [
@@ -1327,6 +1434,7 @@ describe('Note API', () => {
             id: listTool.id,
           },
         ],
+        noteContent: DEFAULT_NOTE_CONTENT,
         expectedStatusCode: 400,
         expectedMessage: 'Incorrect tools passed',
       },
@@ -1344,19 +1452,53 @@ describe('Note API', () => {
             id : listTool.id,
           },
         ],
+        noteContent: DEFAULT_NOTE_CONTENT,
         expectedStatusCode: 200,
         expectedMessage: null,
       },
       /**
-       * Specified less tools
+       * Specified less tools than used in note content
        */
       {
         noteTools: [],
+        noteContent: DEFAULT_NOTE_CONTENT,
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * Specified tools with incorrect name
+       */
+      {
+        noteTools: [
+          {
+            name: 'fakename',
+            id: headerTool.id,
+          },
+        ],
+        noteContent: DEFAULT_NOTE_CONTENT,
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * Specified tools with incorrect id
+       */
+      {
+        noteTools: [
+          {
+            name: headerTool.name,
+            id: 'fakeid',
+          },
+          {
+            name: listTool.name,
+            id: 'anotherfake',
+          },
+        ],
+        noteContent: DEFAULT_NOTE_CONTENT,
         expectedStatusCode: 400,
         expectedMessage: 'Incorrect tools passed',
       },
     ])
-    ('Should patch note tools on note update', async ({ noteTools, expectedStatusCode, expectedMessage }) => {
+    ('Should patch note tools on note update', async ({ noteTools, noteContent, expectedStatusCode, expectedMessage }) => {
       const user = await global.db.insertUser();
 
       const accessToken = await global.auth(user.id);
@@ -1374,7 +1516,7 @@ describe('Note API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          content: DEFAULT_NOTE_CONTENT,
+          content: noteContent,
           tools: noteTools,
         },
         url: `/note/${note.publicId}`,
