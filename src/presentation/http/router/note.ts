@@ -505,6 +505,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     }| ErrorResponse,
   }>('/resolve-hostname/:hostname', {
     schema: {
+      params: {
+        hostname: {
+          type: 'string',
+        },
+      },
       response: {
         '2xx': {
           type: 'object',

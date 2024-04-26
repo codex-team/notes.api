@@ -120,7 +120,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       body: {
         properties: {
           userId: {
-            $ref: 'NoteSettingsSchema#/properties/team/items/properties/id',
+            $ref: 'UserSchema#/properties/id',
           },
           newRole:{
             $ref: 'NoteSettingsSchema#/properties/team/items/properties/role',
