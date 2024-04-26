@@ -341,8 +341,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         },
       },
       body: {
-        updatedAt: {
-          type: 'string',
+        content: {
+          type: 'object',
         },
       },
 

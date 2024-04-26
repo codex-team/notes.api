@@ -118,14 +118,22 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
         },
       },
       body: {
+        properties: {
+          userId: {
+            $ref: 'NoteSettingsSchema#/properties/team/items/properties/id',
+          },
+          newRole:{
+            $ref: 'NoteSettingsSchema#/properties/team/items/properties/role',
+          },
+        },
+      },
+
+      response: {
         '2xx': {
-          description: 'Update notePublicId',
+          type: 'number',
           properties: {
-            userId: {
-              $ref: 'NoteSettingsSchema#/properties/team/items/properties/id',
-            },
-            newRole:{
-              $ref: 'NoteSettingsSchema#/properties/team/items/properties/role',
+            newRole: {
+              type: 'number',
             },
           },
         },
@@ -146,6 +154,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     if (newRole === undefined) {
       return reply.notFound('User does not belong to Note\'s team');
     }
+
 
     return reply.send(newRole);
   });
