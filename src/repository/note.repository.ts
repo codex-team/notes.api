@@ -34,10 +34,11 @@ export default class NoteRepository {
    *
    * @param id - note internal id
    * @param content - new content
+   * @param noteTools - tools which are used in note
    * @returns Note on success, null on failure
    */
-  public async updateNoteContentById(id: NoteInternalId, content: Note['content'] ): Promise<Note | null> {
-    return await this.storage.updateNoteContentById(id, content);
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools']): Promise<Note | null> {
+    return await this.storage.updateNoteContentAndToolsById(id, content, noteTools);
   }
 
   /**

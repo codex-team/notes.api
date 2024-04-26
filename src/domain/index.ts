@@ -61,7 +61,10 @@ export interface DomainServices {
  * @param appConfig - app config
  */
 export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
-  const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository, repositories.noteVisitsRepository);
+  /**
+   * @todo use shared methods for uncoupling repositories unrelated to note service
+   */
+  const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository, repositories.noteVisitsRepository, repositories.editorToolsRepository);
   const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
   const authService = new AuthService(
     appConfig.auth.accessSecret,

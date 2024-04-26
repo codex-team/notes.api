@@ -42,6 +42,8 @@ export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAt
    * Last time when note was updated
    */
   public declare updatedAt: CreationOptional<Note['updatedAt']>;
+
+  public declare tools: Note['tools'];
 }
 
 
@@ -104,6 +106,7 @@ export default class NoteSequelizeStorage {
           key: 'id',
         },
       },
+      tools: DataTypes.JSONB,
       createdAt: DataTypes.DATE,
       updatedAt: DataTypes.DATE,
     }, {
@@ -157,6 +160,7 @@ export default class NoteSequelizeStorage {
       publicId: options.publicId,
       content: options.content,
       creatorId: options.creatorId,
+      tools: options.tools,
     });
   }
 
@@ -165,11 +169,13 @@ export default class NoteSequelizeStorage {
    *
    * @param id - note internal id
    * @param content - new content
+   * @param tools - tools which are used in note
    * @returns Note on success, null on failure
    */
-  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note | null> {
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], tools: Note['tools']): Promise<Note | null> {
     const [affectedRowsCount, affectedRows] = await this.model.update({
       content,
+      tools,
     }, {
       where: {
         id,

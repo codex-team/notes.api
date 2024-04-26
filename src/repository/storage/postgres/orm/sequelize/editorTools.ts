@@ -180,19 +180,4 @@ export default class UserSequelizeStorage {
   public async getTools(): Promise<EditorTool[]> {
     return await EditorToolModel.findAll();
   }
-
-  /**
-   * Get bunch of tools by their names
-   *
-   * @param editorToolNames - tool names
-   */
-  public async getToolsByNames(editorToolNames: EditorTool['name'][]): Promise<EditorTool[]> {
-    return await this.model.findAll({
-      where: {
-        name: {
-          [Op.in]: editorToolNames,
-        },
-      },
-    });
-  }
 }
