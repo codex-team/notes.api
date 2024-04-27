@@ -243,7 +243,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           },
 
           isPublic: {
-            type: 'string',
+            type: 'boolean',
           },
         },
       },
