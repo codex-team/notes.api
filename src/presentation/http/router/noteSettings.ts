@@ -236,6 +236,10 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           $ref: 'NoteSchema#/properties/id',
         },
       },
+      body: {
+        // since notsettings fields are optional
+        properties: {},
+      },
       response: {
         '2xx': {
           $ref: 'NoteSettingsSchema',
