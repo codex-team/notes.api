@@ -1,6 +1,5 @@
 import type SequelizeOrm from '@repository/storage/postgres/orm/index.js';
 import users from '../test-data/users.json';
-import userSessions from '../test-data/user-sessions.json';
 import notes from '../test-data/notes.json';
 import noteSettings from '../test-data/notes-settings.json';
 
@@ -13,16 +12,6 @@ import noteSettings from '../test-data/notes-settings.json';
 async function insertUsers(db: SequelizeOrm): Promise<void> {
   for (const user of users) {
     await db.connection.query(`INSERT INTO public.users (id, email, name, "created_at") VALUES (${user.id}, '${user.email}', '${user.name}', '${user.created_at}')`);
-  }
-}
-/**
- * Fills in the database with user sessions
- *
- * @param db - SequelizeOrm instance
- */
-async function insertUserSessions(db: SequelizeOrm): Promise<void> {
-  for (const userSession of userSessions) {
-    await db.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_token_expires_at") VALUES (${userSession.user_id}, '${userSession.refresh_token}', '${userSession.refresh_token_expires_at}')`);
   }
 }
 /**
@@ -53,7 +42,6 @@ async function insertNoteSettings(db: SequelizeOrm): Promise<void> {
  */
 export async function insertData(db: SequelizeOrm): Promise<void> {
   await insertUsers(db);
-  await insertUserSessions(db);
   await insertNotes(db);
   await insertNoteSettings(db);
 }
