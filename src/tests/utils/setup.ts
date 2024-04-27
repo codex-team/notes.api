@@ -2,7 +2,6 @@ import path from 'path';
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
-import { insertData } from './insert-data.js';
 import { initORM, init as initRepositories } from '@repository/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import config from '@infrastructure/config/index.js';
@@ -64,7 +63,6 @@ beforeAll(async () => {
   await api.init(domainServices);
 
   await runTenantMigrations(migrationsPath, postgresContainer.getConnectionUri());
-  await insertData(orm);
 
   global.api = api;
 

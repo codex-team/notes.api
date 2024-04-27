@@ -22,9 +22,14 @@ describe('Auth API', () => {
       const refreshToken = 'pv-jIqfPj2';
 
       /**
+       * Create test user
+       */
+      const user = await global.db.insertUser();
+
+      /**
        * Insert session data to the DB with tomorrow expiration date
        */
-      await global.db.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_token_expires_at") VALUES (1, '${refreshToken}', CURRENT_DATE + INTERVAL '1 day')`);
+      await global.db.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_token_expires_at") VALUES (${user.id}, '${refreshToken}', CURRENT_DATE + INTERVAL '1 day')`);
 
       const response = await global.api?.fakeRequest({
         method: 'POST',
