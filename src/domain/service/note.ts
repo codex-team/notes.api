@@ -4,6 +4,7 @@ import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
+import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 
@@ -27,6 +28,11 @@ export default class NoteService {
   public noteVisitsRepository: NoteVisitsRepository;
 
   /**
+   * Edtor tools repository
+   */
+  public editorToolsRepository: EditorToolsRepository;
+
+  /**
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
@@ -38,11 +44,13 @@ export default class NoteService {
    * @param noteRepository - note repository
    * @param noteRelationsRepository - note relationship repository
    * @param noteVisitsRepository - note visits repository
+   * @param editorToolsRepository - editor tools repository
    */
-  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository) {
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository) {
     this.noteRepository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
     this.noteVisitsRepository = noteVisitsRepository;
+    this.editorToolsRepository = editorToolsRepository;
   }
 
   /**
@@ -51,13 +59,15 @@ export default class NoteService {
    * @param content - note content
    * @param creatorId - note creator
    * @param parentPublicId - parent note if exist
+   * @param tools - editor tools that were used in a note content
    * @returns { Note } added note object
    */
-  public async addNote(content: Note['content'], creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined): Promise<Note> {
+  public async addNote(content: Note['content'], creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined, tools: Note['tools']): Promise<Note> {
     const note = await this.noteRepository.addNote({
       publicId: createPublicId(),
       content,
       creatorId,
+      tools,
     });
 
     if (parentPublicId !== undefined) {
@@ -110,9 +120,10 @@ export default class NoteService {
    *
    * @param id - note internal id
    * @param content - new content
+   * @param noteTools - tools which are used in note
    */
-  public async updateNoteContentById(id: NoteInternalId, content: Note['content']): Promise<Note> {
-    const updatedNote = await this.noteRepository.updateNoteContentById(id, content);
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools']): Promise<Note> {
+    const updatedNote = await this.noteRepository.updateNoteContentAndToolsById(id, content, noteTools);
 
     if (updatedNote === null) {
       throw new DomainError(`Note with id ${id} was not updated`);
@@ -222,4 +233,50 @@ export default class NoteService {
 
     return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
   };
+
+  /**
+   * Raise domain error if tools, that are in note content are not specified in tools array
+   *
+   * @param tools - editor tools that were used in a note content
+   * @param content - content of the note
+   * @todo validate tool ids
+   */
+  public async validateNoteTools(tools : Note['tools'], content: Note['content'] | Record<string, never>): Promise<void> {
+    /**
+     * Set of the tools that are used in note
+     */
+    const toolsInContent = Array.from(new Set(content.blocks.map(block => block.type)));
+
+    /**
+     * Tools that are specified in tools array
+     */
+    const passedToolsNames = tools.map(tool => tool.name);
+    const passedToolsIds = tools.map(tool => tool.id);
+    /**
+     * Check that all tools used in note are specified in toolsInContent array
+     */
+    const toolsAreSpicified = toolsInContent.every((toolName) => {
+      return passedToolsNames.includes(toolName);
+    });
+
+    if (!toolsAreSpicified) {
+      throw new DomainError('Incorrect tools passed');
+    }
+
+    /**
+     * Extra tools specified
+     */
+    if (tools.length !== toolsInContent.length) {
+      throw new DomainError('Incorrect tools passed');
+    }
+
+    /**
+     * Validate tool ids
+     */
+    try {
+      await this.editorToolsRepository.getToolsByIds(passedToolsIds);
+    } catch {
+      throw new DomainError('Incorrect tools passed');
+    }
+  }
 }

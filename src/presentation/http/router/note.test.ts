@@ -3,6 +3,68 @@ import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
 
 describe('Note API', () => {
+  /**
+   * preinstalled tools
+   */
+  const headerTool = {
+    exportName: 'Header',
+    id: '1',
+    isDefault: true,
+    name: 'header',
+    source: {
+      cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
+    },
+    title: 'Heading',
+    userId: null,
+  };
+
+  const paragraphTool = {
+    name: 'paragraph',
+    exportName: 'Paragraph',
+    id: '2',
+    isDefault: true,
+    source: {
+      cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
+    },
+    title: 'Paragraph',
+    userId: null,
+  };
+
+  const listTool = {
+    exportName: 'List',
+    id: '3',
+    isDefault: true,
+    name: 'list',
+    source:{
+      cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js',
+    },
+    title: 'List',
+    userId: null,
+  };
+
+  /**
+   * Note content mock inserted if no content passed
+   */
+  const DEFAULT_NOTE_CONTENT = {
+    blocks: [
+      {
+        id: 'mJDq8YbvqO',
+        type: listTool.name,
+        data: {
+          text: 'text',
+        },
+      },
+      {
+        id: 'DeL0QehzGe',
+        type: headerTool.name,
+        data: {
+          text: 'fdgsfdgfdsg',
+          level: 2,
+        },
+      },
+    ],
+  };
+
   beforeEach(async () => {
     await global.db.truncateTables();
   });
@@ -14,6 +76,16 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: user.id,
+        tools: [
+          {
+            name: headerTool.name,
+            id : headerTool.id,
+          },
+          {
+            name: paragraphTool.name,
+            id : paragraphTool.id,
+          },
+        ],
       });
 
       /** Create test note settings */
@@ -37,20 +109,7 @@ describe('Note API', () => {
         accessRights: {
           canEdit: false,
         },
-        tools: [
-          {
-            name: 'header',
-            source: {
-              cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
-            },
-          },
-          {
-            name: 'paragraph',
-            source: {
-              cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
-            },
-          },
-        ],
+        tools: [headerTool, paragraphTool],
       });
     });
 
@@ -123,6 +182,16 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: creator.id,
+        tools: [
+          {
+            name: headerTool.name,
+            id : headerTool.id,
+          },
+          {
+            name: paragraphTool.name,
+            id : paragraphTool.id,
+          },
+        ],
       });
 
       /** Create test note settings */
@@ -165,20 +234,7 @@ describe('Note API', () => {
           'accessRights': {
             'canEdit': canEdit,
           },
-          tools: [
-            {
-              name: 'header',
-              source: {
-                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1/dist/header.umd.min.js',
-              },
-            },
-            {
-              name: 'paragraph',
-              source: {
-                cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/paragraph@2.11.3/dist/paragraph.umd.min.js',
-              },
-            },
-          ],
+          tools: [headerTool, paragraphTool],
         });
       } else {
         expect(response?.json()).toStrictEqual({
@@ -490,7 +546,7 @@ describe('Note API', () => {
         blocks: [
           {
             id: 'qxnjUh9muR',
-            type: 'header',
+            type: headerTool.name,
             data: {
               text: 'sample text',
               level: 1,
@@ -498,6 +554,13 @@ describe('Note API', () => {
           },
         ],
       };
+
+      const newTools = [
+        {
+          name: headerTool.name,
+          id: headerTool.id,
+        },
+      ];
 
       let response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -507,6 +570,7 @@ describe('Note API', () => {
         url: `/note/${note.publicId}`,
         body: {
           content: newContent,
+          tools: newTools,
         },
       });
 
@@ -587,9 +651,7 @@ describe('Note API', () => {
         noteId: parentNote.id,
         isPublic: true,
       });
-
       const accessToken = global.auth(user.id);
-
       let response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
@@ -610,6 +672,12 @@ describe('Note API', () => {
               },
             ],
           },
+          tools: [
+            {
+              name: headerTool.name,
+              id: headerTool.id,
+            },
+          ],
         },
       });
 
@@ -628,7 +696,205 @@ describe('Note API', () => {
         id: parentNote.publicId,
       });
     });
+    test.each([
+      /**
+       * Specified extra tools
+       */
+      {
+        noteTools: [
+          {
+            name : headerTool.name,
+            id : headerTool.id,
+          },
+          {
+            name : listTool.name,
+            id : listTool.id,
+          },
+        ],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * All tools specified correctly
+       */
+      {
+        noteTools: [
+          {
+            name: headerTool.name,
+            id: headerTool.id,
+          },
+        ],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
+        expectedStatusCode: 200,
+        expectedMessage: null,
+      },
+      /**
+       * Specified tools with incorrect name
+       */
+      {
+        noteTools: [
+          {
+            name: 'faketool',
+            id: headerTool.id,
+          },
+        ],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * Specified tools with incorrect id
+       */
+      {
+        noteTools: [
+          {
+            name: headerTool.name,
+            id: 'fakeId',
+          },
+        ],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * Specified less tools
+       */
+      {
+        noteTools: [],
+        noteContent: {
+          blocks: [
+            {
+              id: 'qxnjUh9muR',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+            {
+              id: 'qafjG34mus',
+              type: headerTool.name,
+              data: {
+                text: 'sample text',
+                level: 1,
+              },
+            },
+          ],
+        },
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+    ])
+    ('Should save tools that were used for note creation', async ({ noteTools, noteContent, expectedMessage, expectedStatusCode }) => {
+      const user = await global.db.insertUser();
 
+      const accessToken = global.auth(user.id);
+
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note`,
+        body: {
+          content: noteContent,
+          tools: noteTools,
+        },
+      });
+
+      if (expectedStatusCode === 200) {
+        expect(response?.statusCode).toBe(expectedStatusCode);
+
+        response = await global.api?.fakeRequest({
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          url: `/note/${response?.json().id}`,
+        });
+        expect(response?.json().tools).toMatchObject(noteTools);
+      } else {
+        expect(response?.statusCode).toBe(expectedStatusCode);
+        expect(response?.json().message).toBe(expectedMessage);
+      }
+    });
     test.todo('Returns 400 when parentId has incorrect characters and lenght');
   });
 
@@ -1168,6 +1434,135 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(400);
 
       expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
+    });
+  });
+
+  describe('PATCH /note/:notePublicId', async () => {
+    const tools = [headerTool, listTool];
+
+    test.each([
+      /**
+       * Specified more tools than used in note content
+       */
+      {
+        noteTools: [
+          {
+            name: headerTool.name,
+            id: headerTool.id,
+          },
+          {
+            name: paragraphTool.name,
+            id: paragraphTool.id,
+          },
+          {
+            name: listTool.name,
+            id: listTool.id,
+          },
+        ],
+        noteContent: DEFAULT_NOTE_CONTENT,
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * All tools specified correctly
+       */
+      {
+        noteTools: [
+          {
+            name : headerTool.name,
+            id : headerTool.id,
+          },
+          {
+            name : listTool.name,
+            id : listTool.id,
+          },
+        ],
+        noteContent: DEFAULT_NOTE_CONTENT,
+        expectedStatusCode: 200,
+        expectedMessage: null,
+      },
+      /**
+       * Specified less tools than used in note content
+       */
+      {
+        noteTools: [],
+        noteContent: DEFAULT_NOTE_CONTENT,
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * Specified tools with incorrect name
+       */
+      {
+        noteTools: [
+          {
+            name: 'fakename',
+            id: headerTool.id,
+          },
+        ],
+        noteContent: DEFAULT_NOTE_CONTENT,
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+      /**
+       * Specified tools with incorrect id
+       */
+      {
+        noteTools: [
+          {
+            name: headerTool.name,
+            id: 'fakeid',
+          },
+          {
+            name: listTool.name,
+            id: 'anotherfake',
+          },
+        ],
+        noteContent: DEFAULT_NOTE_CONTENT,
+        expectedStatusCode: 400,
+        expectedMessage: 'Incorrect tools passed',
+      },
+    ])
+    ('Should patch note tools on note update', async ({ noteTools, noteContent, expectedStatusCode, expectedMessage }) => {
+      const user = await global.db.insertUser();
+
+      const accessToken = await global.auth(user.id);
+
+      const note = await global.db.insertNote({ creatorId: user.id });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          content: noteContent,
+          tools: noteTools,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      if (expectedStatusCode === 200) {
+        expect(response?.statusCode).toBe(expectedStatusCode),
+
+        response = await global.api?.fakeRequest({
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          url: `/note/${note.publicId}`,
+        });
+
+        expect(response?.json().tools).toMatchObject(tools);
+      } else {
+        expect(response?.statusCode).toBe(expectedStatusCode);
+        expect(response?.json().message).toBe(expectedMessage);
+      }
     });
   });
 });
