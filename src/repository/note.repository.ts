@@ -12,7 +12,6 @@ export default class NoteRepository {
 
   /**
    * Note repository constructor
-   *
    * @param storage - storage for note
    */
   constructor(storage: NoteStorage) {
@@ -21,9 +20,8 @@ export default class NoteRepository {
 
   /**
    * Add note
-   *
    * @param options - note adding options
-   * @returns { Promise<Note> } added note
+   * @returns added note
    */
   public async addNote(options: NoteCreationAttributes): Promise<Note> {
     return await this.storage.createNote(options);
@@ -31,7 +29,6 @@ export default class NoteRepository {
 
   /**
    * Update note content in a store
-   *
    * @param id - note internal id
    * @param content - new content
    * @param noteTools - tools which are used in note
@@ -43,9 +40,8 @@ export default class NoteRepository {
 
   /**
    * Gets note by internal id
-   *
    * @param id - note id
-   * @returns { Promise<Note | null> } found note
+   * @returns found note
    */
   public async getNoteById(id: NoteInternalId): Promise<Note | null> {
     return await this.storage.getNoteById(id);
@@ -53,7 +49,6 @@ export default class NoteRepository {
 
   /**
    * Deletes note by id
-   *
    * @param id - note id
    */
   public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
@@ -62,9 +57,8 @@ export default class NoteRepository {
 
   /**
    * Gets note by hostname
-   *
    * @param hostname - custom hostname
-   * @returns { Promise<Note | null> } found note
+   * @returns found note
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
     return await this.storage.getNoteByHostname(hostname);
@@ -72,7 +66,6 @@ export default class NoteRepository {
 
   /**
    * Returns note by public id. Null if note does not exist.
-   *
    * @param publicId - public id
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
@@ -81,7 +74,6 @@ export default class NoteRepository {
 
   /**
    * Gets note list by creator id
-   *
    * @param id - note creator id
    * @param offset - number of skipped notes
    * @param limit - number of notes to get

@@ -12,7 +12,6 @@ export default class ObjectStorageRepository {
 
   /**
    * Object repository constructor
-   *
    * @param storage - s3 storage
    */
   constructor(storage: S3Storage) {
@@ -21,7 +20,6 @@ export default class ObjectStorageRepository {
 
   /**
    * Get object data by key
-   *
    * @param key - object key
    * @param bucket - bucket name
    */
@@ -31,7 +29,6 @@ export default class ObjectStorageRepository {
 
   /**
    * Inserts object data
-   *
    * @param objectData - object data
    * @param key - object key
    * @param bucket - bucket name

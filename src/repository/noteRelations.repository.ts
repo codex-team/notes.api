@@ -12,7 +12,6 @@ export default class NoteRelationsRepository {
 
   /**
    * Note relationship repository constructor
-   *
    * @param storage - storage for note relationship
    */
   constructor(storage: NoteRelationshipStorage) {
@@ -21,7 +20,6 @@ export default class NoteRelationsRepository {
 
   /**
    * Add note relation
-   *
    * @param noteId - id of the current note
    * @param parentId - id of the parent note
    */
@@ -31,7 +29,6 @@ export default class NoteRelationsRepository {
 
   /**
    * Update note relation
-   *
    * @param noteId - id of the current note
    * @param parentId - id of the parent note
    */
@@ -41,7 +38,6 @@ export default class NoteRelationsRepository {
 
   /**
    * Get parent note id by note id
-   *
    * @param noteId - id of the current note
    */
   public async getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<number | null> {
@@ -50,7 +46,6 @@ export default class NoteRelationsRepository {
 
   /**
    * Delete all note ralations contains noteId
-   *
    * @param noteId - id of the current note
    */
   public async deleteNoteRelationsByNoteId(noteId: NoteInternalId): Promise<boolean> {
@@ -59,7 +54,6 @@ export default class NoteRelationsRepository {
 
   /**
    * Unlink parent note from the current note
-   *
    * @param noteId - id of note to unlink parent
    */
   public async unlinkParent(noteId: NoteInternalId): Promise<boolean> {
@@ -68,7 +62,6 @@ export default class NoteRelationsRepository {
 
   /**
    * Checks if the note has any connection
-   *
    * @param noteId - id of the current note
    */
   public async hasRelation(noteId: NoteInternalId): Promise<boolean> {

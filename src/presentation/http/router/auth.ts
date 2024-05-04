@@ -22,12 +22,11 @@ interface AuthRouterOptions {
   /**
    * Auth service instance
    */
-  authService: AuthService,
+  authService: AuthService;
 }
 
 /**
  * Auth router plugin
- *
  * @param fastify - fastify instance
  * @param opts - router options
  * @param done - callback
@@ -43,7 +42,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
     {
       schema: {
         body: {
-          required: [ 'token' ],
+          required: ['token'],
           properties: {
             token: {
               type: 'string',
@@ -93,7 +92,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
    */
   fastify.delete<{
     Body: AuthOptions;
-    Reply: { ok: boolean }
+    Reply: { ok: boolean };
   }>('/', {
     schema: {
       body: {
@@ -107,7 +106,7 @@ const AuthRouter: FastifyPluginCallback<AuthRouterOptions> = (fastify, opts, don
           description: 'Check for successful deletion of the token',
           content: {
             'application/json': {
-              schema:{
+              schema: {
                 ok: {
                   type: 'boolean',
                 },

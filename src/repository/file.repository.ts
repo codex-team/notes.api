@@ -10,7 +10,6 @@ export default class FileRepository {
 
   /**
    * File repository constructor
-   *
    * @param storage - file storage with methods to access file data
    */
   constructor(storage: FileStorage) {
@@ -19,7 +18,6 @@ export default class FileRepository {
 
   /**
    * Get file data by key
-   *
    * @param objectKey - unique file key in storage
    */
   public async getByKey(objectKey: string): Promise<UploadedFile | null> {
@@ -28,7 +26,6 @@ export default class FileRepository {
 
   /**
    * Inserts file data
-   *
    * @param fileData - file data
    */
   public async insert(fileData: FileCreationAttributes): Promise<UploadedFile> {
@@ -37,7 +34,6 @@ export default class FileRepository {
 
   /**
    * Get file location by key and type, files with different types have different locations
-   *
    * @param type - file type
    * @param key - file unique key
    */
