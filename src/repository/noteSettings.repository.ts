@@ -14,7 +14,6 @@ export default class NoteSettingsRepository {
 
   /**
    * Note Settings repository constructor
-   *
    * @param storage - storage for note
    */
   constructor(storage: NoteSettingsStorage) {
@@ -23,7 +22,6 @@ export default class NoteSettingsRepository {
 
   /**
    * Gets note settings by id
-   *
    * @param id - note id
    * @returns found note
    */
@@ -33,9 +31,8 @@ export default class NoteSettingsRepository {
 
   /**
    * Get note settings by invitation hash
-   *
    * @param invitationHash - hash for inviting to the note team
-   * @returns { Promise<NoteSettings | null> } - found note settings
+   * @returns - found note settings
    */
   public async getNoteSettingsByInvitationHash(invitationHash: InvitationHash): Promise<NoteSettings | null> {
     return await this.storage.getNoteSettingsByInvitationHash(invitationHash);
@@ -43,7 +40,6 @@ export default class NoteSettingsRepository {
 
   /**
    * Get note settings by note id
-   *
    * @param id - note id
    * @returns found note settings
    */
@@ -53,7 +49,6 @@ export default class NoteSettingsRepository {
 
   /**
    * Add note settings
-   *
    * @param settings - note settings
    */
   public async addNoteSettings(settings: NoteSettingsCreationAttributes): Promise<NoteSettings> {
@@ -62,7 +57,6 @@ export default class NoteSettingsRepository {
 
   /**
    * Patch note settings
-   *
    * @param id - note settings id
    * @param data - note settings new values
    * @returns patched note settings

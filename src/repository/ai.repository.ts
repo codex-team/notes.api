@@ -8,14 +8,12 @@ import type { GetCompletionResponsePayload } from './transport/openai-api/types/
 export default class AIRepository {
   /**
    * Constructs repository instance
-   *
    * @param openaiTransport - openai transport
    */
   constructor(private readonly openaiTransport: OpenAIApi) { }
 
   /**
    * Returns predicted completion based on specified string content
-   *
    * @param content - content to complete
    */
   public async getCompletion(content: string): Promise<string> {
@@ -35,6 +33,6 @@ export default class AIRepository {
       return response.choices[0].message.content;
     }
 
-    return  '';
+    return '';
   }
 }

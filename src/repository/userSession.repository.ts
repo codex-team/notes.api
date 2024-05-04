@@ -12,7 +12,6 @@ export default class UserSessionRepository {
 
   /**
    * User session repository constructor
-   *
    * @param storage - storage for user session
    */
   constructor(storage: UserSessionsStorage) {
@@ -21,11 +20,10 @@ export default class UserSessionRepository {
 
   /**
    * Add user session
-   *
    * @param userId - user id
    * @param refreshToken - refresh token
    * @param refreshTokenExpiresAt - refresh token expiration date
-   * @returns { Promise<UserSession> } added user session
+   * @returns added user session
    */
   public async addUserSession(userId: number, refreshToken: string, refreshTokenExpiresAt: Date): Promise<UserSession> {
     /**
@@ -36,9 +34,8 @@ export default class UserSessionRepository {
 
   /**
    * Gets user session by refresh token
-   *
    * @param token - refresh token
-   * @returns { Promise<UserSession | null> } found user session
+   * @returns found user session
    */
   public async getUserSessionByRefreshToken(token: string): Promise<UserSession | null> {
     return await this.storage.findByToken(token);
@@ -46,9 +43,8 @@ export default class UserSessionRepository {
 
   /**
    * Removes user session by refresh token
-   *
    * @param refreshToken - refresh token
-   * @returns { Promise<void> }
+   * @returns
    */
   public async removeUserSessionByRefreshToken(refreshToken: string): Promise<void> {
     await this.storage.removeByRefreshToken(refreshToken);

@@ -12,7 +12,7 @@ export enum Provider {
   /**
    * Google provider
    */
-  GOOGLE = 'google',
+  GOOGLE = 'google'
 }
 
 /**
@@ -46,7 +46,6 @@ export default class UserRepository {
 
   /**
    * User repository constructor
-   *
    * @param storage - storage for user
    * @param googleApiTransport - google api transport
    */
@@ -57,9 +56,8 @@ export default class UserRepository {
 
   /**
    * Get all user information by it's identifier
-   *
    * @param userId - unique user numeric identifier
-   * @returns { Promise<User | null> } found user
+   * @returns found user
    */
   public async getUserById(userId: User['id']): Promise<User | null> {
     return this.storage.getUserByIdOrEmail({
@@ -69,10 +67,9 @@ export default class UserRepository {
 
   /**
    * Get user data from oauth provider, create user if not exists
-   *
    * @param accessToken - provider access token
    * @param provider - provider
-   * @returns { Promise<User | null> } found user
+   * @returns found user
    */
   public async getOrCreateUserByProvider(accessToken: string, provider: Provider): Promise<User | null> {
     let res: GetUserInfoResponsePayload | null;
@@ -125,7 +122,6 @@ export default class UserRepository {
 
   /**
    * Adding link between user and tool
-   *
    * @param options - identifiers of user and tool
    */
   public async addUserEditorTool({ userId, toolId }: AddUserToolOptions): Promise<void> {
@@ -137,7 +133,6 @@ export default class UserRepository {
 
   /**
    * Removing link between user and tool
-   *
    * @param options - identifiers of user and tool
    */
   public async removeUserEditorTool({ userId, toolId }: RemoveUserEditorToolOptions): Promise<void> {

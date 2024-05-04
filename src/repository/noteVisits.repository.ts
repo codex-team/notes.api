@@ -11,15 +11,14 @@ export default class NoteVisitsRepository {
 
   /**
    * Note Visits repository constructor
-   *
    * @param storage - storage for note Visits
    */
   constructor(storage: NoteVisitsStorage) {
     this.storage = storage;
   }
+
   /**
    * Updates existing noteVisit's vizitedAt or creates new record if user opens note for the first time
-   *
    * @param noteId - note internal id
    * @param userId - id of the user
    * @returns updated or created NoteVisit
@@ -30,7 +29,6 @@ export default class NoteVisitsRepository {
 
   /**
    * Deletes all visits of the note when a note is deleted
-   *
    * @param noteId - note internal id
    */
   public async deleteNoteVisits(noteId: NoteInternalId): Promise<boolean> {

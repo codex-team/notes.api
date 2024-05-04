@@ -1,7 +1,5 @@
 import { defineConfig } from 'vitest/config';
 
-/* eslint-disable @typescript-eslint/naming-convention */
-
 export default defineConfig({
   test: {
     pool: 'forks',
@@ -10,7 +8,7 @@ export default defineConfig({
         singleFork: true,
       },
     },
-    setupFiles: [ 'src/tests/utils/setup.ts' ],
+    setupFiles: ['src/tests/utils/setup.ts'],
     coverage: {
       reporter: ['text', 'json-summary', 'json'],
       reportOnFailure: true,
