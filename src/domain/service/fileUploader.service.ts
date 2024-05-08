@@ -41,7 +41,6 @@ export default class FileUploaderService {
 
   /**
    * File uploader service constructor
-   *
    * @param objectRepository - repository for objects
    * @param fileRepository - repository for files data
    */
@@ -52,7 +51,6 @@ export default class FileUploaderService {
 
   /**
    * Upload file
-   *
    * @param fileData - file data, including file data, name and mimetype
    * @param location - file location depending on type
    * @param metadata - file metadata, including user id who uploaded the file
@@ -103,7 +101,6 @@ export default class FileUploaderService {
   /**
    * Get file location by key and type
    * Returns null if where is no such file
-   *
    * @param type - file type
    * @param key - file unique key
    */
@@ -113,7 +110,6 @@ export default class FileUploaderService {
 
   /**
    * Get file data by key
-   *
    * @param objectKey - unique file key in object storage
    * @param location - file location
    */
@@ -147,10 +143,8 @@ export default class FileUploaderService {
     return fileData;
   }
 
-
   /**
    * Define file type by location
-   *
    * @param location - file location
    */
   private defineFileType(location: FileLocation): FileType {
@@ -163,7 +157,6 @@ export default class FileUploaderService {
 
   /**
    * Check if file location is note attachemnt
-   *
    * @param location - to check
    */
   private isNoteAttachemntFileLocation(location: FileLocation): location is NoteAttachmentFileLocation {
@@ -172,7 +165,6 @@ export default class FileUploaderService {
 
   /**
    * Define bucket name by file type
-   *
    * @param fileType - file type
    */
   private defineBucketByFileType(fileType: FileType): string {

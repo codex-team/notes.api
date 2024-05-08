@@ -6,16 +6,15 @@ import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Add middleware to resolve Member's role in a team by user id and note id and add it to request
- *
  * @param noteSettingsService - note settings domain service
  */
 export default function useMemberRoleResolver(noteSettingsService: NoteSettingsService): {
-    /**
-     * Resolve Member's role in a team by user id and note id and add it to request
-     *
-     * Use this middleware as "preHandler" hook with a particular route
-     */
-    memberRoleResolver: preHandlerHookHandler;
+  /**
+   * Resolve Member's role in a team by user id and note id and add it to request
+   *
+   * Use this middleware as "preHandler" hook with a particular route
+   */
+  memberRoleResolver: preHandlerHookHandler;
 } {
   /**
    * Get logger instance

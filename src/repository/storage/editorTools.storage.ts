@@ -4,5 +4,3 @@ import EditorToolsSequelizeStorage from '@repository/storage/postgres/orm/sequel
  * Editor tools storage
  */
 export default EditorToolsSequelizeStorage;
-
-

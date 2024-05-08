@@ -16,37 +16,37 @@ export interface DomainServices {
   /**
    * Note service instance
    */
-  noteService: NoteService,
+  noteService: NoteService;
 
   /**
    * Note settings service instance
    */
-  noteSettingsService: NoteSettingsService,
+  noteSettingsService: NoteSettingsService;
 
   /**
    * Auth service instance
    */
-  authService: AuthService,
+  authService: AuthService;
 
   /**
    * User service instance
    */
-  userService: UserService,
+  userService: UserService;
 
   /**
    * AI service instance
    */
-  aiService: AIService
+  aiService: AIService;
 
   /**
    * Editor tools service instance
    */
-  editorToolsService: EditorToolsService,
+  editorToolsService: EditorToolsService;
 
   /**
    * File uploader service instance
    */
-  fileUploaderService: FileUploaderService,
+  fileUploaderService: FileUploaderService;
 
   /**
    * Note visits service instance
@@ -56,7 +56,6 @@ export interface DomainServices {
 
 /**
  * Initiate services
- *
  * @param repositories - repositories
  * @param appConfig - app config
  */

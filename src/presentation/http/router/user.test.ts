@@ -1,13 +1,11 @@
 import { describe, test, expect } from 'vitest';
 
-
 describe('User API', () => {
   describe('GET /user/myself', () => {
     test('Returns user with status code 200 if user exists', async () => {
       /**
        * Truncate all tables, which are needed
        * Restart autoincrement sequences for data to start with id 1
-       *
        * @todo get rid of restarting database data in tests (move to beforeEach)
        */
       await global.db.truncateTables();
@@ -73,7 +71,7 @@ describe('User API', () => {
         },
         url: '/user/editor-tools',
         body: {
-          'toolId': addedToolId,
+          toolId: addedToolId,
         },
       });
 
@@ -82,7 +80,7 @@ describe('User API', () => {
       const body = response?.json();
 
       expect(body).toStrictEqual({
-        addedTool :{
+        addedTool: {
           id: addedToolId,
           name: 'code',
           title: 'Code Tool',

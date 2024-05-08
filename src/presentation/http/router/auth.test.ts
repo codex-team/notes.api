@@ -58,14 +58,14 @@ describe('Auth API', () => {
       const response = await global.api?.fakeRequest({
         method: 'POST',
         url: '/auth',
-        body:{ token: outdatedToken },
+        body: { token: outdatedToken },
       });
 
       expect(response?.statusCode).toBe(401);
 
       const body = await response?.json();
 
-      expect(body).toStrictEqual({ message:'Session is not valid' });
+      expect(body).toStrictEqual({ message: 'Session is not valid' });
     });
   });
 });
