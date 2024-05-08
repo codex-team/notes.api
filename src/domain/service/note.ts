@@ -40,7 +40,6 @@ export default class NoteService {
 
   /**
    * Note service constructor
-   *
    * @param noteRepository - note repository
    * @param noteRelationsRepository - note relationship repository
    * @param noteVisitsRepository - note visits repository
@@ -55,12 +54,11 @@ export default class NoteService {
 
   /**
    * Adds note
-   *
    * @param content - note content
    * @param creatorId - note creator
    * @param parentPublicId - parent note if exist
    * @param tools - editor tools that were used in a note content
-   * @returns { Note } added note object
+   * @returns added note object
    */
   public async addNote(content: Note['content'], creatorId: Note['creatorId'], parentPublicId: Note['publicId'] | undefined, tools: Note['tools']): Promise<Note> {
     const note = await this.noteRepository.addNote({
@@ -88,7 +86,6 @@ export default class NoteService {
    */
   /**
    * Deletes note by id
-   *
    * @param id - note internal id
    */
   public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
@@ -117,7 +114,6 @@ export default class NoteService {
 
   /**
    * Updates a note
-   *
    * @param id - note internal id
    * @param content - new content
    * @param noteTools - tools which are used in note
@@ -134,7 +130,6 @@ export default class NoteService {
 
   /**
    * Unlink parent note from the current note
-   *
    * @param noteId - id of note to unlink parent
    */
   public async unlinkParent(noteId: NoteInternalId): Promise<boolean> {
@@ -143,7 +138,6 @@ export default class NoteService {
 
   /**
    * Returns note by id
-   *
    * @param id - note internal id
    */
   public async getNoteById(id: NoteInternalId): Promise<Note> {
@@ -158,7 +152,6 @@ export default class NoteService {
 
   /**
    * Returns note by public id
-   *
    * @param publicId - note public id
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note> {
@@ -173,9 +166,8 @@ export default class NoteService {
 
   /**
    * Gets note by custom hostname
-   *
    * @param hostname - hostname
-   * @returns { Promise<Note | null> } note
+   * @returns note
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
     return await this.noteRepository.getNoteByHostname(hostname);
@@ -183,7 +175,6 @@ export default class NoteService {
 
   /**
    * Get parent note id by note id
-   *
    * @param noteId - id of the current note
    */
   public async getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null> {
@@ -192,7 +183,6 @@ export default class NoteService {
 
   /**
    * Returns note list by creator id
-   *
    * @param userId - id of the user
    * @param page - number of current page
    * @returns list of the notes ordered by time of last visit
@@ -207,7 +197,6 @@ export default class NoteService {
 
   /**
    * Update note relation
-   *
    * @param noteId - id of the current note
    * @param parentPublicId - id of the new parent note
    */
@@ -236,12 +225,11 @@ export default class NoteService {
 
   /**
    * Raise domain error if tools, that are in note content are not specified in tools array
-   *
    * @param tools - editor tools that were used in a note content
    * @param content - content of the note
    * @todo validate tool ids
    */
-  public async validateNoteTools(tools : Note['tools'], content: Note['content'] | Record<string, never>): Promise<void> {
+  public async validateNoteTools(tools: Note['tools'], content: Note['content'] | Record<string, never>): Promise<void> {
     /**
      * Set of the tools that are used in note
      */

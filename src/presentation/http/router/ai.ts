@@ -8,19 +8,18 @@ interface AIRouterOptions {
   /**
    * AI service instance
    */
-  aiService: AIService
+  aiService: AIService;
 }
 
 /**
  * Get completion request params
  */
 interface GetCompletionOptions {
-  content: string
+  content: string;
 }
 
 /**
  * Ai Router plugin
- *
  * @param fastify - fastify instance
  * @param opts - router options
  * @param done - done callback

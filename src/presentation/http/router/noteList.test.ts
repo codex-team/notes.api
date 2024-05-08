@@ -4,7 +4,6 @@ beforeEach(async () => {
   /**
    * Truncate all tables, which are needed
    * Restart autoincrement sequences for data to start with id 1
-   *
    * @todo get rid of restarting database data in tests (move to beforeEach)
    */
   await global.db.truncateTables();

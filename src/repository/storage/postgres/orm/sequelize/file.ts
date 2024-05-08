@@ -75,7 +75,6 @@ export default class FileSequelizeStorage {
 
   /**
    * Constructor for file storage
-   *
    * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
@@ -125,7 +124,6 @@ export default class FileSequelizeStorage {
 
   /**
    * Inserts file data into database
-   *
    * @param fileData - File data
    */
   public async insertFile(fileData: FileCreationAttributes): Promise<UploadedFile> {
@@ -134,7 +132,6 @@ export default class FileSequelizeStorage {
 
   /**
    * Get file data by key
-   *
    * @param key - File key
    */
   public getFileDataByKey(key: string): Promise<UploadedFile | null> {
@@ -147,7 +144,6 @@ export default class FileSequelizeStorage {
 
   /**
    * Get file location by key and type
-   *
    * @param type - file type
    * @param key - file unique key
    */

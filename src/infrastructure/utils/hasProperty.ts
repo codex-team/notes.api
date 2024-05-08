@@ -1,6 +1,5 @@
 /**
  * Checks if passed variable is an object and has a property with passed name
- *
  * @param obj - object to check
  * @param name - property name
  */

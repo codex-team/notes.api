@@ -8,20 +8,20 @@ export default interface NoteVisit {
   /**
    * Unique property identifier
    */
-  id: number,
+  id: number;
 
   /**
    * Internal id of the note
    */
-  noteId: NoteInternalId,
+  noteId: NoteInternalId;
 
   /**
    * Id of the user
    */
-  userId: User['id'],
+  userId: User['id'];
 
   /**
    * Time when note was visited for the last time (timestamp with timezone)
    */
-  visitedAt: string,
+  visitedAt: string;
 }

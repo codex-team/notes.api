@@ -5,16 +5,15 @@ import type NoteSettings from '@domain/entities/noteSettings.js';
 
 /**
  * Add middleware for resolve Note settings and add it to request
- *
  * @param noteSettingsService - note settings domain service
  */
 export default function useNoteSettingsResolver(noteSettingsService: NoteSettingsService): {
-    /**
-     * Resolve Note settings by note and add it to request
-     *
-     * Use this middleware as "preHandler" hook with a particular route
-     */
-    noteSettingsResolver: preHandlerHookHandler;
+  /**
+   * Resolve Note settings by note and add it to request
+   *
+   * Use this middleware as "preHandler" hook with a particular route
+   */
+  noteSettingsResolver: preHandlerHookHandler;
 } {
   /**
    * Get logger instance

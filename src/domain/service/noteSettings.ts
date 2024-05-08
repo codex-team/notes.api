@@ -23,7 +23,6 @@ export default class NoteSettingsService {
 
   /**
    * Note Settings service constructor
-   *
    * @param noteSettingsRepository - note settings repository
    * @param teamRepository - team repository
    * @param shared - shared domain methods
@@ -35,7 +34,6 @@ export default class NoteSettingsService {
 
   /**
    * Add user to the team by invitation hash
-   *
    * @param invitationHash - hash for joining to the team
    * @param userId - user to add
    */
@@ -68,7 +66,6 @@ export default class NoteSettingsService {
 
   /**
    * Returns settings for a note with all team members
-   *
    * @param id - note internal id
    */
   public async getNoteSettingsByNoteId(id: NoteInternalId): Promise<NoteSettings> {
@@ -85,7 +82,6 @@ export default class NoteSettingsService {
 
   /**
    * Adds note settings
-   *
    * @param noteId - note id
    * @param isPublic - is note public
    * @returns added note settings
@@ -100,7 +96,6 @@ export default class NoteSettingsService {
 
   /**
    * Partially updates note settings
-   *
    * @param noteId - note internal id
    * @param data - note settings data with new values
    * @returns updated note settings
@@ -118,7 +113,6 @@ export default class NoteSettingsService {
   /**
    * Get user role in team by user id and note id
    * If user is not a member of note, return null
-   *
    * @param userId - user id to check his role
    * @param noteId - note id where user should have role
    */
@@ -130,7 +124,6 @@ export default class NoteSettingsService {
 
   /**
    * Get all team members by note id
-   *
    * @param noteId - note id to get all team members
    * @returns team members
    */
@@ -152,7 +145,6 @@ export default class NoteSettingsService {
 
   /**
    * Remove team member by userId and noteId
-   *
    * @param userId - id of team member
    * @param noteId - note internal id
    * @returns returns userId if team member was deleted and undefined overwise
@@ -163,7 +155,6 @@ export default class NoteSettingsService {
 
   /**
    * Creates team member
-   *
    * @param team - data for team member creation
    * @returns created team member
    */
@@ -173,7 +164,6 @@ export default class NoteSettingsService {
 
   /**
    * Updates invitation hash in note settings
-   *
    * @param noteId - note internal id
    * @returns updated note settings
    */
@@ -194,7 +184,6 @@ export default class NoteSettingsService {
 
   /**
    * Patch team member role by user and note id
-   *
    * @param id - userId of team member
    * @param noteId - note internal id
    * @param role - new team member role

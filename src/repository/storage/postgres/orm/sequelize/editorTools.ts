@@ -66,7 +66,6 @@ export default class UserSequelizeStorage {
 
   /**
    * Constructor for the storage
-   *
    * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
@@ -141,7 +140,6 @@ export default class UserSequelizeStorage {
 
   /**
    * Get bunch of tools by their ids
-   *
    * @param editorToolIds - tool ids
    */
   public async getToolsByIds(editorToolIds: EditorTool['id'][]): Promise<EditorTool[]> {
@@ -156,7 +154,6 @@ export default class UserSequelizeStorage {
 
   /**
    * Get tool by it's identifier
-   *
    * @param editorToolId - unique tool identifier
    */
   public async getToolById(editorToolId: EditorTool['id']): Promise<EditorTool | null> {

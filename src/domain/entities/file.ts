@@ -14,7 +14,7 @@ export enum FileType {
   /**
    * File is a part of note
    */
-  NoteAttachment = 1,
+  NoteAttachment = 1
 }
 
 /**
@@ -36,7 +36,7 @@ export type TestFileLocation = Record<never, never>;
  * File location, when it is a part of note
  */
 export type NoteAttachmentFileLocation = {
-  noteId: NoteInternalId,
+  noteId: NoteInternalId;
 };
 
 /**
@@ -48,8 +48,8 @@ export type FileLocation = TestFileLocation | NoteAttachmentFileLocation;
  * File location type, wich depends on file type
  */
 export interface FileLocationByType {
-  [FileType.Test]: TestFileLocation,
-  [FileType.NoteAttachment]: NoteAttachmentFileLocation,
+  [FileType.Test]: TestFileLocation;
+  [FileType.NoteAttachment]: NoteAttachmentFileLocation;
 }
 
 /**

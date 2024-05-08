@@ -39,7 +39,7 @@ interface InsertUserOptions {
   /**
    * User editor tools
    */
-   editorTools: EditorTool['id'][];
+  editorTools: EditorTool['id'][];
 }
 
 /**
@@ -71,8 +71,6 @@ interface RemoveUserEditorTool {
    */
   toolId: EditorTool['id'];
 }
-
-/* eslint-disable @typescript-eslint/naming-convention */
 
 /**
  * Class representing a user model in database
@@ -130,7 +128,6 @@ export default class UserSequelizeStorage {
 
   /**
    * Constructor for user storage
-   *
    * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
@@ -173,7 +170,6 @@ export default class UserSequelizeStorage {
 
   /**
    * Link tool with user to use it in the editor
-   *
    * @param options - userId & editor credentials to link it to user
    */
   public async addUserEditorTool({
@@ -197,7 +193,6 @@ export default class UserSequelizeStorage {
 
   /**
    * Remove tool from the list of tools of the current user
-   *
    * @param options - identifiers to remove a link between a user and a tool
    */
   public async removeUserEditorTool({
@@ -215,9 +210,8 @@ export default class UserSequelizeStorage {
 
   /**
    * Insert user
-   *
    * @param options - options to insert user
-   * @returns { Promise<User> } inserted user
+   * @returns inserted user
    */
   public async insertUser({
     email,
@@ -236,9 +230,8 @@ export default class UserSequelizeStorage {
 
   /**
    * Get user by id or email
-   *
    * @param options - query options
-   * @returns { Promise<User | null> } found user
+   * @returns found user
    */
   public async getUserByIdOrEmail({
     id,

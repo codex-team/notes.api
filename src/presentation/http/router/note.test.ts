@@ -35,7 +35,7 @@ describe('Note API', () => {
     id: '3',
     isDefault: true,
     name: 'list',
-    source:{
+    source: {
       cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0/dist/list.umd.min.js',
     },
     title: 'List',
@@ -79,11 +79,11 @@ describe('Note API', () => {
         tools: [
           {
             name: headerTool.name,
-            id : headerTool.id,
+            id: headerTool.id,
           },
           {
             name: paragraphTool.name,
-            id : paragraphTool.id,
+            id: paragraphTool.id,
           },
         ],
       });
@@ -185,11 +185,11 @@ describe('Note API', () => {
         tools: [
           {
             name: headerTool.name,
-            id : headerTool.id,
+            id: headerTool.id,
           },
           {
             name: paragraphTool.name,
-            id : paragraphTool.id,
+            id: paragraphTool.id,
           },
         ],
       });
@@ -228,11 +228,11 @@ describe('Note API', () => {
 
       if (expectedStatusCode === 200) {
         expect(response?.json()).toMatchObject({
-          'note': {
-            'id': note.publicId,
+          note: {
+            id: note.publicId,
           },
-          'accessRights': {
-            'canEdit': canEdit,
+          accessRights: {
+            canEdit: canEdit,
           },
           tools: [headerTool, paragraphTool],
         });
@@ -379,13 +379,12 @@ describe('Note API', () => {
       if (expectedMessage !== undefined) {
         expect(response?.json().message).toStrictEqual(expectedMessage);
       } else {
-        expect(response?.json()).toMatchObject({ 'note': {
-          'id': note.publicId,
+        expect(response?.json()).toMatchObject({ note: {
+          id: note.publicId,
         },
-        'accessRights': {
-          'canEdit': canEdit,
-        },
-        });
+        accessRights: {
+          canEdit: canEdit,
+        } });
       }
     });
 
@@ -423,16 +422,16 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        'note': {
-          'id': childNote.publicId,
-          'content': childNote.content,
+        note: {
+          id: childNote.publicId,
+          content: childNote.content,
         },
-        'parentNote': {
-          'id': parentNote.publicId,
-          'content': parentNote.content,
+        parentNote: {
+          id: parentNote.publicId,
+          content: parentNote.content,
         },
-        'accessRights': {
-          'canEdit': false,
+        accessRights: {
+          canEdit: false,
         },
       });
     });
@@ -703,12 +702,12 @@ describe('Note API', () => {
       {
         noteTools: [
           {
-            name : headerTool.name,
-            id : headerTool.id,
+            name: headerTool.name,
+            id: headerTool.id,
           },
           {
-            name : listTool.name,
-            id : listTool.id,
+            name: listTool.name,
+            id: listTool.id,
           },
         ],
         noteContent: {
@@ -1269,7 +1268,7 @@ describe('Note API', () => {
     });
 
     test('Return 406 when there is no note with that public id', async () => {
-      /* id of non-existent note*/
+      /* id of non-existent note */
       const nonExistentId = 'ishvm5qH84';
 
       const response = await global.api?.fakeRequest({
@@ -1312,7 +1311,7 @@ describe('Note API', () => {
         creatorId: user.id,
       });
 
-      /* create note settings for child note*/
+      /* create note settings for child note */
       await global.db.insertNoteSetting({
         noteId: childNote.id,
         isPublic: true,
@@ -1351,17 +1350,17 @@ describe('Note API', () => {
     });
 
     test('Returns 400 when parent is the same as child', async () => {
-      /* create test child note*/
+      /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
-      /* create test parent note*/
+      /* create test parent note */
       const parentNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
-      /* create test note relation*/
+      /* create test note relation */
       await global.db.insertNoteRelation({
         noteId: childNote.id,
         parentId: parentNote.id,
@@ -1386,7 +1385,7 @@ describe('Note API', () => {
     test('Return 400 when parent note does not exist', async () => {
       const nonExistentParentId = '47L43yY7dp';
 
-      const childNote= await global.db.insertNote({
+      const childNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
@@ -1469,12 +1468,12 @@ describe('Note API', () => {
       {
         noteTools: [
           {
-            name : headerTool.name,
-            id : headerTool.id,
+            name: headerTool.name,
+            id: headerTool.id,
           },
           {
-            name : listTool.name,
-            id : listTool.id,
+            name: listTool.name,
+            id: listTool.id,
           },
         ],
         noteContent: DEFAULT_NOTE_CONTENT,

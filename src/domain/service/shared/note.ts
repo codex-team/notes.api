@@ -8,7 +8,6 @@ import type { NoteInternalId } from '@domain/entities/note.js';
 export default interface NoteServiceSharedMethods {
   /**
    * Get parent note id by note id
-   *
    * @param noteId - id of the current note
    */
   getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null>;

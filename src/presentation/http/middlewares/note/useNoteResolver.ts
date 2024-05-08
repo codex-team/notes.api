@@ -8,7 +8,6 @@ import type { Note, NotePublicId } from '@domain/entities/note.js';
 
 /**
  * Add middleware for resolve Note by public id and add it to request
- *
  * @param noteService - note domain service
  */
 export default function useNoteResolver(noteService: NoteService): {
@@ -26,10 +25,9 @@ export default function useNoteResolver(noteService: NoteService): {
 
   /**
    * Search for Note by public id in passed payload and resolves a note by it
-   *
    * @param requestData - fastify request data. Can be query, params or body
    */
-  async function resolveNoteByPublicId(requestData: FastifyRequest['query'] | FastifyRequest['body'] | FastifyRequest['params']): Promise<Note | undefined> {
+  async function resolveNoteByPublicId(requestData: FastifyRequest['query']): Promise<Note | undefined> {
     /**
      * Request params validation
      */

@@ -1,6 +1,6 @@
 import type { Note } from '@domain/entities/note.js';
 
-type NotePublicProperties = 'content' | 'createdAt' | 'updatedAt'| 'creatorId';
+type NotePublicProperties = 'content' | 'createdAt' | 'updatedAt' | 'creatorId';
 
 export interface NotePublic extends Pick<Note, NotePublicProperties> {
   /**
@@ -11,7 +11,6 @@ export interface NotePublic extends Pick<Note, NotePublicProperties> {
 
 /**
  *Change Note to NotePublic
- *
  * @param note - Note data to compose a public note
  */
 export function definePublicNote(note: Note): NotePublic {

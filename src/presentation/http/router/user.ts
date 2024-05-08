@@ -10,17 +10,16 @@ interface UserRouterOptions {
   /**
    * User service instance
    */
-  userService: UserService,
+  userService: UserService;
 
   /**
    * Service editor tool
    */
-  editorToolsService: EditorToolsService,
+  editorToolsService: EditorToolsService;
 }
 
 /**
  * Manages user
- *
  * @param fastify - fastify instance
  * @param opts - empty options
  * @param done - callback
@@ -35,7 +34,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
    * Get user by session
    */
   fastify.get<{
-    Reply: Pick<User, 'id' | 'name' | 'email' | 'photo'>,
+    Reply: Pick<User, 'id' | 'name' | 'email' | 'photo'>;
   }>('/myself', {
     config: {
       policy: [
@@ -105,7 +104,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
    * Tool is linked by it's id.
    */
   fastify.post<{
-    Body: { toolId: string }
+    Body: { toolId: string };
   }>('/editor-tools', {
     config: {
       policy: [
@@ -151,7 +150,7 @@ const UserRouter: FastifyPluginCallback<UserRouterOptions> = (fastify, opts, don
    * Remove editor tool from user extensions
    */
   fastify.delete<{
-    Body: { toolId: string }
+    Body: { toolId: string };
   }>('/editor-tools', {
     config: {
       policy: [

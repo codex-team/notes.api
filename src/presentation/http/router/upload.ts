@@ -48,7 +48,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
        * File to upload
        */
       file: MultipartFile;
-    }
+    };
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -57,7 +57,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
       ],
     },
     schema: {
-      consumes: [ 'multipart/form-data' ],
+      consumes: ['multipart/form-data'],
       params: {
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
@@ -65,7 +65,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
       },
       body: {
         type: 'object',
-        required: [ 'file' ],
+        required: ['file'],
         properties: {
           file: { isFile: true },
         },
@@ -81,7 +81,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
       },
     },
     attachValidation: true,
-    preHandler: [ noteResolver ],
+    preHandler: [noteResolver],
   }, async (request, reply) => {
     /**
      * @todo solve trouble with crashing app, when validations is not passed
@@ -92,7 +92,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
     const { userId } = request;
 
     const location: NoteAttachmentFileLocation = {
-      noteId: request.note!.id as number,
+      noteId: request.note!.id,
     };
 
     const uploadedFileKey = await fileUploaderService.uploadFile(
@@ -115,42 +115,41 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
   fastify.get<{
     Params: {
       key: string;
-    }
-    }>('/:notePublicId/:key', {
-      config: {
-        policy: [
-          'notePublicOrUserInTeam',
-        ],
-      },
-      schema: {
-        params: {
-          key: {
-            $ref: 'UploadSchema#/properties/key',
-          },
-        },
-
-        response: {
-          '2xx': {
-            description: 'Generated buffer',
-            properties: {
-              fileData: { type: 'string' },
-            },
-          },
+    };
+  }>('/:notePublicId/:key', {
+    config: {
+      policy: [
+        'notePublicOrUserInTeam',
+      ],
+    },
+    schema: {
+      params: {
+        key: {
+          $ref: 'UploadSchema#/properties/key',
         },
       },
-      preHandler: [ noteResolver ],
-    }, async (request, reply) => {
-      const fileLocation: NoteAttachmentFileLocation = {
-        noteId: request.note!.id as number,
-      };
 
-      const fileData = await fileUploaderService.getFileData(request.params.key, fileLocation);
+      response: {
+        '2xx': {
+          description: 'Generated buffer',
+          properties: {
+            fileData: { type: 'string' },
+          },
+        },
+      },
+    },
+    preHandler: [noteResolver],
+  }, async (request, reply) => {
+    const fileLocation: NoteAttachmentFileLocation = {
+      noteId: request.note!.id,
+    };
 
-      return reply.send(fileData);
-    });
+    const fileData = await fileUploaderService.getFileData(request.params.key, fileLocation);
+
+    return reply.send(fileData);
+  });
 
   done();
 };
 
 export default UploadRouter;
-

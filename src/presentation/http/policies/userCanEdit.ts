@@ -4,7 +4,6 @@ import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 
 /**
  * Policy to check whether a user has permission to edit the note
- *
  * @param context - Context object, containing Fatify request, Fastify reply and domain services
  */
 export default async function userCanEdit(context: PolicyContext): Promise<void> {

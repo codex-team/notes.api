@@ -29,6 +29,6 @@ export type GetCompletionResponsePayload = {
     message: {
       role: string;
       content: string;
-    }
-  }>
+    };
+  }>;
 };
