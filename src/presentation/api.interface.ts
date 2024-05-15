@@ -47,7 +47,6 @@ export interface RequestParams {
   /**
    * Request body
    */
-
   body?: string | object | Buffer | NodeJS.ReadableStream;
 
   /**
