@@ -27,6 +27,7 @@ logging:
   metricsServer: info
   appServer: info
   database: info
+  s3Storage: info
 
 s3:
   accessKeyId: 'secret'

@@ -1,5 +1,8 @@
+import { getLogger } from '@infrastructure/logging/index.js';
 import S3 from 'aws-sdk/clients/s3.js';
 import type { Buffer } from 'buffer';
+
+const s3StorageLogger = getLogger('s3Storage');
 
 /**
  * Class to handle S3 bucket operations
@@ -55,6 +58,8 @@ export class S3Storage {
 
       return response.Location;
     } catch (error) {
+      s3StorageLogger.error(error);
+
       return null;
     }
   }
@@ -76,6 +81,8 @@ export class S3Storage {
 
       return response.Body as Buffer;
     } catch (error) {
+      s3StorageLogger.error(error);
+
       return null;
     }
   }
@@ -95,6 +102,8 @@ export class S3Storage {
 
       return response.Location as string;
     } catch (error) {
+      s3StorageLogger.error(error);
+
       return null;
     }
   }

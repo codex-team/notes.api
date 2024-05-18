@@ -1,7 +1,7 @@
 import type { S3Storage } from '@repository/storage/s3/index.js';
 
 /**
- * Bucket are needed to to be created
+ * Bucket are needed to be created
  */
 const Buckets = [
   'test',
