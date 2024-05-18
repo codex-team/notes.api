@@ -90,6 +90,7 @@ export const LoggingConfig = z.object({
   metricsServer: LoggingLevel,
   appServer: LoggingLevel,
   database: LoggingLevel,
+  s3Storage: LoggingLevel,
 });
 
 export type LoggingConfig = z.infer<typeof LoggingConfig>;
@@ -159,6 +160,7 @@ const defaultConfig: AppConfig = {
     metricsServer: 'info',
     appServer: 'info',
     database: 'info',
+    s3Storage: 'info',
   },
   database: {
     dsn: 'postgres://user:pass@postgres/codex-notes',
