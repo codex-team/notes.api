@@ -79,4 +79,23 @@ export class S3Storage {
       return null;
     }
   }
+
+  /**
+   * Method to create bucket in object storage, return its location
+   *
+   * @param name - bucket name
+   */
+  public async createBucket(name: string): Promise<string | null> {
+    const createBucketManager = this.s3.createBucket({
+      Bucket: name,
+    });
+
+    try {
+      const response = await createBucketManager.promise();
+
+      return response.Location as string;
+    } catch (error) {
+      return null;
+    }
+  }
 }
