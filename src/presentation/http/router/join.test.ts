@@ -42,6 +42,7 @@ describe('Join API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
+        body: { invitationHash },
         url: `/join/${invitationHash}`,
       });
 
@@ -61,6 +62,7 @@ describe('Join API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
+        body: { hash },
         url: `/join/${hash}`,
       });
 
@@ -107,6 +109,7 @@ describe('Join API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
+        body: { invitationHash },
         url: `/join/${invitationHash}`,
       });
 
