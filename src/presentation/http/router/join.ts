@@ -9,7 +9,7 @@ interface JoinRouterOptions {
   /**
    * Note settings service instance
    */
-  noteSettings: NoteSettingsService
+  noteSettings: NoteSettingsService;
 }
 
 /**
@@ -25,12 +25,12 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
   const noteSettingsService = opts.noteSettings;
 
   fastify.post<{
-    Params: {
+    Body: {
       hash: string
-    }
+    },
   }>('/:hash', {
     schema: {
-      params: {
+      body: {
         hash: {
           $ref: 'JoinSchemaParams#/properties/hash',
         },
@@ -54,7 +54,7 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
       ],
     },
   }, async (request, reply) => {
-    const { hash } = request.params;
+    const { hash } = request.body;
     const { userId } = request;
     let result: TeamMember | null = null;
 
