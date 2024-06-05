@@ -30,7 +30,6 @@ export default class AuthService {
 
   /**
    * Creates jwt service instance
-   *
    * @param accessSecret - access token secret key
    * @param accessTokenExpiresIn - access token expiration time
    * @param refreshTokenExpiresIn - refresh token expiration time
@@ -45,9 +44,8 @@ export default class AuthService {
 
   /**
    * Generates access token
-   *
    * @param payload - payload to sign
-   * @returns {string} access token
+   * @returns access token
    */
   public signAccessToken(payload: AuthPayload): string {
     return jwt.sign(payload, this.accessSecret, {
@@ -57,9 +55,8 @@ export default class AuthService {
 
   /**
    * Verifies access token
-   *
    * @param token - access token
-   * @returns {AuthPayload} payload
+   * @returns payload
    */
   public verifyAccessToken(token: string): AuthPayload {
     return jwt.verify(token, this.accessSecret, { complete: false }) as AuthPayload;
@@ -67,9 +64,8 @@ export default class AuthService {
 
   /**
    * Generates refresh token
-   *
    * @param userId - user to sign refresh token for
-   * @returns {Promise<string>} refresh token
+   * @returns refresh token
    */
   public async signRefreshToken(userId: number): Promise<string> {
     const tokenSize = 10;
@@ -86,9 +82,8 @@ export default class AuthService {
 
   /**
    * Check if refresh token is valid
-   *
    * @param token - refresh token to check
-   * @returns {Promise<UserSession | null>} user session if session is valid
+   * @returns user session if session is valid
    */
   public async verifyRefreshToken(token: string): Promise<UserSession | null> {
     const session = await this.userSessionRepository.getUserSessionByRefreshToken(token);
@@ -114,7 +109,6 @@ export default class AuthService {
 
   /**
    * Removes session by refresh token
-   *
    * @param token - refresh token
    */
   public async removeSessionByRefreshToken(token: string): Promise<void> {

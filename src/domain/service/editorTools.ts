@@ -15,7 +15,6 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
 
   /**
    * Editor tools service constructor
-   *
    * @param repository - user repository instance
    */
   constructor(repository: EditorToolsRepository) {
@@ -23,7 +22,7 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
   }
 
   /**
-   * @returns {Promise<EditorTool[] | null>} all available editor tools
+   * @returns all available editor tools
    */
   public async getTools(): Promise<EditorTool[] | null> {
     return await this.repository.getTools();
@@ -31,7 +30,6 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
 
   /**
    *  Get bunch of editor tools by their ids
-   *
    * @param editorToolIds - tool ids
    */
   public async getToolsByIds(editorToolIds: EditorTool['id'][]): Promise<EditorTool[]> {
@@ -40,7 +38,6 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
 
   /**
    * Get tool by it's identifier
-   *
    * @param editorToolId - unique tool identifier
    */
   public async getToolById(editorToolId: EditorTool['id']): Promise<EditorTool | null> {
@@ -56,10 +53,9 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
 
   /**
    * Adding custom editor tool
-   *
    * @param editorTool - all data about the editor plugin
    * @param userId - user identifier
-   * @returns {Promise<EditorTool>} editor tool data
+   * @returns editor tool data
    */
   public async addTool(editorTool: Omit<EditorToolCreationAttributes, 'userId'>, userId: User['id']): Promise<EditorTool> {
     return await this.repository.addTool({

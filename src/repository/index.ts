@@ -31,62 +31,61 @@ export interface Repositories {
   /**
    * Note repository instance
    */
-  noteRepository: NoteRepository,
+  noteRepository: NoteRepository;
 
   /**
    * Note settings repository instance
    */
-  noteSettingsRepository: NoteSettingsRepository,
+  noteSettingsRepository: NoteSettingsRepository;
 
   /**
    * Note relationship repository instance
    */
-  noteRelationsRepository: NoteRelationsRepository,
+  noteRelationsRepository: NoteRelationsRepository;
 
   /**
    * User session repository instance
    */
-  userSessionRepository: UserSessionRepository,
+  userSessionRepository: UserSessionRepository;
 
   /**
    * User repository instance
    */
-  userRepository: UserRepository,
+  userRepository: UserRepository;
 
   /**
    * AI repository instance
    */
-  aiRepository: AIRepository
+  aiRepository: AIRepository;
 
   /**
    * Editor tools repository instance
    */
-  editorToolsRepository: EditorToolsRepository,
+  editorToolsRepository: EditorToolsRepository;
 
   /**
    * Team repository instance
    */
-  teamRepository: TeamRepository,
+  teamRepository: TeamRepository;
 
   /**
    * File repository instance
    */
-  fileRepository: FileRepository,
+  fileRepository: FileRepository;
 
   /**
    * Object repository instance
    */
-  objectStorageRepository: ObjectStorageRepository,
+  objectStorageRepository: ObjectStorageRepository;
 
   /**
    * Note Visits repository instance
    */
-  noteVisitsRepository: NoteVisitsRepository,
+  noteVisitsRepository: NoteVisitsRepository;
 }
 
 /**
  * Initiate ORM
- *
  * @param databaseConfig - database config
  */
 export async function initORM(databaseConfig: DatabaseConfig): Promise<Orm> {
@@ -102,7 +101,6 @@ export async function initORM(databaseConfig: DatabaseConfig): Promise<Orm> {
 
 /**
  * Initiate repositories
- *
  * @param orm - ORM instance
  * @param s3Config - S3 storage config
  */
@@ -144,7 +142,6 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   noteStorage.createAssociationWithNoteVisitsModel(noteVisitsStorage.model);
   noteVisitsStorage.createAssociationWithNoteModel(noteStorage.model);
   noteVisitsStorage.createAssociationWithUserModel(userStorage.model);
-
 
   /**
    * Prepare db structure

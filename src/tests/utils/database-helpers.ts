@@ -37,38 +37,38 @@ const DEFAULT_NOTE_CONTENT = {
  * default type for note mock creation attributes
  */
 type NoteMockCreationAttributes = {
-  creatorId: Note['creatorId'],
-  content?:  Note['content'],
-  publicId?:  Note['publicId'],
-  tools?: Note['tools'],
+  creatorId: Note['creatorId'];
+  content?: Note['content'];
+  publicId?: Note['publicId'];
+  tools?: Note['tools'];
 };
 
 /**
  * default type for user mock creation attributes
  */
 type UserMockCreationAttributes = {
-  email?: User['email'],
-  name?: User['name'],
-  editorTools?: User['editorTools'],
+  email?: User['email'];
+  name?: User['name'];
+  editorTools?: User['editorTools'];
 };
 
 /**
  * default type for user session mock creation attributes
  */
 type UserSessionMockCreationAttributes = {
-  userId: UserSession['userId'],
-  refreshToker?: UserSession['refreshToken'],
-  refreshTokenExpiresAt?: UserSession['refreshTokenExpiresAt'],
+  userId: UserSession['userId'];
+  refreshToker?: UserSession['refreshToken'];
+  refreshTokenExpiresAt?: UserSession['refreshTokenExpiresAt'];
 };
 
 /**
  * default type for note settings mock creation attributes
  */
 type NoteSettingsMockCreationAttributes = {
-  noteId: NoteSettings['noteId'],
-  customHostname?: NoteSettings['customHostname'],
-  isPublic: NoteSettings['isPublic'],
-  invitationHash?: NoteSettings['invitationHash'],
+  noteId: NoteSettings['noteId'];
+  customHostname?: NoteSettings['customHostname'];
+  isPublic: NoteSettings['isPublic'];
+  invitationHash?: NoteSettings['invitationHash'];
 };
 
 /**
@@ -80,8 +80,8 @@ type NoteTeamMockCreationAttributes = Omit<TeamMember, 'id'>;
  * default type for note relation mock creation attributes
  */
 type NoteRelationMockCreationAttributes = {
-  noteId: Note['id'],
-  parentId: Note['id'],
+  noteId: Note['id'];
+  parentId: Note['id'];
 };
 
 /**
@@ -93,9 +93,9 @@ type EditorToolMockCreationAttributes = Omit<EditorTool, 'id'>;
  * default type for note visit mock creation attributes
  */
 type NoteVisitCreationAttributes = {
-  noteId: NoteVisit['noteId'],
-  userId: NoteVisit['userId'],
-  visitedAt?: NoteVisit['visitedAt'],
+  noteId: NoteVisit['noteId'];
+  userId: NoteVisit['userId'];
+  visitedAt?: NoteVisit['visitedAt'];
 };
 
 /**
@@ -116,7 +116,6 @@ export default class DatabaseHelpers {
   /**
    * Executes specified sql query in test DB.
    * Might be used in tests to perform some specific database operations
-   *
    * @param sqlString - string containing sql to executein test DB
    */
   public async query(sqlString: string): Promise<unknown> {
@@ -126,7 +125,6 @@ export default class DatabaseHelpers {
   /**
    * Inserts note mock to then db
    * Automatically adds note creator to note team
-   *
    * @param note - note object which contain all info about note
    *
    * If content is not passed, it's value in database would be {}
@@ -158,7 +156,6 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts user mock to then db
-   *
    * @param user - user object which contain all info about user
    *
    * If name is not passed, it's value in database would be 'CodeX'
@@ -186,7 +183,6 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts user session mock to the db
-   *
    * @param userSession - userSession object which contain all info about userSession (some info is optional)
    *
    * refreshTokenExpiresAt should be given as Postgres DATE string (e.g. `CURRENT_DATE + INTERVAL '1 day'`)
@@ -203,7 +199,6 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts note settings mock to then db
-   *
    * @param noteSettings - noteSettings object which contain all info about noteSettings (some info is optional
    *
    * If customHostname is not passed, it's value in database would be null
@@ -222,7 +217,6 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts note team mock to then db
-   *
    * @param noteTeam - object that contains all info about noteTeam
    */
   public async insertNoteTeam(noteTeam: NoteTeamMockCreationAttributes): Promise<NoteTeamMockCreationAttributes> {
@@ -233,7 +227,6 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts note relation mock to then db
-   *
    * @param noteRelation object which contain all info about noteRelation
    */
   public async insertNoteRelation(noteRelation: NoteRelationMockCreationAttributes): Promise<NoteRelationMockCreationAttributes> {
@@ -244,14 +237,12 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts editor tool mock to then db
-   *
    * @param editorTool object which contain all info about editorTool (some info is optional)
    *
    * if no isDefault passed, then is_default would be false in database
    */
   public async insertEditorTool(editorTool: EditorToolMockCreationAttributes): Promise<EditorTool['id']> {
     const isDefault = editorTool.isDefault ?? false;
-
 
     const [result, _] = await this.orm.connection.query(`INSERT INTO public.editor_tools ("name", "title", "export_name", "source", "is_default")
     VALUES ('${editorTool.name}', '${editorTool.title}', '${editorTool.exportName}', '${JSON.stringify(editorTool.source)}', ${isDefault})
@@ -264,14 +255,12 @@ export default class DatabaseHelpers {
 
   /**
    * Inserts note visit mock into db
-   *
    * @param visit object which contain all info about noteVisit (visitedAt is optional)
    *
    * if no visitedAt passed, then visited_at would have CLOCK_TIMESTAMP() value
    */
   public async insertNoteVisit(visit: NoteVisitCreationAttributes): Promise<NoteVisit> {
     const visitedAt = visit.visitedAt ?? 'CLOCK_TIMESTAMP()';
-
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.note_visits ("user_id", "note_id", "visited_at")
     VALUES (${visit.userId}, ${visit.noteId}, ${visitedAt})
@@ -317,7 +306,6 @@ export default class DatabaseHelpers {
         EXECUTE format('ALTER sequence %s RESTART WITH 1', seq.sequence_name);
       END LOOP;
     END $$ LANGUAGE plpgsql;`);
-
 
     /** Insert default tools */
     await this.orm.connection.query(`

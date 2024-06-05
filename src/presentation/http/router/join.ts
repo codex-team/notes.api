@@ -9,12 +9,11 @@ interface JoinRouterOptions {
   /**
    * Note settings service instance
    */
-  noteSettings: NoteSettingsService
+  noteSettings: NoteSettingsService;
 }
 
 /**
  * Join Router plugin
- *
  * @todo use different replies for different errors in post route
  * @todo add check for write permission in route
  * @param fastify - fastify instance
@@ -26,8 +25,8 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
 
   fastify.post<{
     Params: {
-      hash: string
-    }
+      hash: string;
+    };
   }>('/:hash', {
     schema: {
       params: {

@@ -4,7 +4,6 @@ import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 
 /**
  * Policy to check does user have permission to access note
- *
  * @param context - Context, object containing Fatify request, Fastify reply and domain services
  */
 export default async function notePublicOrUserInTeam(context: PolicyContext): Promise<void> {

@@ -66,7 +66,6 @@ export default class NoteSettingsSequelizeStorage {
 
   /**
    * Constructor for note storage
-   *
    * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
@@ -115,9 +114,8 @@ export default class NoteSettingsSequelizeStorage {
 
   /**
    * Gets note settings by id
-   *
    * @param id - note id
-   * @returns { Promise<NoteSettings | null> } found note
+   * @returns found note
    */
   public async getNoteSettingsById(id: NoteSettings['id']): Promise<NoteSettings | null> {
     const noteSettings = await this.model.findOne({
@@ -138,9 +136,8 @@ export default class NoteSettingsSequelizeStorage {
 
   /**
    * Get note settings by invitation hash
-   *
    * @param invitationHash - hash for inviting to the note team
-   * @returns { Promise<NoteSettings | null> } - found note settings
+   * @returns - found note settings
    */
   public async getNoteSettingsByInvitationHash(invitationHash: InvitationHash): Promise<NoteSettings | null> {
     return await this.model.findOne({
@@ -152,9 +149,8 @@ export default class NoteSettingsSequelizeStorage {
 
   /**
    * Get note settings
-   *
    * @param noteId - note id
-   * @returns { Promise<NoteSettings | null> } - note settings
+   * @returns - note settings
    */
   public async getNoteSettingsByNoteId(noteId: NoteSettings['noteId']): Promise<NoteSettings | null> {
     const settings = await this.model.findOne({
@@ -173,7 +169,6 @@ export default class NoteSettingsSequelizeStorage {
 
   /**
    * Creates association with note model to make joins
-   *
    * @param model - initialized note model
    */
   public createAssociationWithNoteModel(model: ModelStatic<NoteModel>): void {
@@ -191,9 +186,8 @@ export default class NoteSettingsSequelizeStorage {
 
   /**
    * Insert note settings
-   *
    * @param options - note settings options
-   * @returns { Promise<NoteSettings> } - inserted note settings
+   * @returns - inserted note settings
    */
   public async insertNoteSettings({
     noteId,
@@ -214,7 +208,6 @@ export default class NoteSettingsSequelizeStorage {
 
   /**
    * Update note settings
-   *
    * @param id - note settings id
    * @param data - note settings new data
    */

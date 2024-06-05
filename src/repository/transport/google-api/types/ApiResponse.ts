@@ -11,7 +11,7 @@ interface ApiErrorResponse {
      * Error message
      */
     message: string;
-  }
+  };
 }
 
 export type ApiResponse = Payload | ApiErrorResponse;

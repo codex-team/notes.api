@@ -22,7 +22,7 @@
   "include": [
     "src/**/*.ts",
     "vitest.config.js",
-    ".eslintrc.cjs",
+    ".eslint.config.mjs",
     "fastify.d.ts",
   ],
   "ts-node": {

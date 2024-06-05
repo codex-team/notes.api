@@ -35,4 +35,3 @@ try {
   logger.fatal('Failed to start application ' + err);
   process.exit(1);
 }
-

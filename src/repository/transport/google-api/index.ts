@@ -7,7 +7,6 @@ import type { ApiResponse } from '@repository/transport/google-api/types/ApiResp
 export default class GoogleApiTransport extends Transport {
   /**
    * Constructor for Google api transport
-   *
    * @param baseUrl - Base URL of Google api
    */
   constructor(baseUrl = 'https://www.googleapis.com/oauth2/v2') {
@@ -16,7 +15,6 @@ export default class GoogleApiTransport extends Transport {
 
   /**
    * Make GET request with authorization to Google API
-   *
    * @param endpoint - API endpoint
    * @param accessToken - access token for authorization to Google API
    */

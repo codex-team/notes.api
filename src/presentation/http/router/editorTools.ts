@@ -9,13 +9,11 @@ interface EditorToolsRouterOptions {
   /**
    * Editor tools service instance
    */
-  editorToolsService: EditorToolsService,
+  editorToolsService: EditorToolsService;
 }
-
 
 /**
  * Manages user
- *
  * @param fastify - fastify instance
  * @param opts - empty options
  * @param done - callback
@@ -61,7 +59,7 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = (fast
    * Add editor tool to the library of all tools
    */
   fastify.post<{
-    Body: EditorTool
+    Body: EditorTool;
   }>('/add-tool', {
     config: {
       /**

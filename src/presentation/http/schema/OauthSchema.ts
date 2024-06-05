@@ -1,4 +1,3 @@
-
 export const OauthSchema = {
   $id: 'OauthSchema',
   type: 'object',

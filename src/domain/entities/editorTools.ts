@@ -43,7 +43,7 @@ export default interface EditorTool {
      * Tool URL in content delivery network
      */
     cdn?: string;
-  }
+  };
 }
 
 /**

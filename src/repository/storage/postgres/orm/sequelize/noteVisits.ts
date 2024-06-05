@@ -80,7 +80,6 @@ export default class NoteVisitsSequelizeStorage {
 
   /**
    * Creates association with user model
-   *
    * @param model - initialized note settings model
    */
   public createAssociationWithUserModel(model: ModelStatic<UserModel>): void {
@@ -94,7 +93,6 @@ export default class NoteVisitsSequelizeStorage {
 
   /**
    * Creates association with note model
-   *
    * @param model - initialized note model
    */
   public createAssociationWithNoteModel(model: ModelStatic<NoteModel>): void {
@@ -108,7 +106,6 @@ export default class NoteVisitsSequelizeStorage {
 
   /**
    * Updates existing noteVisit's visitedAt or creates new record if user opens note for the first time
-   *
    * @param noteId - note internal id
    * @param userId - id of the user
    * @returns created or updated NoteVisit
@@ -156,7 +153,6 @@ export default class NoteVisitsSequelizeStorage {
 
   /**
    * Deletes all visits of the note when a note is deleted
-   *
    * @param noteId - note internal id
    */
   public async deleteNoteVisits(noteId: NoteInternalId): Promise<boolean> {

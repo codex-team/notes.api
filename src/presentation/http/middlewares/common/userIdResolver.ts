@@ -5,12 +5,11 @@ import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Add middleware for resolve userId from Access Token and add it to request
- *
  * @param server - fastify instance
  * @param authService - auth domain service
  * @param logger - logger instance
  */
-export default function addUserIdResolver(server: FastifyInstance, authService: AuthService, logger: typeof Logger ): void {
+export default function addUserIdResolver(server: FastifyInstance, authService: AuthService, logger: typeof Logger): void {
   /**
    * Default userId value — null
    */

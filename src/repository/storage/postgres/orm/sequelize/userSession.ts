@@ -4,8 +4,6 @@ import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type UserSession from '@domain/entities/userSession.js';
 
-/* eslint-disable @typescript-eslint/naming-convention */
-
 /**
  * Class representing a user sessions model in database
  */
@@ -31,7 +29,6 @@ class UserSessionModel extends Model<InferAttributes<UserSessionModel>, InferCre
   public declare refreshTokenExpiresAt: Date;
 }
 
-
 /**
  * Class representing a table storing user sessions
  */
@@ -53,7 +50,6 @@ export default class UserSessionSequelizeStorage {
 
   /**
    * Constructor for user sessions storage
-   *
    * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
@@ -94,11 +90,10 @@ export default class UserSessionSequelizeStorage {
 
   /**
    * Creates user session
-   *
    * @param userId - user id
    * @param refreshToken - refresh token
    * @param refreshTokenExpiresAt - refresh token expiration date
-   * @returns { UserSession } created user session
+   * @returns created user session
    */
   public async create(userId: number, refreshToken: string, refreshTokenExpiresAt: Date): Promise<UserSession> {
     return await this.model.create({
@@ -110,9 +105,8 @@ export default class UserSessionSequelizeStorage {
 
   /**
    * Finds user session by refresh token
-   *
    * @param token - refresh token
-   * @returns { UserSession | null } found user session
+   * @returns found user session
    */
   public async findByToken(token: string): Promise<UserSession | null> {
     return await this.model.findOne({
@@ -122,9 +116,8 @@ export default class UserSessionSequelizeStorage {
 
   /**
    * Removes user session by refresh token
-   *
    * @param refreshToken - refresh token
-   * @returns { void }
+   * @returns
    */
   public async removeByRefreshToken(refreshToken: string): Promise<void> {
     await this.model.destroy({
