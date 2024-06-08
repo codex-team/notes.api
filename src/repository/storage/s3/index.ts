@@ -15,7 +15,6 @@ export class S3Storage {
 
   /**
    * Constructor for S3Bucket
-   *
    * @param accessKeyId - AWS access key
    * @param secretAccessKey - AWS secret access key
    * @param region - AWS region
@@ -35,7 +34,6 @@ export class S3Storage {
 
   /**
    * Method to upload a file to S3
-   *
    * @param bucket - S3 bucket name
    * @param key - Key to store the file in S3
    * @param file - file data to upload
@@ -66,7 +64,6 @@ export class S3Storage {
 
   /**
    * Method to get a file from S3
-   *
    * @param bucket - S3 bucket name
    * @param key - Key of the file in S3
    */
@@ -89,7 +86,6 @@ export class S3Storage {
 
   /**
    * Method to create bucket in object storage, return its location
-   *
    * @param name - bucket name
    */
   public async createBucket(name: string): Promise<string | null> {

@@ -6,7 +6,7 @@ import { plugin as TsPlugin, parser as TsParser } from 'typescript-eslint';
 export default [
   ...CodeX,
   {
-    name: 'codex/codestyle/config',
+    name: 'codex/codestyle/configs',
     files: ['eslint.config.mjs', 'vitest.config.js'],
     rules: {
       'n/no-unpublished-import': ['off'],
@@ -14,25 +14,32 @@ export default [
     },
   },
   {
+    name: 'codex/codestyle/dev-files',
+    files: ['src/tests/**', '**/*.test.ts'],
+    rules: {
+      'n/no-unpublished-import': ['error', {
+        allowModules: ['vitest'],
+        ignoreTypeImport: true,
+      }],
+    },
+  },
+  {
     name: 'notex.api',
-    ignores: ['vitest.config.js', 'eslint.config.mjs'],
+    ignores: ['vitest.config.js', 'eslint.config.mjs', 'src/tests/**', '**/*.test.ts'],
     plugins: {
       '@typescript-eslint': TsPlugin,
     },
     languageOptions: {
       parser: TsParser,
       parserOptions: {
-        project: 'tsconfig.eslint.json', // Автоматически находить tsconfig.json в рабочей директории
+        project: 'tsconfig.eslint.json',
         tsconfigRootDir: './',
-        sourceType: 'module', // Allows for the use of imports
+        sourceType: 'module',
       },
     },
     rules: {
       'n/no-missing-import': ['off'],
-      'n/no-unpublished-import': ['error', {
-        allowModules: ['vitest', '@testcontainers/localstack', 'postgres-migrations'],
-        ignoreTypeImport: true,
-      }],
+      'n/no-unpublished-import': ['error'],
       'n/no-unsupported-features/es-builtins': ['error', {
         version: '>=22.1.0',
       }],
@@ -41,7 +48,7 @@ export default [
         format: ['camelCase', 'PascalCase'],
 
         filter: {
-          regex: '^(?!(2xx|2[0-9][0-9]|application/json|VITE.*|HAWK.*)$).*',
+          regex: '^(?!(2xx|2[0-9][0-9]|application/json)$).*',
           match: true,
         },
       }],
