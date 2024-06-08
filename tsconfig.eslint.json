@@ -3,6 +3,6 @@
     "include": [
       "src/**/*.ts",
       "eslint.config.mjs",
-      // "vitest.config.js",
+      "vitest.config.js",
     ],
   }

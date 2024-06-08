@@ -15,17 +15,36 @@ export default [
   },
   {
     name: 'codex/codestyle/dev-files',
-    files: ['src/tests/**', '**/*.test.ts'],
+    files: ['src/tests/**/*', '**/*.test.ts', '**/migrate.ts'],
+    languageOptions: {
+      parser: TsParser,
+      parserOptions: {
+        project: 'tsconfig.dev.json',
+        tsconfigRootDir: './',
+        sourceType: 'module',
+      },
+    },
     rules: {
+      'n/no-missing-import': ['off'],
       'n/no-unpublished-import': ['error', {
-        allowModules: ['vitest'],
+        allowModules: ['vitest', 'postgres-migrations', '@testcontainers/localstack'],
         ignoreTypeImport: true,
       }],
+      /**
+       * @todo get rid of this rule ignores and solve all eslint errors occured
+       */
+      '@typescript-eslint/no-unsafe-member-access': ['off'],
+      '@typescript-eslint/no-unsafe-call': ['off'],
+      '@typescript-eslint/no-unsafe-assignment': ['off'],
+      '@typescript-eslint/no-magic-numbers': ['off'],
+      '@typescript-eslint/no-unsafe-return': ['off'],
+      '@typescript-eslint/restrict-template-expressions': ['off'],
+      'jsdoc/require-jsdoc': ['off'],
     },
   },
   {
     name: 'notex.api',
-    ignores: ['vitest.config.js', 'eslint.config.mjs', 'src/tests/**', '**/*.test.ts'],
+    ignores: ['vitest.config.js', 'eslint.config.mjs', 'src/tests/**/*', '**/*.test.ts', '**/migrate.ts'],
     plugins: {
       '@typescript-eslint': TsPlugin,
     },
@@ -55,16 +74,10 @@ export default [
       /**
        * @todo get rid of this rule ignores and solve all eslint errors occured
        */
-      '@typescript-eslint/no-unsafe-member-access': ['off'],
-      '@typescript-eslint/no-unsafe-call': ['off'],
-      '@typescript-eslint/no-unsafe-assignment': ['off'],
-      '@typescript-eslint/no-unsafe-return': ['off'],
-      '@typescript-eslint/restrict-template-expressions': ['off'],
+      '@typescript-eslint/no-misused-promises': ['off'],
       'jsdoc/require-jsdoc': ['off'],
       'jsdoc/informative-docs': ['off'],
       'jsdoc/require-returns-description': ['off'],
-      '@typescript-eslint/no-magic-numbers': ['off'],
-      '@typescript-eslint/no-misused-promises': ['off'],
     },
   },
 ];
