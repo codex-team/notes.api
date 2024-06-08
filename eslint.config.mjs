@@ -5,6 +5,9 @@ import { plugin as TsPlugin, parser as TsParser } from 'typescript-eslint';
  */
 export default [
   ...CodeX,
+  /**
+   * Override only for config files
+   */
   {
     name: 'codex/codestyle/configs',
     files: ['eslint.config.mjs', 'vitest.config.js'],
@@ -13,6 +16,9 @@ export default [
       '@typescript-eslint/naming-convention': ['off'],
     },
   },
+  /**
+   * Override for dev files that are not in source code (logically)
+   */
   {
     name: 'codex/codestyle/dev-files',
     files: ['src/tests/**/*', '**/*.test.ts', '**/migrate.ts'],
@@ -42,6 +48,9 @@ export default [
       'jsdoc/require-jsdoc': ['off'],
     },
   },
+  /**
+   * Override for sourve code files
+   */
   {
     name: 'notex.api',
     ignores: ['vitest.config.js', 'eslint.config.mjs', 'src/tests/**/*', '**/*.test.ts', '**/migrate.ts'],
