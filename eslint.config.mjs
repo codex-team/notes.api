@@ -6,6 +6,14 @@ import { plugin as TsPlugin, parser as TsParser } from 'typescript-eslint';
 export default [
   ...CodeX,
   {
+    name: 'codex/codestyle/config',
+    files: ['eslint.config.mjs', 'vitest.config.js'],
+    rules: {
+      'n/no-unpublished-import': ['off'],
+      '@typescript-eslint/naming-convention': ['off'],
+    },
+  },
+  {
     name: 'notex.api',
     ignores: ['vitest.config.js', 'eslint.config.mjs'],
     plugins: {
@@ -21,11 +29,10 @@ export default [
     },
     rules: {
       'n/no-missing-import': ['off'],
-      'n/no-unpublished-import': ['off'],
-      // 'n/no-unpublished-import': ['error', {
-      //   allowModules: ['vitest', '@testcontainers/localstack', 'postgres-migrations'],
-      //   ignoreTypeImport: true,
-      // }],
+      'n/no-unpublished-import': ['error', {
+        allowModules: ['vitest', '@testcontainers/localstack', 'postgres-migrations'],
+        ignoreTypeImport: true,
+      }],
       'n/no-unsupported-features/es-builtins': ['error', {
         version: '>=22.1.0',
       }],
