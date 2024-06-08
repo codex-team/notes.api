@@ -3,6 +3,5 @@
   "include": [
     "src/tests/**/*",
     "**/*.test.ts",
-    "**/migrate.ts",
   ],
 }

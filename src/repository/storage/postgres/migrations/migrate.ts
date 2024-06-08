@@ -1,4 +1,5 @@
 import pg, { type ClientConfig } from 'pg';
+/* eslint-disable-next-line n/no-unpublished-import */
 import { migrate } from 'postgres-migrations';
 import logger from './../../../../infrastructure/logging/index.js';
 

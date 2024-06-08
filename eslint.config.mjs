@@ -21,16 +21,19 @@ export default [
    */
   {
     name: 'codex/codestyle/dev-files',
-    files: ['src/tests/**/*', '**/*.test.ts', '**/migrate.ts'],
+    files: ['src/tests/**/*', '**/*.test.ts'],
     languageOptions: {
       parser: TsParser,
       parserOptions: {
-        project: 'tsconfig.dev.json',
+        project: 'tsconfig.test.json',
         tsconfigRootDir: './',
         sourceType: 'module',
       },
     },
     rules: {
+      /**
+       * Current eslint version (9.2.0) has no alias resolver so this error is unfixable
+       */
       'n/no-missing-import': ['off'],
       'n/no-unpublished-import': ['error', {
         allowModules: ['vitest', 'postgres-migrations', '@testcontainers/localstack'],
@@ -53,7 +56,7 @@ export default [
    */
   {
     name: 'notex.api',
-    ignores: ['vitest.config.js', 'eslint.config.mjs', 'src/tests/**/*', '**/*.test.ts', '**/migrate.ts'],
+    ignores: ['vitest.config.js', 'eslint.config.mjs', 'src/tests/**/*', '**/*.test.ts'],
     plugins: {
       '@typescript-eslint': TsPlugin,
     },
