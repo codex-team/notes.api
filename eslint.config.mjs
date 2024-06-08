@@ -69,6 +69,9 @@ export default [
       },
     },
     rules: {
+      /**
+       * Current eslint version (9.2.0) has no alias resolver so this error is unfixable
+       */
       'n/no-missing-import': ['off'],
       'n/no-unpublished-import': ['error'],
       'n/no-unsupported-features/es-builtins': ['error', {
