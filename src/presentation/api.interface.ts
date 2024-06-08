@@ -1,5 +1,6 @@
 import type { DomainServices } from '@domain/index.js';
 import type * as http from 'http';
+import type { Buffer } from 'buffer';
 
 /**
  * API interface

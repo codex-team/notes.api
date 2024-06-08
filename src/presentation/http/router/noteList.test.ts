@@ -101,7 +101,7 @@ describe('GET /notes?page', () => {
     const randomGuy = await global.db.insertUser();
 
     if (isAuthorized) {
-      accessToken = await global.auth(randomGuy.id);
+      accessToken = global.auth(randomGuy.id);
     }
 
     for (let i = 0; i < portionSize; i++) {

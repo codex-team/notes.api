@@ -16,12 +16,12 @@ export default class S3Helpers {
 
   /**
    * Constructor for s3 helpers
-   *
    * @param s3 - s3 client instance
    */
   constructor(s3: S3Storage) {
     this.s3 = s3;
   }
+
   /**
    * Create buckets in s3 storage for testing
    */
