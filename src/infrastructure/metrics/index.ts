@@ -3,6 +3,7 @@ import promClient from 'prom-client';
 import { getLogger } from '@infrastructure/logging/index.js';
 import config from '@infrastructure/config/index.js';
 import { StatusCodes } from 'http-status-codes';
+import process from 'process';
 
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
 const Registry = promClient.Registry;

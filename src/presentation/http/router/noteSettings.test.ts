@@ -239,7 +239,7 @@ describe('NoteSettings API', () => {
         });
       }
 
-      const accessToken = await global.auth(randomGuy.id);
+      const accessToken = global.auth(randomGuy.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -766,7 +766,7 @@ describe('NoteSettings API', () => {
         role: MemberRole.Write,
       });
 
-      const accessToken = await global.auth(user.id);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -791,7 +791,7 @@ describe('NoteSettings API', () => {
         creatorId: creator.id,
       });
 
-      const accessToker = await global.auth(creator.id);
+      const accessToker = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -923,7 +923,7 @@ describe('NoteSettings API', () => {
         creatorId: creator.id,
       });
 
-      const accessToken = await global.auth(creator.id);
+      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
@@ -961,7 +961,7 @@ describe('NoteSettings API', () => {
         role: MemberRole.Write,
       });
 
-      const accessToken = await global.auth(creator.id);
+      const accessToken = global.auth(creator.id);
 
       let response = await global.api?.fakeRequest({
         method: 'DELETE',
@@ -1002,7 +1002,7 @@ describe('NoteSettings API', () => {
         creatorId: creator.id,
       });
 
-      const accessToken = await global.auth(creator.id);
+      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',

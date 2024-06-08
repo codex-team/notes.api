@@ -1,6 +1,7 @@
 import path from 'path';
 import config from './../../../../infrastructure/config/index.js';
 import { runTenantMigrations } from './migrate.js';
+import process from 'process';
 
 /**
  * Path to migration files

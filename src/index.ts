@@ -4,6 +4,7 @@ import API from '@presentation/index.js';
 import runMetricsServer from '@infrastructure/metrics/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import { initORM, init as initRepositories } from '@repository/index.js';
+import process from 'process';
 
 /**
  * Application entry point
@@ -24,7 +25,8 @@ const start = async (): Promise<void> => {
 
     logger.info('Application launched successfully');
   } catch (err) {
-    logger.fatal('Failed to start application ' + err);
+    logger.fatal('Failed to start application ' + (err as Error).toString());
+    /* eslint-disable-next-line n/no-process-exit */
     process.exit(1);
   }
 };
@@ -32,6 +34,7 @@ const start = async (): Promise<void> => {
 try {
   await start();
 } catch (err) {
-  logger.fatal('Failed to start application ' + err);
+  logger.fatal('Failed to start application ' + (err as Error).toString());
+  /* eslint-disable-next-line n/no-process-exit */
   process.exit(1);
 }

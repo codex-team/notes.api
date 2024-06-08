@@ -364,7 +364,7 @@ describe('Note API', () => {
 
       const canEdit = (intermidiateTeamDefined === true && roleInIntermidiateTeam === MemberRole.Write) || (intermidiateTeamDefined === false && roleInRootTeam === MemberRole.Write);
 
-      const accessToken = await global.auth(randomGuy.id);
+      const accessToken = global.auth(randomGuy.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -1436,7 +1436,7 @@ describe('Note API', () => {
     });
   });
 
-  describe('PATCH /note/:notePublicId', async () => {
+  describe('PATCH /note/:notePublicId', () => {
     const tools = [headerTool, listTool];
 
     test.each([
@@ -1525,7 +1525,7 @@ describe('Note API', () => {
     ('Should patch note tools on note update', async ({ noteTools, noteContent, expectedStatusCode, expectedMessage }) => {
       const user = await global.db.insertUser();
 
-      const accessToken = await global.auth(user.id);
+      const accessToken = global.auth(user.id);
 
       const note = await global.db.insertNote({ creatorId: user.id });
 
