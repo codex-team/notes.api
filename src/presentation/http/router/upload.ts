@@ -6,7 +6,7 @@ import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type { NoteAttachmentFileLocation } from '@domain/entities/file.js';
 import { StatusCodes } from 'http-status-codes';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import NoteSettingsService from '@domain/service/noteSettings.js';
+import type NoteSettingsService from '@domain/service/noteSettings.js';
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 
 /**
@@ -39,7 +39,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
 
   /**
    * Prepare note id resolver middleware
-   * It should be used in routes that accepts note public id
+   * It should  be used in routes that accepts note public id
    */
   const { noteResolver } = useNoteResolver(opts.noteService);
 
@@ -98,12 +98,12 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
             key: {
               $ref: 'UploadSchema#/properties/key',
             },
-          }
+          },
         },
       },
     },
     attachValidation: true,
-    preHandler:[
+    preHandler: [
       noteResolver,
       noteSettingsResolver,
       memberRoleResolver,
@@ -162,16 +162,16 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
           },
         },
       },
-      preHandler:[
-        noteResolver,
-        noteSettingsResolver,
-        memberRoleResolver,
-      ],
-    }
+    },
+    preHandler: [
+      noteResolver,
+      noteSettingsResolver,
+      memberRoleResolver,
+    ],
   }, async (request, reply) => {
-      const fileLocation: NoteAttachmentFileLocation = {
-        noteId: request.note!.id as number,
-      };
+    const fileLocation: NoteAttachmentFileLocation = {
+      noteId: request.note!.id,
+    };
 
     const fileData = await fileUploaderService.getFileData(request.params.key, fileLocation);
 
