@@ -23,6 +23,9 @@ interface UploadRouterOptions {
    */
   noteService: NoteService;
 
+  /**
+   * Note settings service instance
+   */
   noteSettingsService: NoteSettingsService;
 
   /**
@@ -100,15 +103,11 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
       },
     },
     attachValidation: true,
-<<<<<<< HEAD
     preHandler:[
       noteResolver,
       noteSettingsResolver,
       memberRoleResolver,
     ],
-=======
-    preHandler: [noteResolver],
->>>>>>> 9615a41936a09f160c2b27571457d4c3dd7f2afa
   }, async (request, reply) => {
     /**
      * @todo solve trouble with crashing app, when validations is not passed
