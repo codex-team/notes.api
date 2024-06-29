@@ -196,6 +196,43 @@ export default class NoteService {
   }
 
   /**
+   * Create note relation
+   * @param noteId - id of the current note
+   * @param parentPublicId - id of the parent note
+   */
+  public async createNoteRelation(noteId: NoteInternalId, parentPublicId: NotePublicId): Promise<boolean> {
+    const currenParentNote = await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
+
+    /**
+     * Check if the note already has a parent
+     */
+    if (currenParentNote !== null) {
+      throw new DomainError(`Note already has parent note`);
+    }
+
+    const parentNote = await this.noteRepository.getNoteByPublicId(parentPublicId);
+
+    if (parentNote === null) {
+      throw new DomainError(`Incorrect parent note`);
+    }
+
+    let parentNoteId: number | null = parentNote.id;
+
+    /**
+     * This loop checks for cyclic reference when updating a note's parent.
+     */
+    while (parentNoteId !== null) {
+      if (parentNoteId === noteId) {
+        throw new DomainError(`Forbidden relation. Note can't be a child of own child`);
+      }
+
+      parentNoteId = await this.noteRelationsRepository.getParentNoteIdByNoteId(parentNoteId);
+    }
+
+    return await this.noteRelationsRepository.addNoteRelation(noteId, parentNote.id);
+  }
+
+  /**
    * Update note relation
    * @param noteId - id of the current note
    * @param parentPublicId - id of the new parent note
