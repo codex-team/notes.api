@@ -8,7 +8,6 @@ import type { ApiResponse } from '../google-api/types/ApiResponse.js';
 export default class OpenAIApi extends Transport {
   /**
    * Constructs OpenAI api tranport instance
-   *
    * @param baseUrl - Base url for the api
    */
   constructor(baseUrl: string = 'https://api.openai.com/v1') {
@@ -17,7 +16,6 @@ export default class OpenAIApi extends Transport {
 
   /**
    * Make GET request with authorization to OpenAI API
-   *
    * @param endpoint - api endpoint
    * @param data - form-data or text to request ChatGPT
    */

@@ -10,22 +10,21 @@ interface OauthRouterOptions {
   /**
    * User service instance
    */
-  userService: UserService,
+  userService: UserService;
 
   /**
    * Auth service instance
    */
-  authService: AuthService,
+  authService: AuthService;
 
   /**
    * Cookie domain for refresh and access tokens
    */
-  cookieDomain: string,
+  cookieDomain: string;
 }
 
 /**
  * OAuth router plugin
- *
  * @param fastify - fastify instance
  * @param opts - router options
  * @param done - callback

@@ -20,7 +20,6 @@ export default class UserService {
 
   /**
    * User service constructor
-   *
    * @param repository - user repository instance
    * @param shared - shared domain methods
    */
@@ -30,9 +29,8 @@ export default class UserService {
 
   /**
    * Get user by it's identifier
-   *
    * @param userId - unique user identifier
-   * @returns { Promise<User | null> } found user
+   * @returns found user
    */
   public async getUserById(userId: User['id']): Promise<User | null> {
     return await this.repository.getUserById(userId);
@@ -40,10 +38,9 @@ export default class UserService {
 
   /**
    * Get user by provider
-   *
    * @param accessToken - provider access token
    * @param provider - provider
-   * @returns { Promise<User | null> } found user
+   * @returns found user
    */
   public async getUserByProvider(accessToken: string, provider: Provider): Promise<User | null> {
     return await this.repository.getOrCreateUserByProvider(accessToken, provider);
@@ -51,7 +48,6 @@ export default class UserService {
 
   /**
    * Get user editor tools ids
-   *
    * @param userId - user unique identifier
    */
   public async getUserEditorTools(userId: User['id']): Promise<EditorTool[]> {
@@ -68,7 +64,6 @@ export default class UserService {
 
     /**
      * Combine user tools and default tools
-     *
      * @todo load tools in notes service
      */
     return [...userTools, ...uniqueDefaultEditorTools];
@@ -76,17 +71,16 @@ export default class UserService {
 
   /**
    * Adds editor tool to user settings by its id
-   *
    * @param options - user id & editor tool
    */
   public async addUserEditorTool({
     userId,
     toolId,
   }: {
-    userId: User['id'],
-    toolId: EditorTool['id'],
+    userId: User['id'];
+    toolId: EditorTool['id'];
   }): Promise<EditorTool> {
-    const toolToAdd =  await this.shared.editorTools.getToolById(toolId);
+    const toolToAdd = await this.shared.editorTools.getToolById(toolId);
 
     if (toolToAdd === null) {
       throw new DomainError('Editor tool not found');
@@ -102,15 +96,14 @@ export default class UserService {
 
   /**
    * Removes editor tool from user settings by its id
-   *
    * @param options - user id & editor tool
    */
   public async removeUserEditorTool({
     userId,
     toolId,
   }: {
-    userId: User['id'],
-    toolId: EditorTool['id'],
+    userId: User['id'];
+    toolId: EditorTool['id'];
   }): Promise<void> {
     return await this.repository.removeUserEditorTool({
       userId,

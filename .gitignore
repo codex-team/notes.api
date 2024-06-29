@@ -2,7 +2,6 @@ app-config.local.yaml
 .idea
 dist
 database
-s3
 
 # Logs
 logs

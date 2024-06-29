@@ -1,6 +1,5 @@
 /**
  * True if passed variable is not null/undefined/''/{}
- *
  * @param v value to check
  */
 export function notEmpty<T>(v: T | undefined | null | object): v is T {
@@ -9,7 +8,6 @@ export function notEmpty<T>(v: T | undefined | null | object): v is T {
 
 /**
  * True if passed variable is null/undefined/''/{}
- *
  * @param v value to check
  */
 export function isEmpty(v: unknown): v is null | undefined | '' | Record<string, never> {

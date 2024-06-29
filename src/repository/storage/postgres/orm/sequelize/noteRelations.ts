@@ -52,7 +52,6 @@ export default class NoteRelationsSequelizeStorage {
 
   /**
    * Constructor for note relatinship storage
-   *
    * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
@@ -92,7 +91,6 @@ export default class NoteRelationsSequelizeStorage {
 
   /**
    * Insert note relation to database
-   *
    * @param noteId - id of the current note
    * @param parentId - id of the parent note
    */
@@ -107,7 +105,6 @@ export default class NoteRelationsSequelizeStorage {
 
   /**
    * Gets parent note id by note id
-   *
    * @param noteId - note id
    */
   public async getParentNoteIdByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null> {
@@ -123,13 +120,12 @@ export default class NoteRelationsSequelizeStorage {
 
   /**
    * Update note content by id
-   *
    * @param noteId - id of the current note
    * @param parentId - parent note id
    * @returns Note on success, null on failure
    */
   public async updateNoteRelationById(noteId: NoteInternalId, parentId: NoteInternalId): Promise<boolean> {
-    const [ affectedRowsCount ] = await this.model.update({
+    const [affectedRowsCount] = await this.model.update({
       parentId,
     }, {
       where: {
@@ -143,17 +139,16 @@ export default class NoteRelationsSequelizeStorage {
 
   /**
    * Delete all note relations contains noteId
-   *
    * @param noteId - id of the current note
    */
   public async deleteNoteRelationsByNoteId(noteId: NoteInternalId): Promise<boolean> {
     const affectedRows = await this.model.destroy({
       where: {
-        [Op.or]: [ {
+        [Op.or]: [{
           noteId: noteId,
         }, {
           parentId: noteId,
-        } ],
+        }],
       },
     });
 
@@ -165,7 +160,6 @@ export default class NoteRelationsSequelizeStorage {
 
   /**
    * Unlink parent note from the current note
-   *
    * @param noteId - id of note to unlink parent
    */
   public async unlinkParent(noteId: NoteInternalId): Promise<boolean> {
@@ -183,7 +177,6 @@ export default class NoteRelationsSequelizeStorage {
 
   /**
    * Creates association with note model to make joins
-   *
    * @param model - initialized note model
    */
   public createAssociationWithNoteModel(model: ModelStatic<NoteModel>): void {
@@ -201,17 +194,16 @@ export default class NoteRelationsSequelizeStorage {
 
   /**
    * Checks if the note has any relation
-   *
    * @param noteId - id of the current note
    */
   public async hasRelation(noteId: NoteInternalId): Promise<boolean> {
     const foundNote = await this.model.findOne ({
       where: {
-        [Op.or]: [ {
+        [Op.or]: [{
           noteId: noteId,
         }, {
           parentId: noteId,
-        } ],
+        }],
       },
     });
 

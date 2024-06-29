@@ -1,7 +1,6 @@
 import type { Note } from '@domain/entities/note.js';
 import type { NotePublic } from '@domain/entities/notePublic.js';
 
-
 /**
  * Note list  entity.
  * An object with the "items" property containing a list of all existing notes created by the user
@@ -17,4 +16,3 @@ export type NoteList = {
 export type NoteListPublic = {
   items: NotePublic[];
 };
-

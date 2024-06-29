@@ -1,18 +1,17 @@
 import pg, { type ClientConfig } from 'pg';
+/* eslint-disable-next-line n/no-unpublished-import */
 import { migrate } from 'postgres-migrations';
 import logger from './../../../../infrastructure/logging/index.js';
 
-
 /**
  * Connects to the database and runs migrations
- *
  * @param migrationsPath - path to migrations files
  * @param dsn - database connection string
  */
-export async function runTenantMigrations(migrationsPath: string, dsn: string ): Promise<void> {
+export async function runTenantMigrations(migrationsPath: string, dsn: string): Promise<void> {
   logger.info('🚚 Running migrations...');
 
-  const dbConfig: ClientConfig =  {
+  const dbConfig: ClientConfig = {
     connectionString: dsn,
     connectionTimeoutMillis: 10_000,
     options: '-c search_path=public',

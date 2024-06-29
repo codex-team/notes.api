@@ -175,12 +175,12 @@ const defaultConfig: AppConfig = {
 };
 
 const args = arg({ /* eslint-disable @typescript-eslint/naming-convention */
-  '--config': [ String ],
+  '--config': [String],
   '-c': '--config',
 });
 
 const cwd = process.cwd();
-const paths = (args['--config'] || [ './app-config.yaml' ]).map((configPath) => {
+const paths = (args['--config'] || ['./app-config.yaml']).map((configPath) => {
   if (path.isAbsolute(configPath)) {
     return configPath;
   }

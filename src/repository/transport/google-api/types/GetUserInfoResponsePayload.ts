@@ -23,4 +23,3 @@ export default interface GetUserInfoResponsePayload {
    */
   picture: string;
 }
-

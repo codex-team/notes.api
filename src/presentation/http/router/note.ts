@@ -19,12 +19,12 @@ interface NoteRouterOptions {
   /**
    * Note service instance
    */
-  noteService: NoteService,
+  noteService: NoteService;
 
   /**
    * Note Settings service instance
    */
-  noteSettingsService: NoteSettingsService,
+  noteSettingsService: NoteSettingsService;
 
   /**
    * Note visits service instance
@@ -39,7 +39,6 @@ interface NoteRouterOptions {
 
 /**
  * Note router plugin
- *
  * @param fastify - fastify instance
  * @param opts - empty options
  * @param done - callback
@@ -77,15 +76,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.get<{
     Params: {
       notePublicId: NotePublicId;
-    },
+    };
     Reply: {
-      note: NotePublic,
-      parentNote?: NotePublic | undefined,
+      note: NotePublic;
+      parentNote?: NotePublic | undefined;
       accessRights: {
-        canEdit: boolean,
-      },
-      tools: EditorTool[],
-    }| ErrorResponse,
+        canEdit: boolean;
+      };
+      tools: EditorTool[];
+    } | ErrorResponse;
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -147,7 +146,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     /**
      * Check if user is authorized
-     *
      * @todo use event bus to save note visits
      */
     if (userId !== null) {
@@ -165,7 +163,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Get all tools used in the note
      */
-    const noteToolsIds : EditorTool['id'][] = note.tools.map((tool) => tool.id);
+    const noteToolsIds: EditorTool['id'][] = note.tools.map(tool => tool.id);
 
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
     /**
@@ -187,10 +185,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   fastify.delete<{
     Params: {
       notePublicId: NotePublicId;
-    },
+    };
     Reply: {
-      isDeleted: boolean
-    },
+      isDeleted: boolean;
+    };
   }>('/:notePublicId', {
     schema: {
       params: {
@@ -226,7 +224,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Check if note does not exist
      */
-    return reply.send({ isDeleted : isDeleted });
+    return reply.send({ isDeleted: isDeleted });
   });
 
   /**
@@ -238,10 +236,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       content: JSON;
       parentId?: NotePublicId;
       tools: Note['tools'];
-    },
+    };
     Reply: {
-      id: NotePublicId,
-    },
+      id: NotePublicId;
+    };
   }>('/', {
     config: {
       policy: [
@@ -261,7 +259,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         '2xx': {
           description: 'Note fields response',
           content: {
-            'application/json':{
+            'application/json': {
               schema: {
                 id: {
                   $ref: 'NoteSchema#/properties/id',
@@ -287,7 +285,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     /**
      * Save note visit when note created
-     *
      * @todo use even bus to save noteVisit
      */
 
@@ -317,15 +314,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   fastify.patch<{
     Params: {
-      notePublicId: NotePublicId,
-    },
+      notePublicId: NotePublicId;
+    };
     Body: {
-      content: Note['content'],
-      tools: Note['tools'],
-    },
+      content: Note['content'];
+      tools: Note['tools'];
+    };
     Reply: {
-      updatedAt: Note['updatedAt'],
-    }
+      updatedAt: Note['updatedAt'];
+    };
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -380,14 +377,14 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   fastify.patch<{
     Params: {
-      notePublicId: NotePublicId,
-    },
+      notePublicId: NotePublicId;
+    };
     Body: {
-      parentNoteId: NotePublicId,
-    },
+      parentNoteId: NotePublicId;
+    };
     Reply: {
-      isUpdated: boolean,
-    }
+      isUpdated: boolean;
+    };
   }>('/:notePublicId/relation', {
     schema: {
       params: {
@@ -425,7 +422,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteId = request.note?.id as number;
     const parentNoteId = request.body.parentNoteId;
 
-    const isUpdated =  await noteService.updateNoteRelation(noteId, parentNoteId);
+    const isUpdated = await noteService.updateNoteRelation(noteId, parentNoteId);
 
     return reply.send({ isUpdated });
   });
@@ -435,11 +432,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    */
   fastify.delete<{
     Params: {
-      notePublicId: NotePublicId,
-    },
+      notePublicId: NotePublicId;
+    };
     Reply: {
-      isDeleted: boolean,
-    }
+      isDeleted: boolean;
+    };
   }>('/:notePublicId/relation', {
     schema: {
       params: {
@@ -474,7 +471,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     /**
      * Delete all visits of the note
-     *
      * @todo use event bus to delete note visits
      */
     await noteVisitsService.deleteNoteVisits(noteId);
@@ -498,14 +494,14 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
        * Custom Hostname to search note by
        */
       hostname: string;
-    },
+    };
     Reply: {
-      note: NotePublic,
+      note: NotePublic;
       accessRights: {
-        canEdit: boolean,
-      },
-      tools: EditorTool[],
-    }| ErrorResponse,
+        canEdit: boolean;
+      };
+      tools: EditorTool[];
+    } | ErrorResponse;
   }>('/resolve-hostname/:hostname', {
     schema: {
       params: {
@@ -554,7 +550,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     /**
      * Save note visit if user is authorized
-     *
      * @todo use event bus to save note visits
      */
     if (userId !== null) {
@@ -586,8 +581,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     /**
      * Get all tools used in the note
      */
-    const noteToolsIds : EditorTool['id'][] = note.tools.map((tool) => tool.id);
-
+    const noteToolsIds: EditorTool['id'][] = note.tools.map(tool => tool.id);
 
     const noteTools = await editorToolsService.getToolsByIds(noteToolsIds);
 

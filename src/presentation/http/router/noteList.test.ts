@@ -4,7 +4,6 @@ beforeEach(async () => {
   /**
    * Truncate all tables, which are needed
    * Restart autoincrement sequences for data to start with id 1
-   *
    * @todo get rid of restarting database data in tests (move to beforeEach)
    */
   await global.db.truncateTables();
@@ -102,7 +101,7 @@ describe('GET /notes?page', () => {
     const randomGuy = await global.db.insertUser();
 
     if (isAuthorized) {
-      accessToken = await global.auth(randomGuy.id);
+      accessToken = global.auth(randomGuy.id);
     }
 
     for (let i = 0; i < portionSize; i++) {

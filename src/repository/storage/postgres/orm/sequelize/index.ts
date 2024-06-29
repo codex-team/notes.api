@@ -20,7 +20,6 @@ export default class SequelizeOrm {
 
   /**
    * Constructor for class
-   *
    * @param databaseConfig - database config
    */
   constructor(databaseConfig: DatabaseConfig) {
@@ -55,7 +54,7 @@ export default class SequelizeOrm {
   /**
    * Get database connection
    */
-  public get connection(): Sequelize  {
+  public get connection(): Sequelize {
     return this.conn;
   }
 }

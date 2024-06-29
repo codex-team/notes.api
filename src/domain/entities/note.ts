@@ -18,12 +18,12 @@ export type ToolUsedInNoteContent = {
   /**
    * Name of certain editor tool
    */
-  name: EditorTool['name'],
+  name: EditorTool['name'];
 
   /**
    * Id of certain editor tool (nanoid)
    */
-  id: EditorTool['id']
+  id: EditorTool['id'];
 };
 
 /**
@@ -48,8 +48,8 @@ export interface Note {
       id: string;
       type: string;
       data: unknown;
-      tunes?: {[name: string]: unknown}
-    }>
+      tunes?: { [name: string]: unknown };
+    }>;
   };
 
   /**
@@ -72,7 +72,6 @@ export interface Note {
    */
   tools: ToolUsedInNoteContent[];
 }
-
 
 /**
  * Part of note entity used to create new note

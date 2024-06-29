@@ -65,7 +65,6 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Constructor for note storage
-   *
    * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
@@ -110,7 +109,6 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Creates association with note model to make joins
-   *
    * @param model - initialized note model
    */
   public createAssociationWithNoteModel(model: ModelStatic<NoteModel>): void {
@@ -128,7 +126,6 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Creates association with user model to make joins
-   *
    * @param model - initialized user model
    */
   public createAssociationWithUserModel(model: ModelStatic<UserModel>): void {
@@ -146,7 +143,6 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Create new team member membership
-   *
    * @param data - team membership data
    */
   public async createTeamMembership(data: TeamMemberCreationAttributes): Promise<TeamMember> {
@@ -159,10 +155,9 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Check if user is note team member
-   *
    * @param userId - user id to check
    * @param noteId - note id to identify team
-   * @returns { Promise<boolean> } returns true if user is team member
+   * @returns returns true if user is team member
    */
   public async isUserInTeam(userId: User['id'], noteId: NoteInternalId): Promise<boolean> {
     const teamMemberShip = await this.model.findOne({
@@ -177,7 +172,6 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Get all team members by note id
-   *
    * @param noteId - note id to get all team members
    * @returns team relations
    */
@@ -191,7 +185,6 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Get all team members by note id with info about users
-   *
    * @param noteId - note id to get all team members
    * @returns team with additional info
    */
@@ -214,7 +207,6 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Remove team member by id
-   *
    * @param userId - id of team member
    * @param noteId - note internal id
    * @returns returns userId if team member was deleted and undefined overwise
@@ -232,7 +224,6 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Patch team member role by user and note id
-   *
    * @param userId - id of team member
    * @param noteId - note internal id
    * @param role - new team member role

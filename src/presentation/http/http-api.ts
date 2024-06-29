@@ -33,7 +33,6 @@ import UploadRouter from './router/upload.js';
 import { ajvFilePlugin } from '@fastify/multipart';
 import { UploadSchema } from './schema/Upload.js';
 
-
 const appServerLogger = getLogger('appServer');
 
 /**
@@ -47,14 +46,12 @@ export default class HttpApi implements Api {
 
   /**
    * Constructs the instance
-   *
    * @param config - http server config
    */
   constructor(private readonly config: HttpApiConfig) { }
 
   /**
    * Initializes http server
-   *
    * @param domainServices - instances of domain services
    */
   public async init(domainServices: DomainServices): Promise<void> {
@@ -72,12 +69,11 @@ export default class HttpApi implements Api {
      * To guarantee consistent and predictable behavior,
      * it's highly recommended to always load plugins in order as shown below:
      *
-     *   └── plugins (from the Fastify ecosystem)
-     *   └── your plugins (your custom plugins)
-     *   └── decorators
-     *   └── hooks
-     *   └── your services
-     *
+     * └── plugins (from the Fastify ecosystem)
+     * └── your plugins (your custom plugins)
+     * └── decorators
+     * └── hooks
+     * └── your services
      * @see https://fastify.dev/docs/latest/Guides/Getting-Started#loading-order-of-your-plugins
      */
     this.domainErrorHandler();
@@ -97,7 +93,6 @@ export default class HttpApi implements Api {
     await this.addApiRoutes(domainServices);
   }
 
-
   /**
    * Runs http server
    */
@@ -115,11 +110,10 @@ export default class HttpApi implements Api {
   /**
    * Performs fake request to API routes.
    * Used for API testing
-   *
    * @param params - request options
    */
   public async fakeRequest(params: RequestParams): Promise<Response | undefined> {
-    const response =  await this.server?.inject(params);
+    const response = await this.server?.inject(params);
 
     if (response === undefined) {
       return;
@@ -145,13 +139,13 @@ export default class HttpApi implements Api {
           description: 'Fastify REST API',
           version: '0.1.0',
         },
-        servers: [ {
+        servers: [{
           url: 'http://localhost:1337',
           description: 'Localhost environment',
         }, {
           url: 'https://api.notex.so',
           description: 'Production environment',
-        } ],
+        }],
         components: {
           securitySchemes: {
             oAuthGoogle: {
@@ -161,7 +155,7 @@ export default class HttpApi implements Api {
                 authorizationCode: {
                   authorizationUrl: 'https://api.notex.so/oauth/google/login',
                   scopes: {
-                    'notesManagement': 'Create, read, update and delete notes',
+                    notesManagement: 'Create, read, update and delete notes',
                   },
                   tokenUrl: 'https://api.notex.so/oauth/google/callback',
                 },
@@ -198,7 +192,6 @@ export default class HttpApi implements Api {
 
   /**
    * Registers all routers
-   *
    * @param domainServices - instances of domain services
    */
   private async addApiRoutes(domainServices: DomainServices): Promise<void> {
@@ -319,7 +312,6 @@ export default class HttpApi implements Api {
 
   /**
    * Add middlewares
-   *
    * @param domainServices - instances of domain services
    */
   private addCommonMiddlewares(domainServices: DomainServices): void {
@@ -332,7 +324,6 @@ export default class HttpApi implements Api {
 
   /**
    * Add "onRoute" hook that will add "preHandler" checking policies passed through the route config
-   *
    * @param domainServices - instances of domain services
    */
   private addPoliciesCheckHook(domainServices: DomainServices): void {
@@ -348,14 +339,13 @@ export default class HttpApi implements Api {
        */
       if (routeOptions.preHandler === undefined) {
         routeOptions.preHandler = [];
-      } else if (!Array.isArray(routeOptions.preHandler) ) {
-        routeOptions.preHandler = [ routeOptions.preHandler ];
+      } else if (!Array.isArray(routeOptions.preHandler)) {
+        routeOptions.preHandler = [routeOptions.preHandler];
       }
 
       routeOptions.preHandler.push(async (request, reply) => {
         for (const policy of policies) {
-          await Policies[policy]({
-            request,
+          await Policies[policy]({ request,
             reply,
             domainServices });
         }

@@ -46,7 +46,6 @@ export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAt
   public declare tools: Note['tools'];
 }
 
-
 /**
  * Class representing a table storing Notes
  */
@@ -78,7 +77,6 @@ export default class NoteSequelizeStorage {
 
   /**
    * Constructor for note storage
-   *
    * @param ormInstance - ORM instance
    */
   constructor({ connection }: Orm) {
@@ -117,7 +115,6 @@ export default class NoteSequelizeStorage {
 
   /**
    * Creates association with note settings model
-   *
    * @param model - initialized note settings model
    */
   public createAssociationWithNoteSettingsModel(model: ModelStatic<NoteSettingsModel>): void {
@@ -134,7 +131,6 @@ export default class NoteSequelizeStorage {
 
   /**
    * create association with note cisits model
-   *
    * @param model - initialized note visits model
    */
   public createAssociationWithNoteVisitsModel(model: ModelStatic<NoteVisitsModel>): void {
@@ -151,9 +147,8 @@ export default class NoteSequelizeStorage {
 
   /**
    * Insert note to database
-   *
    * @param options - note creation options
-   * @returns { Note } - created note
+   * @returns - created note
    */
   public async createNote(options: NoteCreationAttributes): Promise<Note> {
     return await this.model.create({
@@ -166,7 +161,6 @@ export default class NoteSequelizeStorage {
 
   /**
    * Update note content by id
-   *
    * @param id - note internal id
    * @param content - new content
    * @param tools - tools which are used in note
@@ -192,7 +186,6 @@ export default class NoteSequelizeStorage {
 
   /**
    * Gets note by id
-   *
    * @param id - internal id
    */
   public async getNoteById(id: NoteInternalId): Promise<Note | null> {
@@ -205,12 +198,11 @@ export default class NoteSequelizeStorage {
 
   /**
    * Deletes note by id
-   *
    * @param id - internal id
    */
   public async deleteNoteById(id: NoteInternalId): Promise<boolean> {
     const affectedRows = await this.model.destroy({
-      where:{
+      where: {
         id,
       },
     });
@@ -223,7 +215,6 @@ export default class NoteSequelizeStorage {
 
   /**
    * Gets note list by creator id
-   *
    * @param userId - id of certain user
    * @param offset - number of skipped notes
    * @param limit - number of notes to get
@@ -240,30 +231,28 @@ export default class NoteSequelizeStorage {
       where: {
         '$noteVisits.user_id$': userId,
       },
-      order: [ [
+      order: [[
         {
           model: this.visitsModel,
           as: 'noteVisits',
         },
         'visited_at',
         'DESC',
-      ] ],
-      include: [ {
+      ]],
+      include: [{
         model: this.visitsModel,
         as: 'noteVisits',
         duplicating: false,
-      } ],
+      }],
     });
 
     return reply;
   }
 
-
   /**
    * Gets note by id
-   *
    * @param hostname - custom hostname
-   * @returns { Promise<Note | null> } found note
+   * @returns found note
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
     if (!this.settingsModel) {
@@ -288,9 +277,8 @@ export default class NoteSequelizeStorage {
 
   /**
    * Gets note by public id
-   *
    * @param publicId - note public id
-   * @returns { Promise<Note | null> } found note
+   * @returns found note
    */
   public async getNoteByPublicId(publicId: NotePublicId): Promise<Note | null> {
     return await this.model.findOne({

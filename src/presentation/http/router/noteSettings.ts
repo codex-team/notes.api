@@ -27,7 +27,6 @@ interface NoteSettingsRouterOptions {
 
 /**
  * Note Settings router plugin
- *
  * @param fastify - fastify instance
  * @param opts - empty options
  * @param done - callback
@@ -57,8 +56,8 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   fastify.get<{
     Params: {
       notePublicId: NotePublicId;
-    },
-    Reply: NoteSettingsPublic,
+    };
+    Reply: NoteSettingsPublic;
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -97,13 +96,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    */
   fastify.patch<{
     Params: {
-      notePublicId: NotePublicId,
-      },
+      notePublicId: NotePublicId;
+    };
     Body: {
-      userId: User['id'],
-      newRole: MemberRole,
-      },
-    Reply: MemberRole,
+      userId: User['id'];
+      newRole: MemberRole;
+    };
+    Reply: MemberRole;
   }>('/:notePublicId/team', {
     config: {
       policy: [
@@ -122,7 +121,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
           userId: {
             $ref: 'UserSchema#/properties/id',
           },
-          newRole:{
+          newRole: {
             $ref: 'NoteSettingsSchema#/properties/team/items/properties/role',
           },
         },
@@ -155,7 +154,6 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
       return reply.notFound('User does not belong to Note\'s team');
     }
 
-
     return reply.send(newRole);
   });
 
@@ -164,12 +162,12 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    */
   fastify.delete<{
     Params: {
-      notePublicId: NotePublicId,
-    },
+      notePublicId: NotePublicId;
+    };
     Body: {
-      userId: User['id'],
-    },
-    Reply: User['id']
+      userId: User['id'];
+    };
+    Reply: User['id'];
   }>('/:notePublicId/team', {
     config: {
       policy: [
@@ -218,11 +216,11 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * Patch noteSettings by note id
    */
   fastify.patch<{
-    Body: Pick<NoteSettings, 'customHostname' | 'isPublic'>,
+    Body: Pick<NoteSettings, 'customHostname' | 'isPublic'>;
     Params: {
       notePublicId: NotePublicId;
-    },
-    Reply: NoteSettingsPublic,
+    };
+    Reply: NoteSettingsPublic;
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -283,9 +281,9 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    */
   fastify.get<{
     Params: {
-      notePublicId: NotePublicId,
-    },
-    Reply: Team,
+      notePublicId: NotePublicId;
+    };
+    Reply: Team;
   }>('/:notePublicId/team', {
     config: {
       policy: [
@@ -330,10 +328,10 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
   fastify.patch<{
     Params: {
       notePublicId: NotePublicId;
-    },
+    };
     Reply: {
       invitationHash: InvitationHash;
-    },
+    };
   }>('/:notePublicId/invitation-hash', {
     config: {
       policy: [

@@ -10,13 +10,12 @@ interface NoteListRouterOptions {
   /**
    * Note service instance
    */
-  noteService: NoteService,
+  noteService: NoteService;
 
 }
 
 /**
  * Note list router plugin
- *
  * @param fastify - fastify instance
  * @param opts - empty options
  * @param done - callback
@@ -30,7 +29,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
   fastify.get<{
     Querystring: {
       page: number;
-    },
+    };
   }>('/', {
     config: {
       policy: [
@@ -47,7 +46,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
       },
 
       response: {
-        '2xx':{
+        '2xx': {
           description: 'Query notelist',
           properties: {
             items: {

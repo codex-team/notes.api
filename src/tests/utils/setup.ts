@@ -16,6 +16,7 @@ import type Api from '@presentation/api.interface.js';
 import DatabaseHelpers from './database-helpers.js';
 import { S3Storage } from '@repository/storage/s3/index.js';
 import S3Helpers from './s3-helpers.js';
+import process from 'process';
 
 /**
  * Tests setup maximum duration.
@@ -28,13 +29,12 @@ declare global {
    * Globally exposed variable, containing reference to http server object.
    * Is accessed as 'global.server' in tests
    */
-  /* eslint-disable-next-line no-var */
+
   var api: Api | undefined;
 
   /**
    * Globally exposed method for creating accessToken using id
    * Is accessed as 'global.server' in tests
-   *
    * @param userId - id of the user that will be considered the author of the request
    * @returns accessToken for authorization
    */
@@ -43,13 +43,13 @@ declare global {
   /**
    * DatabaseHelpers class that contains methods for work with database
    */
-  /* eslint-disable-next-line no-var */
+
   var db: DatabaseHelpers;
 
   /**
    * S3Helpers class that contains methods for work with s3
    */
-  /* eslint-disable-next-line no-var */
+
   var s3: S3Helpers;
 }
 
@@ -81,7 +81,7 @@ beforeAll(async () => {
   global.api = api;
 
   global.auth = (userId: number) => {
-    return domainServices.authService.signAccessToken({ id : userId });
+    return domainServices.authService.signAccessToken({ id: userId });
   };
 
   global.db = new DatabaseHelpers(orm);

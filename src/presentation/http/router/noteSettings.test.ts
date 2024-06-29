@@ -221,7 +221,7 @@ describe('NoteSettings API', () => {
         });
       }
 
-      /** specify team for intermidiateNote if randomGuy is not in it*/
+      /** specify team for intermidiateNote if randomGuy is not in it */
       if (intermidiateTeamDefined && roleInIntermidiateTeam === undefined) {
         await global.db.insertNoteTeam({
           noteId: intermidiateNote.id,
@@ -230,7 +230,7 @@ describe('NoteSettings API', () => {
         });
       }
 
-      /** specify team for intermidiateNote if randomGuy is in it*/
+      /** specify team for intermidiateNote if randomGuy is in it */
       if (intermidiateTeamDefined && roleInIntermidiateTeam !== undefined) {
         await global.db.insertNoteTeam({
           noteId: intermidiateNote.id,
@@ -239,7 +239,7 @@ describe('NoteSettings API', () => {
         });
       }
 
-      const accessToken = await global.auth(randomGuy.id);
+      const accessToken = global.auth(randomGuy.id);
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -390,7 +390,7 @@ describe('NoteSettings API', () => {
             noteId: note.id,
             role: MemberRole.Write,
             userId: user.id,
-          } ]);
+          }]);
       } else {
         expect(response?.json()).toStrictEqual(
           {
@@ -504,7 +504,7 @@ describe('NoteSettings API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          'isPublic': false,
+          isPublic: false,
         },
         url: `/note-settings/${note.publicId}`,
       });
@@ -621,7 +621,7 @@ describe('NoteSettings API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         body: {
-          'isPublic': false,
+          isPublic: false,
         },
         url: `/note-settings/${note.publicId}/invitation-hash`,
       });
@@ -766,7 +766,7 @@ describe('NoteSettings API', () => {
         role: MemberRole.Write,
       });
 
-      const accessToken = await global.auth(user.id);
+      const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -791,7 +791,7 @@ describe('NoteSettings API', () => {
         creatorId: creator.id,
       });
 
-      const accessToker = await global.auth(creator.id);
+      const accessToker = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -841,7 +841,7 @@ describe('NoteSettings API', () => {
         expectedStatusCode: 401,
       },
     ])
-    ('Delete user from the team', async ( { role, isAuthorized, expectedStatusCode } ) => {
+    ('Delete user from the team', async ({ role, isAuthorized, expectedStatusCode }) => {
       const creator = await global.db.insertUser();
 
       const user = await global.db.insertUser();
@@ -901,14 +901,14 @@ describe('NoteSettings API', () => {
 
         expect(response?.json()).toMatchObject([
           {
-            'noteId': note.id,
-            'userId': creator.id,
-            'role': MemberRole.Write,
+            noteId: note.id,
+            userId: creator.id,
+            role: MemberRole.Write,
           },
           {
-            'noteId': note.id,
-            'userId': user.id,
-            'role': role,
+            noteId: note.id,
+            userId: user.id,
+            role: role,
           },
         ]);
       }
@@ -923,7 +923,7 @@ describe('NoteSettings API', () => {
         creatorId: creator.id,
       });
 
-      const accessToken = await global.auth(creator.id);
+      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
@@ -961,7 +961,7 @@ describe('NoteSettings API', () => {
         role: MemberRole.Write,
       });
 
-      const accessToken = await global.auth(creator.id);
+      const accessToken = global.auth(creator.id);
 
       let response = await global.api?.fakeRequest({
         method: 'DELETE',
@@ -988,9 +988,9 @@ describe('NoteSettings API', () => {
 
       expect(response?.json()).toMatchObject([
         {
-          'noteId': note.id,
-          'userId': creator.id,
-          'role': 1,
+          noteId: note.id,
+          userId: creator.id,
+          role: 1,
         },
       ]);
     });
@@ -1002,7 +1002,7 @@ describe('NoteSettings API', () => {
         creatorId: creator.id,
       });
 
-      const accessToken = await global.auth(creator.id);
+      const accessToken = global.auth(creator.id);
 
       const response = await global.api?.fakeRequest({
         method: 'DELETE',
