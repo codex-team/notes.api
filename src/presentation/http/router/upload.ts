@@ -5,6 +5,9 @@ import type NoteService from '@domain/service/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import type { NoteAttachmentFileLocation } from '@domain/entities/file.js';
 import { StatusCodes } from 'http-status-codes';
+import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
+import NoteSettingsService from '@domain/service/noteSettings.js';
+import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 
 /**
  * Interface for upload router options
@@ -20,6 +23,8 @@ interface UploadRouterOptions {
    */
   noteService: NoteService;
 
+  noteSettingsService: NoteSettingsService;
+
   /**
    * Limit for uploaded files size
    */
@@ -34,6 +39,18 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
    * It should be used in routes that accepts note public id
    */
   const { noteResolver } = useNoteResolver(opts.noteService);
+
+  /**
+   * Prepare note settings resolver middleware
+   * It should be used to use note settings in middlewares
+   */
+  const { noteSettingsResolver } = useNoteSettingsResolver(opts.noteSettingsService);
+
+  /**
+   * Prepare user role resolver middleware
+   * It should be used to use user role in middlewares
+   */
+  const { memberRoleResolver } = useMemberRoleResolver(opts.noteSettingsService);
 
   await fastify.register(fastifyMultipart, {
     limits: {
@@ -74,14 +91,20 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
         '2xx': {
           type: 'object',
           description: 'File key to get it from the API',
-          key: {
-            $ref: 'UploadSchema#/properties/key',
-          },
+          properties: {
+            key: {
+              $ref: 'UploadSchema#/properties/key',
+            },
+          }
         },
       },
     },
     attachValidation: true,
-    preHandler: [ noteResolver ],
+    preHandler:[
+      noteResolver,
+      noteSettingsResolver,
+      memberRoleResolver,
+    ],
   }, async (request, reply) => {
     /**
      * @todo solve trouble with crashing app, when validations is not passed
@@ -138,7 +161,11 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
           },
         },
       },
-      preHandler: [ noteResolver ],
+      preHandler:[
+        noteResolver,
+        noteSettingsResolver,
+        memberRoleResolver,
+      ],
     }, async (request, reply) => {
       const fileLocation: NoteAttachmentFileLocation = {
         noteId: request.note!.id as number,

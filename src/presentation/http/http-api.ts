@@ -259,6 +259,7 @@ export default class HttpApi implements Api {
       fileUploaderService: domainServices.fileUploaderService,
       noteService: domainServices.noteService,
       fileSizeLimit: this.config.fileSizeLimit,
+      noteSettingsService: domainServices.noteSettingsService
     });
   }
 
