@@ -39,7 +39,7 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
 
   /**
    * Prepare note id resolver middleware
-   * It should  be used in routes that accepts note public id
+   * It should be used in routes that accepts note public id
    */
   const { noteResolver } = useNoteResolver(opts.noteService);
 
