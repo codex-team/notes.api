@@ -373,6 +373,61 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
   });
 
   /**
+   * Create note relation by id.
+   */
+  fastify.post<{
+    Params: {
+      notePublicId: NotePublicId;
+    };
+    Body: {
+      parentNoteId: NotePublicId;
+    };
+    Reply: {
+      isCreated: boolean;
+    };
+  }>('/:notePublicId/relation', {
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      body: {
+        parentNoteId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          description: 'Was the relation created',
+          properties: {
+            isCreated: {
+              type: 'boolean',
+            },
+          },
+        },
+      },
+    },
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+    const parentNoteId = request.body.parentNoteId;
+
+    const isCreated = await noteService.createNoteRelation(noteId, parentNoteId);
+
+    return reply.send({ isCreated });
+  });
+
+  /**
    * Update note relation by id.
    */
   fastify.patch<{
