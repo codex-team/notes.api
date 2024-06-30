@@ -1436,6 +1436,171 @@ describe('Note API', () => {
     });
   });
 
+  describe('POST /note/:notePublicId/relation', () => {
+    let accessToken = '';
+    let user: User;
+
+    beforeEach(async () => {
+      /** create test user */
+      user = await global.db.insertUser();
+
+      accessToken = global.auth(user.id);
+    });
+    test('Returns 200 and isCreated=true when relation was successfully created', async () => {
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create note settings for child note */
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: parentNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.json().parentNote.id).toBe(parentNote.publicId);
+    });
+
+    test('Returns 400 when note already has parent note', async () => {
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test note, that will be new parent for the child note */
+      const newParentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: newParentNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual('Note already has parent note');
+    });
+
+    test('Returns 400 when parent is the same as child', async () => {
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: childNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
+    });
+
+    test('Return 400 when parent note does not exist', async () => {
+      const nonExistentParentId = '47L43yY7dp';
+
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: nonExistentParentId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual('Incorrect parent note Id');
+    });
+
+    test('Return 400 when circular reference occurs', async () => {
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: childNote.publicId,
+        },
+        url: `/note/${parentNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(400);
+
+      expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
+    });
+  });
+
   describe('PATCH /note/:notePublicId', () => {
     const tools = [headerTool, listTool];
 
