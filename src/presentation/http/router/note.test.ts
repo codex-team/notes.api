@@ -1505,12 +1505,6 @@ describe('Note API', () => {
         creatorId: user.id,
       });
 
-      /* create note settings for child note */
-      await global.db.insertNoteSetting({
-        noteId: childNote.id,
-        isPublic: true,
-      });
-
       /* create test relation */
       await global.db.insertNoteRelation({
         noteId: childNote.id,
