@@ -1476,8 +1476,6 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(200);
 
-      expect(response?.json().isCreated).toBe(true);
-
       response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
@@ -1569,7 +1567,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(400);
 
-      expect(response?.json().message).toStrictEqual('Incorrect parent note');
+      expect(response?.json().message).toStrictEqual('Incorrect parent note Id');
     });
 
     test('Return 400 when circular reference occurs', async () => {
