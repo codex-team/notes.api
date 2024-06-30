@@ -200,7 +200,7 @@ export default class NoteService {
    * @param noteId - id of the current note
    * @param parentPublicId - id of the parent note
    */
-  public async createNoteRelation(noteId: NoteInternalId, parentPublicId: NotePublicId): Promise<boolean> {
+  public async createNoteRelation(noteId: NoteInternalId, parentPublicId: NotePublicId): Promise<Note> {
     const currenParentNote = await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
 
     /**
@@ -213,7 +213,7 @@ export default class NoteService {
     const parentNote = await this.noteRepository.getNoteByPublicId(parentPublicId);
 
     if (parentNote === null) {
-      throw new DomainError(`Incorrect parent note`);
+      throw new DomainError(`Incorrect parent note Id`);
     }
 
     let parentNoteId: number | null = parentNote.id;
@@ -229,7 +229,13 @@ export default class NoteService {
       parentNoteId = await this.noteRelationsRepository.getParentNoteIdByNoteId(parentNoteId);
     }
 
-    return await this.noteRelationsRepository.addNoteRelation(noteId, parentNote.id);
+    const isCreated = await this.noteRelationsRepository.addNoteRelation(noteId, parentNote.id);
+
+    if (!isCreated) {
+      throw new DomainError(`Relation was not created`);
+    }
+
+    return parentNote;
   }
 
   /**

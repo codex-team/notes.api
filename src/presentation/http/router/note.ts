@@ -383,7 +383,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       parentNoteId: NotePublicId;
     };
     Reply: {
-      isCreated: boolean;
+      parentNote: Note;
     };
   }>('/:notePublicId/relation', {
     schema: {
@@ -400,10 +400,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       response: {
         '2xx': {
           type: 'object',
-          description: 'Was the relation created',
+          description: 'Parent note',
           properties: {
-            isCreated: {
-              type: 'boolean',
+            parentNote: {
+              type: 'Note',
             },
           },
         },
@@ -422,9 +422,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteId = request.note?.id as number;
     const parentNoteId = request.body.parentNoteId;
 
-    const isCreated = await noteService.createNoteRelation(noteId, parentNoteId);
+    const parentNote = await noteService.createNoteRelation(noteId, parentNoteId);
 
-    return reply.send({ isCreated });
+    return reply.send({ parentNote });
   });
 
   /**
