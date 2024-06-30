@@ -400,10 +400,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       response: {
         '2xx': {
           type: 'object',
-          description: 'Parent note',
           properties: {
             parentNote: {
-              type: 'Note',
+              $ref: 'NoteSchema#',
             },
           },
         },
