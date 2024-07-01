@@ -268,7 +268,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
       customHostname,
       isPublic,
-      cover
+      cover,
     });
 
     if (updatedNoteSettings === null) {
