@@ -244,7 +244,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
             type: 'boolean',
           },
           cover: {
-            type: 'string'
+            type: 'string',
           }
         },
       },
