@@ -69,6 +69,7 @@ type NoteSettingsMockCreationAttributes = {
   customHostname?: NoteSettings['customHostname'];
   isPublic: NoteSettings['isPublic'];
   invitationHash?: NoteSettings['invitationHash'];
+  cover?: NoteSettings['cover'];
 };
 
 /**
@@ -207,10 +208,11 @@ export default class DatabaseHelpers {
   public async insertNoteSetting(noteSettings: NoteSettingsMockCreationAttributes): Promise<NoteSettingsMockCreationAttributes> {
     const customHostname = noteSettings.customHostname ?? null;
     const invitationHash = noteSettings.invitationHash ?? createInvitationHash();
+    const cover = noteSettings.cover ?? null;
 
     noteSettings.invitationHash = invitationHash;
 
-    await this.orm.connection.query(`INSERT INTO public.note_settings ("note_id", "custom_hostname", "is_public", "invitation_hash") VALUES (${noteSettings.noteId}, '${customHostname}', ${noteSettings.isPublic}, '${invitationHash}')`);
+    await this.orm.connection.query(`INSERT INTO public.note_settings ("note_id", "custom_hostname", "is_public", "invitation_hash", "cover") VALUES (${noteSettings.noteId}, '${customHostname}', ${noteSettings.isPublic}, '${invitationHash}', '${cover}')`);
 
     return noteSettings;
   }

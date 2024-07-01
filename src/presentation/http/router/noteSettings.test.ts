@@ -480,6 +480,7 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
+        cover: 'image.png',
       });
 
       /** Create test team if user is in team */
@@ -505,6 +506,7 @@ describe('NoteSettings API', () => {
         },
         body: {
           isPublic: false,
+          cover: 'new-image.png',
         },
         url: `/note-settings/${note.publicId}`,
       });
@@ -513,6 +515,7 @@ describe('NoteSettings API', () => {
 
       if (expectedStatusCode === 200) {
         expect(response?.json().isPublic).toBe(false);
+        expect(response?.json().cover).toBe('new-image.png');
       }
     });
 
