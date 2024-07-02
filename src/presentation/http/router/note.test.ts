@@ -600,6 +600,65 @@ describe('Note API', () => {
       }
     });
 
+    test('UpdatedAt field is updated when note is modified', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      const accessToken = global.auth(user.id);
+
+      /** Create test note */
+      let note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      /** Save the original value of updatedAt */
+      const originalUpdatedAt = note.updatedAt;
+
+      const newContent = {
+        blocks: [
+          {
+            id: 'qxnjUh9muR',
+            type: headerTool.name,
+            data: {
+              text: 'sample text',
+              level: 1,
+            },
+          },
+        ],
+      };
+
+      const newTools = [
+        {
+          name: headerTool.name,
+          id: headerTool.id,
+        },
+      ];
+
+      /** Modify the note */
+      const response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+        body: {
+          content: newContent,
+          tools: newTools,
+        },
+      });
+
+      /** Check if note was modified successfully */
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json().updatedAt).not.toEqual(originalUpdatedAt);
+    });
+
     test('Returns status 406 when the public id does not exist', async () => {
       const nonexistentId = 'ishvm5qH84';
 
