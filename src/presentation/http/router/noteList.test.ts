@@ -112,8 +112,8 @@ describe('GET /notes?page', () => {
       await global.db.insertNoteSetting({
         noteId: note.id,
         cover: 'image.png',
-        isPublic: false
-      })
+        isPublic: false,
+      });
 
       if (notesVisited) {
         await global.db.insertNoteVisit({

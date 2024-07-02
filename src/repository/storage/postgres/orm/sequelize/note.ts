@@ -1,4 +1,4 @@
-import { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
+import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
@@ -256,7 +256,7 @@ export default class NoteSequelizeStorage {
         as: 'noteVisits',
         duplicating: false,
       }, {
-        model: this.settingsModel!,
+        model: this.settingsModel,
         as: 'noteSettings',
         attributes: ['cover'],
         duplicating: false,
@@ -279,7 +279,7 @@ export default class NoteSequelizeStorage {
         publicId: note.publicId,
         creatorId: note.creatorId,
         tools: note.tools,
-      }
+      };
     });
   }
 
