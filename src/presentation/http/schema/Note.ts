@@ -14,6 +14,7 @@ export const NoteSchema = {
       maxLength: 10,
       minLength: 10,
     },
+    cover: { type: 'string' },
     content: {
       type: 'object',
       properties: {

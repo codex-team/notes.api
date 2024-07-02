@@ -1,6 +1,6 @@
 import type { Note } from '@domain/entities/note.js';
 
-type NotePublicProperties = 'content' | 'createdAt' | 'updatedAt' | 'creatorId';
+type NotePublicProperties = 'content' | 'createdAt' | 'updatedAt' | 'creatorId' | 'cover';
 
 export interface NotePublic extends Pick<Note, NotePublicProperties> {
   /**
@@ -20,6 +20,7 @@ export function definePublicNote(note: Note): NotePublic {
     createdAt: note.createdAt,
     updatedAt: note.updatedAt,
     creatorId: note.creatorId,
+    cover: note.cover,
   };
 
   return notePublic;

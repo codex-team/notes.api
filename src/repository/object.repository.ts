@@ -1,4 +1,4 @@
-import type { S3Storage } from './storage/s3/index.js';
+import type { S3Storage } from '@repository/storage/s3/index.js';
 import type { Buffer } from 'buffer';
 
 /**

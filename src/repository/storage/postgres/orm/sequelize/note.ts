@@ -1,4 +1,4 @@
-import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, Sequelize } from 'sequelize';
+import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
 import { DataTypes, Model } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
@@ -43,7 +43,15 @@ export class NoteModel extends Model<InferAttributes<NoteModel>, InferCreationAt
    */
   public declare updatedAt: CreationOptional<Note['updatedAt']>;
 
+  /**
+   * Editor tools, which note contains
+   */
   public declare tools: Note['tools'];
+
+  /**
+   * Joined note settings model
+   */
+  public declare noteSettings?: NonAttribute<NoteSettingsModel>;
 }
 
 /**
@@ -225,6 +233,10 @@ export default class NoteSequelizeStorage {
       throw new DomainError('NoteVisit model should be defined');
     }
 
+    if (!this.settingsModel) {
+      throw new Error('Note settings model not initialized');
+    }
+
     const reply = await this.model.findAll({
       offset: offset,
       limit: limit,
@@ -243,10 +255,32 @@ export default class NoteSequelizeStorage {
         model: this.visitsModel,
         as: 'noteVisits',
         duplicating: false,
+      }, {
+        model: this.settingsModel,
+        as: 'noteSettings',
+        attributes: ['cover'],
+        duplicating: false,
       }],
     });
 
-    return reply;
+    /**
+     * Convert note model data to Note entity with cover property
+     */
+    return reply.map((note) => {
+      return {
+        id: note.id,
+        /**
+         * noteSettings is required to be, because we make join
+         */
+        cover: note.noteSettings!.cover,
+        content: note.content,
+        updatedAt: note.updatedAt,
+        createdAt: note.createdAt,
+        publicId: note.publicId,
+        creatorId: note.creatorId,
+        tools: note.tools,
+      };
+    });
   }
 
   /**
