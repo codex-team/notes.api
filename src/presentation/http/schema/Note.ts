@@ -28,5 +28,13 @@ export const NoteSchema = {
         },
       },
     },
+    createdAt: {
+      type: 'string',
+      format: 'date-time',
+    },
+    updatedAt: {
+      type: 'string',
+      format: 'date-time',
+    },
   },
 };
