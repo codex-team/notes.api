@@ -111,7 +111,7 @@ describe('GET /notes?page', () => {
 
       await global.db.insertNoteSetting({
         noteId: note.id,
-        cover: 'image.png',
+        cover: 'DZnvqi63.png',
         isPublic: false,
       });
 
