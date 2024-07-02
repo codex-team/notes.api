@@ -17,7 +17,7 @@ import EditorToolsRepository from '@repository/editorTools.repository.js';
 import TeamRepository from '@repository/team.repository.js';
 import TeamStorage from '@repository/storage/team.storage.js';
 import NoteRelationsRepository from '@repository/noteRelations.repository.js';
-import { S3Storage } from './storage/s3/index.js';
+import { S3Storage } from '@repository/storage/s3/index.js';
 import FileStorage from './storage/file.storage.js';
 import FileRepository from './file.repository.js';
 import ObjectStorageRepository from './object.repository.js';
