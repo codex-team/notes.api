@@ -35,6 +35,16 @@ export class EditorToolModel extends Model<InferAttributes<EditorToolModel>, Inf
   public declare source: EditorTool['source'];
 
   /**
+   * Editor tool description
+   */
+  public declare description: EditorTool['description'];
+
+  /**
+   * Cover image for the tool
+   */
+  public declare cover: EditorTool['cover'];
+
+  /**
    * Applies to user editor tools by default
    */
   public declare isDefault: EditorTool['isDefault'];
@@ -106,6 +116,14 @@ export default class UserSequelizeStorage {
         type: DataTypes.JSON,
         allowNull: false,
       },
+      description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      cover: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       isDefault: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
@@ -124,6 +142,8 @@ export default class UserSequelizeStorage {
     name,
     title,
     exportName,
+    description,
+    cover,
     userId,
     source,
     isDefault,
@@ -132,6 +152,8 @@ export default class UserSequelizeStorage {
       name,
       userId,
       title,
+      description,
+      cover,
       exportName,
       source,
       isDefault,
@@ -176,5 +198,20 @@ export default class UserSequelizeStorage {
    */
   public async getTools(): Promise<EditorTool[]> {
     return await EditorToolModel.findAll();
+  }
+
+  /**
+   * Update tool cover
+   * @param editorToolId
+   * @param cover
+   */
+  public async updateToolCover(editorToolId: EditorTool['id'], cover: EditorTool['cover']): Promise<void> {
+    await this.model.update({
+      cover,
+    }, {
+      where: {
+        $id$: editorToolId,
+      },
+    });
   }
 }

@@ -63,4 +63,8 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
       ...editorTool,
     });
   }
+
+  public async updateToolCover(editorToolId: EditorTool['id'], cover: EditorTool['cover']): Promise<void> {
+    return await this.repository.updateToolCover(editorToolId, cover);
+  }
 }

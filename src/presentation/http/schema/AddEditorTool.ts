@@ -1,5 +1,5 @@
-export const EditorToolSchema = {
-  $id: 'EditorToolSchema',
+export const AddEditorToolSchema = {
+  $id: 'AddEditorToolSchema',
   type: 'object',
   required: [
     'name',
@@ -31,7 +31,7 @@ export const EditorToolSchema = {
     },
     cover: {
       type: 'string',
-      description: 'S3 key to the tool cover image',
+      description: 'Multipart data',
     },
     isDefault: {
       type: 'boolean',

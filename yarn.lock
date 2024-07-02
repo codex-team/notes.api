@@ -1047,9 +1047,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/multipart@npm:^8.2.0":
-  version: 8.2.0
-  resolution: "@fastify/multipart@npm:8.2.0"
+"@fastify/multipart@npm:^8.3.0":
+  version: 8.3.0
+  resolution: "@fastify/multipart@npm:8.3.0"
   dependencies:
     "@fastify/busboy": ^2.1.0
     "@fastify/deepmerge": ^1.0.0
@@ -1057,7 +1057,7 @@ __metadata:
     fastify-plugin: ^4.0.0
     secure-json-parse: ^2.4.0
     stream-wormhole: ^1.1.0
-  checksum: 0135a82aa4532fc4ae99b3ef1cdd29c39e9ef3ed06fb1c509dff932043b056cbfc12523e5fa0414424356f314fa48d040486c7dbff9ab16628f56e96b5efaf4d
+  checksum: 06dbd19f582b5efa88de39c8a84065ca090b9dff51c4c5aa145807f78c703a66f15b6c33108cfcc04e549b375c9fb2fca69418b00b415e54a44a17eceb9f9297
   languageName: node
   linkType: hard
 
@@ -6546,7 +6546,7 @@ __metadata:
     "@codex-team/config-loader": ^1.0.0
     "@fastify/cookie": ^8.3.0
     "@fastify/cors": ^8.3.0
-    "@fastify/multipart": ^8.2.0
+    "@fastify/multipart": ^8.3.0
     "@fastify/oauth2": ^7.2.1
     "@fastify/swagger": ^8.8.0
     "@fastify/swagger-ui": ^1.9.3

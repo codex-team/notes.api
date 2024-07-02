@@ -1,4 +1,4 @@
-import type { FileData, NoteAttachmentFileLocation, FileLocationByType, FileLocation, FileMetadata } from '@domain/entities/file.js';
+import type { FileData, NoteAttachmentFileLocation, FileLocationByType, FileLocation, FileMetadata, EditorToolCoverFileLocation } from '@domain/entities/file.js';
 import type UploadedFile from '@domain/entities/file.js';
 import { FileType } from '@domain/entities/file.js';
 import { createFileId } from '@infrastructure/utils/id.js';
@@ -181,6 +181,10 @@ export default class FileUploaderService {
       return FileType.NoteAttachment;
     }
 
+    if (this.isEditorToolCoverFileLocation(location)) {
+      return FileType.EditorToolCover;
+    }
+
     return FileType.Test;
   }
 
@@ -190,6 +194,10 @@ export default class FileUploaderService {
    */
   private isNoteAttachemntFileLocation(location: FileLocation): location is NoteAttachmentFileLocation {
     return 'noteId' in location;
+  }
+
+  private isEditorToolCoverFileLocation(location: FileLocation): location is EditorToolCoverFileLocation {
+    return 'isEditorToolCover' in location;
   }
 
   /**
@@ -202,6 +210,8 @@ export default class FileUploaderService {
         return 'test';
       case FileType.NoteAttachment:
         return 'note-attachment';
+      case FileType.EditorToolCover:
+        return 'editor-tool-covers';
       default:
         throw new DomainError('Unknown file type');
     }

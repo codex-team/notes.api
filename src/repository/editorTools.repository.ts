@@ -57,4 +57,13 @@ export default class EditorToolsRepository {
 
     return editorTools;
   }
+
+  /**
+   * Update tool cover
+   * @param editorToolId
+   * @param cover
+   */
+  public async updateToolCover(editorToolId: EditorTool['id'], cover: EditorTool['cover']): Promise<void> {
+    return await this.storage.updateToolCover(editorToolId, cover);
+  }
 }
