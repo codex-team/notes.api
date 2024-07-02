@@ -68,6 +68,11 @@ export interface Note {
   updatedAt: string;
 
   /**
+   * Note image id
+   */
+  cover?: string | null;
+
+  /**
    * All tools used in certain note
    */
   tools: ToolUsedInNoteContent[];
