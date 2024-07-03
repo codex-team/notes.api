@@ -1,6 +1,9 @@
 import { getLogger } from '@infrastructure/logging/index.js';
-import S3 from 'aws-sdk/clients/s3.js';
-import type { Buffer } from 'buffer';
+import { S3Client, GetObjectCommand, PutObjectCommand, CreateBucketCommand } from '@aws-sdk/client-s3';
+import { Buffer } from 'buffer';
+import { Readable } from 'stream';
+import { streamToBuffer } from '@infrastructure/utils/streamToBuffer.js';
+import { isEmpty } from '@infrastructure/utils/empty.js';
 
 const s3StorageLogger = getLogger('s3Storage');
 
@@ -11,7 +14,7 @@ export class S3Storage {
   /**
    * S3 instance
    */
-  private readonly s3: S3;
+  private readonly s3: S3Client;
 
   /**
    * Constructor for S3Bucket
@@ -21,10 +24,10 @@ export class S3Storage {
    * @param endpoint - AWS endpoint (in case of localstack or other S3 compatible services)
    */
   constructor(accessKeyId: string, secretAccessKey: string, region?: string, endpoint?: string) {
-    this.s3 = new S3({
+    this.s3 = new S3Client({
       endpoint,
       region,
-      s3ForcePathStyle: true,
+      forcePathStyle: true,
       credentials: {
         accessKeyId,
         secretAccessKey,
@@ -39,27 +42,22 @@ export class S3Storage {
    * @param file - file data to upload
    */
   public async uploadFile(bucket: string, key: string, file: Buffer): Promise<string | null> {
-    /**
-     * Create an upload manager to upload the file to S3
-     */
-    const uploadManager = this.s3.upload({
-      Bucket: bucket,
-      Key: key,
-      Body: file,
-    });
-
-    /**
-     * Wait for the upload to complete and return the URL of the uploaded file
-     */
     try {
-      const response = await uploadManager.promise();
-
-      return response.Location;
+      /**
+       * Try to upload file data to s3
+       */
+      await this.s3.send(new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: file,
+      }))
     } catch (error) {
       s3StorageLogger.error(error);
 
       return null;
     }
+
+    return key;
   }
 
   /**
@@ -68,18 +66,22 @@ export class S3Storage {
    * @param key - Key of the file in S3
    */
   public async getFile(bucket: string, key: string): Promise<Buffer | null> {
-    const getObjectManager = this.s3.getObject({
-      Bucket: bucket,
-      Key: key,
-    });
-
     try {
-      const response = await getObjectManager.promise();
+      const { Body } = await this.s3.send(new GetObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }));
 
-      return response.Body as Buffer;
-    } catch (error) {
-      s3StorageLogger.error(error);
-
+      /**
+       * Body must be readable to parse stream
+       */
+      if (!(Body instanceof Readable)) {
+        throw new Error("Expected Body to be a Readable stream");
+      }
+      const fileContent = await streamToBuffer(Body);
+      return fileContent;
+    } catch (err) {
+      s3StorageLogger.error(err);
       return null;
     }
   }
@@ -89,18 +91,20 @@ export class S3Storage {
    * @param name - bucket name
    */
   public async createBucket(name: string): Promise<string | null> {
-    const createBucketManager = this.s3.createBucket({
-      Bucket: name,
-    });
-
     try {
-      const response = await createBucketManager.promise();
+      const { Location } = await this.s3.send(new CreateBucketCommand({
+        Bucket: name,
+      }));
 
-      return response.Location as string;
-    } catch (error) {
-      s3StorageLogger.error(error);
+      if (isEmpty(Location)) {
+        return null;
+      }
 
-      return null;
+      return Location;
+    } catch (err) {
+        s3StorageLogger.error(err);
+
+        return null;
     }
   }
 }

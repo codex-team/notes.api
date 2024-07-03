@@ -31,4 +31,5 @@ services:
     environment:
       MINIO_ROOT_USER: codex
       MINIO_ROOT_PASSWORD: minio12345
+      MINIO_REGION: my-region
     command: server --console-address ":9001" /data
