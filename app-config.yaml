@@ -33,6 +33,7 @@ s3:
   accessKeyId: 'secret'
   secretAccessKey: 'secret'
   endpoint: 'http://localhost:9000'
+  region: 'my-region'
 
 database:
   dsn: 'postgres://codex:postgres@postgres:5432/notes'
