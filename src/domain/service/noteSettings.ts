@@ -113,8 +113,6 @@ export default class NoteSettingsService {
      */
     if (notEmpty(data.cover)) {
       if (notEmpty(noteSettings.cover)) {
-        console.log('new cover', data.cover)
-        console.log('old cover', noteSettings.cover)
         await this.shared.fileUploader.deleteFile(noteSettings.cover);
       }
     }

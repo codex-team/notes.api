@@ -169,9 +169,6 @@ export default class FileUploaderService {
     const isRemovedFromObjectStorage = await this.objectRepository.delete(key, bucket);
     const isRemovedFromDatabase = await this.fileRepository.deleteByKey(key);
 
-    console.log('isRemovedFromObjectStorage', isRemovedFromObjectStorage)
-    console.log('isRemovedFromDatabase', isRemovedFromDatabase)
-
     if (isRemovedFromObjectStorage === false || isRemovedFromDatabase === false) {
       throw new DomainError('Cannot delete file');
     }
