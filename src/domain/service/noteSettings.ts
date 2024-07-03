@@ -111,10 +111,8 @@ export default class NoteSettingsService {
     /**
      * In this case we need to remove previous cover
      */
-    if (notEmpty(data.cover)) {
-      if (notEmpty(noteSettings.cover)) {
-        await this.shared.fileUploader.deleteFile(noteSettings.cover);
-      }
+    if (notEmpty(data.cover) && notEmpty(noteSettings.cover)) {
+      await this.shared.fileUploader.deleteFile(noteSettings.cover);
     }
 
     return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);

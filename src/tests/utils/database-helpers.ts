@@ -208,7 +208,7 @@ export default class DatabaseHelpers {
   public async insertNoteSetting(noteSettings: NoteSettingsMockCreationAttributes): Promise<NoteSettingsMockCreationAttributes> {
     const customHostname = noteSettings.customHostname ?? null;
     const invitationHash = noteSettings.invitationHash ?? createInvitationHash();
-    const cover = noteSettings.cover ?? null;
+    const cover = noteSettings.cover ?? '';
 
     noteSettings.invitationHash = invitationHash;
 
