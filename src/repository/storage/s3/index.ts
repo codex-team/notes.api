@@ -76,7 +76,9 @@ export class S3Storage {
        * Body must be readable to parse stream
        */
       if (!(Body instanceof Readable)) {
-        throw new Error("Expected Body to be a Readable stream");
+        s3StorageLogger.error('Expected Body to be a Readable stream');
+
+        return null;
       }
       const fileContent = await streamToBuffer(Body);
       return fileContent;
