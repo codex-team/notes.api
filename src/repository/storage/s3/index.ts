@@ -1,5 +1,5 @@
 import { getLogger } from '@infrastructure/logging/index.js';
-import { S3Client, GetObjectCommand, PutObjectCommand, CreateBucketCommand } from '@aws-sdk/client-s3';
+import { S3Client, GetObjectCommand, PutObjectCommand, CreateBucketCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { Buffer } from 'buffer';
 import { Readable } from 'stream';
 import { streamToBuffer } from '@infrastructure/utils/streamToBuffer.js';
@@ -85,6 +85,27 @@ export class S3Storage {
     } catch (err) {
       s3StorageLogger.error(err);
       return null;
+    }
+  }
+
+  /**
+   * Remove file from bucket
+   * @param bucket - bucket name
+   * @param key - file key
+   * @returns true if object was deleted
+   */
+  public async removeFile(bucket: string, key: string): Promise<boolean> {
+    try {
+      await this.s3.send(new DeleteObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }))
+
+      return true;
+    } catch (error) {
+      s3StorageLogger.error(error)
+
+      return false;
     }
   }
 

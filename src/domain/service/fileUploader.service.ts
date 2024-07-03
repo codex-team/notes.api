@@ -6,6 +6,7 @@ import type FileRepository from '@repository/file.repository.js';
 import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import mime from 'mime';
+import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * File data for upload
@@ -141,6 +142,39 @@ export default class FileUploaderService {
     }
 
     return fileData;
+  }
+
+  /**
+   * Delete file
+   * @param key - file key
+   */
+  public async deleteFile(key: UploadedFile['key']): Promise<void> {
+    const fileData = await this.fileRepository.getByKey(key);
+
+    console.log(fileData);
+
+    if (isEmpty(fileData)) {
+      throw new DomainError('File not found');
+    }
+
+    /**
+     * Define file type and bucket
+     */
+    const fileType = this.defineFileType(fileData.location);
+    const bucket = this.defineBucketByFileType(fileType);
+
+    /**
+     * Delete file from object storage and database
+     */
+    const isRemovedFromObjectStorage = await this.objectRepository.delete(key, bucket);
+    const isRemovedFromDatabase = await this.fileRepository.deleteByKey(key);
+
+    console.log('isRemovedFromObjectStorage', isRemovedFromObjectStorage)
+    console.log('isRemovedFromDatabase', isRemovedFromDatabase)
+
+    if (isRemovedFromObjectStorage === false || isRemovedFromDatabase === false) {
+      throw new DomainError('Cannot delete file');
+    }
   }
 
   /**

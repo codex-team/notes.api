@@ -36,4 +36,13 @@ export default class ObjectStorageRepository {
   public async insert(objectData: Buffer, key: string, bucket: string): Promise<string | null> {
     return await this.storage.uploadFile(bucket, key, objectData);
   }
+
+  /**
+   * Delete object
+   * @param key - object key
+   * @param bucket - bucket name
+   */
+  public async delete(key: string, bucket: string): Promise<boolean> {
+    return await this.storage.removeFile(bucket, key);
+  }
 }

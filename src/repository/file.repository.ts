@@ -40,4 +40,13 @@ export default class FileRepository {
   public async getFileLocationByKey<T extends FileType>(type: T, key: UploadedFile['key']): Promise<FileLocationByType[T] | null> {
     return await this.storage.getFileLocationByKey(type, key);
   };
+
+  /**
+   * Delete file by key
+   * @param key - file unique key
+   * @returns true if file deleted
+   */
+  public async deleteByKey(key: UploadedFile['key']): Promise<boolean> {
+    return await this.storage.delete(key);
+  }
 }
