@@ -161,4 +161,22 @@ export default class FileSequelizeStorage {
 
     return res.location as FileLocationByType[T];
   }
+
+  /**
+   * Delete file
+   * @param key - file key
+   * @returns true if file deleted
+   */
+  public async delete(key: UploadedFile['key']): Promise<boolean> {
+    const affectedRows = await this.model.destroy({
+      where: {
+        key,
+      },
+    });
+
+    /**
+     * If file not found return false
+     */
+    return affectedRows > 0;
+  }
 }

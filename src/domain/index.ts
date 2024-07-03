@@ -72,10 +72,12 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     repositories.userSessionRepository
   );
   const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
+  const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository);
 
   const sharedServices = {
     editorTools: editorToolsService,
     note: noteService,
+    fileUploader: fileUploaderService,
     /**
      * @todo find a way how to resolve circular dependency
      */
@@ -84,8 +86,6 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   const userService = new UserService(repositories.userRepository, sharedServices);
   const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, sharedServices);
   const aiService = new AIService(repositories.aiRepository);
-
-  const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository);
 
   return {
     fileUploaderService,

@@ -9,6 +9,7 @@ import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type { SharedDomainMethods } from './shared/index.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Service responsible for Note Settings
@@ -105,6 +106,13 @@ export default class NoteSettingsService {
 
     if (noteSettings === null) {
       throw new DomainError(`Note settings not found`);
+    }
+
+    /**
+     * In this case we need to remove previous cover
+     */
+    if (notEmpty(data.cover) && notEmpty(noteSettings.cover)) {
+      await this.shared.fileUploader.deleteFile(noteSettings.cover);
     }
 
     return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);

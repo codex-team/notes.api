@@ -480,7 +480,6 @@ describe('NoteSettings API', () => {
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
-        cover: 'image.png',
       });
 
       /** Create test team if user is in team */
