@@ -151,8 +151,6 @@ export default class FileUploaderService {
   public async deleteFile(key: UploadedFile['key']): Promise<void> {
     const fileData = await this.fileRepository.getByKey(key);
 
-    console.log(fileData);
-
     if (isEmpty(fileData)) {
       throw new DomainError('File not found');
     }
