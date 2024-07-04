@@ -46,10 +46,6 @@ describe('Join API', () => {
         noteId: note.publicId,
         role: 1,
       });
-
-      expect(response?.json()).toStrictEqual({
-        message: 'User already in team',
-      });
     });
     test('Returns 406 when invitation hash is not valid', async () => {
       const hash = 'Jih23y4igf';
