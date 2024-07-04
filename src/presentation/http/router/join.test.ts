@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 
 describe('Join API', () => {
   describe('POST /join/:hash', () => {
-    test('Returns 406 when user is already in the team', async () => {
+    test('Returns 200 and teamMember when user is already in the team', async () => {
       const invitationHash = 'Hzh2hy4igf';
 
       /**
@@ -45,7 +45,15 @@ describe('Join API', () => {
         url: `/join/${invitationHash}`,
       });
 
-      expect(response?.statusCode).toBe(406);
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        result: {
+          userId: user.id,
+          noteId: note.publicId,
+          role: 0,
+        },
+      });
 
       expect(response?.json()).toStrictEqual({
         message: 'User already in team',
