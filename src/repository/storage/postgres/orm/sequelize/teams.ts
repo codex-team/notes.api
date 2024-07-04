@@ -154,12 +154,12 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
-   * Check if user is note team member
+   * Get team member by user id and note id
    * @param userId - user id to check
    * @param noteId - note id to identify team
-   * @returns returns true if user is team member
+   * @returns return null if user is not in team, teamMember otherwhise
    */
-  public async isUserInTeam(userId: User['id'], noteId: NoteInternalId): Promise<boolean> {
+  public async getTeamMemberByNoteAndUserId(userId: User['id'], noteId: NoteInternalId): Promise<TeamMember | null> {
     const teamMemberShip = await this.model.findOne({
       where: {
         noteId,
@@ -167,7 +167,7 @@ export default class TeamsSequelizeStorage {
       },
     });
 
-    return teamMemberShip !== null;
+    return teamMemberShip;
   }
 
   /**

@@ -50,12 +50,16 @@ export default class NoteSettingsService {
     }
 
     /**
-     * Check if user not already in team
+     * Try to get team member by user and note id
      */
-    const isUserTeamMember = await this.teamRepository.isUserInTeam(userId, noteSettings.noteId);
+    const member = await this.teamRepository.getTeamMemberByNoteAndUserId(userId, noteSettings.noteId);
 
-    if (isUserTeamMember) {
-      throw new DomainError(`User already in team`);
+    if (member !== null) {
+      return {
+        noteId: await this.shared.note.getNotePublicIdByInternal(member.noteId),
+        userId: member.userId,
+        role: member.role,
+      };
     }
 
     const teamMember = await this.teamRepository.createTeamMembership({
@@ -65,7 +69,6 @@ export default class NoteSettingsService {
     });
 
     return {
-      id: teamMember.id,
       noteId: await this.shared.note.getNotePublicIdByInternal(teamMember.noteId),
       userId: teamMember.userId,
       role: teamMember.role,

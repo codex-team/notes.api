@@ -65,7 +65,7 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
       return reply.notAcceptable(causedError.message);
     }
 
-    return reply.send({ result });
+    return reply.send(result);
   });
 
   done();
