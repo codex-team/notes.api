@@ -1,6 +1,4 @@
-import EditorTool from '@domain/entities/editorTools.js';
 import type { MultipartFields, MultipartFile, MultipartValue } from '@fastify/multipart';
-import { Multipart } from '@fastify/multipart';
 
 export interface AddEditorToolDto extends MultipartFields {
   name: MultipartValue;

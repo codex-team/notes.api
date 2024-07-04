@@ -60,8 +60,8 @@ export default class EditorToolsRepository {
 
   /**
    * Update tool cover
-   * @param editorToolId
-   * @param cover
+   * @param editorToolId - unique tool identifier
+   * @param cover - new tool cover
    */
   public async updateToolCover(editorToolId: EditorTool['id'], cover: EditorTool['cover']): Promise<void> {
     return await this.storage.updateToolCover(editorToolId, cover);

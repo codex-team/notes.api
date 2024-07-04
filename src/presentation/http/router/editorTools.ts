@@ -1,6 +1,5 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type EditorToolsService from '@domain/service/editorTools.js';
-import type EditorTool from '@domain/entities/editorTools.js';
 import type { AddEditorToolDto } from './dto/AddEditorTool.dto.js';
 import type FileUploaderService from '@domain/service/fileUploader.service.js';
 import fastifyMultipart from '@fastify/multipart';
@@ -116,19 +115,17 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = async
 
     let coverKey: string | undefined = undefined;
 
-    if (editorTool.cover) {
-      const coverBuffer = await editorTool.cover.toBuffer();
+    const coverBuffer = await editorTool.cover.toBuffer();
 
-      coverKey = await fileUploaderService.uploadFile({
-        data: coverBuffer,
-        name: createFileId(),
-        mimetype: editorTool.cover.mimetype,
-      }, {
-        isEditorToolCover: true,
-      }, {
-        userId,
-      });
-    }
+    coverKey = await fileUploaderService.uploadFile({
+      data: coverBuffer,
+      name: createFileId(),
+      mimetype: editorTool.cover.mimetype,
+    }, {
+      isEditorToolCover: true,
+    }, {
+      userId,
+    });
 
     const tool = await editorToolsService.addTool({
       title: String(editorTool.title?.value),

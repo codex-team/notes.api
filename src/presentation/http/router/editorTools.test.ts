@@ -19,10 +19,20 @@ describe('EditorTools API', () => {
         title: 'Code Tool',
         exportName: 'Code',
         isDefault: false,
+        description: '',
         source: {
           cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
         },
       };
+
+      const formData = new FormData();
+
+      formData.append('name', toolToAdd.name);
+      formData.append('title', toolToAdd.title);
+      formData.append('exportName', toolToAdd.exportName);
+      formData.append('isDefault', String(toolToAdd.isDefault));
+      formData.append('description', toolToAdd.description);
+      formData.append('source', JSON.stringify(toolToAdd.source));
 
       const addToolResponse = await global.api?.fakeRequest({
         method: 'POST',
@@ -30,7 +40,7 @@ describe('EditorTools API', () => {
           authorization: `Bearer ${accessToken}`,
         },
         url: '/editor-tools/add-tool',
-        body: toolToAdd,
+        body: formData,
       });
 
       expect(addToolResponse?.statusCode).toBe(200);
@@ -39,6 +49,7 @@ describe('EditorTools API', () => {
 
       expect(body.data).toMatchObject({
         ...toolToAdd,
+        cover: '',
         userId,
       });
 
@@ -68,13 +79,20 @@ describe('EditorTools API', () => {
         },
       };
 
+      const formData = new FormData();
+
+      formData.append('title', toolDataWithoutName.title);
+      formData.append('exportName', toolDataWithoutName.exportName);
+      formData.append('isDefault', String(toolDataWithoutName.isDefault));
+      formData.append('source', JSON.stringify(toolDataWithoutName.source));
+
       const response = await global.api?.fakeRequest({
         method: 'POST',
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
         url: '/editor-tools/add-tool',
-        body: toolDataWithoutName,
+        body: formData,
       });
 
       expect(response?.statusCode).toBe(400);
