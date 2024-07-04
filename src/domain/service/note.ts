@@ -320,6 +320,10 @@ export default class NoteService {
   public async getNotePublicIdByInternal(id: NoteInternalId): Promise<NotePublicId> {
     const note = await this.noteRepository.getNoteById(id);
 
-    return note!.publicId;
+    if (note === null) {
+      throw new DomainError(`Note with id ${id}was not found`);
+    }
+
+    return note.publicId;
   }
 }
