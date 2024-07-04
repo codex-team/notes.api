@@ -25,6 +25,7 @@ describe('EditorTools API', () => {
         },
       };
 
+      // eslint-disable-next-line
       const formData = new FormData();
 
       formData.append('name', toolToAdd.name);
@@ -80,6 +81,7 @@ describe('EditorTools API', () => {
         },
       };
 
+      // eslint-disable-next-line
       const formData = new FormData();
 
       formData.append('title', toolDataWithoutName.title);
