@@ -48,11 +48,9 @@ describe('Join API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        result: {
-          userId: user.id,
-          noteId: note.publicId,
-          role: 0,
-        },
+        userId: user.id,
+        noteId: note.publicId,
+        role: 0,
       });
 
       expect(response?.json()).toStrictEqual({
@@ -120,11 +118,9 @@ describe('Join API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        result: {
-          userId: randomGuy.id,
-          noteId: note.publicId,
-          role: 0,
-        },
+        userId: randomGuy.id,
+        noteId: note.publicId,
+        role: 0,
       });
     });
   });
