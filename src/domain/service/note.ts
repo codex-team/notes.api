@@ -321,7 +321,7 @@ export default class NoteService {
     const note = await this.noteRepository.getNoteById(id);
 
     if (note === null) {
-      throw new DomainError(`Note with id ${id}was not found`);
+      throw new DomainError(`Note with id ${id} was not found`);
     }
 
     return note.publicId;
