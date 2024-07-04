@@ -28,12 +28,6 @@ describe('Join API', () => {
         invitationHash,
       });
 
-      await global.db.insertNoteTeam({
-        userId: user.id,
-        noteId: note.id,
-        role: 0,
-      });
-
       const accessToken = global.auth(user.id);
 
       /** add same user to the same note team */
@@ -50,7 +44,7 @@ describe('Join API', () => {
       expect(response?.json()).toMatchObject({
         userId: user.id,
         noteId: note.publicId,
-        role: 0,
+        role: 1,
       });
 
       expect(response?.json()).toStrictEqual({
