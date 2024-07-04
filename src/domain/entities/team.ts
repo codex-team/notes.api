@@ -42,7 +42,7 @@ export interface TeamMember {
 /**
  * Team member public entity sends to user with public id of the note
  */
-export type TeamMemberPublic = Omit<TeamMember, 'noteId'> & { noteId: NotePublicId };
+export type TeamMemberPublic = Omit<TeamMember, 'noteId' | 'id'> & { noteId: NotePublicId };
 
 export type Team = TeamMember[];
 
