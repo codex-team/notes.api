@@ -30,13 +30,13 @@ export default class TeamRepository {
   }
 
   /**
-   * Check if user is note team member
+   * Get team member by user id and note id
    * @param userId - user id to check
    * @param noteId - note id to identify team
-   * @returns returns true if user is team member
+   * @returns null if user is not in team, teamMember otherwhise
    */
-  public async isUserInTeam(userId: User['id'], noteId: NoteInternalId): Promise<boolean> {
-    return await this.storage.isUserInTeam(userId, noteId);
+  public async getTeamMemberByNoteAndUserId(userId: User['id'], noteId: NoteInternalId): Promise<TeamMember | null> {
+    return await this.storage.getTeamMemberByNoteAndUserId(userId, noteId);
   }
 
   /**

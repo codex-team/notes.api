@@ -310,4 +310,20 @@ export default class NoteService {
       throw new DomainError('Incorrect tools passed');
     }
   }
+
+  /**
+   * Get note public id by it's internal id
+   * Used for making entities that use NoteInternalId public
+   * @param id - internal id of the note
+   * @returns note public id
+   */
+  public async getNotePublicIdByInternal(id: NoteInternalId): Promise<NotePublicId> {
+    const note = await this.noteRepository.getNoteById(id);
+
+    if (note === null) {
+      throw new DomainError(`Note with id ${id} was not found`);
+    }
+
+    return note.publicId;
+  }
 }

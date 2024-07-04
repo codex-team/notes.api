@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 
 describe('Join API', () => {
   describe('POST /join/:hash', () => {
-    test('Returns 406 when user is already in the team', async () => {
+    test('Returns 200 and teamMember when user is already in the team', async () => {
       const invitationHash = 'Hzh2hy4igf';
 
       /**
@@ -28,12 +28,6 @@ describe('Join API', () => {
         invitationHash,
       });
 
-      await global.db.insertNoteTeam({
-        userId: user.id,
-        noteId: note.id,
-        role: 0,
-      });
-
       const accessToken = global.auth(user.id);
 
       /** add same user to the same note team */
@@ -45,10 +39,12 @@ describe('Join API', () => {
         url: `/join/${invitationHash}`,
       });
 
-      expect(response?.statusCode).toBe(406);
+      expect(response?.statusCode).toBe(200);
 
-      expect(response?.json()).toStrictEqual({
-        message: 'User already in team',
+      expect(response?.json()).toMatchObject({
+        userId: user.id,
+        noteId: note.publicId,
+        role: 1,
       });
     });
     test('Returns 406 when invitation hash is not valid', async () => {
@@ -112,11 +108,9 @@ describe('Join API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        result: {
-          userId: randomGuy.id,
-          noteId: note.id,
-          role: 0,
-        },
+        userId: randomGuy.id,
+        noteId: note.publicId,
+        role: 0,
       });
     });
   });

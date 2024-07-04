@@ -1,4 +1,4 @@
-import type { NoteInternalId } from './note.js';
+import type { NoteInternalId, NotePublicId } from './note.js';
 import type User from './user.js';
 
 export enum MemberRole {
@@ -38,6 +38,11 @@ export interface TeamMember {
    */
   role: MemberRole;
 }
+
+/**
+ * Team member public entity sends to user with public id of the note
+ */
+export type TeamMemberPublic = Omit<TeamMember, 'noteId' | 'id'> & { noteId: NotePublicId };
 
 export type Team = TeamMember[];
 
