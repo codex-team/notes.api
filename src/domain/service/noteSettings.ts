@@ -3,7 +3,7 @@ import type { InvitationHash } from '@domain/entities/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 import type NoteSettingsRepository from '@repository/noteSettings.repository.js';
 import type TeamRepository from '@repository/team.repository.js';
-import type { Team, TeamMember, TeamMemberCreationAttributes } from '@domain/entities/team.js';
+import type { Team, TeamMember, TeamMemberPublic, TeamMemberCreationAttributes } from '@domain/entities/team.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
@@ -38,7 +38,7 @@ export default class NoteSettingsService {
    * @param invitationHash - hash for joining to the team
    * @param userId - user to add
    */
-  public async addUserToTeamByInvitationHash(invitationHash: InvitationHash, userId: User['id']): Promise<TeamMember | null> {
+  public async addUserToTeamByInvitationHash(invitationHash: InvitationHash, userId: User['id']): Promise<TeamMemberPublic | null> {
     const defaultUserRole = MemberRole.Read;
     const noteSettings = await this.noteSettingsRepository.getNoteSettingsByInvitationHash(invitationHash);
 
@@ -58,11 +58,18 @@ export default class NoteSettingsService {
       throw new DomainError(`User already in team`);
     }
 
-    return await this.teamRepository.createTeamMembership({
+    const teamMember = await this.teamRepository.createTeamMembership({
       noteId: noteSettings.noteId,
       userId,
       role: defaultUserRole,
     });
+
+    return {
+      id: teamMember.id,
+      noteId: await this.shared.note.getNotePublicIdByInternal(teamMember.noteId),
+      userId: teamMember.userId,
+      role: teamMember.role,
+    };
   }
 
   /**

@@ -1,6 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
-import type { TeamMember } from '@domain/entities/team.js';
+import type { TeamMemberPublic } from '@domain/entities/team.js';
 
 /**
  * Represents AI router options
@@ -55,7 +55,7 @@ const JoinRouter: FastifyPluginCallback<JoinRouterOptions> = (fastify, opts, don
   }, async (request, reply) => {
     const { hash } = request.params;
     const { userId } = request;
-    let result: TeamMember | null = null;
+    let result: TeamMemberPublic | null = null;
 
     try {
       result = await noteSettingsService.addUserToTeamByInvitationHash(hash, userId as number);
