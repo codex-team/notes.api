@@ -114,7 +114,7 @@ describe('Join API', () => {
       expect(response?.json()).toMatchObject({
         result: {
           userId: randomGuy.id,
-          noteId: note.id,
+          noteId: note.publicId,
           role: 0,
         },
       });
