@@ -115,24 +115,36 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = async
 
     let coverKey: string | undefined = undefined;
 
-    const coverBuffer = await editorTool.cover.toBuffer();
+    if (editorTool.cover) {
+      const coverBuffer = await editorTool.cover.toBuffer();
 
-    coverKey = await fileUploaderService.uploadFile({
-      data: coverBuffer,
-      name: createFileId(),
-      mimetype: editorTool.cover.mimetype,
-    }, {
-      isEditorToolCover: true,
-    }, {
-      userId,
-    });
+      coverKey = await fileUploaderService.uploadFile({
+        data: coverBuffer,
+        name: createFileId(),
+        mimetype: editorTool.cover.mimetype,
+      }, {
+        isEditorToolCover: true,
+      }, {
+        userId,
+      });
+    }
+
+    const source: {
+      cdn: string;
+    } = editorTool.isDefault?.value !== undefined
+      ? JSON.parse(String(editorTool.source.value)) as {
+        cdn: string;
+      }
+      : {
+          cdn: '',
+        };
 
     const tool = await editorToolsService.addTool({
       title: String(editorTool.title?.value),
       name: String(editorTool.name?.value),
       exportName: String(editorTool.exportName?.value),
       description: String(editorTool.description?.value),
-      source: JSON.parse(String(editorTool.source?.value)),
+      source: source,
       isDefault: Boolean(editorTool.isDefault?.value ?? false),
       cover: coverKey ?? '',
     }, userId);

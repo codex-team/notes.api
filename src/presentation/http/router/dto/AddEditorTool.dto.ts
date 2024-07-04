@@ -6,7 +6,7 @@ export interface AddEditorToolDto extends MultipartFields {
   exportName: MultipartValue;
   description: MultipartValue;
   isDefault?: MultipartValue;
+  cover?: MultipartFile;
   userId: MultipartValue;
-  source: MultipartValue;
-  cover: MultipartFile;
+  source: MultipartValue<string>;
 }
