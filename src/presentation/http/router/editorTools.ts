@@ -91,9 +91,9 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = async
     },
     schema: {
       consumes: ['multipart/form-data'],
-      // body: {
-      //   $ref: 'AddEditorToolSchema',
-      // },
+      body: {
+        $ref: 'AddEditorToolSchema',
+      },
       response: {
         '2xx': {
           description: 'Editor tool fields',
@@ -131,8 +131,8 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = async
 
     const source: {
       cdn: string;
-    } = editorTool.isDefault?.value !== undefined
-      ? JSON.parse(String(editorTool.source.value)) as {
+    } = editorTool.source?.value !== undefined
+      ? JSON.parse(editorTool.source.value) as {
         cdn: string;
       }
       : {
@@ -140,11 +140,11 @@ const EditorToolsRouter: FastifyPluginCallback<EditorToolsRouterOptions> = async
         };
 
     const tool = await editorToolsService.addTool({
-      title: String(editorTool.title?.value),
-      name: String(editorTool.name?.value),
-      exportName: String(editorTool.exportName?.value),
-      description: String(editorTool.description?.value),
-      source: source,
+      title: editorTool.title?.value ?? '',
+      name: editorTool.name?.value ?? '',
+      exportName: editorTool.exportName.value ?? '',
+      description: editorTool.description.value ?? '',
+      source,
       isDefault: Boolean(editorTool.isDefault?.value ?? false),
       cover: coverKey ?? '',
     }, userId);

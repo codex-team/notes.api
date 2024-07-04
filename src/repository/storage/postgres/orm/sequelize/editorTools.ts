@@ -203,7 +203,7 @@ export default class UserSequelizeStorage {
   /**
    * Update tool cover
    * @param editorToolId - tool identifier
-   * @param cover - new cover file
+   * @param cover - new cover s3 key
    */
   public async updateToolCover(editorToolId: EditorTool['id'], cover: EditorTool['cover']): Promise<void> {
     await this.model.update({

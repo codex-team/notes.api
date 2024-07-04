@@ -196,6 +196,10 @@ export default class FileUploaderService {
     return 'noteId' in location;
   }
 
+  /**
+   * Check if file location is editor tool cover
+   * @param location - to check
+   */
   private isEditorToolCoverFileLocation(location: FileLocation): location is EditorToolCoverFileLocation {
     return 'isEditorToolCover' in location;
   }

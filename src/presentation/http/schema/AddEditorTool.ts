@@ -9,47 +9,39 @@ export const AddEditorToolSchema = {
   ],
   properties: {
     id: {
-      type: 'string',
+      type: 'object',
       readOnly: true,
       description: 'Unique tool id',
     },
     name: {
-      type: 'string',
+      type: 'object',
       description: 'Plugin id that editor will use, e.g. "warning", "list", "linkTool"',
     },
     title: {
-      type: 'string',
+      type: 'object',
       description: 'User-friendly name that will be shown in marketplace, .e.g "Warning tool 3000"',
     },
     exportName: {
-      type: 'string',
+      type: 'object',
       description: 'Name of the plugin\'s class, e.g. "LinkTool", "Checklist", "Header"',
     },
     description: {
-      type: 'string',
+      type: 'object',
       description: 'Plugin description that will be shown in the marketplace',
     },
     cover: {
-      type: 'string',
-      description: 'Multipart data',
+      type: 'object',
     },
     isDefault: {
-      type: 'boolean',
+      type: 'object',
       description: 'Is plugin included by default in the editor',
-      default: false,
     },
     userId: {
-      type: ['number', 'null'],
+      type: 'object',
       description: 'User id that added the tool to the marketplace',
     },
     source: {
       type: 'object',
-      properties: {
-        cdn: {
-          type: 'string',
-          description: 'Tool URL in content delivery network',
-        },
-      },
     },
   },
 };
