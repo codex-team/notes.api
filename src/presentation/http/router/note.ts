@@ -362,10 +362,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteId = request.note?.id as number;
     const content = request.body.content;
     const noteTools = request.body.tools;
+    const { userId } = request;
 
     await noteService.validateNoteTools(noteTools, content);
 
-    const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools);
+    const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools, userId!);
 
     return reply.send({
       updatedAt: note.updatedAt,

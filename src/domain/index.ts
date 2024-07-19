@@ -63,7 +63,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   /**
    * @todo use shared methods for uncoupling repositories unrelated to note service
    */
-  const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository, repositories.noteVisitsRepository, repositories.editorToolsRepository);
+  const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository, repositories.noteVisitsRepository, repositories.editorToolsRepository, repositories.noteHistoryRepository);
   const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
   const authService = new AuthService(
     appConfig.auth.accessSecret,
