@@ -23,7 +23,7 @@ import FileRepository from './file.repository.js';
 import ObjectStorageRepository from './object.repository.js';
 import NoteVisitsRepository from './noteVisits.repository.js';
 import NoteVisitsStorage from './storage/noteVisits.storage.js';
-
+import NoteHistoryStorage from './storage/noteHistory.storage.js';
 /**
  * Interface for initiated repositories
  */
@@ -118,6 +118,7 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   const s3Storage = new S3Storage(s3Config.accessKeyId, s3Config.secretAccessKey, s3Config.region, s3Config.endpoint);
   const editorToolsStorage = new EditorToolsStorage(orm);
   const noteVisitsStorage = new NoteVisitsStorage(orm);
+  const noteHistoryStorage = new NoteHistoryStorage(orm);
 
   /**
    * Create associations between note and note settings
@@ -142,6 +143,14 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   noteStorage.createAssociationWithNoteVisitsModel(noteVisitsStorage.model);
   noteVisitsStorage.createAssociationWithNoteModel(noteStorage.model);
   noteVisitsStorage.createAssociationWithUserModel(userStorage.model);
+
+  /**
+   * Create associations between note history and note, note history and user storages
+   */
+  noteHistoryStorage.createAssociationWithNoteModel(noteStorage.model);
+  noteHistoryStorage.createAssociationWithUserModel(userStorage.model);
+  noteStorage.createAssociationWithNoteHistoryModel(noteHistoryStorage.model);
+  userStorage.createAssociationWithNoteHistoryModel(noteHistoryStorage.model);
 
   /**
    * Prepare db structure
