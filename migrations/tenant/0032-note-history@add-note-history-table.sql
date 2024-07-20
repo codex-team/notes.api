@@ -21,9 +21,9 @@ ALTER TABLE public.note_history
 --
 -- Name: note_history user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: codex
 --
-ALTER TABLE public.note_history DROP CONSTRAINT IF EXISTS user_id_fkey;
+ALTER TABLE public.note_history DROP CONSTRAINT IF EXISTS useeeer_id_fkey;
 ALTER TABLE public.note_history
-  ADD CONSTRAINT user_id_fkey FOREIGN KEY (note_id) REFERENCES public.users(id)
+  ADD CONSTRAINT useeeer_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
   ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE UNIQUE INDEX note_history_note_id_idx ON public.note_history (note_id);

@@ -175,7 +175,7 @@ export default class UserSequelizeStorage {
     this.historyModel = model;
 
     this.model.hasMany(this.historyModel, {
-      foreignKey: 'noteId',
+      foreignKey: 'userId',
       as: 'noteHistory',
     });
   }
