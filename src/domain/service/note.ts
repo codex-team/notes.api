@@ -83,6 +83,7 @@ export default class NoteService {
       content,
       userId: creatorId,
       noteId: note.id,
+      tools,
     });
 
     if (parentPublicId !== undefined) {
@@ -141,10 +142,13 @@ export default class NoteService {
      * If content changes are valuable, they will be saved to note history
      */
     if (await this.checkContentDifference(id, content)) {
+      console.log('hiiiiiistory updated');
+
       await this.noteHistoryRepository.createNoteHistoryRecord({
         content,
         userId: userId,
         noteId: id,
+        tools: noteTools,
       });
     };
 
@@ -363,7 +367,11 @@ export default class NoteService {
    * @returns - boolean, true if changes are valuable enough, false otherwise
    */
   public async checkContentDifference(noteId: NoteInternalId, content: Note['content']): Promise<boolean> {
-    const currentlySavedNoteContent = (await this.getNoteById(noteId)).content;
+    const currentlySavedNoteContent = (await this.noteHistoryRepository.getLatestContent(noteId));
+
+    if (currentlySavedNoteContent === undefined) {
+      throw new DomainError('No history for the note found');
+    }
 
     const currentContentLength = currentlySavedNoteContent.blocks.reduce((length, block) => {
       length += JSON.stringify(block.data).length;
@@ -371,11 +379,17 @@ export default class NoteService {
       return length;
     }, 0);
 
+    console.log('current ccontent length', currentContentLength);
+
     const patchedContentLength = content.blocks.reduce((length, block) => {
       length += JSON.stringify(block.data).length;
 
       return length;
     }, 0);
+
+    console.log('patched content length', patchedContentLength);
+
+    console.log('delta', Math.abs(currentContentLength - patchedContentLength));
 
     if (Math.abs(currentContentLength - patchedContentLength) >= this.valuableContentChangesLength) {
       return true;

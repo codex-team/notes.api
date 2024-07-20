@@ -19,4 +19,8 @@ export default class NoteHistoryRepository {
   public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryRecord | null> {
     return await this.storage.getHistoryRecordById(id);
   }
+
+  public async getLatestContent(noteId: NoteHistoryRecord['noteId']): Promise<NoteHistoryRecord['content'] | undefined> {
+    return await this.storage.getLatestContent(noteId);
+  }
 }

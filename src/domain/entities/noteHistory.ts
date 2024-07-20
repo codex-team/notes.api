@@ -20,17 +20,22 @@ export interface NoteHistoryRecord {
   /**
    * Timestamp of note update
    */
-  updatedAt: string;
+  createdAt: string;
 
   /**
    * Version of note content
    */
   content: Note['content'];
+
+  /**
+   * Note tools of current version of note content
+   */
+  tools: Note['tools'];
 }
 
 /**
  * Part of note entity used to create new note
  */
-export type NoteHistoryCreationAttributes = Omit<NoteHistoryRecord, 'id' | 'updatedAt'>;
+export type NoteHistoryCreationAttributes = Omit<NoteHistoryRecord, 'id' | 'createdAt'>;
 
-export type NoteHistoryMeta = Omit<NoteHistoryRecord, 'content'>;
+export type NoteHistoryMeta = Omit<NoteHistoryRecord, 'content' | 'noteId' | 'tools'>;

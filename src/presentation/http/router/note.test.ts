@@ -65,6 +65,52 @@ describe('Note API', () => {
     ],
   };
 
+  /**
+   * Note content mock inserted if no content passed
+   */
+  const ALTERNATIVE_NOTE_CONTENT = {
+    blocks: [
+      {
+        id: 'mJDq8YbvqO',
+        type: listTool.name,
+        data: {
+          text: 'another text here',
+        },
+      },
+      {
+        id: 'DeL0QehzGe',
+        type: headerTool.name,
+        data: {
+          text: 'fdgsfdgfdsg',
+          level: 2,
+        },
+      },
+    ],
+  };
+
+  /**
+   * Note content with many blocks, used for checking patch note saves to history
+   */
+  const LARGE_NOTE_CONTENT = {
+    blocks: [
+      {
+        id: 'mJDq8YbvqO',
+        type: listTool.name,
+        data: {
+          text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla.',
+        },
+      },
+      {
+        id: 'DeL0QehzGe',
+        type: headerTool.name,
+        data: {
+          text: 'fdgsfdgfdsg',
+          level: 2,
+        },
+      },
+    ],
+  };
+
   beforeEach(async () => {
     await global.db.truncateTables();
   });
@@ -1790,6 +1836,176 @@ describe('Note API', () => {
         expect(response?.statusCode).toBe(expectedStatusCode);
         expect(response?.json().message).toBe(expectedMessage);
       }
+    });
+  });
+
+  describe.only('GET /note/:notePublicId/history', () => {
+    test.each([
+      {
+        authorized: false,
+        userCanEdit: false,
+        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
+        expectedMessage: 'You must be authenticated to access this resource',
+      },
+      {
+        authorized: true,
+        userCanEdit: false,
+        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
+        expectedMessage: 'Permission denied',
+      },
+      {
+        authorized: false,
+        userCanEdit: true,
+        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
+        expectedMessage: 'You must be authenticated to access this resource',
+      },
+      {
+        authorized: true,
+        userCanEdit: true,
+        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
+        expectedMessage: null,
+        expectedResponseLength: 1,
+      },
+      {
+        authorized: true,
+        userCanEdit: true,
+        newNoteContent: LARGE_NOTE_CONTENT,
+        expectedMessage: null,
+        expectedResponseLength: 2,
+      },
+    ])('Should return note history', async ({ authorized, userCanEdit, newNoteContent, expectedMessage, expectedResponseLength }) => {
+      /**
+       * Creator of the note
+       */
+      const creator = await global.db.insertUser();
+
+      /**
+       * Authorization token of the creator
+       */
+      const creatorAccessToken = global.auth(creator.id);
+
+      /**
+       * User who wants to check note history
+       */
+      const user = await global.db.insertUser();
+
+      /**
+       * Access token of the user who wants to check note history
+       */
+      let userAccessToken: string = '';
+
+      /**
+       * New note posted by creator
+       */
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${creatorAccessToken}`,
+        },
+        body: {
+          content: DEFAULT_NOTE_CONTENT,
+          tools: [
+            {
+              name: headerTool.name,
+              id: headerTool.id,
+            },
+            {
+              name: listTool.name,
+              id: listTool.id,
+            },
+          ],
+        },
+        url: `/note`,
+      });
+
+      /**
+       * Id of the note posted by creator
+       */
+      const noteId = response?.json().id;
+
+      if (authorized) {
+        userAccessToken = global.auth(user.id);
+      }
+
+      if (userCanEdit) {
+        await global.db.insertNoteTeam({
+          noteId: 1,
+          userId: user.id,
+          role: MemberRole.Write,
+        });
+      }
+
+      response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${creatorAccessToken}`,
+        },
+        body: {
+          content: newNoteContent,
+          tools: [
+            {
+              name: headerTool.name,
+              id: headerTool.id,
+            },
+            {
+              name: listTool.name,
+              id: listTool.id,
+            },
+          ],
+        },
+        url: `/note/${noteId}`,
+      });
+
+      /**
+       * Get note history
+       */
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${userAccessToken}`,
+        },
+        url: `/note/${noteId}/history`,
+      });
+
+      if (expectedMessage !== null) {
+        expect(response?.json()).toStrictEqual({ message: expectedMessage });
+      } else if (expectedResponseLength !== undefined) {
+        expect(response?.json().noteHistoryMeta).toHaveLength(expectedResponseLength);
+      }
+    });
+  });
+
+  describe.only('GET /note/:notePublicId/history', () => {
+    test.each([
+      {
+        authorized: false,
+        userCanEdit: false,
+        expectedMessage: 'You must be authenticated to access this resource',
+      },
+      {
+        authorized: true,
+        userCanEdit: false,
+        expectedMessage: 'Permission denied',
+      },
+      {
+        authorized: false,
+        userCanEdit: true,
+        expectedMessage: 'You must be authenticated to access this resource',
+      },
+      {
+        authorized: true,
+        userCanEdit: true,
+        expectedMessage: null,
+        expectedResponseLength: 1,
+      },
+      {
+        authorized: true,
+        userCanEdit: true,
+        expectedMessage: null,
+        expectedResponseLength: 2,
+      },
+    ])('Should return note history', async ({ authorized, userCanEdit, expectedMessage, expectedResponseLength }) => {
+
     });
   });
 });
