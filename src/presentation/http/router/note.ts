@@ -11,6 +11,7 @@ import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.j
 import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
+import type { NoteHistoryMeta, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
 
 /**
  * Interface for the note router.
@@ -644,6 +645,78 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       note: notePublic,
       accessRights: { canEdit: canEdit },
       tools: noteTools,
+    });
+  });
+
+  /**
+   * Get note history preview
+   */
+  fastify.get<{
+    Params: {
+      notePublicId: NotePublicId;
+    };
+    Reply: {
+      noteHistoryMeta: NoteHistoryMeta[];
+    } | ErrorResponse;
+  }>('/:notePublicId/history', {
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const { note } = request;
+    const noteId = request.note?.id as number;
+
+    if (note === null) {
+      return reply.notFound('Note not found');
+    }
+
+    return reply.send({
+      noteHistoryMeta: await noteService.getNoteHistoryByNoteId(noteId),
+    });
+  });
+
+  /**
+   * Get note history record
+   */
+  fastify.get<{
+    Params: {
+      notePublicId: NotePublicId;
+      historyId: NoteHistoryRecord['id'];
+    };
+    Reply: {
+      noteHistoryRecord: NoteHistoryRecord;
+    } | ErrorResponse;
+  }>('/:notePublicId/history/:historyId', {
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const { note } = request;
+    const historyId = request.params.historyId;
+
+    /**
+     * Check if note exists
+     */
+    if (note === null) {
+      return reply.notFound('Note not found');
+    }
+
+    const historyRecord = await noteService.getHistoryResordById(historyId);
+
+    return reply.send({
+      noteHistoryRecord: historyRecord,
     });
   });
 
