@@ -9,6 +9,7 @@ import type { TeamMember } from '@domain/entities/team.ts';
 import type EditorTool from '@domain/entities/editorTools.ts';
 import type NoteVisit from '@domain/entities/noteVisit.js';
 import { nanoid } from 'nanoid';
+import type { NoteHistoryCreationAttributes, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
 
 /**
  * Note content mock inserted if no content passed
@@ -276,6 +277,29 @@ export default class DatabaseHelpers {
     const createdVisit = results[0];
 
     return createdVisit;
+  }
+
+  /**
+   * Inserts note history mock into db
+   * @param history - object that contains all data needed for history record creation
+   * @returns created note history record
+   */
+  public async insertNoteHistory(history: NoteHistoryCreationAttributes): Promise<NoteHistoryRecord> {
+    const [result, _] = await this.orm.connection.query(`INSERT INTO public.note_history ("user_id", "note_id", "created_at", "content", "tools")
+      VALUES ('${history.userId}', '${history.noteId}', CLOCK_TIMESTAMP(), '${JSON.stringify(history.content)}', '${JSON.stringify(history.tools)}')
+      RETURNING "id", "note_id" as "noteId", "user_id" as "userId", "created_at" as "createdAt", "content", "tools"`,
+    {
+      type: QueryTypes.INSERT,
+      returning: true,
+    });
+
+    const createdHistory = result[0];
+
+    /**
+     * JSON cast is needed since in router it happens by default (and in test we always use response.json())
+     * Overwhise model createdAt would be treated as Date object
+     */
+    return JSON.parse(JSON.stringify(createdHistory));
   }
 
   /**

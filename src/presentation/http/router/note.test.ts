@@ -1839,7 +1839,7 @@ describe('Note API', () => {
     });
   });
 
-  describe.only('GET /note/:notePublicId/history', () => {
+  describe('GET /note/:notePublicId/history', () => {
     test.each([
       {
         authorized: false,
@@ -1975,7 +1975,7 @@ describe('Note API', () => {
     });
   });
 
-  describe.only('GET /note/:notePublicId/history', () => {
+  describe('GET /note/:notePublicId/history', () => {
     test.each([
       {
         authorized: false,
@@ -1996,16 +1996,66 @@ describe('Note API', () => {
         authorized: true,
         userCanEdit: true,
         expectedMessage: null,
-        expectedResponseLength: 1,
+        expectedResponse: 1,
       },
       {
         authorized: true,
         userCanEdit: true,
         expectedMessage: null,
-        expectedResponseLength: 2,
+        expectedResponse: 2,
       },
-    ])('Should return note history', async ({ authorized, userCanEdit, expectedMessage, expectedResponseLength }) => {
+    ])('Should return note history', async ({ authorized, userCanEdit, expectedMessage, expectedResponse }) => {
+      const creator = await global.db.insertUser();
 
+      const note = await global.db.insertNote({ creatorId: creator.id });
+
+      const history = await global.db.insertNoteHistory({
+        userId: creator.id,
+        noteId: note.id,
+        content: DEFAULT_NOTE_CONTENT,
+        tools: [
+          {
+            name: headerTool.name,
+            id: headerTool.id,
+          },
+          {
+            name: listTool.name,
+            id: listTool.id,
+          },
+        ],
+      });
+
+      const user = await global.db.insertUser();
+
+      let accessToken: string = '';
+
+      if (authorized) {
+        accessToken = global.auth(user.id);
+      }
+
+      if (userCanEdit) {
+        await global.db.insertNoteTeam({
+          userId: user.id,
+          noteId: note.id,
+          role: MemberRole.Write,
+        });
+      }
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}/history/${history.id}`,
+      });
+
+      if (expectedMessage !== null) {
+        expect(response?.json()).toStrictEqual({ message: expectedMessage });
+      } else if (expectedResponse !== undefined) {
+        expect(response?.json()).toStrictEqual({
+          noteHistoryRecord: history,
+        });
+      }
     });
   });
 });
