@@ -667,6 +667,26 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         'userCanEdit',
       ],
     },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            noteHistoryMeta: {
+              type: 'array',
+              items: {
+                $ref: 'HistoryMetaSchema#',
+              },
+            },
+          },
+        },
+      },
+    },
     preHandler: [
       noteResolver,
     ],
@@ -700,6 +720,26 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         'authRequired',
         'userCanEdit',
       ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+        historyId: {
+          $ref: 'NoteHistorySchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            noteHistoryRecord: {
+              $ref: 'NoteHistorySchema#',
+            },
+          },
+        },
+      },
     },
     preHandler: [
       noteResolver,
