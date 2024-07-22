@@ -1,5 +1,5 @@
 --
--- Name: note-history; Type: TABLE; Schema: public; Owner: codex
+-- Name: note_history; Type: TABLE; Schema: public; Owner: codex
 --
 
 CREATE TABLE IF NOT EXISTS public.note_history (
