@@ -141,7 +141,7 @@ export default class NoteSequelizeStorage {
   }
 
   /**
-   * create association with note cisits model
+   * create association with note visits model
    * @param model - initialized note visits model
    */
   public createAssociationWithNoteVisitsModel(model: ModelStatic<NoteVisitsModel>): void {
@@ -156,6 +156,10 @@ export default class NoteSequelizeStorage {
     });
   };
 
+  /**
+   * create association with note history model
+   * @param model - initialized note history model
+   */
   public createAssociationWithNoteHistoryModel(model: ModelStatic<NoteHistoryModel>): void {
     this.historyModel = model;
 

@@ -171,6 +171,10 @@ export default class UserSequelizeStorage {
     });
   }
 
+  /**
+   * create association with note history model
+   * @param model - initialized note history model
+   */
   public createAssociationWithNoteHistoryModel(model: ModelStatic<NoteHistoryModel>): void {
     this.historyModel = model;
 
