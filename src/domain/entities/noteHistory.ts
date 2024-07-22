@@ -8,7 +8,7 @@ export interface NoteHistoryRecord {
   id: number;
 
   /**
-   * Id of the note those content history is stored
+   * Id of the note whose content history is stored
    */
   noteId: NoteInternalId;
 
@@ -40,7 +40,7 @@ export type NoteHistoryCreationAttributes = Omit<NoteHistoryRecord, 'id' | 'crea
 
 /**
  * Meta data of the note history record
- * Used for presentation of the note history recored in web
+ * Used for presentation of the note history record in web
  */
 export type NoteHistoryMeta = Omit<NoteHistoryRecord, 'content' | 'noteId' | 'tools'>;
 
