@@ -16,7 +16,7 @@ export class NoteHistoryModel extends Model<InferAttributes<NoteHistoryModel>, I
   public declare id: CreationOptional<NoteHistoryRecord['id']>;
 
   /**
-   * Id of the note those content history is stored
+   * Id of the note whose content history is stored
    */
   public declare noteId: NoteHistoryRecord['noteId'];
 
