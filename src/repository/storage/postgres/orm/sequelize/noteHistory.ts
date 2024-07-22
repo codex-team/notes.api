@@ -5,12 +5,39 @@ import { NoteModel } from './note.js';
 import { UserModel } from './user.js';
 import type { NoteHistoryCreationAttributes, NoteHistoryRecord, NoteHistoryMeta } from '@domain/entities/noteHistory.js';
 
+/**
+ * Note history model instance
+ * Represents structure that is stored in the database
+ */
 export class NoteHistoryModel extends Model<InferAttributes<NoteHistoryModel>, InferCreationAttributes<NoteHistoryModel>> {
+  /**
+   * Unique identified of note history record
+   */
   public declare id: CreationOptional<NoteHistoryRecord['id']>;
+
+  /**
+   * Id of the note those content history is stored
+   */
   public declare noteId: NoteHistoryRecord['noteId'];
+
+  /**
+   * User that updated note content
+   */
   public declare userId: NoteHistoryRecord['userId'];
+
+  /**
+   * Timestamp of the note update
+   */
   public declare createdAt: CreationOptional<NoteHistoryRecord['createdAt']>;
+
+  /**
+   * Certain version of note content
+   */
   public declare content: NoteHistoryRecord['content'];
+
+  /**
+   * Note tools of current version of note content
+   */
   public declare tools: NoteHistoryRecord['tools'];
 }
 
@@ -86,6 +113,11 @@ export default class NoteHistorySequelizeStorage {
     });
   }
 
+  /**
+   * Creates note hisotry record in storage
+   * @param options - all data used for note history record creation
+   * @returns - created note history record
+   */
   public async createNoteHistoryRecord(options: NoteHistoryCreationAttributes): Promise<NoteHistoryRecord> {
     return await this.model.create({
       noteId: options.noteId,
@@ -101,6 +133,11 @@ export default class NoteHistorySequelizeStorage {
     });
   }
 
+  /**
+   * Gets array of metadata of all saved note history records
+   * @param noteId - id of the note, whose history we want to see
+   * @returns array of metadata of the history records
+   */
   public async getNoteHistoryByNoteId(noteId: NoteHistoryRecord['noteId']): Promise<NoteHistoryMeta[]> {
     return await this.model.findAll({
       where: { noteId },
@@ -108,10 +145,20 @@ export default class NoteHistorySequelizeStorage {
     });
   }
 
+  /**
+   * Get concrete history record by it's id
+   * @param id - id of the history record
+   * @returns full history record or null if there is no record with such an id
+   */
   public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryRecord | null> {
     return await this.model.findByPk(id);
   }
 
+  /**
+   * Gets recent saved history record content
+   * @param noteId - id of the note, whose recent history record we want to see
+   * @returns - latest saved content of the note
+   */
   public async getLatestContent(noteId: NoteHistoryRecord['id']): Promise<NoteHistoryRecord['content'] | undefined> {
     const latestHistory = await this.model.findOne({
       where: { noteId },

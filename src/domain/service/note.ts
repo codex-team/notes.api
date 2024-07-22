@@ -34,6 +34,9 @@ export default class NoteService {
    */
   public editorToolsRepository: EditorToolsRepository;
 
+  /**
+   * Note history repository
+   */
   public noteHistoryRepository: NoteHistoryRepository;
 
   /**
@@ -42,6 +45,9 @@ export default class NoteService {
    */
   private readonly noteListPortionSize = 30;
 
+  /**
+   * Constant used for checking that content changes are valuable enough to save updated note content to the history
+   */
   private readonly valuableContentChangesLength = 100;
 
   /**
@@ -404,7 +410,7 @@ export default class NoteService {
    * Get concrete history record of the note
    * Used for showing some of the note content versions
    * @param id - id of the note history record
-   * @returns full note history record or raises domain error if record not found
+   * @returns full public note history record or raises domain error if record not found
    */
   public async getHistoryResordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryPublic> {
     const noteHistoryRecord = await this.noteHistoryRepository.getHistoryRecordById(id);
@@ -413,6 +419,10 @@ export default class NoteService {
       throw new DomainError('This version of the note not found');
     }
 
+    /**
+     * Resolve note history record for it to be public
+     * changes noteId from internal to public
+     */
     const noteHistoryPublic = {
       id: noteHistoryRecord.id,
       noteId: await this.getNotePublicIdByInternal(noteHistoryRecord.noteId),
