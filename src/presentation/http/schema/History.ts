@@ -18,7 +18,7 @@ export const HistotyRecordShema = {
     },
     noteId: {
       description: 'unique note identifier',
-      type: 'number',
+      type: 'string',
     },
     userId: {
       description: 'unique user identifier',
@@ -72,10 +72,6 @@ export const HistoryMetaSchema = {
   ],
   id: {
     description: 'unique note hisotry record identifier',
-    type: 'number',
-  },
-  noteId: {
-    description: 'unique note identifier',
     type: 'number',
   },
   userId: {

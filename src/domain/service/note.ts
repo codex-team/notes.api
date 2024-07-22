@@ -8,7 +8,7 @@ import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
-import type { NoteHistoryMeta, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
+import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
 
 /**
  * Note service
@@ -406,13 +406,22 @@ export default class NoteService {
    * @param id - id of the note history record
    * @returns full note history record or raises domain error if record not found
    */
-  public async getHistoryResordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryRecord> {
+  public async getHistoryResordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryPublic> {
     const noteHistoryRecord = await this.noteHistoryRepository.getHistoryRecordById(id);
 
     if (noteHistoryRecord === null) {
       throw new DomainError('This version of the note not found');
     }
 
-    return noteHistoryRecord;
+    const noteHistoryPublic = {
+      id: noteHistoryRecord.id,
+      noteId: await this.getNotePublicIdByInternal(noteHistoryRecord.noteId),
+      userId: noteHistoryRecord.userId,
+      content: noteHistoryRecord.content,
+      tools: noteHistoryRecord.tools,
+      createdAt: noteHistoryRecord.createdAt,
+    };
+
+    return noteHistoryPublic;
   }
 }

@@ -11,7 +11,7 @@ import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.j
 import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
-import type { NoteHistoryMeta, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
+import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
 
 /**
  * Interface for the note router.
@@ -712,7 +712,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       historyId: NoteHistoryRecord['id'];
     };
     Reply: {
-      noteHistoryRecord: NoteHistoryRecord;
+      noteHistoryRecord: NoteHistoryPublic;
     } | ErrorResponse;
   }>('/:notePublicId/history/:historyId', {
     config: {

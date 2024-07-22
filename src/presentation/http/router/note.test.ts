@@ -2067,7 +2067,14 @@ describe('Note API', () => {
         expect(response?.json()).toStrictEqual({ message: expectedMessage });
       } else if (expectedResponse !== undefined) {
         expect(response?.json()).toStrictEqual({
-          noteHistoryRecord: history,
+          noteHistoryRecord: {
+            id: history.id,
+            userId: history.userId,
+            noteId: note.publicId,
+            createdAt: history.createdAt,
+            content: history.content,
+            tools: history.tools,
+          },
         });
       }
     });
