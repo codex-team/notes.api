@@ -365,6 +365,8 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteTools = request.body.tools;
     const { userId } = request;
 
+    console.log('i trieeeed very much');
+
     await noteService.validateNoteTools(noteTools, content);
 
     const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools, userId!);

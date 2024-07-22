@@ -65,6 +65,17 @@ describe('Note API', () => {
     ],
   };
 
+  const DEFAULT_NOTE_TOOLS = [
+    {
+      name: headerTool.name,
+      id: headerTool.id,
+    },
+    {
+      name: listTool.name,
+      id: listTool.id,
+    },
+  ];
+
   /**
    * Note content mock inserted if no content passed
    */
@@ -569,6 +580,13 @@ describe('Note API', () => {
         creatorId: creator.id,
       });
 
+      await global.db.insertNoteHistory({
+        userId: creator.id,
+        noteId: note.id,
+        content: DEFAULT_NOTE_CONTENT,
+        tools: DEFAULT_NOTE_TOOLS,
+      });
+
       /** Create test note settings */
       await global.db.insertNoteSetting({
         noteId: note.id,
@@ -690,6 +708,13 @@ describe('Note API', () => {
         },
       ];
 
+      await global.db.insertNoteHistory({
+        userId: user.id,
+        noteId: note.id,
+        content: DEFAULT_NOTE_CONTENT,
+        tools: DEFAULT_NOTE_TOOLS,
+      });
+
       /** Modify the note */
       const response = await global.api?.fakeRequest({
         method: 'PATCH',
@@ -809,16 +834,7 @@ describe('Note API', () => {
        * Specified extra tools
        */
       {
-        noteTools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: listTool.name,
-            id: listTool.id,
-          },
-        ],
+        noteTools: DEFAULT_NOTE_TOOLS,
         noteContent: {
           blocks: [
             {
@@ -1432,6 +1448,14 @@ describe('Note API', () => {
         parentId: parentNote.id,
       });
 
+      /** create test note history */
+      await global.db.insertNoteHistory({
+        userId: user.id,
+        noteId: childNote.id,
+        tools: DEFAULT_NOTE_TOOLS,
+        content: DEFAULT_NOTE_CONTENT,
+      });
+
       let response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -1740,16 +1764,7 @@ describe('Note API', () => {
        * All tools specified correctly
        */
       {
-        noteTools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: listTool.name,
-            id: listTool.id,
-          },
-        ],
+        noteTools: DEFAULT_NOTE_TOOLS,
         noteContent: DEFAULT_NOTE_CONTENT,
         expectedStatusCode: 200,
         expectedMessage: null,
@@ -1806,6 +1821,14 @@ describe('Note API', () => {
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
+      });
+
+      /** create test note history */
+      await global.db.insertNoteHistory({
+        userId: user.id,
+        noteId: note.id,
+        tools: DEFAULT_NOTE_TOOLS,
+        content: DEFAULT_NOTE_CONTENT,
       });
 
       let response = await global.api?.fakeRequest({
@@ -2013,16 +2036,7 @@ describe('Note API', () => {
         userId: creator.id,
         noteId: note.id,
         content: DEFAULT_NOTE_CONTENT,
-        tools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: listTool.name,
-            id: listTool.id,
-          },
-        ],
+        tools: DEFAULT_NOTE_TOOLS,
       });
 
       const user = await global.db.insertUser();
