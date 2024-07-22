@@ -1864,24 +1864,30 @@ describe('Note API', () => {
 
   describe('GET /note/:notePublicId/history', () => {
     test.each([
-      {
-        authorized: false,
-        userCanEdit: false,
-        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
-        expectedMessage: 'You must be authenticated to access this resource',
-      },
+      /**
+       * User can not edit the note state
+       * Should return permission denied response
+       */
       {
         authorized: true,
         userCanEdit: false,
         newNoteContent: ALTERNATIVE_NOTE_CONTENT,
         expectedMessage: 'Permission denied',
       },
+      /**
+       * Unauthorized state
+       * Should return unauthorized response
+       */
       {
         authorized: false,
         userCanEdit: true,
         newNoteContent: ALTERNATIVE_NOTE_CONTENT,
         expectedMessage: 'You must be authenticated to access this resource',
       },
+      /**
+       * New content changes are not valuable enough
+       * Should return one history record, which is saved on note creation
+       */
       {
         authorized: true,
         userCanEdit: true,
@@ -1889,6 +1895,10 @@ describe('Note API', () => {
         expectedMessage: null,
         expectedResponseLength: 1,
       },
+      /**
+       * New content changes are valuable enough
+       * Should return two history records, one from the note creation, another from note content update
+       */
       {
         authorized: true,
         userCanEdit: true,
@@ -2000,34 +2010,34 @@ describe('Note API', () => {
 
   describe('GET /note/:notePublicId/history', () => {
     test.each([
-      {
-        authorized: false,
-        userCanEdit: false,
-        expectedMessage: 'You must be authenticated to access this resource',
-      },
+      /**
+       * User can not edit the note state
+       * Should return permission denied response
+       */
       {
         authorized: true,
         userCanEdit: false,
         expectedMessage: 'Permission denied',
       },
+      /**
+       * Unauthorized state
+       * Should return unauthorized response
+       */
       {
         authorized: false,
         userCanEdit: true,
         expectedMessage: 'You must be authenticated to access this resource',
       },
+      /**
+       * User is authorized and can edit the note
+       * Should return history record that is inserted
+       */
       {
         authorized: true,
         userCanEdit: true,
         expectedMessage: null,
-        expectedResponse: 1,
       },
-      {
-        authorized: true,
-        userCanEdit: true,
-        expectedMessage: null,
-        expectedResponse: 2,
-      },
-    ])('Should return note history', async ({ authorized, userCanEdit, expectedMessage, expectedResponse }) => {
+    ])('Should return note history', async ({ authorized, userCanEdit, expectedMessage }) => {
       const creator = await global.db.insertUser();
 
       const note = await global.db.insertNote({ creatorId: creator.id });
@@ -2065,7 +2075,7 @@ describe('Note API', () => {
 
       if (expectedMessage !== null) {
         expect(response?.json()).toStrictEqual({ message: expectedMessage });
-      } else if (expectedResponse !== undefined) {
+      } else {
         expect(response?.json()).toStrictEqual({
           noteHistoryRecord: {
             id: history.id,
