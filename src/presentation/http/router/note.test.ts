@@ -717,6 +717,14 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
+    // test.each
+    //
+    //
+    //
+    //
+    //
+    //
+
     test.todo('Returns 400 when parentId has incorrect characters and length');
   });
 
@@ -1882,23 +1890,18 @@ describe('Note API', () => {
       if (expectedMessage !== null) {
         expect(response?.json()).toStrictEqual({ message: expectedMessage });
       } else {
-        expect(response?.json().noteHistoryMeta).toMatchObject([
+        expect(response?.json().noteHistoryMeta).toStrictEqual([
           /**
            * First history record created automatically on note insertion
            */
           {
-            id: '1',
-            noteId: note.publicId,
+            id: 1,
             userId: creator.id,
-            content: note.content,
-            tools: note.tools,
           },
           {
             id: history.id,
-            noteId: history.noteId,
             userId: history.userId,
-            content: history.content,
-            tools: history.tools,
+            createdAt: history.createdAt,
           },
         ]);
       }

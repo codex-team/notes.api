@@ -678,7 +678,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
             noteHistoryMeta: {
               type: 'array',
               items: {
-                $ref: 'HistoryMetaSchema#',
+                $ref: 'HistoryMetaSchema',
               },
             },
           },

@@ -70,17 +70,19 @@ export const HistoryMetaSchema = {
     'userId',
     'createdAt',
   ],
-  id: {
-    description: 'unique note hisotry record identifier',
-    type: 'number',
-  },
-  userId: {
-    description: 'unique user identifier',
-    type: 'number',
-  },
-  createdAt: {
-    description: 'time, when note history record was created',
-    type: 'string',
-    format: 'date-time',
+  properties: {
+    id: {
+      description: 'unique note hisotry record identifier',
+      type: 'number',
+    },
+    userId: {
+      description: 'unique user identifier',
+      type: 'number',
+    },
+    createdAt: {
+      description: 'time, when note history record was created',
+      type: 'string',
+      format: 'date-time',
+    },
   },
 };
