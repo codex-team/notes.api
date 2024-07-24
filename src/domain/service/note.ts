@@ -147,7 +147,7 @@ export default class NoteService {
     /**
      * If content changes are valuable, they will be saved to note history
      */
-    if (await this.checkContentDifference(id, content)) {
+    if (await this.areContentChangesSignificant(id, content)) {
       await this.noteHistoryRepository.createNoteHistoryRecord({
         content,
         userId: userId,
@@ -371,7 +371,7 @@ export default class NoteService {
    * @param content - updated note content
    * @returns - boolean, true if changes are valuable enough, false otherwise
    */
-  public async checkContentDifference(noteId: NoteInternalId, content: Note['content']): Promise<boolean> {
+  public async areContentChangesSignificant(noteId: NoteInternalId, content: Note['content']): Promise<boolean> {
     const currentlySavedNoteContent = (await this.noteHistoryRepository.getLastContentVersion(noteId));
 
     if (currentlySavedNoteContent === undefined) {
