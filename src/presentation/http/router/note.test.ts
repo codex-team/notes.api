@@ -747,24 +747,27 @@ describe('Note API', () => {
   });
 
   describe('POST and PATCH note correctly save note history records', () => {
+    const newContentWithSmallChanges = ALTERNATIVE_NOTE_CONTENT;
+    const newContentWithSignificantChanges = LARGE_NOTE_CONTENT;
+
     test.each([
       /**
        * Patching note content with small changes
        * History should have only one record inserted on note creation
        */
       {
-        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
-        expectedHistoryLength: 1,
+        newNoteContent: newContentWithSmallChanges,
+        historyRecordAdded: false,
       },
       /**
        * Patching note content with large changes
        * History should have two records, inserted on note creation and on note patch
        */
       {
-        newNoteContent: LARGE_NOTE_CONTENT,
-        expectedHistoryLength: 2,
+        newNoteContent: newContentWithSignificantChanges,
+        historyRecordAdded: true,
       },
-    ])('On note creation and note updates history records saves correctly', async ({ newNoteContent, expectedHistoryLength }) => {
+    ])('On note creation and note updates history records saves correctly', async ({ newNoteContent, historyRecordAdded }) => {
       const user = await global.db.insertUser();
 
       const accessToken = global.auth(user.id);
@@ -803,7 +806,11 @@ describe('Note API', () => {
         url: `/note/${noteId}/history`,
       });
 
-      expect(response?.json().noteHistoryMeta).toHaveLength(expectedHistoryLength);
+      if (historyRecordAdded) {
+        expect(response?.json().noteHistoryMeta).toHaveLength(2);
+      } else {
+        expect(response?.json().noteHistoryMeta).toHaveLength(1);
+      }
     });
   });
 
