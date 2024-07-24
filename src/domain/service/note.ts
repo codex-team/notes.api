@@ -366,6 +366,7 @@ export default class NoteService {
 
   /**
    * Check if content changes are valuable enough to save currently changed note to the history
+   * The sufficiency of changes is determined by the length of the content change
    * @param noteId - id of the note that is currently changed
    * @param content - updated note content
    * @returns - boolean, true if changes are valuable enough, false otherwise

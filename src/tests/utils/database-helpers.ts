@@ -34,6 +34,9 @@ const DEFAULT_NOTE_CONTENT = {
   ],
 };
 
+/**
+ * Note tools used in DEFAULT_NOTE_CONTENT constant
+ */
 const DEFAULT_NOTE_TOOLS = [
   {
     name: 'header',

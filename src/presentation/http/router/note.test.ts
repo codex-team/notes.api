@@ -65,6 +65,9 @@ describe('Note API', () => {
     ],
   };
 
+  /**
+   * Note tools used in default, alternative and large NOTE_CONTENT constants
+   */
   const DEFAULT_NOTE_TOOLS = [
     {
       name: headerTool.name,
@@ -75,29 +78,6 @@ describe('Note API', () => {
       id: paragraphTool.id,
     },
   ];
-
-  /**
-   * Note content mock inserted if no content passed
-   */
-  const ALTERNATIVE_NOTE_CONTENT = {
-    blocks: [
-      {
-        id: 'mJDq8YbvqO',
-        type: paragraphTool.name,
-        data: {
-          text: 'another text here',
-        },
-      },
-      {
-        id: 'DeL0QehzGe',
-        type: headerTool.name,
-        data: {
-          text: 'fdgsfdgfdsg',
-          level: 2,
-        },
-      },
-    ],
-  };
 
   /**
    * Note content with many blocks, used for checking patch note saves to history
@@ -1823,7 +1803,6 @@ describe('Note API', () => {
       {
         authorized: true,
         userCanEdit: false,
-        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
         expectedMessage: 'Permission denied',
       },
       /**
@@ -1833,41 +1812,21 @@ describe('Note API', () => {
       {
         authorized: false,
         userCanEdit: true,
-        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
         expectedMessage: 'You must be authenticated to access this resource',
       },
       /**
-       * New content changes are not valuable enough
-       * Should return one history record, which is saved on note creation
+       * Should return array of history records
        */
       {
         authorized: true,
         userCanEdit: true,
-        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
         expectedMessage: null,
-        expectedResponseLength: 1,
       },
-      /**
-       * New content changes are valuable enough
-       * Should return two history records, one from the note creation, another from note content update
-       */
-      {
-        authorized: true,
-        userCanEdit: true,
-        newNoteContent: LARGE_NOTE_CONTENT,
-        expectedMessage: null,
-        expectedResponseLength: 2,
-      },
-    ])('Should return note history preview by note id', async ({ authorized, userCanEdit, newNoteContent, expectedMessage, expectedResponseLength }) => {
+    ])('Should return note history preview by note id', async ({ authorized, userCanEdit, expectedMessage }) => {
       /**
        * Creator of the note
        */
       const creator = await global.db.insertUser();
-
-      /**
-       * Authorization token of the creator
-       */
-      const creatorAccessToken = global.auth(creator.id);
 
       /**
        * User who wants to check note history
@@ -1901,22 +1860,18 @@ describe('Note API', () => {
         });
       }
 
-      let response = await global.api?.fakeRequest({
-        method: 'PATCH',
-        headers: {
-          authorization: `Bearer ${creatorAccessToken}`,
-        },
-        body: {
-          content: newNoteContent,
-          tools: DEFAULT_NOTE_TOOLS,
-        },
-        url: `/note/${note.publicId}`,
+      /** Insert new note history record mock */
+      const history = await global.db.insertNoteHistory({
+        noteId: note.id,
+        userId: creator.id,
+        content: LARGE_NOTE_CONTENT,
+        tools: DEFAULT_NOTE_TOOLS,
       });
 
       /**
        * Get note history
        */
-      response = await global.api?.fakeRequest({
+      const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
           authorization: `Bearer ${userAccessToken}`,
@@ -1926,8 +1881,26 @@ describe('Note API', () => {
 
       if (expectedMessage !== null) {
         expect(response?.json()).toStrictEqual({ message: expectedMessage });
-      } else if (expectedResponseLength !== undefined) {
-        expect(response?.json().noteHistoryMeta).toHaveLength(expectedResponseLength);
+      } else {
+        expect(response?.json().noteHistoryMeta).toMatchObject([
+          /**
+           * First history record created automatically on note insertion
+           */
+          {
+            id: '1',
+            noteId: note.publicId,
+            userId: creator.id,
+            content: note.content,
+            tools: note.tools,
+          },
+          {
+            id: history.id,
+            noteId: history.noteId,
+            userId: history.userId,
+            content: history.content,
+            tools: history.tools,
+          },
+        ]);
       }
     });
   });
