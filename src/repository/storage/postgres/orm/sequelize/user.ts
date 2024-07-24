@@ -1,4 +1,4 @@
-import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional, ModelStatic } from 'sequelize';
+import type { Sequelize, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import { literal } from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
@@ -168,19 +168,6 @@ export default class UserSequelizeStorage {
       tableName: this.tableName,
       sequelize: this.database,
       timestamps: false,
-    });
-  }
-
-  /**
-   * create association with note history model
-   * @param model - initialized note history model
-   */
-  public createAssociationWithNoteHistoryModel(model: ModelStatic<NoteHistoryModel>): void {
-    this.historyModel = model;
-
-    this.model.hasMany(this.historyModel, {
-      foreignKey: 'userId',
-      as: 'noteHistory',
     });
   }
 

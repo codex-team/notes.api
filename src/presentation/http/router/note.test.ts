@@ -49,14 +49,14 @@ describe('Note API', () => {
     blocks: [
       {
         id: 'mJDq8YbvqO',
-        type: listTool.name,
+        type: headerTool.name,
         data: {
           text: 'text',
         },
       },
       {
         id: 'DeL0QehzGe',
-        type: headerTool.name,
+        type: paragraphTool.name,
         data: {
           text: 'fdgsfdgfdsg',
           level: 2,
@@ -71,8 +71,8 @@ describe('Note API', () => {
       id: headerTool.id,
     },
     {
-      name: listTool.name,
-      id: listTool.id,
+      name: paragraphTool.name,
+      id: paragraphTool.id,
     },
   ];
 
@@ -83,7 +83,7 @@ describe('Note API', () => {
     blocks: [
       {
         id: 'mJDq8YbvqO',
-        type: listTool.name,
+        type: paragraphTool.name,
         data: {
           text: 'another text here',
         },
@@ -133,16 +133,7 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        tools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: paragraphTool.name,
-            id: paragraphTool.id,
-          },
-        ],
+        tools: DEFAULT_NOTE_TOOLS,
       });
 
       /** Create test note settings */
@@ -239,16 +230,7 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        tools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: paragraphTool.name,
-            id: paragraphTool.id,
-          },
-        ],
+        tools: DEFAULT_NOTE_TOOLS,
       });
 
       /** Create test note settings */
@@ -1862,7 +1844,7 @@ describe('Note API', () => {
     });
   });
 
-  describe('GET /note/:notePublicId/history', () => {
+  describe.only('GET /note/:notePublicId/history', () => {
     test.each([
       /**
        * User can not edit the note state
@@ -1906,7 +1888,7 @@ describe('Note API', () => {
         expectedMessage: null,
         expectedResponseLength: 2,
       },
-    ])('Should return note history', async ({ authorized, userCanEdit, newNoteContent, expectedMessage, expectedResponseLength }) => {
+    ])('Should return note history preview by note id', async ({ authorized, userCanEdit, newNoteContent, expectedMessage, expectedResponseLength }) => {
       /**
        * Creator of the note
        */
@@ -1937,16 +1919,7 @@ describe('Note API', () => {
         },
         body: {
           content: DEFAULT_NOTE_CONTENT,
-          tools: [
-            {
-              name: headerTool.name,
-              id: headerTool.id,
-            },
-            {
-              name: listTool.name,
-              id: listTool.id,
-            },
-          ],
+          tools: DEFAULT_NOTE_TOOLS,
         },
         url: `/note`,
       });
@@ -2008,7 +1981,7 @@ describe('Note API', () => {
     });
   });
 
-  describe('GET /note/:notePublicId/history', () => {
+  describe('GET /note/:notePublicId/history/:historyId', () => {
     test.each([
       /**
        * User can not edit the note state
@@ -2037,7 +2010,7 @@ describe('Note API', () => {
         userCanEdit: true,
         expectedMessage: null,
       },
-    ])('Should return note history', async ({ authorized, userCanEdit, expectedMessage }) => {
+    ])('Should return certain note history record by it\'s id', async ({ authorized, userCanEdit, expectedMessage }) => {
       const creator = await global.db.insertUser();
 
       const note = await global.db.insertNote({ creatorId: creator.id });

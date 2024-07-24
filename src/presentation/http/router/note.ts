@@ -365,8 +365,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteTools = request.body.tools;
     const { userId } = request;
 
-    console.log('i trieeeed very much');
-
     await noteService.validateNoteTools(noteTools, content);
 
     const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools, userId!);
@@ -695,7 +693,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteId = request.note?.id as number;
 
     if (note === null) {
-      return reply.notFound('Note not found');
+      return reply.notAcceptable('Note not found');
     }
 
     return reply.send({
@@ -752,10 +750,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      * Check if note exists
      */
     if (note === null) {
-      return reply.notFound('Note not found');
+      return reply.notAcceptable('Note not found');
     }
 
-    const historyRecord = await noteService.getHistoryResordById(historyId);
+    const historyRecord = await noteService.getHistoryRecordById(historyId);
 
     return reply.send({
       noteHistoryRecord: historyRecord,

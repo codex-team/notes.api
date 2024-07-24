@@ -48,7 +48,7 @@ export default class NoteHistoryRepository {
    * @param noteId - id of the note, whose recent history record we want to see
    * @returns - latest saved content of the note
    */
-  public async getLatestContent(noteId: NoteHistoryRecord['noteId']): Promise<NoteHistoryRecord['content'] | undefined> {
-    return await this.storage.getLatestContent(noteId);
+  public async getLastContentVersion(noteId: NoteHistoryRecord['noteId']): Promise<NoteHistoryRecord['content'] | undefined> {
+    return await this.storage.getLastContentVersion(noteId);
   }
 }

@@ -157,19 +157,6 @@ export default class NoteSequelizeStorage {
   };
 
   /**
-   * create association with note history model
-   * @param model - initialized note history model
-   */
-  public createAssociationWithNoteHistoryModel(model: ModelStatic<NoteHistoryModel>): void {
-    this.historyModel = model;
-
-    this.model.hasMany(this.historyModel, {
-      foreignKey: 'noteId',
-      as: 'noteHistory',
-    });
-  }
-
-  /**
    * Insert note to database
    * @param options - note creation options
    * @returns - created note

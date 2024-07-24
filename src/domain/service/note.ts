@@ -55,8 +55,8 @@ export default class NoteService {
    * @param noteRepository - note repository
    * @param noteRelationsRepository - note relationship repository
    * @param noteVisitsRepository - note visits repository
-   * @param editorToolsRepository - editor tools repository
-   * @param noteHistoryRepository - aa
+   * @param editorToolsRepository - editor tools repositoryn
+   * @param noteHistoryRepository - note history repository
    */
   constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository, noteHistoryRepository: NoteHistoryRepository) {
     this.noteRepository = noteRepository;
@@ -371,7 +371,7 @@ export default class NoteService {
    * @returns - boolean, true if changes are valuable enough, false otherwise
    */
   public async checkContentDifference(noteId: NoteInternalId, content: Note['content']): Promise<boolean> {
-    const currentlySavedNoteContent = (await this.noteHistoryRepository.getLatestContent(noteId));
+    const currentlySavedNoteContent = (await this.noteHistoryRepository.getLastContentVersion(noteId));
 
     if (currentlySavedNoteContent === undefined) {
       throw new DomainError('No history for the note found');
@@ -412,7 +412,7 @@ export default class NoteService {
    * @param id - id of the note history record
    * @returns full public note history record or raises domain error if record not found
    */
-  public async getHistoryResordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryPublic> {
+  public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryPublic> {
     const noteHistoryRecord = await this.noteHistoryRepository.getHistoryRecordById(id);
 
     if (noteHistoryRecord === null) {

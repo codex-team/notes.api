@@ -153,8 +153,6 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
    */
   noteHistoryStorage.createAssociationWithNoteModel(noteStorage.model);
   noteHistoryStorage.createAssociationWithUserModel(userStorage.model);
-  noteStorage.createAssociationWithNoteHistoryModel(noteHistoryStorage.model);
-  userStorage.createAssociationWithNoteHistoryModel(noteHistoryStorage.model);
 
   /**
    * Prepare db structure

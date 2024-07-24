@@ -159,7 +159,7 @@ export default class NoteHistorySequelizeStorage {
    * @param noteId - id of the note, whose recent history record we want to see
    * @returns - latest saved content of the note
    */
-  public async getLatestContent(noteId: NoteHistoryRecord['id']): Promise<NoteHistoryRecord['content'] | undefined> {
+  public async getLastContentVersion(noteId: NoteHistoryRecord['id']): Promise<NoteHistoryRecord['content'] | undefined> {
     const latestHistory = await this.model.findOne({
       where: { noteId },
       order: [['createdAt', 'DESC']],
