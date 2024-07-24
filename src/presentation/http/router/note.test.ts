@@ -1879,25 +1879,15 @@ describe('Note API', () => {
        */
       let userAccessToken: string = '';
 
-      /**
-       * New note posted by creator
-       */
-      let response = await global.api?.fakeRequest({
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${creatorAccessToken}`,
-        },
-        body: {
-          content: DEFAULT_NOTE_CONTENT,
-          tools: DEFAULT_NOTE_TOOLS,
-        },
-        url: `/note`,
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
       });
 
-      /**
-       * Id of the note posted by creator
-       */
-      const noteId = response?.json().id;
+      /** Insert note settings mock */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
 
       if (authorized) {
         userAccessToken = global.auth(user.id);
@@ -1911,25 +1901,16 @@ describe('Note API', () => {
         });
       }
 
-      response = await global.api?.fakeRequest({
+      let response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
           authorization: `Bearer ${creatorAccessToken}`,
         },
         body: {
           content: newNoteContent,
-          tools: [
-            {
-              name: headerTool.name,
-              id: headerTool.id,
-            },
-            {
-              name: listTool.name,
-              id: listTool.id,
-            },
-          ],
+          tools: DEFAULT_NOTE_TOOLS,
         },
-        url: `/note/${noteId}`,
+        url: `/note/${note.publicId}`,
       });
 
       /**
@@ -1940,7 +1921,7 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${userAccessToken}`,
         },
-        url: `/note/${noteId}/history`,
+        url: `/note/${note.publicId}/history`,
       });
 
       if (expectedMessage !== null) {
