@@ -167,4 +167,19 @@ export default class NoteHistorySequelizeStorage {
 
     return latestHistory?.content;
   }
+
+  /**
+   * Delete all note history records of the note
+   * @param noteId - internal id of the note
+   * @returns - true if history was deleted, false otherwise
+   */
+  public async deleteNoteHistoryByNoteid(noteId: NoteHistoryRecord['id']): Promise<boolean> {
+    const destroyedRows = await this.model.destroy({
+      where: {
+        noteId,
+      },
+    });
+
+    return destroyedRows !== 0;
+  }
 }

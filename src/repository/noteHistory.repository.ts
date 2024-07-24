@@ -51,4 +51,13 @@ export default class NoteHistoryRepository {
   public async getLastContentVersion(noteId: NoteHistoryRecord['noteId']): Promise<NoteHistoryRecord['content'] | undefined> {
     return await this.storage.getLastContentVersion(noteId);
   }
+
+  /**
+   * Delete all note history records of the note
+   * @param noteId - internal id of the note
+   * @returns - true if history was deleted, false otherwise
+   */
+  public async deleteNoteHistoryByNoteId(noteId: NoteHistoryRecord['id']): Promise<boolean> {
+    return await this.storage.deleteNoteHistoryByNoteid(noteId);
+  }
 }

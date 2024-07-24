@@ -127,6 +127,11 @@ export default class NoteService {
       }
     }
 
+    /**
+     * Delete all note history records on note deletion
+     */
+    await this.noteHistoryRepository.deleteNoteHistoryByNoteId(id);
+
     const isNoteDeleted = await this.noteRepository.deleteNoteById(id);
 
     if (isNoteDeleted === false) {
