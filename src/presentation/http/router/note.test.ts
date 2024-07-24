@@ -2072,4 +2072,46 @@ describe('Note API', () => {
       }
     });
   });
+
+  describe('DELETE /note/:noteId', () => {
+    test('Delete note history on note deletion', async () => {
+      /**
+       * Insert test user
+       */
+      const user = await global.db.insertUser();
+
+      /**
+       * Authorization for user
+       */
+      const accessToken = global.auth(user.id);
+
+      /**
+       * Insert test note, note history record will be inserted automatically
+       */
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /**
+       * Delete note
+       */
+      await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}/history`,
+      });
+
+      expect(response?.json().message).toBe('Note not found');
+    });
+  });
 });
