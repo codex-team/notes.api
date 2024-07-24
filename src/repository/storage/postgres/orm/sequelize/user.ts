@@ -4,7 +4,6 @@ import { Model, DataTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools.js';
-import type { NoteHistoryModel } from './noteHistory.js';
 
 /**
  * Query options for getting user
@@ -116,8 +115,6 @@ export default class UserSequelizeStorage {
    * User model in database
    */
   public model: typeof UserModel;
-
-  public historyModel: typeof NoteHistoryModel | null = null;
 
   /**
    * Database instance
