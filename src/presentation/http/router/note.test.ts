@@ -1762,7 +1762,7 @@ describe('Note API', () => {
   });
 
   describe('PATCH /note/:notePublicId', () => {
-    const tools = [headerTool, listTool];
+    const tools = [headerTool, paragraphTool];
 
     test.each([
       /**
