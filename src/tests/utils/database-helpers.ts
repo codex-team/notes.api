@@ -34,6 +34,17 @@ const DEFAULT_NOTE_CONTENT = {
   ],
 };
 
+const DEFAULT_NOTE_TOOLS = [
+  {
+    name: 'header',
+    id: '1',
+  },
+  {
+    name: 'paragraph',
+    id: '2',
+  },
+];
+
 /**
  * default type for note mock creation attributes
  */
@@ -127,6 +138,7 @@ export default class DatabaseHelpers {
   /**
    * Inserts note mock to then db
    * Automatically adds note creator to note team
+   * Automatically adds first note history record
    * @param note - note object which contain all info about note
    *
    * If content is not passed, it's value in database would be {}
@@ -135,7 +147,7 @@ export default class DatabaseHelpers {
   public async insertNote(note: NoteMockCreationAttributes): Promise<Note> {
     const content = note.content ?? DEFAULT_NOTE_CONTENT;
     const publicId = note.publicId ?? createPublicId();
-    const tools = note.tools ?? [];
+    const tools = note.tools ?? DEFAULT_NOTE_TOOLS;
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id", "tools")
     VALUES ('${JSON.stringify(content)}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}', '${JSON.stringify(tools)}'::jsonb)
@@ -151,6 +163,13 @@ export default class DatabaseHelpers {
       userId: createdNote.creatorId,
       noteId: createdNote.id,
       role: 1,
+    });
+
+    await this.insertNoteHistory({
+      userId: createdNote.creatorId,
+      noteId: createdNote.id,
+      content,
+      tools: DEFAULT_NOTE_TOOLS,
     });
 
     return createdNote;

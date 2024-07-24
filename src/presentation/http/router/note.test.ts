@@ -106,7 +106,7 @@ describe('Note API', () => {
     blocks: [
       {
         id: 'mJDq8YbvqO',
-        type: listTool.name,
+        type: paragraphTool.name,
         data: {
           text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla.',
         },
@@ -562,13 +562,6 @@ describe('Note API', () => {
         creatorId: creator.id,
       });
 
-      await global.db.insertNoteHistory({
-        userId: creator.id,
-        noteId: note.id,
-        content: DEFAULT_NOTE_CONTENT,
-        tools: DEFAULT_NOTE_TOOLS,
-      });
-
       /** Create test note settings */
       await global.db.insertNoteSetting({
         noteId: note.id,
@@ -689,13 +682,6 @@ describe('Note API', () => {
           id: headerTool.id,
         },
       ];
-
-      await global.db.insertNoteHistory({
-        userId: user.id,
-        noteId: note.id,
-        content: DEFAULT_NOTE_CONTENT,
-        tools: DEFAULT_NOTE_TOOLS,
-      });
 
       /** Modify the note */
       const response = await global.api?.fakeRequest({
@@ -1430,14 +1416,6 @@ describe('Note API', () => {
         parentId: parentNote.id,
       });
 
-      /** create test note history */
-      await global.db.insertNoteHistory({
-        userId: user.id,
-        noteId: childNote.id,
-        tools: DEFAULT_NOTE_TOOLS,
-        content: DEFAULT_NOTE_CONTENT,
-      });
-
       let response = await global.api?.fakeRequest({
         method: 'PATCH',
         headers: {
@@ -1803,14 +1781,6 @@ describe('Note API', () => {
       await global.db.insertNoteSetting({
         noteId: note.id,
         isPublic: true,
-      });
-
-      /** create test note history */
-      await global.db.insertNoteHistory({
-        userId: user.id,
-        noteId: note.id,
-        tools: DEFAULT_NOTE_TOOLS,
-        content: DEFAULT_NOTE_CONTENT,
       });
 
       let response = await global.api?.fakeRequest({
