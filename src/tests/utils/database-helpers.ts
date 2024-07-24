@@ -153,7 +153,7 @@ export default class DatabaseHelpers {
     const tools = note.tools ?? DEFAULT_NOTE_TOOLS;
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id", "tools")
-    VALUES ('${JSON.stringify(content)}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}', '${JSON.stringify(tools)}'::jsonb)
+    VALUES ('${JSON.stringify(content)}', ${note.creatorId}, CLOCK_TIMESTAMP(), CLOCK_TIMESTAMP(), '${publicId}', '${JSON.stringify(tools)}'::jsonb)
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,
@@ -194,7 +194,7 @@ export default class DatabaseHelpers {
     const email = user?.email ?? `${randomPart}@codexmail.com`;
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
-    VALUES ('${email}', '${name}', CURRENT_DATE, '${editorTools}'::jsonb)
+    VALUES ('${email}', '${name}', CLOCK_TIMESTAMP(), '${editorTools}'::jsonb)
     RETURNING "id", "email", "name", "editor_tools" AS "editorTools", "created_at" AS "createdAt", "photo"`,
     {
       type: QueryTypes.INSERT,
@@ -209,12 +209,12 @@ export default class DatabaseHelpers {
    * Inserts user session mock to the db
    * @param userSession - userSession object which contain all info about userSession (some info is optional)
    *
-   * refreshTokenExpiresAt should be given as Postgres DATE string (e.g. `CURRENT_DATE + INTERVAL '1 day'`)
+   * refreshTokenExpiresAt should be given as Postgres DATE string (e.g. `CLOCK_TIMESTAMP() + INTERVAL '1 day'`)
    *
-   * if no refreshTokenExpiresAt passed, it's value in database would be `CURRENT_DATE + INTERVAL '1 day'`
+   * if no refreshTokenExpiresAt passed, it's value in database would be `CLOCK_TIMESTAMP() + INTERVAL '1 day'`
    */
   public async insertUserSession(userSession: UserSessionMockCreationAttributes): Promise<UserSessionMockCreationAttributes> {
-    const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? `CURRENT_DATE + INTERVAL '1 day')`;
+    const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? `CLOCK_TIMESTAMP() + INTERVAL '1 day')`;
 
     await this.orm.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_toker_expires_at") VALUES (${userSession.userId}, '${userSession.refreshToker}, '${refreshTokerExpiresAt}')`);
 

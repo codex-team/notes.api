@@ -43,7 +43,8 @@ describe('Note API', () => {
   };
 
   /**
-   * Note content mock inserted if no content passed
+   * Default note content mock
+   * Used for inserting note content
    */
   const DEFAULT_NOTE_CONTENT = {
     blocks: [
@@ -52,6 +53,30 @@ describe('Note API', () => {
         type: headerTool.name,
         data: {
           text: 'text',
+        },
+      },
+      {
+        id: 'DeL0QehzGe',
+        type: paragraphTool.name,
+        data: {
+          text: 'fdgsfdgfdsg',
+          level: 2,
+        },
+      },
+    ],
+  };
+
+  /**
+   * Alternative note content mock
+   * Used for patching note content
+   */
+  const ALTERNATIVE_NOTE_CONTENT = {
+    blocks: [
+      {
+        id: 'mJDq8YbvqO',
+        type: headerTool.name,
+        data: {
+          text: 'another text',
         },
       },
       {
@@ -80,7 +105,8 @@ describe('Note API', () => {
   ];
 
   /**
-   * Note content with many blocks, used for checking patch note saves to history
+   * Note content with large text field
+   * Used for patching note content
    */
   const LARGE_NOTE_CONTENT = {
     blocks: [
@@ -717,15 +743,68 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    // test.each
-    //
-    //
-    //
-    //
-    //
-    //
-
     test.todo('Returns 400 when parentId has incorrect characters and length');
+  });
+
+  describe('POST and PATCH note correctly save note history records', () => {
+    test.each([
+      /**
+       * Patching note content with small changes
+       * History should have only one record inserted on note creation
+       */
+      {
+        newNoteContent: ALTERNATIVE_NOTE_CONTENT,
+        expectedHistoryLength: 1,
+      },
+      /**
+       * Patching note content with large changes
+       * History should have two records, inserted on note creation and on note patch
+       */
+      {
+        newNoteContent: LARGE_NOTE_CONTENT,
+        expectedHistoryLength: 2,
+      },
+    ])('On note creation and note updates history records saves correctly', async ({ newNoteContent, expectedHistoryLength }) => {
+      const user = await global.db.insertUser();
+
+      const accessToken = global.auth(user.id);
+
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          content: DEFAULT_NOTE_CONTENT,
+          tools: DEFAULT_NOTE_TOOLS,
+        },
+        url: '/note',
+      });
+
+      const noteId = response?.json().id;
+
+      response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          content: newNoteContent,
+          tools: DEFAULT_NOTE_TOOLS,
+        },
+        url: `/note/${noteId}`,
+      });
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${noteId}/history`,
+      });
+
+      expect(response?.json().noteHistoryMeta).toHaveLength(expectedHistoryLength);
+    });
   });
 
   describe('POST /note', () => {
@@ -1802,7 +1881,7 @@ describe('Note API', () => {
     });
   });
 
-  describe.only('GET /note/:notePublicId/history', () => {
+  describe('GET /note/:notePublicId/history', () => {
     test.each([
       /**
        * User can not edit the note state
@@ -1890,20 +1969,17 @@ describe('Note API', () => {
       if (expectedMessage !== null) {
         expect(response?.json()).toStrictEqual({ message: expectedMessage });
       } else {
-        expect(response?.json().noteHistoryMeta).toStrictEqual([
-          /**
-           * First history record created automatically on note insertion
-           */
-          {
-            id: 1,
-            userId: creator.id,
-          },
-          {
-            id: history.id,
-            userId: history.userId,
-            createdAt: history.createdAt,
-          },
-        ]);
+        expect(response?.json().noteHistoryMeta).toHaveLength(2);
+        expect(response?.json().noteHistoryMeta[0]).toMatchObject({
+          id: 1,
+          userId: creator.id,
+        });
+
+        expect(response?.json().noteHistoryMeta[1]).toMatchObject({
+          id: history.id,
+          userId: history.userId,
+          createdAt: history.createdAt,
+        });
       }
     });
   });
