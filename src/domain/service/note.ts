@@ -7,6 +7,8 @@ import type NoteRelationsRepository from '@repository/noteRelations.repository.j
 import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
+import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
+import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
 
 /**
  * Note service
@@ -33,23 +35,35 @@ export default class NoteService {
   public editorToolsRepository: EditorToolsRepository;
 
   /**
+   * Note history repository
+   */
+  public noteHistoryRepository: NoteHistoryRepository;
+
+  /**
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
   private readonly noteListPortionSize = 30;
 
   /**
+   * Constant used for checking that content changes are valuable enough to save updated note content to the history
+   */
+  private readonly valuableContentChangesLength = 100;
+
+  /**
    * Note service constructor
    * @param noteRepository - note repository
    * @param noteRelationsRepository - note relationship repository
    * @param noteVisitsRepository - note visits repository
-   * @param editorToolsRepository - editor tools repository
+   * @param editorToolsRepository - editor tools repositoryn
+   * @param noteHistoryRepository - note history repository
    */
-  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository) {
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository, noteHistoryRepository: NoteHistoryRepository) {
     this.noteRepository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
     this.noteVisitsRepository = noteVisitsRepository;
     this.editorToolsRepository = editorToolsRepository;
+    this.noteHistoryRepository = noteHistoryRepository;
   }
 
   /**
@@ -65,6 +79,16 @@ export default class NoteService {
       publicId: createPublicId(),
       content,
       creatorId,
+      tools,
+    });
+
+    /**
+     * First note save always goes to the note history
+     */
+    await this.noteHistoryRepository.createNoteHistoryRecord({
+      content,
+      userId: creatorId,
+      noteId: note.id,
       tools,
     });
 
@@ -117,8 +141,21 @@ export default class NoteService {
    * @param id - note internal id
    * @param content - new content
    * @param noteTools - tools which are used in note
+   * @param userId - id of the user that made changes
    */
-  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools']): Promise<Note> {
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools'], userId: User['id']): Promise<Note> {
+    /**
+     * If content changes are valuable, they will be saved to note history
+     */
+    if (await this.areContentChangesSignificant(id, content)) {
+      await this.noteHistoryRepository.createNoteHistoryRecord({
+        content,
+        userId: userId,
+        noteId: id,
+        tools: noteTools,
+      });
+    };
+
     const updatedNote = await this.noteRepository.updateNoteContentAndToolsById(id, content, noteTools);
 
     if (updatedNote === null) {
@@ -325,5 +362,77 @@ export default class NoteService {
     }
 
     return note.publicId;
+  }
+
+  /**
+   * Check if content changes are valuable enough to save currently changed note to the history
+   * The sufficiency of changes is determined by the length of the content change
+   * @param noteId - id of the note that is currently changed
+   * @param content - updated note content
+   * @returns - boolean, true if changes are valuable enough, false otherwise
+   */
+  public async areContentChangesSignificant(noteId: NoteInternalId, content: Note['content']): Promise<boolean> {
+    const currentlySavedNoteContent = (await this.noteHistoryRepository.getLastContentVersion(noteId));
+
+    if (currentlySavedNoteContent === undefined) {
+      throw new DomainError('No history for the note found');
+    }
+
+    const currentContentLength = currentlySavedNoteContent.blocks.reduce((length, block) => {
+      length += JSON.stringify(block.data).length;
+
+      return length;
+    }, 0);
+
+    const patchedContentLength = content.blocks.reduce((length, block) => {
+      length += JSON.stringify(block.data).length;
+
+      return length;
+    }, 0);
+
+    if (Math.abs(currentContentLength - patchedContentLength) >= this.valuableContentChangesLength) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Get all note content change history metadata (without actual content)
+   * Used for preview of all changes of the note content
+   * @param noteId - id of the note
+   * @returns - array of metadata of note changes history
+   */
+  public async getNoteHistoryByNoteId(noteId: Note['id']): Promise<NoteHistoryMeta[]> {
+    return await this.noteHistoryRepository.getNoteHistoryByNoteId(noteId);
+  }
+
+  /**
+   * Get concrete history record of the note
+   * Used for showing some of the note content versions
+   * @param id - id of the note history record
+   * @returns full public note history record or raises domain error if record not found
+   */
+  public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryPublic> {
+    const noteHistoryRecord = await this.noteHistoryRepository.getHistoryRecordById(id);
+
+    if (noteHistoryRecord === null) {
+      throw new DomainError('This version of the note not found');
+    }
+
+    /**
+     * Resolve note history record for it to be public
+     * changes noteId from internal to public
+     */
+    const noteHistoryPublic = {
+      id: noteHistoryRecord.id,
+      noteId: await this.getNotePublicIdByInternal(noteHistoryRecord.noteId),
+      userId: noteHistoryRecord.userId,
+      content: noteHistoryRecord.content,
+      tools: noteHistoryRecord.tools,
+      createdAt: noteHistoryRecord.createdAt,
+    };
+
+    return noteHistoryPublic;
   }
 }

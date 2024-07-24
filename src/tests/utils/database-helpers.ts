@@ -9,6 +9,7 @@ import type { TeamMember } from '@domain/entities/team.ts';
 import type EditorTool from '@domain/entities/editorTools.ts';
 import type NoteVisit from '@domain/entities/noteVisit.js';
 import { nanoid } from 'nanoid';
+import type { NoteHistoryCreationAttributes, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
 
 /**
  * Note content mock inserted if no content passed
@@ -32,6 +33,20 @@ const DEFAULT_NOTE_CONTENT = {
     },
   ],
 };
+
+/**
+ * Note tools used in DEFAULT_NOTE_CONTENT constant
+ */
+const DEFAULT_NOTE_TOOLS = [
+  {
+    name: 'header',
+    id: '1',
+  },
+  {
+    name: 'paragraph',
+    id: '2',
+  },
+];
 
 /**
  * default type for note mock creation attributes
@@ -126,6 +141,7 @@ export default class DatabaseHelpers {
   /**
    * Inserts note mock to then db
    * Automatically adds note creator to note team
+   * Automatically adds first note history record
    * @param note - note object which contain all info about note
    *
    * If content is not passed, it's value in database would be {}
@@ -134,10 +150,10 @@ export default class DatabaseHelpers {
   public async insertNote(note: NoteMockCreationAttributes): Promise<Note> {
     const content = note.content ?? DEFAULT_NOTE_CONTENT;
     const publicId = note.publicId ?? createPublicId();
-    const tools = note.tools ?? [];
+    const tools = note.tools ?? DEFAULT_NOTE_TOOLS;
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.notes ("content", "creator_id", "created_at", "updated_at", "public_id", "tools")
-    VALUES ('${JSON.stringify(content)}', ${note.creatorId}, CURRENT_DATE, CURRENT_DATE, '${publicId}', '${JSON.stringify(tools)}'::jsonb)
+    VALUES ('${JSON.stringify(content)}', ${note.creatorId}, CLOCK_TIMESTAMP(), CLOCK_TIMESTAMP(), '${publicId}', '${JSON.stringify(tools)}'::jsonb)
     RETURNING "id", "content", "creator_id" AS "creatorId", "public_id" AS "publicId", "created_at" AS "createdAt", "updated_at" AS "updatedAt"`,
     {
       type: QueryTypes.INSERT,
@@ -150,6 +166,13 @@ export default class DatabaseHelpers {
       userId: createdNote.creatorId,
       noteId: createdNote.id,
       role: 1,
+    });
+
+    await this.insertNoteHistory({
+      userId: createdNote.creatorId,
+      noteId: createdNote.id,
+      content,
+      tools: DEFAULT_NOTE_TOOLS,
     });
 
     return createdNote;
@@ -171,7 +194,7 @@ export default class DatabaseHelpers {
     const email = user?.email ?? `${randomPart}@codexmail.com`;
 
     const [results, _] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
-    VALUES ('${email}', '${name}', CURRENT_DATE, '${editorTools}'::jsonb)
+    VALUES ('${email}', '${name}', CLOCK_TIMESTAMP(), '${editorTools}'::jsonb)
     RETURNING "id", "email", "name", "editor_tools" AS "editorTools", "created_at" AS "createdAt", "photo"`,
     {
       type: QueryTypes.INSERT,
@@ -186,12 +209,12 @@ export default class DatabaseHelpers {
    * Inserts user session mock to the db
    * @param userSession - userSession object which contain all info about userSession (some info is optional)
    *
-   * refreshTokenExpiresAt should be given as Postgres DATE string (e.g. `CURRENT_DATE + INTERVAL '1 day'`)
+   * refreshTokenExpiresAt should be given as Postgres DATE string (e.g. `CLOCK_TIMESTAMP() + INTERVAL '1 day'`)
    *
-   * if no refreshTokenExpiresAt passed, it's value in database would be `CURRENT_DATE + INTERVAL '1 day'`
+   * if no refreshTokenExpiresAt passed, it's value in database would be `CLOCK_TIMESTAMP() + INTERVAL '1 day'`
    */
   public async insertUserSession(userSession: UserSessionMockCreationAttributes): Promise<UserSessionMockCreationAttributes> {
-    const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? `CURRENT_DATE + INTERVAL '1 day')`;
+    const refreshTokerExpiresAt = userSession.refreshTokenExpiresAt ?? `CLOCK_TIMESTAMP() + INTERVAL '1 day')`;
 
     await this.orm.connection.query(`INSERT INTO public.user_sessions ("user_id", "refresh_token", "refresh_toker_expires_at") VALUES (${userSession.userId}, '${userSession.refreshToker}, '${refreshTokerExpiresAt}')`);
 
@@ -276,6 +299,29 @@ export default class DatabaseHelpers {
     const createdVisit = results[0];
 
     return createdVisit;
+  }
+
+  /**
+   * Inserts note history mock into db
+   * @param history - object that contains all data needed for history record creation
+   * @returns created note history record
+   */
+  public async insertNoteHistory(history: NoteHistoryCreationAttributes): Promise<NoteHistoryRecord> {
+    const [result, _] = await this.orm.connection.query(`INSERT INTO public.note_history ("user_id", "note_id", "created_at", "content", "tools")
+      VALUES ('${history.userId}', '${history.noteId}', CLOCK_TIMESTAMP(), '${JSON.stringify(history.content)}', '${JSON.stringify(history.tools)}')
+      RETURNING "id", "note_id" as "noteId", "user_id" as "userId", "created_at" as "createdAt", "content", "tools"`,
+    {
+      type: QueryTypes.INSERT,
+      returning: true,
+    });
+
+    const createdHistory = result[0];
+
+    /**
+     * JSON cast is needed since in router it happens by default (and in test we always use response.json())
+     * Overwhise model createdAt would be treated as Date object
+     */
+    return JSON.parse(JSON.stringify(createdHistory));
   }
 
   /**

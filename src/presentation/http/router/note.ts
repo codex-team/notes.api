@@ -11,6 +11,7 @@ import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.j
 import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
+import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
 
 /**
  * Interface for the note router.
@@ -362,10 +363,11 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteId = request.note?.id as number;
     const content = request.body.content;
     const noteTools = request.body.tools;
+    const { userId } = request;
 
     await noteService.validateNoteTools(noteTools, content);
 
-    const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools);
+    const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools, userId!);
 
     return reply.send({
       updatedAt: note.updatedAt,
@@ -643,6 +645,118 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       note: notePublic,
       accessRights: { canEdit: canEdit },
       tools: noteTools,
+    });
+  });
+
+  /**
+   * Get note history preview
+   */
+  fastify.get<{
+    Params: {
+      notePublicId: NotePublicId;
+    };
+    Reply: {
+      noteHistoryMeta: NoteHistoryMeta[];
+    } | ErrorResponse;
+  }>('/:notePublicId/history', {
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            noteHistoryMeta: {
+              type: 'array',
+              items: {
+                $ref: 'HistoryMetaSchema',
+              },
+            },
+          },
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const { note } = request;
+    const noteId = request.note?.id as number;
+
+    if (note === null) {
+      return reply.notAcceptable('Note not found');
+    }
+
+    return reply.send({
+      noteHistoryMeta: await noteService.getNoteHistoryByNoteId(noteId),
+    });
+  });
+
+  /**
+   * Get note history record
+   */
+  fastify.get<{
+    Params: {
+      notePublicId: NotePublicId;
+      historyId: NoteHistoryRecord['id'];
+    };
+    Reply: {
+      noteHistoryRecord: NoteHistoryPublic;
+    } | ErrorResponse;
+  }>('/:notePublicId/history/:historyId', {
+    config: {
+      policy: [
+        'authRequired',
+        'userCanEdit',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+        historyId: {
+          $ref: 'NoteHistorySchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            noteHistoryRecord: {
+              $ref: 'NoteHistorySchema#',
+            },
+          },
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+    ],
+  }, async (request, reply) => {
+    const { note } = request;
+    const historyId = request.params.historyId;
+
+    /**
+     * Check if note exists
+     */
+    if (note === null) {
+      return reply.notAcceptable('Note not found');
+    }
+
+    const historyRecord = await noteService.getHistoryRecordById(historyId);
+
+    return reply.send({
+      noteHistoryRecord: historyRecord,
     });
   });
 

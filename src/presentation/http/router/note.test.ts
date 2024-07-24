@@ -43,15 +43,78 @@ describe('Note API', () => {
   };
 
   /**
-   * Note content mock inserted if no content passed
+   * Default note content mock
+   * Used for inserting note content
    */
   const DEFAULT_NOTE_CONTENT = {
     blocks: [
       {
         id: 'mJDq8YbvqO',
-        type: listTool.name,
+        type: headerTool.name,
         data: {
           text: 'text',
+        },
+      },
+      {
+        id: 'DeL0QehzGe',
+        type: paragraphTool.name,
+        data: {
+          text: 'fdgsfdgfdsg',
+          level: 2,
+        },
+      },
+    ],
+  };
+
+  /**
+   * Alternative note content mock
+   * Used for patching note content
+   */
+  const ALTERNATIVE_NOTE_CONTENT = {
+    blocks: [
+      {
+        id: 'mJDq8YbvqO',
+        type: headerTool.name,
+        data: {
+          text: 'another text',
+        },
+      },
+      {
+        id: 'DeL0QehzGe',
+        type: paragraphTool.name,
+        data: {
+          text: 'fdgsfdgfdsg',
+          level: 2,
+        },
+      },
+    ],
+  };
+
+  /**
+   * Note tools used in default, alternative and large NOTE_CONTENT constants
+   */
+  const DEFAULT_NOTE_TOOLS = [
+    {
+      name: headerTool.name,
+      id: headerTool.id,
+    },
+    {
+      name: paragraphTool.name,
+      id: paragraphTool.id,
+    },
+  ];
+
+  /**
+   * Note content with large text field
+   * Used for patching note content
+   */
+  const LARGE_NOTE_CONTENT = {
+    blocks: [
+      {
+        id: 'mJDq8YbvqO',
+        type: paragraphTool.name,
+        data: {
+          text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla.',
         },
       },
       {
@@ -76,16 +139,7 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: user.id,
-        tools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: paragraphTool.name,
-            id: paragraphTool.id,
-          },
-        ],
+        tools: DEFAULT_NOTE_TOOLS,
       });
 
       /** Create test note settings */
@@ -182,16 +236,7 @@ describe('Note API', () => {
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: creator.id,
-        tools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: paragraphTool.name,
-            id: paragraphTool.id,
-          },
-        ],
+        tools: DEFAULT_NOTE_TOOLS,
       });
 
       /** Create test note settings */
@@ -701,6 +746,74 @@ describe('Note API', () => {
     test.todo('Returns 400 when parentId has incorrect characters and length');
   });
 
+  describe('POST and PATCH note correctly save note history records', () => {
+    const newContentWithSmallChanges = ALTERNATIVE_NOTE_CONTENT;
+    const newContentWithSignificantChanges = LARGE_NOTE_CONTENT;
+
+    test.each([
+      /**
+       * Patching note content with small changes
+       * History should have only one record inserted on note creation
+       */
+      {
+        newNoteContent: newContentWithSmallChanges,
+        historyRecordAdded: false,
+      },
+      /**
+       * Patching note content with large changes
+       * History should have two records, inserted on note creation and on note patch
+       */
+      {
+        newNoteContent: newContentWithSignificantChanges,
+        historyRecordAdded: true,
+      },
+    ])('On note creation and note updates history records saves correctly', async ({ newNoteContent, historyRecordAdded }) => {
+      const user = await global.db.insertUser();
+
+      const accessToken = global.auth(user.id);
+
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          content: DEFAULT_NOTE_CONTENT,
+          tools: DEFAULT_NOTE_TOOLS,
+        },
+        url: '/note',
+      });
+
+      const noteId = response?.json().id;
+
+      response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          content: newNoteContent,
+          tools: DEFAULT_NOTE_TOOLS,
+        },
+        url: `/note/${noteId}`,
+      });
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${noteId}/history`,
+      });
+
+      if (historyRecordAdded) {
+        expect(response?.json().noteHistoryMeta).toHaveLength(2);
+      } else {
+        expect(response?.json().noteHistoryMeta).toHaveLength(1);
+      }
+    });
+  });
+
   describe('POST /note', () => {
     test('Should correctly save relation to parent note if parentId passed', async () => {
       const user = await global.db.insertUser();
@@ -763,16 +876,7 @@ describe('Note API', () => {
        * Specified extra tools
        */
       {
-        noteTools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: listTool.name,
-            id: listTool.id,
-          },
-        ],
+        noteTools: DEFAULT_NOTE_TOOLS,
         noteContent: {
           blocks: [
             {
@@ -1665,7 +1769,7 @@ describe('Note API', () => {
   });
 
   describe('PATCH /note/:notePublicId', () => {
-    const tools = [headerTool, listTool];
+    const tools = [headerTool, paragraphTool];
 
     test.each([
       /**
@@ -1694,16 +1798,7 @@ describe('Note API', () => {
        * All tools specified correctly
        */
       {
-        noteTools: [
-          {
-            name: headerTool.name,
-            id: headerTool.id,
-          },
-          {
-            name: listTool.name,
-            id: listTool.id,
-          },
-        ],
+        noteTools: DEFAULT_NOTE_TOOLS,
         noteContent: DEFAULT_NOTE_CONTENT,
         expectedStatusCode: 200,
         expectedMessage: null,
@@ -1789,6 +1884,191 @@ describe('Note API', () => {
       } else {
         expect(response?.statusCode).toBe(expectedStatusCode);
         expect(response?.json().message).toBe(expectedMessage);
+      }
+    });
+  });
+
+  describe('GET /note/:notePublicId/history', () => {
+    test.each([
+      /**
+       * User can not edit the note state
+       * Should return permission denied response
+       */
+      {
+        authorized: true,
+        userCanEdit: false,
+        expectedMessage: 'Permission denied',
+      },
+      /**
+       * Unauthorized state
+       * Should return unauthorized response
+       */
+      {
+        authorized: false,
+        userCanEdit: true,
+        expectedMessage: 'You must be authenticated to access this resource',
+      },
+      /**
+       * Should return array of history records
+       */
+      {
+        authorized: true,
+        userCanEdit: true,
+        expectedMessage: null,
+      },
+    ])('Should return note history preview by note id', async ({ authorized, userCanEdit, expectedMessage }) => {
+      /**
+       * Creator of the note
+       */
+      const creator = await global.db.insertUser();
+
+      /**
+       * User who wants to check note history
+       */
+      const user = await global.db.insertUser();
+
+      /**
+       * Access token of the user who wants to check note history
+       */
+      let userAccessToken: string = '';
+
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /** Insert note settings mock */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: false,
+      });
+
+      if (authorized) {
+        userAccessToken = global.auth(user.id);
+      }
+
+      if (userCanEdit) {
+        await global.db.insertNoteTeam({
+          noteId: 1,
+          userId: user.id,
+          role: MemberRole.Write,
+        });
+      }
+
+      /** Insert new note history record mock */
+      const history = await global.db.insertNoteHistory({
+        noteId: note.id,
+        userId: creator.id,
+        content: LARGE_NOTE_CONTENT,
+        tools: DEFAULT_NOTE_TOOLS,
+      });
+
+      /**
+       * Get note history
+       */
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${userAccessToken}`,
+        },
+        url: `/note/${note.publicId}/history`,
+      });
+
+      if (expectedMessage !== null) {
+        expect(response?.json()).toStrictEqual({ message: expectedMessage });
+      } else {
+        expect(response?.json().noteHistoryMeta).toHaveLength(2);
+        expect(response?.json().noteHistoryMeta[0]).toMatchObject({
+          id: 1,
+          userId: creator.id,
+        });
+
+        expect(response?.json().noteHistoryMeta[1]).toMatchObject({
+          id: history.id,
+          userId: history.userId,
+          createdAt: history.createdAt,
+        });
+      }
+    });
+  });
+
+  describe('GET /note/:notePublicId/history/:historyId', () => {
+    test.each([
+      /**
+       * User can not edit the note state
+       * Should return permission denied response
+       */
+      {
+        authorized: true,
+        userCanEdit: false,
+        expectedMessage: 'Permission denied',
+      },
+      /**
+       * Unauthorized state
+       * Should return unauthorized response
+       */
+      {
+        authorized: false,
+        userCanEdit: true,
+        expectedMessage: 'You must be authenticated to access this resource',
+      },
+      /**
+       * User is authorized and can edit the note
+       * Should return history record that is inserted
+       */
+      {
+        authorized: true,
+        userCanEdit: true,
+        expectedMessage: null,
+      },
+    ])('Should return certain note history record by it\'s id', async ({ authorized, userCanEdit, expectedMessage }) => {
+      const creator = await global.db.insertUser();
+
+      const note = await global.db.insertNote({ creatorId: creator.id });
+
+      const history = await global.db.insertNoteHistory({
+        userId: creator.id,
+        noteId: note.id,
+        content: DEFAULT_NOTE_CONTENT,
+        tools: DEFAULT_NOTE_TOOLS,
+      });
+
+      const user = await global.db.insertUser();
+
+      let accessToken: string = '';
+
+      if (authorized) {
+        accessToken = global.auth(user.id);
+      }
+
+      if (userCanEdit) {
+        await global.db.insertNoteTeam({
+          userId: user.id,
+          noteId: note.id,
+          role: MemberRole.Write,
+        });
+      }
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}/history/${history.id}`,
+      });
+
+      if (expectedMessage !== null) {
+        expect(response?.json()).toStrictEqual({ message: expectedMessage });
+      } else {
+        expect(response?.json()).toStrictEqual({
+          noteHistoryRecord: {
+            id: history.id,
+            userId: history.userId,
+            noteId: note.publicId,
+            createdAt: history.createdAt,
+            content: history.content,
+            tools: history.tools,
+          },
+        });
       }
     });
   });

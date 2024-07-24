@@ -165,7 +165,7 @@ export default class NoteSettingsService {
    * Remove team member by userId and noteId
    * @param userId - id of team member
    * @param noteId - note internal id
-   * @returns returns userId if team member was deleted and undefined overwise
+   * @returns returns userId if team member was deleted and undefined otherwise
    */
   public async removeTeamMemberByUserIdAndNoteId(userId: TeamMember['id'], noteId: NoteInternalId): Promise<User['id'] | undefined> {
     return await this.teamRepository.removeTeamMemberByUserIdAndNoteId(userId, noteId);

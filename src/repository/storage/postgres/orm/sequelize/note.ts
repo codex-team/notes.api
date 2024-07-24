@@ -6,6 +6,7 @@ import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import type { NoteHistoryModel } from './noteHistory.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -73,6 +74,8 @@ export default class NoteSequelizeStorage {
    */
   public visitsModel: typeof NoteVisitsModel | null = null;
 
+  public historyModel: typeof NoteHistoryModel | null = null;
+
   /**
    * Database instance
    */
@@ -138,7 +141,7 @@ export default class NoteSequelizeStorage {
   }
 
   /**
-   * create association with note cisits model
+   * create association with note visits model
    * @param model - initialized note visits model
    */
   public createAssociationWithNoteVisitsModel(model: ModelStatic<NoteVisitsModel>): void {
