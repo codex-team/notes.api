@@ -193,8 +193,8 @@ export default class DatabaseHelpers {
     const name = user?.name ?? `CodeX-${randomPart}`;
     const email = user?.email ?? `${randomPart}@codexmail.com`;
 
-    const [results, _] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools", "photo")
-    VALUES ('${email}', '${name}', CLOCK_TIMESTAMP(), '${editorTools}'::jsonb, '')
+    const [results, _] = await this.orm.connection.query(`INSERT INTO public.users ("email", "name", "created_at", "editor_tools")
+    VALUES ('${email}', '${name}', CLOCK_TIMESTAMP(), '${editorTools}'::jsonb)
     RETURNING "id", "email", "name", "editor_tools" AS "editorTools", "created_at" AS "createdAt", "photo"`,
     {
       type: QueryTypes.INSERT,

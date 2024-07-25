@@ -1,18 +1,6 @@
 import type { NoteInternalId, Note, NotePublicId } from './note.js';
 import type User from './user.js';
 
-interface UserMeta {
-  /**
-   * Name of the user
-   */
-  name: User['name'];
-
-  /**
-   * Photo of the user
-   */
-  photo: User['photo'];
-};
-
 export interface NoteHistoryRecord {
   /**
    * Unique identified of note history record
@@ -54,13 +42,7 @@ export type NoteHistoryCreationAttributes = Omit<NoteHistoryRecord, 'id' | 'crea
  * Meta data of the note history record
  * Used for presentation of the note history record in web
  */
-export type NoteHistoryMeta = Omit<NoteHistoryRecord, 'content' | 'noteId' | 'tools'> & {
-  /**
-   * Meta data of the user who did changes
-   * Used for note history metadata presentation
-   */
-  user: UserMeta;
-};
+export type NoteHistoryMeta = Omit<NoteHistoryRecord, 'content' | 'noteId' | 'tools'>;
 
 /**
  * Public note history record with note public id instead of note internal id

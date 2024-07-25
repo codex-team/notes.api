@@ -44,9 +44,9 @@ export class NoteHistoryModel extends Model<InferAttributes<NoteHistoryModel>, I
 export default class NoteHistorySequelizeStorage {
   public model: typeof NoteHistoryModel;
 
-  public userModel: typeof UserModel | undefined = undefined;
+  public userModel: typeof UserModel | null = null;
 
-  public noteModel: typeof NoteModel | undefined = undefined;
+  public noteModel: typeof NoteModel | null = null;
 
   private readonly database: Sequelize;
 
@@ -96,7 +96,7 @@ export default class NoteHistorySequelizeStorage {
 
     this.model.belongsTo(this.userModel, {
       foreignKey: 'userId',
-      as: 'user',
+      as: this.userModel.tableName,
     });
   }
 
@@ -109,7 +109,7 @@ export default class NoteHistorySequelizeStorage {
 
     this.model.belongsTo(this.noteModel, {
       foreignKey: 'noteId',
-      as: 'note',
+      as: this.noteModel.tableName,
     });
   }
 
@@ -139,23 +139,10 @@ export default class NoteHistorySequelizeStorage {
    * @returns array of metadata of the history records
    */
   public async getNoteHistoryByNoteId(noteId: NoteHistoryRecord['noteId']): Promise<NoteHistoryMeta[]> {
-    const historyMeta = await this.model.findAll({
+    return await this.model.findAll({
       where: { noteId },
       attributes: ['id', 'userId', 'createdAt'],
-      include: {
-        model: this.userModel,
-        as: 'user',
-        attributes: ['name', 'photo'],
-      },
-      raw: true,
     });
-
-    /**
-     * We need this cast because of using sequelize model.include
-     * Since it returns NoteHistoryModel[], however we included userModel,
-     * without this cast NoteHistoryModel[] and NoteHistoryMeta[] are incompatible
-     */
-    return historyMeta as unknown as NoteHistoryMeta[];
   }
 
   /**

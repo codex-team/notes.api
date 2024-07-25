@@ -84,18 +84,5 @@ export const HistoryMetaSchema = {
       type: 'string',
       format: 'date-time',
     },
-    user: {
-      type: 'object',
-      properties: {
-        name: {
-          description: 'name of the user',
-          type: 'string',
-        },
-        photo: {
-          description: 'photo of the user',
-          type: 'string',
-        },
-      },
-    },
   },
 };

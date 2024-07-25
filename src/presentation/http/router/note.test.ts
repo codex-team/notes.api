@@ -1977,22 +1977,15 @@ describe('Note API', () => {
         expect(response?.json()).toStrictEqual({ message: expectedMessage });
       } else {
         expect(response?.json().noteHistoryMeta).toHaveLength(2);
-        expect(response?.json().noteHistoryMeta[1]).toMatchObject({
+        expect(response?.json().noteHistoryMeta[0]).toMatchObject({
+          id: 1,
           userId: creator.id,
-          user: {
-            name: creator.name,
-            photo: creator.photo,
-          },
         });
 
-        expect(response?.json().noteHistoryMeta[0]).toMatchObject({
+        expect(response?.json().noteHistoryMeta[1]).toMatchObject({
           id: history.id,
           userId: history.userId,
           createdAt: history.createdAt,
-          user: {
-            name: creator.name,
-            photo: creator.photo,
-          },
         });
       }
     });
