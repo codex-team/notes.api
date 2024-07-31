@@ -436,6 +436,7 @@ export default class NoteService {
       content: noteHistoryRecord.content,
       tools: noteHistoryRecord.tools,
       createdAt: noteHistoryRecord.createdAt,
+      user: noteHistoryRecord.user,
     };
 
     return noteHistoryPublic;
