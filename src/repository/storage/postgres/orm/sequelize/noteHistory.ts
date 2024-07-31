@@ -161,7 +161,7 @@ export default class NoteHistorySequelizeStorage {
   /**
    * Get concrete history record by it's id
    * @param id - id of the history record
-   * @returns full history record or null if there is no record with such an id
+   * @returns full history record with user information or null if there is no record with such an id
    */
   public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryView | null> {
     const historyView = await this.model.findOne({

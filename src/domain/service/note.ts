@@ -416,7 +416,7 @@ export default class NoteService {
    * Get concrete history record of the note
    * Used for showing some of the note content versions
    * @param id - id of the note history record
-   * @returns full public note history record or raises domain error if record not found
+   * @returns full public note history record with user information or raises domain error if record not found
    */
   public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryPublic> {
     const noteHistoryRecord = await this.noteHistoryRepository.getHistoryRecordById(id);
