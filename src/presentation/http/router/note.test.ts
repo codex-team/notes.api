@@ -2074,6 +2074,10 @@ describe('Note API', () => {
             createdAt: history.createdAt,
             content: history.content,
             tools: history.tools,
+            user: {
+              name: creator.name,
+              photo: creator.photo,
+            },
           },
         });
       }
