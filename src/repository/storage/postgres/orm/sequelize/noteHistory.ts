@@ -147,6 +147,7 @@ export default class NoteHistorySequelizeStorage {
         as: 'user',
         attributes: ['name', 'photo'],
       },
+      order: [['createdAt', 'DESC']],
     });
 
     /**
