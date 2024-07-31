@@ -1,4 +1,4 @@
-import type { NoteHistoryCreationAttributes, NoteHistoryMeta, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
+import type { NoteHistoryCreationAttributes, NoteHistoryMeta, NoteHistoryRecord, NoteHistoryView } from '@domain/entities/noteHistory.js';
 import type NoteHistoryStorage from '@repository/storage/noteHistory.storage.js';
 
 /**
@@ -36,9 +36,9 @@ export default class NoteHistoryRepository {
    * Get concrete history record by it's id
    * Used for presentation of certain version of note content saved in history
    * @param id - id of the history record
-   * @returns full history record or null if there is no record with such an id
+   * @returns full history record with user information or null if there is no record with such an id
    */
-  public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryRecord | null> {
+  public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryView | null> {
     return await this.storage.getHistoryRecordById(id);
   }
 

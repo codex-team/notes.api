@@ -63,6 +63,11 @@ export type NoteHistoryMeta = Omit<NoteHistoryRecord, 'content' | 'noteId' | 'to
 };
 
 /**
+ * Entity that represents NoteHistoryRecord with user info
+ */
+export type NoteHistoryView = NoteHistoryRecord & { user: UserMeta };
+
+/**
  * Public note history record with note public id instead of note internal id
  */
-export type NoteHistoryPublic = Omit<NoteHistoryRecord, 'noteId'> & { noteId: NotePublicId };
+export type NoteHistoryPublic = Omit<NoteHistoryView, 'noteId'> & { noteId: NotePublicId };

@@ -3,7 +3,7 @@ import { DataTypes, literal, Model } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import { NoteModel } from './note.js';
 import { UserModel } from './user.js';
-import type { NoteHistoryCreationAttributes, NoteHistoryRecord, NoteHistoryMeta } from '@domain/entities/noteHistory.js';
+import type { NoteHistoryCreationAttributes, NoteHistoryRecord, NoteHistoryMeta, NoteHistoryView } from '@domain/entities/noteHistory.js';
 
 /**
  * Note history model instance
@@ -147,6 +147,7 @@ export default class NoteHistorySequelizeStorage {
         as: 'user',
         attributes: ['name', 'photo'],
       },
+      order: [['createdAt', 'DESC']],
     });
 
     /**
@@ -160,10 +161,26 @@ export default class NoteHistorySequelizeStorage {
   /**
    * Get concrete history record by it's id
    * @param id - id of the history record
-   * @returns full history record or null if there is no record with such an id
+   * @returns full history record with user information or null if there is no record with such an id
    */
-  public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryRecord | null> {
-    return await this.model.findByPk(id);
+  public async getHistoryRecordById(id: NoteHistoryRecord['id']): Promise<NoteHistoryView | null> {
+    const historyView = await this.model.findOne({
+      where: {
+        id,
+      },
+      include: {
+        model: this.userModel,
+        as: 'user',
+        attributes: ['name', 'photo'],
+      },
+    });
+
+    /**
+     * We need this cast because of using sequelize model.include
+     * Since it returns NoteHistoryModel[], however we included userModel,
+     * without this cast NoteHistoryModel[] and NoteHistoryView are incompatible
+     */
+    return historyView as unknown as NoteHistoryView;
   }
 
   /**
