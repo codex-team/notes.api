@@ -10,6 +10,7 @@ export const HistotyRecordShema = {
     'userId',
     'createdAt',
     'tools',
+    'user',
   ],
   properties: {
     id: {
@@ -28,6 +29,19 @@ export const HistotyRecordShema = {
       description: 'time, when note history record was created',
       type: 'string',
       format: 'date-time',
+    },
+    user: {
+      type: 'object',
+      properties: {
+        name: {
+          description: 'name of the user',
+          type: 'string',
+        },
+        photo: {
+          description: 'photo of the user',
+          type: 'string',
+        },
+      },
     },
     content: {
       description: 'content of certain version of the note',
@@ -69,6 +83,7 @@ export const HistoryMetaSchema = {
     'id',
     'userId',
     'createdAt',
+    'user',
   ],
   properties: {
     id: {
