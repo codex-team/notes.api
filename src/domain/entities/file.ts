@@ -14,7 +14,12 @@ export enum FileType {
   /**
    * File is a part of note
    */
-  NoteAttachment = 1
+  NoteAttachment = 1,
+
+  /**
+   * Tool cover
+   */
+  EditorToolCover = 2
 }
 
 /**
@@ -40,9 +45,16 @@ export type NoteAttachmentFileLocation = {
 };
 
 /**
+ * Editor tool cover location
+ */
+export type EditorToolCoverFileLocation = {
+  isEditorToolCover: boolean;
+};
+
+/**
  * Possible file location
  */
-export type FileLocation = TestFileLocation | NoteAttachmentFileLocation;
+export type FileLocation = TestFileLocation | NoteAttachmentFileLocation | EditorToolCoverFileLocation;
 
 /**
  * File location type, wich depends on file type
@@ -50,6 +62,7 @@ export type FileLocation = TestFileLocation | NoteAttachmentFileLocation;
 export interface FileLocationByType {
   [FileType.Test]: TestFileLocation;
   [FileType.NoteAttachment]: NoteAttachmentFileLocation;
+  [FileType.EditorToolCover]: EditorToolCoverFileLocation;
 }
 
 /**
