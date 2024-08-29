@@ -9,6 +9,7 @@ import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
 import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
+import type TeamRepository from '@repository/team.repository.js';
 
 /**
  * Note service
@@ -40,6 +41,11 @@ export default class NoteService {
   public noteHistoryRepository: NoteHistoryRepository;
 
   /**
+   * Team repository
+   */
+  public teamRepository: TeamRepository;
+
+  /**
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
@@ -57,13 +63,15 @@ export default class NoteService {
    * @param noteVisitsRepository - note visits repository
    * @param editorToolsRepository - editor tools repositoryn
    * @param noteHistoryRepository - note history repository
+   * @param teamRepository - team note repository
    */
-  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository, noteHistoryRepository: NoteHistoryRepository) {
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository, noteHistoryRepository: NoteHistoryRepository, teamRepository: TeamRepository) {
     this.noteRepository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
     this.noteVisitsRepository = noteVisitsRepository;
     this.editorToolsRepository = editorToolsRepository;
     this.noteHistoryRepository = noteHistoryRepository;
+    this.teamRepository = teamRepository;
   }
 
   /**
@@ -440,5 +448,41 @@ export default class NoteService {
     };
 
     return noteHistoryPublic;
+  }
+
+  /**
+   * Get note parent structure recursively by note id and user id
+   * and check if user has access to the parent note.
+   * @param noteId - id of the note to get parent structure
+   * @param userId - id of the user that is requesting the parent structure
+   * @returns - array of notes that are parent structure of the note
+   */
+  public async getNoteParentStructure(noteId: NoteInternalId, userId: number | null): Promise<Array<{ noteId: Note['publicId']; content: Note['content'] }>> {
+    const noteUserAccess = await this.teamRepository.getTeamMemberByNoteAndUserId(userId as NoteInternalId, noteId);
+
+    if (userId === null || noteUserAccess === null) {
+      const nextNoteId = await this.getParentNoteIdByNoteId(noteId);
+
+      if (nextNoteId === null || userId === null) {
+        return [];
+      }
+
+      return [...await this.getNoteParentStructure(nextNoteId, userId)];
+    }
+
+    const parentNoteId = await this.getParentNoteIdByNoteId(noteId);
+
+    const noteData = await this.getNoteById(noteId);
+
+    const noteObjectInfo = {
+      noteId: noteData.publicId,
+      content: noteData.content,
+    };
+
+    if (parentNoteId === null) {
+      return [noteObjectInfo];
+    }
+
+    return [noteObjectInfo, ...await this.getNoteParentStructure(parentNoteId, userId)].reverse();
   }
 }
