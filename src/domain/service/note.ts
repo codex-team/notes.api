@@ -1,4 +1,4 @@
-import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteInternalId, NoteParentStructure, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
@@ -457,32 +457,7 @@ export default class NoteService {
    * @param userId - id of the user that is requesting the parent structure
    * @returns - array of notes that are parent structure of the note
    */
-  public async getNoteParentStructure(noteId: NoteInternalId, userId: number | null): Promise<Array<{ noteId: Note['publicId']; content: Note['content'] }>> {
-    const noteUserAccess = await this.teamRepository.getTeamMemberByNoteAndUserId(userId as NoteInternalId, noteId);
-
-    if (userId === null || noteUserAccess === null) {
-      const nextNoteId = await this.getParentNoteIdByNoteId(noteId);
-
-      if (nextNoteId === null || userId === null) {
-        return [];
-      }
-
-      return [...await this.getNoteParentStructure(nextNoteId, userId)];
-    }
-
-    const parentNoteId = await this.getParentNoteIdByNoteId(noteId);
-
-    const noteData = await this.getNoteById(noteId);
-
-    const noteObjectInfo = {
-      noteId: noteData.publicId,
-      content: noteData.content,
-    };
-
-    if (parentNoteId === null) {
-      return [noteObjectInfo];
-    }
-
-    return [noteObjectInfo, ...await this.getNoteParentStructure(parentNoteId, userId)].reverse();
+  public async getNoteParentStructure(noteId: NoteInternalId, userId: number): Promise<Array<NoteParentStructure>> {
+    return await this.teamRepository.getAllNotesParents(noteId, userId);
   }
 }

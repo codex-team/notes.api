@@ -6,8 +6,9 @@ import type { Team, TeamMemberCreationAttributes, TeamMember } from '@domain/ent
 import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
-import type { NoteInternalId } from '@domain/entities/note.js';
+import type { NoteInternalId, NoteParentStructure } from '@domain/entities/note.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import type { NoteRelationsModel } from './noteRelations.js';
 
 /**
  * Class representing a teams model in database
@@ -57,6 +58,11 @@ export default class TeamsSequelizeStorage {
    * User model instance
    */
   private userModel: typeof UserModel | null = null;
+
+  /**
+   * Note relation model instance
+   */
+  private noteRelationModel: typeof NoteRelationsModel | null = null;
 
   /**
    * Teams table name
@@ -142,6 +148,14 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
+   * create association with note relations model
+   * @param model - initialized note relations model
+   */
+  public createAssociationWithNoteRelationsModel(model: ModelStatic<NoteRelationsModel>): void {
+    this.noteRelationModel = model;
+  }
+
+  /**
    * Create new team member membership
    * @param data - team membership data
    */
@@ -201,6 +215,57 @@ export default class TeamsSequelizeStorage {
         attributes: ['id', 'name', 'email', 'photo'],
       },
     });
+  }
+
+  /**
+   * Get note parent structure
+   * @param noteId : the ID of the note.
+   * @param userId : The ID of the user.
+   */
+  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NoteParentStructure[]> {
+    if (!this.noteModel || !this.noteRelationModel) {
+      throw new DomainError('Note model or Note relation model not initialized');
+    }
+
+    const parentNotes: NoteParentStructure[] = [];
+    let currentNoteId: NoteInternalId | null = noteId;
+
+    while (currentNoteId != null) {
+      // Check if the user has access to the current note
+      const teamMember = await this.model.findOne({
+        where: {
+          noteId: currentNoteId,
+          userId,
+        },
+      });
+
+      if (teamMember) {
+        // If the user does not have access, add the note to the array
+        const note = await this.noteModel.findOne({
+          where: { id: currentNoteId },
+        });
+
+        if (note) {
+          parentNotes.push({
+            noteId: note.publicId,
+            content: note.content,
+          });
+        }
+      }
+
+      // Retrieve the parent note
+      const noteRelation: NoteRelationsModel | null = await this.noteRelationModel.findOne({
+        where: { noteId: currentNoteId },
+      });
+
+      if (noteRelation != null) {
+        currentNoteId = noteRelation.parentId;
+      } else {
+        currentNoteId = null;
+      }
+    }
+
+    return parentNotes.reverse();
   }
 
   /**
