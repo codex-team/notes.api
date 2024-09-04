@@ -233,9 +233,12 @@ export default class TeamsSequelizeStorage {
 
     const parentNotes: NoteParentContent[] = [];
     let currentNoteId: NoteInternalId | null = noteId;
+    /**
+     * Store notes that user can not access, to check the inherited team if has access
+     */
+    let storeUnaccessibleNote: NoteParentContent[] = [];
 
     while (currentNoteId != null) {
-      // Check if the user has access to the current note
       const teamMember = await this.model.findOne({
         where: {
           noteId: currentNoteId,
@@ -249,10 +252,26 @@ export default class TeamsSequelizeStorage {
       });
 
       if (teamMember && teamMember.notes !== undefined && teamMember.notes !== null) {
+        if (storeUnaccessibleNote.length > 0) {
+          parentNotes.push(...storeUnaccessibleNote);
+          storeUnaccessibleNote = [];
+        }
         parentNotes.push({
           noteId: teamMember.notes.publicId,
           content: teamMember.notes.content,
         });
+      } else {
+        const note = await this.noteModel.findOne({
+          where: { id: currentNoteId },
+          attributes: ['publicId', 'content'],
+        });
+
+        if (note !== null) {
+          storeUnaccessibleNote.push({
+            noteId: note.publicId,
+            content: note.content,
+          });
+        }
       }
 
       // Retrieve the parent note

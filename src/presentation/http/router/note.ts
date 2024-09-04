@@ -172,10 +172,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = memberRole === MemberRole.Write;
 
-    const noteParentContent = await noteService.getNoteParentStructure(noteId, userId!);
-
-    console.log('noteParentContent', noteParentContent);
-
     return reply.send({
       note: notePublic,
       parentNote: parentNote,
