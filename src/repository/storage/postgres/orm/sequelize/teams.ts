@@ -6,8 +6,7 @@ import type { Team, TeamMemberCreationAttributes, TeamMember } from '@domain/ent
 import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
-import type { NoteInternalId, NoteParentStructure } from '@domain/entities/note.js';
-import { DomainError } from '@domain/entities/DomainError.js';
+import type { NoteInternalId, NoteParentContent } from '@domain/entities/note.js';
 import type { NoteRelationsModel } from './noteRelations.js';
 
 /**
@@ -33,6 +32,11 @@ export class TeamsModel extends Model<InferAttributes<TeamsModel>, InferCreation
    * Team member role, show what user can do with note
    */
   public declare role: MemberRole;
+
+  /**
+   * Note relation content
+   */
+  public declare notes?: NoteModel | null;
 }
 
 /**
@@ -202,7 +206,7 @@ export default class TeamsSequelizeStorage {
    */
   public async getTeamMembersWithUserInfoByNoteId(noteId: NoteInternalId): Promise<Team> {
     if (!this.userModel) {
-      throw new DomainError('User model not initialized');
+      throw new Error('TeamStorage: User model not defined');
     }
 
     return await this.model.findAll({
@@ -219,15 +223,15 @@ export default class TeamsSequelizeStorage {
 
   /**
    * Get note parent structure
-   * @param noteId : the ID of the note.
-   * @param userId : The ID of the user.
+   * @param noteId - the ID of the note.
+   * @param userId - the ID of the user.
    */
-  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NoteParentStructure[]> {
+  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NoteParentContent[]> {
     if (!this.noteModel || !this.noteRelationModel) {
-      throw new DomainError('Note model or Note relation model not initialized');
+      throw new Error(`${this.noteModel !== null ? 'TeamStorage: Note relation model is not defined' : 'TeamStorage: Note model is not defined'}`);
     }
 
-    const parentNotes: NoteParentStructure[] = [];
+    const parentNotes: NoteParentContent[] = [];
     let currentNoteId: NoteInternalId | null = noteId;
 
     while (currentNoteId != null) {
@@ -237,20 +241,18 @@ export default class TeamsSequelizeStorage {
           noteId: currentNoteId,
           userId,
         },
+        include: {
+          model: this.noteModel,
+          as: this.noteModel.tableName,
+          required: true,
+        },
       });
 
-      if (teamMember) {
-        // If the user does not have access, add the note to the array
-        const note = await this.noteModel.findOne({
-          where: { id: currentNoteId },
+      if (teamMember && teamMember.notes !== undefined && teamMember.notes !== null) {
+        parentNotes.push({
+          noteId: teamMember.notes.publicId,
+          content: teamMember.notes.content,
         });
-
-        if (note) {
-          parentNotes.push({
-            noteId: note.publicId,
-            content: note.content,
-          });
-        }
       }
 
       // Retrieve the parent note

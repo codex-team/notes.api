@@ -5,7 +5,6 @@ import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from 
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
-import { DomainError } from '@domain/entities/DomainError.js';
 import type { NoteHistoryModel } from './noteHistory.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -233,11 +232,11 @@ export default class NoteSequelizeStorage {
    */
   public async getNoteListByUserId(userId: number, offset: number, limit: number): Promise<Note[]> {
     if (this.visitsModel === null) {
-      throw new DomainError('NoteVisit model should be defined');
+      throw new Error('NoteStorage: NoteVisit model should be defined');
     }
 
     if (!this.settingsModel) {
-      throw new Error('Note settings model not initialized');
+      throw new Error('NoteStorage: Note settings model not initialized');
     }
 
     const reply = await this.model.findAll({
@@ -293,7 +292,7 @@ export default class NoteSequelizeStorage {
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
     if (!this.settingsModel) {
-      throw new Error('Note settings model not initialized');
+      throw new Error('NoteStorage: Note settings model not initialized');
     }
 
     /**

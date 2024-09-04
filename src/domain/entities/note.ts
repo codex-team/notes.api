@@ -84,9 +84,9 @@ export interface Note {
 export type NoteCreationAttributes = Pick<Note, 'publicId' | 'content' | 'creatorId' | 'tools'>;
 
 /**
- * The return type for note parent structure
+ * Represents the content of a parent note.
  */
-export type NoteParentStructure = {
+export type NoteParentContent = {
   /**
    * Note public id
    */
