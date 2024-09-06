@@ -6,8 +6,9 @@ import type { Team, TeamMemberCreationAttributes, TeamMember } from '@domain/ent
 import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
-import type { NoteInternalId, NoteParentContent } from '@domain/entities/note.js';
+import type { NoteInternalId, NoteParentsStructure } from '@domain/entities/note.js';
 import type { NoteRelationsModel } from './noteRelations.js';
+import { isEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Class representing a teams model in database
@@ -226,17 +227,17 @@ export default class TeamsSequelizeStorage {
    * @param noteId - the ID of the note.
    * @param userId - the ID of the user.
    */
-  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NoteParentContent[]> {
+  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NoteParentsStructure> {
     if (!this.noteModel || !this.noteRelationModel) {
       throw new Error(`${this.noteModel !== null ? 'TeamStorage: Note relation model is not defined' : 'TeamStorage: Note model is not defined'}`);
     }
 
-    const parentNotes: NoteParentContent[] = [];
+    const parentNotes: NoteParentsStructure = [];
     let currentNoteId: NoteInternalId | null = noteId;
     /**
      * Store notes that user can not access, to check the inherited team if has access
      */
-    let storeUnaccessibleNote: NoteParentContent[] = [];
+    let storeUnaccessibleNote: NoteParentsStructure = [];
 
     while (currentNoteId != null) {
       const teamMember = await this.model.findOne({
@@ -248,10 +249,11 @@ export default class TeamsSequelizeStorage {
           model: this.noteModel,
           as: this.noteModel.tableName,
           required: true,
+          attributes: ['publicId', 'content'],
         },
       });
 
-      if (teamMember && teamMember.notes !== undefined && teamMember.notes !== null) {
+      if (teamMember && !isEmpty(teamMember.notes)) {
         if (storeUnaccessibleNote.length > 0) {
           parentNotes.push(...storeUnaccessibleNote);
           storeUnaccessibleNote = [];
@@ -260,7 +262,7 @@ export default class TeamsSequelizeStorage {
           noteId: teamMember.notes.publicId,
           content: teamMember.notes.content,
         });
-      } else {
+      } else if (teamMember === null) {
         const note = await this.noteModel.findOne({
           where: { id: currentNoteId },
           attributes: ['publicId', 'content'],
