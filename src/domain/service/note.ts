@@ -1,4 +1,4 @@
-import type { Note, NoteInternalId, NoteParentContent, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteInternalId, NoteParentsStructure, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
@@ -457,7 +457,7 @@ export default class NoteService {
    * @param userId - id of the user that is requesting the parent structure
    * @returns - array of notes that are parent structure of the note
    */
-  public async getNoteParentStructure(noteId: NoteInternalId, userId: number): Promise<Array<NoteParentContent>> {
+  public async getNoteParentStructure(noteId: NoteInternalId, userId: number): Promise<NoteParentsStructure> {
     return await this.teamRepository.getAllNotesParents(noteId, userId);
   }
 }
