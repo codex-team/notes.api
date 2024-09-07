@@ -2,7 +2,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
-import type { Note, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteParentsStructure, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
@@ -85,6 +85,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         canEdit: boolean;
       };
       tools: EditorTool[];
+      parentStructure: NoteParentsStructure;
     } | ErrorResponse;
   }>('/:notePublicId', {
     config: {
@@ -172,11 +173,14 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = memberRole === MemberRole.Write;
 
+    const noteParentStructure = await noteService.getNoteParentStructure(noteId, userId!);
+
     return reply.send({
       note: notePublic,
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
       tools: noteTools,
+      parentStructure: noteParentStructure,
     });
   });
 
