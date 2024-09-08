@@ -518,6 +518,133 @@ describe('Note API', () => {
 
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
+
+    test('Returns one object of note parent structure by note public id with 200 status', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      /** Create test note - a parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note - a child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      /** Create test note relation */
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: childNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parentStructure: [
+          {
+            noteId: parentNote.publicId,
+            content: parentNote.content,
+          },
+        ],
+      });
+    });
+
+    test('Returns multiple objects of note parent structure by note public id with 200 status', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      /** Create test note - a parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note - a child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note - a grandchild note */
+      const grandchildNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: grandchildNote.id,
+        isPublic: true,
+      });
+
+      /** Create test note relation */
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: childNote.id,
+      });
+
+      await global.db.insertNoteRelation({
+        parentId: childNote.id,
+        noteId: grandchildNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note/${grandchildNote.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parentStructure: [
+          {
+            noteId: childNote.publicId,
+            content: childNote.content,
+          },
+          {
+            noteId: parentNote.publicId,
+            content: parentNote.content,
+          },
+        ],
+      });
+    });
+
+    test('Returns empty array of note parent structure by note public id with 200 status', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      /** Create test note */
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        url: `/note/${note.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parentStructure: [],
+      });
+    });
   });
 
   describe('PATCH note/:notePublicId ', () => {
