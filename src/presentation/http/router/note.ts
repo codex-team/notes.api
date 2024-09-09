@@ -124,6 +124,20 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
                 $ref: 'EditorToolSchema',
               },
             },
+            parentStructure: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  noteId: {
+                    $ref: 'NoteSchema#/properties/id',
+                  },
+                  content: {
+                    $ref: 'NoteSchema#/properties/content',
+                  },
+                },
+              },
+            },
           },
         },
       },

@@ -519,9 +519,12 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    test('Returns one object of note parent structure by note public id with 200 status', async () => {
+    test('Returns two objects of note parent structure by note public id with 200 status', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
+
+      /** Create acces token for the user */
+      const accessToken = global.auth(user.id);
 
       /** Create test note - a parent note */
       const parentNote = await global.db.insertNote({
@@ -547,6 +550,9 @@ describe('Note API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
         url: `/note/${childNote.publicId}`,
       });
 
@@ -558,6 +564,10 @@ describe('Note API', () => {
             noteId: parentNote.publicId,
             content: parentNote.content,
           },
+          {
+            noteId: childNote.publicId,
+            content: childNote.content,
+          },
         ],
       });
     });
@@ -565,6 +575,9 @@ describe('Note API', () => {
     test('Returns multiple objects of note parent structure by note public id with 200 status', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
+
+      /** Create acces token for the user */
+      const accessToken = global.auth(user.id);
 
       /** Create test note - a parent note */
       const parentNote = await global.db.insertNote({
@@ -600,6 +613,9 @@ describe('Note API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
         url: `/note/${grandchildNote.publicId}`,
       });
 
@@ -608,21 +624,27 @@ describe('Note API', () => {
       expect(response?.json()).toMatchObject({
         parentStructure: [
           {
+            noteId: parentNote.publicId,
+            content: parentNote.content,
+          },
+          {
             noteId: childNote.publicId,
             content: childNote.content,
           },
           {
-            noteId: parentNote.publicId,
-            content: parentNote.content,
+            noteId: grandchildNote.publicId,
+            content: grandchildNote.content,
           },
         ],
       });
     });
 
-    test('Returns empty array of note parent structure by note public id with 200 status', async () => {
+    test('Returns one object in array of note parent structure by note public id with 200 status', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
+      /** Create acces token for the user */
+      const accessToken = global.auth(user.id);
       /** Create test note */
       const note = await global.db.insertNote({
         creatorId: user.id,
@@ -636,13 +658,21 @@ describe('Note API', () => {
 
       const response = await global.api?.fakeRequest({
         method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
         url: `/note/${note.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [],
+        parentStructure: [
+          {
+            noteId: note.publicId,
+            content: note.content,
+          },
+        ],
       });
     });
   });
