@@ -6,6 +6,10 @@ import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
+import { NoteRelationsModel } from './noteRelations.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
+import { NoteList } from '@domain/entities/noteList.js';
+import { TeamsModel } from './teams.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -74,6 +78,10 @@ export default class NoteSequelizeStorage {
   public visitsModel: typeof NoteVisitsModel | null = null;
 
   public historyModel: typeof NoteHistoryModel | null = null;
+
+  public noteRelationModel: typeof NoteRelationsModel | null = null;
+
+  public teamModel: typeof TeamsModel | null = null;
 
   /**
    * Database instance
@@ -154,6 +162,22 @@ export default class NoteSequelizeStorage {
       as: 'noteVisits',
     });
   };
+
+  public createAssociationWithNoteRelationModel(model: ModelStatic<NoteRelationsModel>): void {
+
+    /**
+     * Create association with note relations
+     */
+    this.noteRelationModel = model;
+  }
+
+  public createAssociationWithTeamsModel(model: ModelStatic<TeamsModel>): void {
+
+    /**
+     * Create association with teams
+    */
+    this.teamModel = model;
+  }
 
   /**
    * Insert note to database
@@ -323,4 +347,68 @@ export default class NoteSequelizeStorage {
       },
     });
   };
+
+
+  /**
+   * Get all parent notes of a note that a user has access to,
+   * by checking the team access.
+   * @param noteId - the ID of the note.
+   * @param userId - the ID of the user.
+   */
+  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NoteList> {
+    if (!this.teamModel || !this.noteRelationModel) {
+      throw new Error(`${this.model !== null ? 'TeamStorage: Note relation model is not defined' : 'TeamStorage: Note model is not defined'}`);
+    }
+
+    const parentNotes: NoteList = { items: [] };
+    let currentNoteId: NoteInternalId | null = noteId;
+    /**
+     * Store notes that user can not access, to check the inherited team if has access
+     */
+    let storeUnaccessibleNote: Note[] = [];
+
+    while (currentNoteId != null) {
+      const teamMember = await this.teamModel.findOne({
+        where: {
+          noteId: currentNoteId,
+          userId,
+        },
+        include: {
+          model: this.model,
+          as: this.model.tableName,
+          required: true,
+        },
+      });
+
+      if (teamMember && notEmpty(teamMember.notes)) {
+        if (storeUnaccessibleNote.length > 0) {
+          parentNotes.items.push(...storeUnaccessibleNote);
+          storeUnaccessibleNote = [];
+        }
+        parentNotes.items.push(teamMember.notes);
+      } else if (teamMember === null) {
+        const note = await this.model.findOne({
+          where: { id: currentNoteId },
+        });
+
+        if (note !== null) {
+          storeUnaccessibleNote.push(note);
+        }
+      }
+
+      // Retrieve the parent note
+      const noteRelation: NoteRelationsModel | null = await this.noteRelationModel.findOne({
+        where: { noteId: currentNoteId },
+      });
+
+      if (noteRelation != null) {
+        currentNoteId = noteRelation.parentId;
+      } else {
+        currentNoteId = null;
+      }
+    }
+
+    parentNotes.items.reverse();
+    return parentNotes;
+  }
 }

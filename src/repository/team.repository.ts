@@ -1,6 +1,6 @@
 import type TeamStorage from '@repository/storage/team.storage.js';
 import type { Team, TeamMember, TeamMemberCreationAttributes, MemberRole } from '@domain/entities/team.js';
-import type { NoteInternalId, NoteParentsStructure } from '@domain/entities/note.js';
+import type { NoteInternalId } from '@domain/entities/note.js';
 import type User from '@domain/entities/user.js';
 
 /**
@@ -56,16 +56,6 @@ export default class TeamRepository {
   public async getTeamMembersByNoteId(noteId: NoteInternalId): Promise<Team> {
     return await this.storage.getTeamMembersWithUserInfoByNoteId(noteId);
   };
-
-  /**
-   * Get all notes parents based on note id and user id, by checking team access
-   * @param noteId : note id to get all its parents
-   * @param userId : user id to check access
-   * @returns an array of note parents objects containing public id and content
-   */
-  public async getAllNotesParents(noteId: NoteInternalId, userId: number): Promise<NoteParentsStructure> {
-    return await this.storage.getAllNoteParents(noteId, userId);
-  }
 
   /**
    * Remove team member by id

@@ -2,7 +2,7 @@ import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
-import type { Note, NoteParentsStructure, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
@@ -12,6 +12,7 @@ import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
+import { NoteList } from '@domain/entities/noteList.js';
 
 /**
  * Interface for the note router.
@@ -85,7 +86,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         canEdit: boolean;
       };
       tools: EditorTool[];
-      parentStructure: NoteParentsStructure;
+      parents: NoteList;
     } | ErrorResponse;
   }>('/:notePublicId', {
     config: {
@@ -124,16 +125,13 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
                 $ref: 'EditorToolSchema',
               },
             },
-            parentStructure: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  noteId: {
-                    $ref: 'NoteSchema#/properties/id',
-                  },
-                  content: {
-                    $ref: 'NoteSchema#/properties/content',
+            parents: {
+              type: 'object',
+              properties: {
+                items: {
+                  type: 'array',
+                  items: {
+                    $ref: 'NoteSchema',
                   },
                 },
               },
@@ -194,7 +192,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
       tools: noteTools,
-      parentStructure: noteParentStructure,
+      parents: noteParentStructure,
     });
   });
 

@@ -519,7 +519,7 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    test('Returns two objects of note parent structure by note public id with 200 status', async () => {
+    test('Returns two parents in case of relation between child and parent notes with 200 status', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -559,20 +559,22 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
-          {
-            noteId: parentNote.publicId,
-            content: parentNote.content,
-          },
-          {
-            noteId: childNote.publicId,
-            content: childNote.content,
-          },
-        ],
+        parents: {
+          items: [
+            {
+              id: parentNote.publicId,
+              content: parentNote.content,
+            },
+            {
+              id: childNote.publicId,
+              content: childNote.content,
+            },
+          ],
+        },
       });
     });
 
-    test('Returns multiple objects of note parent structure by note public id with 200 status', async () => {
+    test('Returns multiple parents in case of multiple notes relations with user presence in team in each note with 200 status', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -622,24 +624,26 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
-          {
-            noteId: parentNote.publicId,
-            content: parentNote.content,
-          },
-          {
-            noteId: childNote.publicId,
-            content: childNote.content,
-          },
-          {
-            noteId: grandchildNote.publicId,
-            content: grandchildNote.content,
-          },
-        ],
+        parents: {
+          items: [
+            {
+              id: parentNote.publicId,
+              content: parentNote.content
+            },
+            {
+              id: childNote.publicId,
+              content: childNote.content
+            },
+            {
+              id: grandchildNote.publicId,
+              content: grandchildNote.content
+            },
+          ],
+        }
       });
     });
 
-    test('Returns one object in array of note parent structure by note public id with 200 status', async () => {
+    test('Returns one parent in case where there is no note relation with 200 status', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -667,12 +671,14 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
-          {
-            noteId: note.publicId,
-            content: note.content,
-          },
-        ],
+        parents: {
+          items: [
+            {
+              id: note.publicId,
+              content: note.content,
+            },
+          ],
+        }
       });
     });
   });

@@ -1,4 +1,5 @@
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import { NoteList } from '@domain/entities/noteList.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 
 /**
@@ -80,5 +81,15 @@ export default class NoteRepository {
    */
   public async getNoteListByUserId(id: number, offset: number, limit: number): Promise<Note[]> {
     return await this.storage.getNoteListByUserId(id, offset, limit);
+  }
+
+  /**
+   * Get all notes parents based on note id and user id, by checking team access
+   * @param noteId : note id to get all its parents
+   * @param userId : user id to check access
+   * @returns an array of note parents objects containing public id and content
+   */
+  public async getAllNotesParents(noteId: NoteInternalId, userId: number): Promise<NoteList> {
+    return await this.storage.getAllNoteParents(noteId, userId);
   }
 }

@@ -6,9 +6,7 @@ import type { Team, TeamMemberCreationAttributes, TeamMember } from '@domain/ent
 import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
-import type { NoteInternalId, NoteParentsStructure } from '@domain/entities/note.js';
-import type { NoteRelationsModel } from './noteRelations.js';
-import { isEmpty } from '@infrastructure/utils/empty.js';
+import type { NoteInternalId } from '@domain/entities/note.js';
 
 /**
  * Class representing a teams model in database
@@ -63,11 +61,6 @@ export default class TeamsSequelizeStorage {
    * User model instance
    */
   private userModel: typeof UserModel | null = null;
-
-  /**
-   * Note relation model instance
-   */
-  private noteRelationModel: typeof NoteRelationsModel | null = null;
 
   /**
    * Teams table name
@@ -153,14 +146,6 @@ export default class TeamsSequelizeStorage {
   }
 
   /**
-   * create association with note relations model
-   * @param model - initialized note relations model
-   */
-  public createAssociationWithNoteRelationsModel(model: ModelStatic<NoteRelationsModel>): void {
-    this.noteRelationModel = model;
-  }
-
-  /**
    * Create new team member membership
    * @param data - team membership data
    */
@@ -220,75 +205,6 @@ export default class TeamsSequelizeStorage {
         attributes: ['id', 'name', 'email', 'photo'],
       },
     });
-  }
-
-  /**
-   * Get note parent structure
-   * @param noteId - the ID of the note.
-   * @param userId - the ID of the user.
-   */
-  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NoteParentsStructure> {
-    if (!this.noteModel || !this.noteRelationModel) {
-      throw new Error(`${this.noteModel !== null ? 'TeamStorage: Note relation model is not defined' : 'TeamStorage: Note model is not defined'}`);
-    }
-
-    const parentNotes: NoteParentsStructure = [];
-    let currentNoteId: NoteInternalId | null = noteId;
-    /**
-     * Store notes that user can not access, to check the inherited team if has access
-     */
-    let storeUnaccessibleNote: NoteParentsStructure = [];
-
-    while (currentNoteId != null) {
-      const teamMember = await this.model.findOne({
-        where: {
-          noteId: currentNoteId,
-          userId,
-        },
-        include: {
-          model: this.noteModel,
-          as: this.noteModel.tableName,
-          required: true,
-          attributes: ['publicId', 'content'],
-        },
-      });
-
-      if (teamMember && !isEmpty(teamMember.notes)) {
-        if (storeUnaccessibleNote.length > 0) {
-          parentNotes.push(...storeUnaccessibleNote);
-          storeUnaccessibleNote = [];
-        }
-        parentNotes.push({
-          noteId: teamMember.notes.publicId,
-          content: teamMember.notes.content,
-        });
-      } else if (teamMember === null) {
-        const note = await this.noteModel.findOne({
-          where: { id: currentNoteId },
-          attributes: ['publicId', 'content'],
-        });
-
-        if (note !== null) {
-          storeUnaccessibleNote.push({
-            noteId: note.publicId,
-            content: note.content,
-          });
-        }
-      }
-
-      // Retrieve the parent note
-      const noteRelation: NoteRelationsModel | null = await this.noteRelationModel.findOne({
-        where: { noteId: currentNoteId },
-      });
-
-      if (noteRelation != null) {
-        currentNoteId = noteRelation.parentId;
-      } else {
-        currentNoteId = null;
-      }
-    }
-
-    return parentNotes.reverse();
   }
 
   /**

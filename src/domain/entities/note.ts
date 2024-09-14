@@ -82,25 +82,3 @@ export interface Note {
  * Part of note entity used to create new note
  */
 export type NoteCreationAttributes = Pick<Note, 'publicId' | 'content' | 'creatorId' | 'tools'>;
-
-/**
- * This type represents only note's content
- * Used for work with just note's content in web part
- * This type would be used as a part of the structure, that represents all parent notes of the current note
- */
-export type NoteIdAndContent = {
-  /**
-   * Note public id
-   */
-  noteId: Note['publicId'];
-
-  /**
-   * Note content
-   */
-  content: Note['content'];
-};
-
-/**
- * This type represents the structure, that represents all parent notes of the current note
- */
-export type NoteParentsStructure = NoteIdAndContent[];
