@@ -12,7 +12,7 @@ import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
-import { NoteList } from '@domain/entities/noteList.js';
+import type { NoteList } from '@domain/entities/noteList.js';
 
 /**
  * Interface for the note router.

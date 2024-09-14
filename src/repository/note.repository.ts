@@ -1,5 +1,5 @@
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
-import { NoteList } from '@domain/entities/noteList.js';
+import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 
 /**

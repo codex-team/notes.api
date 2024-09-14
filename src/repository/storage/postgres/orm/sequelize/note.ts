@@ -6,10 +6,10 @@ import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
-import { NoteRelationsModel } from './noteRelations.js';
+import type { NoteRelationsModel } from './noteRelations.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
-import { NoteList } from '@domain/entities/noteList.js';
-import { TeamsModel } from './teams.js';
+import type { NoteList } from '@domain/entities/noteList.js';
+import type { TeamsModel } from './teams.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -164,7 +164,6 @@ export default class NoteSequelizeStorage {
   };
 
   public createAssociationWithNoteRelationModel(model: ModelStatic<NoteRelationsModel>): void {
-
     /**
      * Create association with note relations
      */
@@ -172,10 +171,9 @@ export default class NoteSequelizeStorage {
   }
 
   public createAssociationWithTeamsModel(model: ModelStatic<TeamsModel>): void {
-
     /**
      * Create association with teams
-    */
+     */
     this.teamModel = model;
   }
 
@@ -348,7 +346,6 @@ export default class NoteSequelizeStorage {
     });
   };
 
-
   /**
    * Get all parent notes of a note that a user has access to,
    * by checking the team access.
@@ -409,6 +406,7 @@ export default class NoteSequelizeStorage {
     }
 
     parentNotes.items.reverse();
+
     return parentNotes;
   }
 }

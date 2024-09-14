@@ -628,18 +628,18 @@ describe('Note API', () => {
           items: [
             {
               id: parentNote.publicId,
-              content: parentNote.content
+              content: parentNote.content,
             },
             {
               id: childNote.publicId,
-              content: childNote.content
+              content: childNote.content,
             },
             {
               id: grandchildNote.publicId,
-              content: grandchildNote.content
+              content: grandchildNote.content,
             },
           ],
-        }
+        },
       });
     });
 
@@ -678,7 +678,7 @@ describe('Note API', () => {
               content: note.content,
             },
           ],
-        }
+        },
       });
     });
   });
