@@ -559,18 +559,16 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parents: {
-          items: [
-            {
-              id: parentNote.publicId,
-              content: parentNote.content,
-            },
-            {
-              id: childNote.publicId,
-              content: childNote.content,
-            },
-          ],
-        },
+        parents: [
+          {
+            id: parentNote.publicId,
+            content: parentNote.content,
+          },
+          {
+            id: childNote.publicId,
+            content: childNote.content,
+          },
+        ],
       });
     });
 
@@ -624,22 +622,20 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parents: {
-          items: [
-            {
-              id: parentNote.publicId,
-              content: parentNote.content,
-            },
-            {
-              id: childNote.publicId,
-              content: childNote.content,
-            },
-            {
-              id: grandchildNote.publicId,
-              content: grandchildNote.content,
-            },
-          ],
-        },
+        parents: [
+          {
+            id: parentNote.publicId,
+            content: parentNote.content,
+          },
+          {
+            id: childNote.publicId,
+            content: childNote.content,
+          },
+          {
+            id: grandchildNote.publicId,
+            content: grandchildNote.content,
+          },
+        ],
       });
     });
 
@@ -671,14 +667,75 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parents: {
-          items: [
-            {
-              id: note.publicId,
-              content: note.content,
-            },
-          ],
+        parents: [
+          {
+            id: note.publicId,
+            content: note.content,
+          },
+        ],
+      });
+    });
+
+    test('Returns mutiple parents in case where user is not in the team of a note with 200 status', async () => {
+      /** Create test user */
+      const user1 = await global.db.insertUser();
+      const user2 = await global.db.insertUser();
+
+      /** Create acces token for the user */
+      const accessToken = global.auth(user1.id);
+      /** Create test note */
+      const grandChildNote = await global.db.insertNote({
+        creatorId: user1.id,
+      });
+
+      const childNote = await global.db.insertNote({
+        creatorId: user2.id,
+      });
+
+      const parentNote = await global.db.insertNote({
+        creatorId: user1.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: grandChildNote.id,
+        isPublic: true,
+      });
+
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: childNote.id,
+      });
+
+      await global.db.insertNoteRelation({
+        parentId: childNote.id,
+        noteId: grandChildNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
         },
+        url: `/note/${grandChildNote.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parents: [
+          {
+            id: parentNote.publicId,
+            content: parentNote.content,
+          },
+          {
+            id: childNote.publicId,
+            content: childNote.content,
+          },
+          {
+            id: grandChildNote.publicId,
+            content: grandChildNote.content,
+          },
+        ],
       });
     });
   });

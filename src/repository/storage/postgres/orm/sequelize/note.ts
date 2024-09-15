@@ -8,8 +8,8 @@ import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
 import type { NoteRelationsModel } from './noteRelations.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
-import type { NoteList } from '@domain/entities/noteList.js';
 import type { TeamsModel } from './teams.js';
+import type { NotePublic } from '@domain/entities/notePublic.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -352,12 +352,12 @@ export default class NoteSequelizeStorage {
    * @param noteId - the ID of the note.
    * @param userId - the ID of the user.
    */
-  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NoteList> {
+  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NotePublic[]> {
     if (!this.teamModel || !this.noteRelationModel) {
       throw new Error(`${this.model !== null ? 'TeamStorage: Note relation model is not defined' : 'TeamStorage: Note model is not defined'}`);
     }
 
-    const parentNotes: NoteList = { items: [] };
+    const parentNotes: NotePublic[] = [];
     let currentNoteId: NoteInternalId | null = noteId;
     /**
      * Store notes that user can not access, to check the inherited team if has access
@@ -379,10 +379,22 @@ export default class NoteSequelizeStorage {
 
       if (teamMember && notEmpty(teamMember.notes)) {
         if (storeUnaccessibleNote.length > 0) {
-          parentNotes.items.push(...storeUnaccessibleNote);
+          parentNotes.push(...storeUnaccessibleNote.map(note => ({
+            id: note.publicId,
+            content: note.content,
+            updatedAt: note.updatedAt,
+            createdAt: note.createdAt,
+            creatorId: note.creatorId,
+          })));
           storeUnaccessibleNote = [];
         }
-        parentNotes.items.push(teamMember.notes);
+        parentNotes.push({
+          id: teamMember.notes.publicId,
+          content: teamMember.notes.content,
+          updatedAt: teamMember.notes.updatedAt,
+          createdAt: teamMember.notes.createdAt,
+          creatorId: teamMember.notes.creatorId,
+        });
       } else if (teamMember === null) {
         const note = await this.model.findOne({
           where: { id: currentNoteId },
@@ -405,7 +417,7 @@ export default class NoteSequelizeStorage {
       }
     }
 
-    parentNotes.items.reverse();
+    parentNotes.reverse();
 
     return parentNotes;
   }

@@ -12,7 +12,6 @@ import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
-import type { NoteList } from '@domain/entities/noteList.js';
 
 /**
  * Interface for the note router.
@@ -86,7 +85,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         canEdit: boolean;
       };
       tools: EditorTool[];
-      parents: NoteList;
+      parents: NotePublic[];
     } | ErrorResponse;
   }>('/:notePublicId', {
     config: {
@@ -126,14 +125,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
               },
             },
             parents: {
-              type: 'object',
-              properties: {
-                items: {
-                  type: 'array',
-                  items: {
-                    $ref: 'NoteSchema',
-                  },
-                },
+              type: 'array',
+              items: {
+                $ref: 'NoteSchema',
               },
             },
           },

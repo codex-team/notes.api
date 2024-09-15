@@ -10,6 +10,7 @@ import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
 import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
 import type TeamRepository from '@repository/team.repository.js';
+import type { NotePublic } from '@domain/entities/notePublic.js';
 
 /**
  * Note service
@@ -457,7 +458,7 @@ export default class NoteService {
    * @param userId - id of the user that is requesting the parent structure
    * @returns - array of notes that are parent structure of the note
    */
-  public async getNoteParentStructure(noteId: NoteInternalId, userId: number): Promise<NoteList> {
+  public async getNoteParentStructure(noteId: NoteInternalId, userId: number): Promise<NotePublic[]> {
     return await this.noteRepository.getAllNotesParents(noteId, userId);
   }
 }
