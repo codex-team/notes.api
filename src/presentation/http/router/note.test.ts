@@ -683,24 +683,97 @@ describe('Note API', () => {
 
       /** Create acces token for the user */
       const accessToken = global.auth(user1.id);
-      /** Create test note */
+
+      /** Create test base note */
       const grandChildNote = await global.db.insertNote({
         creatorId: user1.id,
       });
 
+      /** Create base note parent */
       const childNote = await global.db.insertNote({
         creatorId: user2.id,
       });
 
+      /** Create base note grand parent */
       const parentNote = await global.db.insertNote({
         creatorId: user1.id,
       });
 
+      /** Create base note settings */
       await global.db.insertNoteSetting({
         noteId: grandChildNote.id,
         isPublic: true,
       });
 
+      /** Create note relations */
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: childNote.id,
+      });
+
+      await global.db.insertNoteRelation({
+        parentId: childNote.id,
+        noteId: grandChildNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${grandChildNote.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parents: [
+          {
+            id: parentNote.publicId,
+            content: parentNote.content,
+          },
+          {
+            id: childNote.publicId,
+            content: childNote.content,
+          },
+          {
+            id: grandChildNote.publicId,
+            content: grandChildNote.content,
+          },
+        ],
+      });
+    });
+
+    test('Returns multiple parents in case when note is not public with 200 status', async () => {
+      /** Create test user */
+      const user1 = await global.db.insertUser();
+      const user2 = await global.db.insertUser();
+
+      /** Create acces token for the user */
+      const accessToken = global.auth(user1.id);
+
+      /** Create test base note */
+      const grandChildNote = await global.db.insertNote({
+        creatorId: user1.id,
+      });
+
+      /** Create base note parent */
+      const childNote = await global.db.insertNote({
+        creatorId: user2.id,
+      });
+
+      /** Create base note grand parent */
+      const parentNote = await global.db.insertNote({
+        creatorId: user1.id,
+      });
+
+      /** Create base note settings */
+      await global.db.insertNoteSetting({
+        noteId: grandChildNote.id,
+        isPublic: false,
+      });
+
+      /** Create note relations */
       await global.db.insertNoteRelation({
         parentId: parentNote.id,
         noteId: childNote.id,
