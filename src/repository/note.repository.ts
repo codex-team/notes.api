@@ -89,7 +89,7 @@ export default class NoteRepository {
    * @param userId : user id to check access
    * @returns an array of note parents objects containing public id and content
    */
-  public async getAllNotesParents(noteId: NoteInternalId, userId: number): Promise<NotePublic[]> {
+  public async getNoteParents(noteId: NoteInternalId, userId: number): Promise<NotePublic[]> {
     return await this.storage.getAllNoteParents(noteId, userId);
   }
 }

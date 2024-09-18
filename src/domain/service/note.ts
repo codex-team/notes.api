@@ -9,7 +9,6 @@ import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
 import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
-import type TeamRepository from '@repository/team.repository.js';
 import type { NotePublic } from '@domain/entities/notePublic.js';
 
 /**
@@ -42,11 +41,6 @@ export default class NoteService {
   public noteHistoryRepository: NoteHistoryRepository;
 
   /**
-   * Team repository
-   */
-  public teamRepository: TeamRepository;
-
-  /**
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
@@ -64,15 +58,13 @@ export default class NoteService {
    * @param noteVisitsRepository - note visits repository
    * @param editorToolsRepository - editor tools repositoryn
    * @param noteHistoryRepository - note history repository
-   * @param teamRepository - team note repository
    */
-  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository, noteHistoryRepository: NoteHistoryRepository, teamRepository: TeamRepository) {
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository, noteHistoryRepository: NoteHistoryRepository) {
     this.noteRepository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
     this.noteVisitsRepository = noteVisitsRepository;
     this.editorToolsRepository = editorToolsRepository;
     this.noteHistoryRepository = noteHistoryRepository;
-    this.teamRepository = teamRepository;
   }
 
   /**
@@ -459,6 +451,6 @@ export default class NoteService {
    * @returns - array of notes that are parent structure of the note
    */
   public async getNoteParentStructure(noteId: NoteInternalId, userId: number): Promise<NotePublic[]> {
-    return await this.noteRepository.getAllNotesParents(noteId, userId);
+    return await this.noteRepository.getNoteParents(noteId, userId);
   }
 }
