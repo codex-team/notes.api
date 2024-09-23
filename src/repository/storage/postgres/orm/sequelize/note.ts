@@ -8,8 +8,6 @@ import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
 import type { NoteRelationsModel } from './noteRelations.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
-import type { TeamsModel } from './teams.js';
-import type { NotePublic } from '@domain/entities/notePublic.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -80,8 +78,6 @@ export default class NoteSequelizeStorage {
   public historyModel: typeof NoteHistoryModel | null = null;
 
   public noteRelationModel: typeof NoteRelationsModel | null = null;
-
-  public teamModel: typeof TeamsModel | null = null;
 
   /**
    * Database instance
@@ -168,13 +164,6 @@ export default class NoteSequelizeStorage {
      * Create association with note relations
      */
     this.noteRelationModel = model;
-  }
-
-  public createAssociationWithTeamsModel(model: ModelStatic<TeamsModel>): void {
-    /**
-     * Create association with teams
-     */
-    this.teamModel = model;
   }
 
   /**
@@ -348,61 +337,25 @@ export default class NoteSequelizeStorage {
 
   /**
    * Get all parent notes of a note that a user has access to,
-   * by checking the team access.
+   * where the user has access to.
    * @param noteId - the ID of the note.
-   * @param userId - the ID of the user.
    */
-  public async getAllNoteParents(noteId: NoteInternalId, userId: number): Promise<NotePublic[]> {
-    if (!this.teamModel || !this.noteRelationModel) {
-      throw new Error(`${this.model !== null ? 'TeamStorage: Note relation model is not defined' : 'TeamStorage: Note model is not defined'}`);
+  public async getAllNoteParents(noteId: NoteInternalId): Promise<Note[]> {
+    if (!this.noteRelationModel) {
+      throw new Error('NoteStorage: Note Relation model is not defined');
     }
 
-    const parentNotes: NotePublic[] = [];
+    const parentNotes: Note[] = [];
     let currentNoteId: NoteInternalId | null = noteId;
-    /**
-     * Store notes that user can not access, to check the inherited team if has access
-     */
-    let storeUnaccessibleNote: Note[] = [];
 
     while (currentNoteId != null) {
-      const teamMember = await this.teamModel.findOne({
-        where: {
-          noteId: currentNoteId,
-          userId,
-        },
-        include: {
-          model: this.model,
-          as: this.model.tableName,
-          required: true,
-        },
+      // Get the note for database
+      const note: Note | null = await this.model.findOne({
+        where: { id: currentNoteId },
       });
 
-      if (teamMember && notEmpty(teamMember.notes)) {
-        if (storeUnaccessibleNote.length > 0) {
-          parentNotes.push(...storeUnaccessibleNote.map(note => ({
-            id: note.publicId,
-            content: note.content,
-            updatedAt: note.updatedAt,
-            createdAt: note.createdAt,
-            creatorId: note.creatorId,
-          })));
-          storeUnaccessibleNote = [];
-        }
-        parentNotes.push({
-          id: teamMember.notes.publicId,
-          content: teamMember.notes.content,
-          updatedAt: teamMember.notes.updatedAt,
-          createdAt: teamMember.notes.createdAt,
-          creatorId: teamMember.notes.creatorId,
-        });
-      } else if (teamMember === null) {
-        const note = await this.model.findOne({
-          where: { id: currentNoteId },
-        });
-
-        if (note !== null) {
-          storeUnaccessibleNote.push(note);
-        }
+      if (notEmpty(note)) {
+        parentNotes.push(note);
       }
 
       // Retrieve the parent note

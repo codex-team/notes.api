@@ -183,14 +183,14 @@ describe('Note API', () => {
   describe('GET note/:notePublicId ', () => {
     let context: {
       user: User;
-      user2: User;
+      anotherUser: User;
       parentNote: Note;
       childNote: Note;
       differentChildNote: Note;
       grandChildNote: Note;
     } = {
       user: {} as User,
-      user2: {} as User,
+      anotherUser: {} as User,
       parentNote: {} as Note,
       childNote: {} as Note,
       differentChildNote: {} as Note,
@@ -198,30 +198,32 @@ describe('Note API', () => {
     };
 
     beforeEach(async () => {
-      /** Create test user */
-      context.user = await global.db.insertUser();
+      if (expect.getState().currentTestName === 'Returns note parents by note public id in different note accessibility and authorization') {
+        /** Create test user */
+        context.user = await global.db.insertUser();
 
-      context.user2 = await global.db.insertUser();
+        context.anotherUser = await global.db.insertUser();
 
-      /** Create test note - a parent note */
-      context.parentNote = await global.db.insertNote({
-        creatorId: context.user.id,
-      });
+        /** Create test note - a parent note */
+        context.parentNote = await global.db.insertNote({
+          creatorId: context.user.id,
+        });
 
-      /** Create test note - a child note */
-      context.childNote = await global.db.insertNote({
-        creatorId: context.user.id,
-      });
+        /** Create test note - a child note */
+        context.childNote = await global.db.insertNote({
+          creatorId: context.user.id,
+        });
 
-      /** Create test note - create note with different user */
-      context.differentChildNote = await global.db.insertNote({
-        creatorId: context.user2.id,
-      });
+        /** Create test note - create note with different user */
+        context.differentChildNote = await global.db.insertNote({
+          creatorId: context.anotherUser.id,
+        });
 
-      /** Create test note - a grandchild note */
-      context.grandChildNote = await global.db.insertNote({
-        creatorId: context.user.id,
-      });
+        /** Create test note - a grandchild note */
+        context.grandChildNote = await global.db.insertNote({
+          creatorId: context.user.id,
+        });
+      }
     });
 
     test.each([
@@ -564,69 +566,69 @@ describe('Note API', () => {
     });
 
     test.each([
-      /** Returns two parents in case of relation between child and parent notes with 200 status */
+      /** Returns two parents in case of relation between child and parent notes */
       {
-        testCase: 1,
+        testScenario: 1,
         numberOfNotes: 2,
         childNoteCreatedByDifferentUser: false,
         isPublic: true,
         expectedStatusCode: 200,
       },
-      /** Returns multiple parents in case of multiple notes relations with user presence in team in each note with 200 status */
+      /** Returns multiple parents in case of multiple notes relations with user presence in team in each note */
       {
-        testCase: 2,
+        testScenario: 2,
         numberOfNotes: 3,
         childNoteCreatedByDifferentUser: false,
         isPublic: true,
         expectedStatusCode: 200,
       },
-      /** Returns one parent in case where there is no note relation with 200 status */
+      /** Returns one parent in case where there is no note relation */
       {
-        testCase: 3,
+        testScenario: 3,
         numberOfNotes: 1,
         childNoteCreatedByDifferentUser: false,
         isPublic: true,
         expectedStatusCode: 200,
       },
-      /** Returns mutiple parents in case where user is not in the team of a note with 200 status */
+      /** Returns mutiple parents in case where user is not in the team of a note */
       {
-        testCase: 4,
+        testScenario: 4,
         numberOfNotes: 3,
         childNoteCreatedByDifferentUser: true,
         isPublic: true,
         expectedStatusCode: 200,
       },
-      /** Returns multiple parents in case when note is not public with 200 status */
+      /** Returns multiple parents in case when note is not public */
       {
-        testCase: 5,
+        testScenario: 5,
         numberOfNotes: 3,
         childNoteCreatedByDifferentUser: true,
         isPublic: false,
         expectedStatusCode: 200,
       },
-      /** Returns no note in case when the user is not authorized to note with 403 status */
+      /** Returns no note in case when the user is not authorized to note */
       {
-        testCase: 6,
+        testScenario: 6,
         numberOfNotes: 2,
         childNoteCreatedByDifferentUser: true,
         isPublic: false,
         expectedStatusCode: 403,
       },
-      /** Returns one note in case when the user has no access to note with 200 status */
+      /** Returns one note in case when the user has no access to note */
       {
-        testCase: 7,
+        testScenario: 7,
         numberOfNotes: 2,
         childNoteCreatedByDifferentUser: true,
         isPublic: true,
         expectedStatusCode: 200,
       },
-    ])('Get note parents in different scenarios', async ({ testCase, numberOfNotes, childNoteCreatedByDifferentUser, isPublic, expectedStatusCode }) => {
+    ])('Returns note parents by note public id in different note accessibility and authorization', async ({ testScenario, numberOfNotes, childNoteCreatedByDifferentUser, isPublic, expectedStatusCode }) => {
       if (context !== undefined) {
         /** Create acces token for the user */
         let accessToken = global.auth(context.user.id);
 
-        if (testCase === 6 || testCase == 7) {
-          accessToken = global.auth(context.user2.id);
+        if (testScenario === 6 || testScenario == 7) {
+          accessToken = global.auth(context.anotherUser.id);
         }
         let noteId = context.parentNote.id;
         let notePublicId = context.parentNote.publicId;
@@ -664,7 +666,7 @@ describe('Note API', () => {
           url: `/note/${notePublicId}`,
         });
 
-        switch (testCase) {
+        switch (testScenario) {
           case (1):
             expect(response?.statusCode).toBe(expectedStatusCode);
             expect(response?.json()).toMatchObject({

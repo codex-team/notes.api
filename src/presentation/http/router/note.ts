@@ -179,7 +179,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = memberRole === MemberRole.Write;
 
-    const noteParentStructure = await noteService.getNoteParentStructure(noteId, userId!);
+    const noteParentStructure = await noteService.getNoteParents(noteId);
 
     return reply.send({
       note: notePublic,

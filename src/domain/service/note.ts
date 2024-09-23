@@ -447,10 +447,19 @@ export default class NoteService {
    * Get note parent structure recursively by note id and user id
    * and check if user has access to the parent note.
    * @param noteId - id of the note to get parent structure
-   * @param userId - id of the user that is requesting the parent structure
    * @returns - array of notes that are parent structure of the note
    */
-  public async getNoteParentStructure(noteId: NoteInternalId, userId: number): Promise<NotePublic[]> {
-    return await this.noteRepository.getNoteParents(noteId, userId);
+  public async getNoteParents(noteId: NoteInternalId): Promise<NotePublic[]> {
+    const noteParents = await this.noteRepository.getNoteParents(noteId);
+    const noteParentsPublic: NotePublic[] = noteParents.map((note) => {
+      console.log('note content inside map:', note);
+
+      return {
+        ...note,
+        id: note.publicId,
+      };
+    });
+
+    return noteParentsPublic;
   }
 }
