@@ -198,7 +198,7 @@ describe('Note API', () => {
     };
 
     beforeEach(async () => {
-      if (expect.getState().currentTestName === 'Returns note parents by note public id in different note accessibility and authorization') {
+      if (expect.getState().currentTestName?.includes('Returns note parents by note public id in different note accessibility and authorization') ?? false) {
         /** Create test user */
         context.user = await global.db.insertUser();
 
@@ -739,6 +739,10 @@ describe('Note API', () => {
             expect(response?.statusCode).toBe(expectedStatusCode);
             expect(response?.json()).toMatchObject({
               parents: [
+                {
+                  id: context.parentNote.publicId,
+                  content: context.parentNote.content,
+                },
                 {
                   id: context.differentChildNote.publicId,
                   content: context.differentChildNote.content,

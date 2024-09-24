@@ -452,11 +452,12 @@ export default class NoteService {
   public async getNoteParents(noteId: NoteInternalId): Promise<NotePublic[]> {
     const noteParents = await this.noteRepository.getNoteParents(noteId);
     const noteParentsPublic: NotePublic[] = noteParents.map((note) => {
-      console.log('note content inside map:', note);
-
       return {
-        ...note,
+        content: note.content,
         id: note.publicId,
+        creatorId: note.creatorId,
+        createdAt: note.createdAt,
+        updatedAt: note.updatedAt,
       };
     });
 
