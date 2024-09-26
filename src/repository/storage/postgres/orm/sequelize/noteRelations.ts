@@ -5,6 +5,7 @@ import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
 import type { Note } from '@domain/entities/note.js';
 import { Model, DataTypes } from 'sequelize';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Class representing a note relations in database
@@ -209,4 +210,68 @@ export default class NoteRelationsSequelizeStorage {
 
     return foundNote !== null;
   };
+
+  /**
+   * Get all parent notes of a note that a user has access to,
+   * where the user has access to.
+   * @param noteId - the ID of the note.
+   */
+  public async getAllNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
+    if (!this.noteModel) {
+      throw new Error('NoteRelationStorage: Note model is not defined');
+    }
+
+    const parentNotes: NoteInternalId[] = [];
+    let currentNoteId: NoteInternalId | null = noteId;
+
+    while (currentNoteId != null) {
+      // Get the note for database
+      const note: Note | null = await this.noteModel.findOne({
+        where: { id: currentNoteId },
+      });
+
+      if (notEmpty(note)) {
+        parentNotes.push(note.id);
+      }
+
+      // Retrieve the parent note
+      const noteRelation: NoteRelationsModel | null = await this.model.findOne({
+        where: { noteId: currentNoteId },
+      });
+
+      if (noteRelation != null) {
+        currentNoteId = noteRelation.parentId;
+      } else {
+        currentNoteId = null;
+      }
+    }
+
+    parentNotes.reverse();
+
+    return parentNotes;
+  }
+
+  /**
+   * Get all notes based on their ids
+   * @param noteIds - list of note ids
+   */
+  public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
+    if (!this.noteModel) {
+      throw new Error('NoteRelationStorage: Note model is not defined');
+    }
+
+    const notes: Note[] = [];
+
+    for (const noteId of noteIds) {
+      const note: Note | null = await this.noteModel.findOne({
+        where: { id: noteId },
+      });
+
+      if (notEmpty(note)) {
+        notes.push(note);
+      }
+    }
+
+    return notes;
+  }
 }

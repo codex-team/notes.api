@@ -565,193 +565,219 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    test.each([
-      /** Returns two parents in case of relation between child and parent notes */
-      {
-        testScenario: 1,
-        numberOfNotes: 2,
-        childNoteCreatedByDifferentUser: false,
-        isPublic: true,
-        expectedStatusCode: 200,
-      },
-      /** Returns multiple parents in case of multiple notes relations with user presence in team in each note */
-      {
-        testScenario: 2,
-        numberOfNotes: 3,
-        childNoteCreatedByDifferentUser: false,
-        isPublic: true,
-        expectedStatusCode: 200,
-      },
-      /** Returns one parent in case where there is no note relation */
-      {
-        testScenario: 3,
-        numberOfNotes: 1,
-        childNoteCreatedByDifferentUser: false,
-        isPublic: true,
-        expectedStatusCode: 200,
-      },
-      /** Returns mutiple parents in case where user is not in the team of a note */
-      {
-        testScenario: 4,
-        numberOfNotes: 3,
-        childNoteCreatedByDifferentUser: true,
-        isPublic: true,
-        expectedStatusCode: 200,
-      },
-      /** Returns multiple parents in case when note is not public */
-      {
-        testScenario: 5,
-        numberOfNotes: 3,
-        childNoteCreatedByDifferentUser: true,
-        isPublic: false,
-        expectedStatusCode: 200,
-      },
-      /** Returns no note in case when the user is not authorized to note */
-      {
-        testScenario: 6,
-        numberOfNotes: 2,
-        childNoteCreatedByDifferentUser: true,
-        isPublic: false,
-        expectedStatusCode: 403,
-      },
-      /** Returns one note in case when the user has no access to note */
-      {
-        testScenario: 7,
-        numberOfNotes: 2,
-        childNoteCreatedByDifferentUser: true,
-        isPublic: true,
-        expectedStatusCode: 200,
-      },
-    ])('Returns note parents by note public id in different note accessibility and authorization', async ({ testScenario, numberOfNotes, childNoteCreatedByDifferentUser, isPublic, expectedStatusCode }) => {
-      if (context !== undefined) {
-        /** Create acces token for the user */
-        let accessToken = global.auth(context.user.id);
+    test('Returns two parents note in case of relation between child and parent note with status 200', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser();
 
-        if (testScenario === 6 || testScenario == 7) {
-          accessToken = global.auth(context.anotherUser.id);
-        }
-        let noteId = context.parentNote.id;
-        let notePublicId = context.parentNote.publicId;
+      /** Create acces token for the user */
+      const accessToken = global.auth(user.id);
 
-        if (numberOfNotes == 2 && !childNoteCreatedByDifferentUser) {
-          noteId = context.childNote.id;
-          notePublicId = context.childNote.publicId;
-        } else if (numberOfNotes == 2 && childNoteCreatedByDifferentUser) {
-          noteId = context.differentChildNote.id;
-          notePublicId = context.differentChildNote.publicId;
-        } else if (numberOfNotes == 3) {
-          noteId = context.grandChildNote.id;
-          notePublicId = context.grandChildNote.publicId;
-        }
+      /** Create test note - a parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
 
-        /** Create test note settings */
-        await global.db.insertNoteSetting({
-          noteId: noteId,
-          isPublic: isPublic,
-        });
+      /** Create test note - a child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
 
-        for (let i = 0; i < numberOfNotes - 1; i++) {
-          /** Create test note relation */
-          await global.db.insertNoteRelation({
-            parentId: i == 0 ? context.parentNote.id : (childNoteCreatedByDifferentUser ? context.differentChildNote.id : context.childNote.id),
-            noteId: i == 0 ? (childNoteCreatedByDifferentUser ? context.differentChildNote.id : context.childNote.id) : context.grandChildNote.id,
-          });
-        }
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
 
-        const response = await global.api?.fakeRequest({
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${accessToken}`,
+      /** Create test note relation */
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: childNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parentStructure: [
+          {
+            noteId: parentNote.publicId,
+            content: parentNote.content,
           },
-          url: `/note/${notePublicId}`,
-        });
+          {
+            noteId: childNote.publicId,
+            content: childNote.content,
+          },
+        ],
+      });
+    });
 
-        switch (testScenario) {
-          case (1):
-            expect(response?.statusCode).toBe(expectedStatusCode);
-            expect(response?.json()).toMatchObject({
-              parents: [
-                {
-                  id: context.parentNote.publicId,
-                  content: context.parentNote.content,
-                },
-                {
-                  id: context.childNote.publicId,
-                  content: context.childNote.content,
-                },
-              ],
-            });
-            break;
-          case (2):
-            expect(response?.statusCode).toBe(expectedStatusCode);
-            expect(response?.json()).toMatchObject({
-              parents: [
-                {
-                  id: context.parentNote.publicId,
-                  content: context.parentNote.content,
-                },
-                {
-                  id: context.childNote.publicId,
-                  content: context.childNote.content,
-                },
-                {
-                  id: context.grandChildNote.publicId,
-                  content: context.grandChildNote.content,
-                },
-              ],
-            });
-            break;
-          case (3):
-            expect(response?.statusCode).toBe(expectedStatusCode);
-            expect(response?.json()).toMatchObject({
-              parents: [
-                {
-                  id: context.parentNote.publicId,
-                  content: context.parentNote.content,
-                },
-              ],
-            });
-            break;
-          case (4):
-          case (5):
-            expect(response?.statusCode).toBe(expectedStatusCode);
-            expect(response?.json()).toMatchObject({
-              parents: [
-                {
-                  id: context.parentNote.publicId,
-                  content: context.parentNote.content,
-                },
-                {
-                  id: context.differentChildNote.publicId,
-                  content: context.differentChildNote.content,
-                },
-                {
-                  id: context.grandChildNote.publicId,
-                  content: context.grandChildNote.content,
-                },
-              ],
-            });
-            break;
-          case (6):
-            expect(response?.statusCode).toBe(expectedStatusCode);
-            break;
-          case (7):
-            expect(response?.statusCode).toBe(expectedStatusCode);
-            expect(response?.json()).toMatchObject({
-              parents: [
-                {
-                  id: context.parentNote.publicId,
-                  content: context.parentNote.content,
-                },
-                {
-                  id: context.differentChildNote.publicId,
-                  content: context.differentChildNote.content,
-                },
-              ],
-            });
-            break;
-        }
-      }
+    test('Returns three parents note in case of relation between all notes with status 200', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      /** Create acces token for the user */
+      const accessToken = global.auth(user.id);
+
+      /** Create test note - a grand parent note */
+      const grandParentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note - a parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note - a child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      /** Create note relation between parent and grandParentNote */
+      await global.db.insertNoteRelation({
+        parentId: grandParentNote.id,
+        noteId: parentNote.id,
+      });
+
+      /** Create test note relation */
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: childNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parentStructure: [
+          {
+            noteId: grandParentNote.publicId,
+            content: grandParentNote.content,
+          },
+          {
+            noteId: parentNote.publicId,
+            content: parentNote.content,
+          },
+          {
+            noteId: childNote.publicId,
+            content: childNote.content,
+          },
+        ],
+      });
+    });
+
+    test('Returns two parents note in case where the note is not created by the same user but share relation with status 200', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      /** Create another user */
+      const anotherUser = await global.db.insertUser();
+
+      /** Create acces token for the user */
+      const accessToken = global.auth(user.id);
+
+      /** Create test note - a parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: anotherUser.id,
+      });
+
+      /** Create test note - a child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      /** Create test note relation */
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: childNote.id,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parentStructure: [
+          {
+            noteId: parentNote.publicId,
+            content: parentNote.content,
+          },
+          {
+            noteId: childNote.publicId,
+            content: childNote.content,
+          },
+        ],
+      });
+    });
+
+    test('Returns one note in case where there is no relation exist for the note with status 200', async () => {
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      /** Create acces token for the user */
+      const accessToken = global.auth(user.id);
+
+      /** Create test note - a child note */
+      const note = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toMatchObject({
+        parentStructure: [
+          {
+            noteId: note.publicId,
+            content: note.content,
+          },
+        ],
+      });
     });
   });
 

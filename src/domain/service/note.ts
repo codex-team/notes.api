@@ -9,7 +9,7 @@ import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
 import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
-import type { NotePublic } from '@domain/entities/notePublic.js';
+import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
 
 /**
  * Note service
@@ -450,15 +450,10 @@ export default class NoteService {
    * @returns - array of notes that are parent structure of the note
    */
   public async getNoteParents(noteId: NoteInternalId): Promise<NotePublic[]> {
-    const noteParents = await this.noteRepository.getNoteParents(noteId);
+    const noteIds: NoteInternalId[] = await this.noteRelationsRepository.getNoteParentsIds(noteId);
+    const noteParents = await this.noteRelationsRepository.getNotesByIds(noteIds);
     const noteParentsPublic: NotePublic[] = noteParents.map((note) => {
-      return {
-        content: note.content,
-        id: note.publicId,
-        creatorId: note.creatorId,
-        createdAt: note.createdAt,
-        updatedAt: note.updatedAt,
-      };
+      return definePublicNote(note);
     });
 
     return noteParentsPublic;

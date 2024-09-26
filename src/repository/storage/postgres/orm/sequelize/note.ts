@@ -7,7 +7,6 @@ import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
 import type { NoteRelationsModel } from './noteRelations.js';
-import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -334,44 +333,4 @@ export default class NoteSequelizeStorage {
       },
     });
   };
-
-  /**
-   * Get all parent notes of a note that a user has access to,
-   * where the user has access to.
-   * @param noteId - the ID of the note.
-   */
-  public async getAllNoteParents(noteId: NoteInternalId): Promise<Note[]> {
-    if (!this.noteRelationModel) {
-      throw new Error('NoteStorage: Note Relation model is not defined');
-    }
-
-    const parentNotes: Note[] = [];
-    let currentNoteId: NoteInternalId | null = noteId;
-
-    while (currentNoteId != null) {
-      // Get the note for database
-      const note: Note | null = await this.model.findOne({
-        where: { id: currentNoteId },
-      });
-
-      if (notEmpty(note)) {
-        parentNotes.push(note);
-      }
-
-      // Retrieve the parent note
-      const noteRelation: NoteRelationsModel | null = await this.noteRelationModel.findOne({
-        where: { noteId: currentNoteId },
-      });
-
-      if (noteRelation != null) {
-        currentNoteId = noteRelation.parentId;
-      } else {
-        currentNoteId = null;
-      }
-    }
-
-    parentNotes.reverse();
-
-    return parentNotes;
-  }
 }
