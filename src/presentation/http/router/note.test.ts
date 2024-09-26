@@ -605,13 +605,13 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
+        parents: [
           {
-            noteId: parentNote.publicId,
+            id: parentNote.publicId,
             content: parentNote.content,
           },
           {
-            noteId: childNote.publicId,
+            id: childNote.publicId,
             content: childNote.content,
           },
         ],
@@ -669,17 +669,17 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
+        parents: [
           {
-            noteId: grandParentNote.publicId,
+            id: grandParentNote.publicId,
             content: grandParentNote.content,
           },
           {
-            noteId: parentNote.publicId,
+            id: parentNote.publicId,
             content: parentNote.content,
           },
           {
-            noteId: childNote.publicId,
+            id: childNote.publicId,
             content: childNote.content,
           },
         ],
@@ -729,13 +729,13 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
+        parents: [
           {
-            noteId: parentNote.publicId,
+            id: parentNote.publicId,
             content: parentNote.content,
           },
           {
-            noteId: childNote.publicId,
+            id: childNote.publicId,
             content: childNote.content,
           },
         ],
@@ -771,9 +771,9 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
+        parents: [
           {
-            noteId: note.publicId,
+            id: note.publicId,
             content: note.content,
           },
         ],
