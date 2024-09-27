@@ -6,7 +6,7 @@ import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
-import type { NoteRelationsModel } from './noteRelations.js';
+import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -75,8 +75,6 @@ export default class NoteSequelizeStorage {
   public visitsModel: typeof NoteVisitsModel | null = null;
 
   public historyModel: typeof NoteHistoryModel | null = null;
-
-  public noteRelationModel: typeof NoteRelationsModel | null = null;
 
   /**
    * Database instance
@@ -157,13 +155,6 @@ export default class NoteSequelizeStorage {
       as: 'noteVisits',
     });
   };
-
-  public createAssociationWithNoteRelationModel(model: ModelStatic<NoteRelationsModel>): void {
-    /**
-     * Create association with note relations
-     */
-    this.noteRelationModel = model;
-  }
 
   /**
    * Insert note to database
@@ -333,4 +324,24 @@ export default class NoteSequelizeStorage {
       },
     });
   };
+
+  /**
+   * Get all notes based on their ids
+   * @param noteIds - list of note ids
+   */
+  public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
+    const notes: Note[] = [];
+
+    for (const noteId of noteIds) {
+      const note: Note | null = await this.model.findOne({
+        where: { id: noteId },
+      });
+
+      if (notEmpty(note)) {
+        notes.push(note);
+      }
+    }
+
+    return notes;
+  }
 }

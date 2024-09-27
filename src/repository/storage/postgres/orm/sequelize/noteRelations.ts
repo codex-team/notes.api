@@ -222,56 +222,20 @@ export default class NoteRelationsSequelizeStorage {
     }
 
     const parentNotes: NoteInternalId[] = [];
-    let currentNoteId: NoteInternalId | null = noteId;
 
-    while (currentNoteId != null) {
-      // Get the note for database
-      const note: Note | null = await this.noteModel.findOne({
-        where: { id: currentNoteId },
-      });
+    // get all note ids via a singe sql query
+    const noteRelation: NoteRelationsModel[] | null = await this.model.findAll({
+      where: { noteId },
+      attributes: ['noteId'],
+      raw: true,
+    });
 
-      if (notEmpty(note)) {
-        parentNotes.push(note.id);
-      }
-
-      // Retrieve the parent note
-      const noteRelation: NoteRelationsModel | null = await this.model.findOne({
-        where: { noteId: currentNoteId },
-      });
-
-      if (noteRelation != null) {
-        currentNoteId = noteRelation.parentId;
-      } else {
-        currentNoteId = null;
-      }
+    if (notEmpty(noteRelation)) {
+      parentNotes.push(...noteRelation.map(relation => relation.noteId));
     }
 
     parentNotes.reverse();
 
     return parentNotes;
-  }
-
-  /**
-   * Get all notes based on their ids
-   * @param noteIds - list of note ids
-   */
-  public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
-    if (!this.noteModel) {
-      throw new Error('NoteRelationStorage: Note model is not defined');
-    }
-
-    const notes: Note[] = [];
-
-    for (const noteId of noteIds) {
-      const note: Note | null = await this.noteModel.findOne({
-        where: { id: noteId },
-      });
-
-      if (notEmpty(note)) {
-        notes.push(note);
-      }
-    }
-
-    return notes;
   }
 }

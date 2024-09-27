@@ -1,4 +1,4 @@
-import type { Note, NoteInternalId } from '@domain/entities/note.js';
+import type { NoteInternalId } from '@domain/entities/note.js';
 import type NoteRelationshipStorage from '@repository/storage/noteRelations.storage.js';
 
 /**
@@ -75,14 +75,5 @@ export default class NoteRelationsRepository {
    */
   public async getNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
     return await this.storage.getAllNoteParentsIds(noteId);
-  }
-
-  /**
-   * Get all notes based on their ids
-   * @param noteIds : list of note ids
-   * @returns an array of notes
-   */
-  public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
-    return await this.storage.getNotesByIds(noteIds);
   }
 }

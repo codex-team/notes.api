@@ -1,7 +1,6 @@
 import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
-import type { Note } from '@domain/entities/note.js';
 
 describe('Note API', () => {
   /**
@@ -181,51 +180,6 @@ describe('Note API', () => {
   });
 
   describe('GET note/:notePublicId ', () => {
-    let context: {
-      user: User;
-      anotherUser: User;
-      parentNote: Note;
-      childNote: Note;
-      differentChildNote: Note;
-      grandChildNote: Note;
-    } = {
-      user: {} as User,
-      anotherUser: {} as User,
-      parentNote: {} as Note,
-      childNote: {} as Note,
-      differentChildNote: {} as Note,
-      grandChildNote: {} as Note,
-    };
-
-    beforeEach(async () => {
-      if (expect.getState().currentTestName?.includes('Returns note parents by note public id in different note accessibility and authorization') ?? false) {
-        /** Create test user */
-        context.user = await global.db.insertUser();
-
-        context.anotherUser = await global.db.insertUser();
-
-        /** Create test note - a parent note */
-        context.parentNote = await global.db.insertNote({
-          creatorId: context.user.id,
-        });
-
-        /** Create test note - a child note */
-        context.childNote = await global.db.insertNote({
-          creatorId: context.user.id,
-        });
-
-        /** Create test note - create note with different user */
-        context.differentChildNote = await global.db.insertNote({
-          creatorId: context.anotherUser.id,
-        });
-
-        /** Create test note - a grandchild note */
-        context.grandChildNote = await global.db.insertNote({
-          creatorId: context.user.id,
-        });
-      }
-    });
-
     test.each([
       /** Returns 200 if user is team member with a Read role */
       {
@@ -565,7 +519,7 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    test('Returns two parents note in case of relation between child and parent note with status 200', async () => {
+    test('Returns one parents note in case when note has one parents', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -605,20 +559,20 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
+        parents: [
           {
-            noteId: parentNote.publicId,
+            id: parentNote.publicId,
             content: parentNote.content,
           },
           {
-            noteId: childNote.publicId,
+            id: childNote.publicId,
             content: childNote.content,
           },
         ],
       });
     });
 
-    test('Returns three parents note in case of relation between all notes with status 200', async () => {
+    test('Returns two parents note in case when note has two parents', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -669,24 +623,24 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
+        parents: [
           {
-            noteId: grandParentNote.publicId,
+            id: grandParentNote.publicId,
             content: grandParentNote.content,
           },
           {
-            noteId: parentNote.publicId,
+            id: parentNote.publicId,
             content: parentNote.content,
           },
           {
-            noteId: childNote.publicId,
+            id: childNote.publicId,
             content: childNote.content,
           },
         ],
       });
     });
 
-    test('Returns two parents note in case where the note is not created by the same user but share relation with status 200', async () => {
+    test('Returns one parents note in case where the note is not created by the same user but share relation', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -729,13 +683,13 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
+        parents: [
           {
-            noteId: parentNote.publicId,
+            id: parentNote.publicId,
             content: parentNote.content,
           },
           {
-            noteId: childNote.publicId,
+            id: childNote.publicId,
             content: childNote.content,
           },
         ],
@@ -771,9 +725,9 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parentStructure: [
+        parents: [
           {
-            noteId: note.publicId,
+            id: note.publicId,
             content: note.content,
           },
         ],

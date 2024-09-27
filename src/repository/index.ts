@@ -139,7 +139,6 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   /**
    * Create associations between note and relations table
    */
-  noteStorage.createAssociationWithNoteRelationModel(noteRelationshipStorage.model);
   noteRelationshipStorage.createAssociationWithNoteModel(noteStorage.model);
 
   /**

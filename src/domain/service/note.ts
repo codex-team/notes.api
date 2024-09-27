@@ -451,7 +451,7 @@ export default class NoteService {
    */
   public async getNoteParents(noteId: NoteInternalId): Promise<NotePublic[]> {
     const noteIds: NoteInternalId[] = await this.noteRelationsRepository.getNoteParentsIds(noteId);
-    const noteParents = await this.noteRelationsRepository.getNotesByIds(noteIds);
+    const noteParents = await this.noteRepository.getNotesByIds(noteIds);
     const noteParentsPublic: NotePublic[] = noteParents.map((note) => {
       return definePublicNote(note);
     });
