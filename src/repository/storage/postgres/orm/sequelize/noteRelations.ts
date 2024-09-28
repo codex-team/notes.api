@@ -5,7 +5,7 @@ import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
 import type { Note } from '@domain/entities/note.js';
 import { Model, DataTypes } from 'sequelize';
-import { notEmpty } from '@infrastructure/utils/empty.js';
+import { isEmpty, notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Class representing a note relations in database
@@ -217,21 +217,27 @@ export default class NoteRelationsSequelizeStorage {
    * @param noteId - the ID of the note.
    */
   public async getAllNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
-    if (!this.noteModel) {
-      throw new Error('NoteRelationStorage: Note model is not defined');
-    }
-
     const parentNotes: NoteInternalId[] = [];
+    let currentNoteId: number | null = noteId;
 
-    // get all note ids via a singe sql query
-    const noteRelation: NoteRelationsModel[] | null = await this.model.findAll({
-      where: { noteId },
-      attributes: ['noteId'],
-      raw: true,
-    });
+    // get all note ids via a singe sql query instead of many
+    while (currentNoteId !== null) {
+      const noteRelation: NoteRelationsModel | null = await this.model.findOne({
+        where: {
+          noteId: currentNoteId,
+        },
+      });
 
-    if (notEmpty(noteRelation)) {
-      parentNotes.push(...noteRelation.map(relation => relation.noteId));
+      if (notEmpty(noteRelation)) {
+        parentNotes.push(noteRelation.noteId);
+      }
+
+      if (isEmpty(noteRelation)) {
+        parentNotes.push(currentNoteId);
+        break;
+      } else {
+        currentNoteId = noteRelation.parentId ?? null;
+      }
     }
 
     parentNotes.reverse();
