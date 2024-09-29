@@ -640,7 +640,7 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns one parents note in case where the note is not created by the same user but share relation', async () => {
+    test('Returns one parent\'s note when the user is not in the parent note\'s team but shares a relation', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
