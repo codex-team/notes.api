@@ -74,6 +74,6 @@ export default class NoteRelationsRepository {
    * @returns an array of note parents ids
    */
   public async getNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
-    return await this.storage.getAllNoteParentsIds(noteId);
+    return await this.storage.getNoteParentsIds(noteId);
   }
 }

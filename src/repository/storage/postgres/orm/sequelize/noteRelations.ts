@@ -1,11 +1,11 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, Sequelize } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { Op } from 'sequelize';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
 import type { Note } from '@domain/entities/note.js';
 import { Model, DataTypes } from 'sequelize';
-import { isEmpty, notEmpty } from '@infrastructure/utils/empty.js';
 
 /**
  * Class representing a note relations in database
@@ -216,29 +216,29 @@ export default class NoteRelationsSequelizeStorage {
    * where the user has access to.
    * @param noteId - the ID of the note.
    */
-  public async getAllNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
-    const parentNotes: NoteInternalId[] = [];
-    let currentNoteId: number | null = noteId;
+  public async getNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
+    let parentNotes: NoteInternalId[] = [];
 
     // get all note ids via a singe sql query instead of many
-    while (currentNoteId !== null) {
-      const noteRelation: NoteRelationsModel | null = await this.model.findOne({
-        where: {
-          noteId: currentNoteId,
-        },
-      });
+    const query = `
+      WITH RECURSIVE note_tree AS (
+        SELECT noteId, parentId
+        FROM NoteRelations
+        WHERE noteId = :startNoteId
+        UNION ALL
+        SELECT nr.noteId, nr.parentId
+        FROM NoteRelations nr
+        INNER JOIN note_tree nt ON nt.parentId = nr.noteId
+      )
+      SELECT noteId FROM note_tree;
+    `;
 
-      if (notEmpty(noteRelation)) {
-        parentNotes.push(noteRelation.noteId);
-      }
+    const result = await this.model.sequelize?.query(query, {
+      replacements: { startNoteId: noteId },
+      type: QueryTypes.SELECT,
+    });
 
-      if (isEmpty(noteRelation)) {
-        parentNotes.push(currentNoteId);
-        break;
-      } else {
-        currentNoteId = noteRelation.parentId ?? null;
-      }
-    }
+    parentNotes = (result as { noteId: number }[])?.map(note => note.noteId) ?? [];
 
     parentNotes.reverse();
 

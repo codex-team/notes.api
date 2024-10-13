@@ -519,7 +519,7 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(expectedMessage);
     });
 
-    test('Returns one parents note in case when note has one parents', async () => {
+    test('Returns one parents note in case when note has one parent', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -572,7 +572,7 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns two parents note in case when note has two parents', async () => {
+    test('Returns two note parents in case when note has two parents', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -640,7 +640,7 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns one parent\'s note when the user is not in the parent note\'s team but shares a relation', async () => {
+    test('Returns one parent note when the user is not in the parent note\'s team but shares a note relation', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
