@@ -31,11 +31,6 @@ export class TeamsModel extends Model<InferAttributes<TeamsModel>, InferCreation
    * Team member role, show what user can do with note
    */
   public declare role: MemberRole;
-
-  /**
-   * Note relation content
-   */
-  public declare notes?: NoteModel | null;
 }
 
 /**

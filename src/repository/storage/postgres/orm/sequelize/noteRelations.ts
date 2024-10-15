@@ -221,26 +221,36 @@ export default class NoteRelationsSequelizeStorage {
 
     // get all note ids via a singe sql query instead of many
     const query = `
-      WITH RECURSIVE note_tree AS (
-        SELECT noteId, parentId
-        FROM NoteRelations
-        WHERE noteId = :startNoteId
-        UNION ALL
-        SELECT nr.noteId, nr.parentId
-        FROM NoteRelations nr
-        INNER JOIN note_tree nt ON nt.parentId = nr.noteId
-      )
-      SELECT noteId FROM note_tree;
-    `;
+    WITH RECURSIVE note_parents AS (
+      SELECT np.note_id, np.parent_id
+      FROM ${String(this.database.literal(this.tableName).val)} np
+      WHERE np.note_id = :startNoteId
+      UNION ALL
+      SELECT nr.note_id, nr.parent_id
+      FROM ${String(this.database.literal(this.tableName).val)} nr
+      INNER JOIN note_parents np ON np.parent_id = nr.note_id
+    )
+    SELECT np.note_id, np.parent_id
+    FROM note_parents np;`;
 
-    const result = await this.model.sequelize?.query(query, {
-      replacements: { startNoteId: noteId },
-      type: QueryTypes.SELECT,
-    });
+    try {
+      const result = await this.database.query(query, {
+        replacements: { startNoteId: noteId },
+        type: QueryTypes.SELECT,
+      });
 
-    parentNotes = (result as { noteId: number }[])?.map(note => note.noteId) ?? [];
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const output = (result as { note_id: number; parent_id: number }[])?.map(note => note.parent_id) ?? [];
 
-    parentNotes.reverse();
+      if (output.find(note => (note == noteId)) == undefined) {
+        parentNotes = [noteId, ...output];
+      } else {
+        parentNotes = output;
+      }
+      parentNotes.reverse();
+    } catch {
+      console.log(`something wrong happened with sql query`);
+    }
 
     return parentNotes;
   }
