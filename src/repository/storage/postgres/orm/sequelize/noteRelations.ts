@@ -240,13 +240,8 @@ export default class NoteRelationsSequelizeStorage {
       });
 
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const output = (result as { note_id: number; parent_id: number }[])?.map(note => note.parent_id) ?? [];
+      parentNotes = (result as { note_id: number; parent_id: number }[])?.map(note => note.parent_id) ?? [];
 
-      if (output.find(note => (note == noteId)) == undefined) {
-        parentNotes = [noteId, ...output];
-      } else {
-        parentNotes = output;
-      }
       parentNotes.reverse();
     } catch {
       console.log(`something wrong happened with sql query`);

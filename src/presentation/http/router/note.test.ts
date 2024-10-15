@@ -564,10 +564,6 @@ describe('Note API', () => {
             id: parentNote.publicId,
             content: parentNote.content,
           },
-          {
-            id: childNote.publicId,
-            content: childNote.content,
-          },
         ],
       });
     });
@@ -632,10 +628,6 @@ describe('Note API', () => {
             id: parentNote.publicId,
             content: parentNote.content,
           },
-          {
-            id: childNote.publicId,
-            content: childNote.content,
-          },
         ],
       });
     });
@@ -688,15 +680,11 @@ describe('Note API', () => {
             id: parentNote.publicId,
             content: parentNote.content,
           },
-          {
-            id: childNote.publicId,
-            content: childNote.content,
-          },
         ],
       });
     });
 
-    test('Returns one note in case where there is no relation exist for the note with status 200', async () => {
+    test('Returns no note in case where there is no relation exist for the note with status 200', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -725,12 +713,7 @@ describe('Note API', () => {
       expect(response?.statusCode).toBe(200);
 
       expect(response?.json()).toMatchObject({
-        parents: [
-          {
-            id: note.publicId,
-            content: note.content,
-          },
-        ],
+        parents: [],
       });
     });
   });
