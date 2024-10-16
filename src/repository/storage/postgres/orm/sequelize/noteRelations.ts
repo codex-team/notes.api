@@ -217,8 +217,6 @@ export default class NoteRelationsSequelizeStorage {
    * @param noteId - the ID of the note.
    */
   public async getNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
-    let parentNotes: NoteInternalId[] = [];
-
     // get all note ids via a singe sql query instead of many
     const query = `
     WITH RECURSIVE note_parents AS (
@@ -233,20 +231,16 @@ export default class NoteRelationsSequelizeStorage {
     SELECT np.note_id, np.parent_id
     FROM note_parents np;`;
 
-    try {
-      const result = await this.database.query(query, {
-        replacements: { startNoteId: noteId },
-        type: QueryTypes.SELECT,
-      });
+    const result = await this.database.query(query, {
+      replacements: { startNoteId: noteId },
+      type: QueryTypes.SELECT,
+    });
 
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      parentNotes = (result as { note_id: number; parent_id: number }[])?.map(note => note.parent_id) ?? [];
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    let noteParents = (result as { note_id: number; parent_id: number }[])?.map(note => note.parent_id) ?? [];
 
-      parentNotes.reverse();
-    } catch {
-      console.log(`something wrong happened with sql query`);
-    }
+    noteParents.reverse();
 
-    return parentNotes;
+    return noteParents;
   }
 }

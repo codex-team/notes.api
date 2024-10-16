@@ -1,12 +1,11 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, Op } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
-import { notEmpty } from '@infrastructure/utils/empty.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -330,17 +329,13 @@ export default class NoteSequelizeStorage {
    * @param noteIds - list of note ids
    */
   public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
-    const notes: Note[] = [];
-
-    for (const noteId of noteIds) {
-      const note: Note | null = await this.model.findOne({
-        where: { id: noteId },
-      });
-
-      if (notEmpty(note)) {
-        notes.push(note);
-      }
-    }
+    const notes: Note[] = await this.model.findAll({
+      where: {
+        id: {
+          [Op.in]: noteIds,
+        },
+      },
+    });
 
     return notes;
   }

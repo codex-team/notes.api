@@ -181,12 +181,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     const noteParentStructure = await noteService.getNoteParents(noteId);
 
+    const noteParentsPublic = noteParentStructure.map((notes) => {
+      return definePublicNote(notes);
+    });
+
     return reply.send({
       note: notePublic,
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
       tools: noteTools,
-      parents: noteParentStructure,
+      parents: noteParentsPublic,
     });
   });
 

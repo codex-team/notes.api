@@ -523,7 +523,7 @@ describe('Note API', () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
-      /** Create acces token for the user */
+      /** Create access token for the user */
       const accessToken = global.auth(user.id);
 
       /** Create test note - a parent note */
@@ -572,7 +572,7 @@ describe('Note API', () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
-      /** Create acces token for the user */
+      /** Create access token for the user */
       const accessToken = global.auth(user.id);
 
       /** Create test note - a grand parent note */
@@ -632,14 +632,14 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns one parent note when the user is not in the parent note\'s team but shares a note relation', async () => {
+    test('Returns one parent note when the user is not in the parent note\'s team but has note relation', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
       /** Create another user */
       const anotherUser = await global.db.insertUser();
 
-      /** Create acces token for the user */
+      /** Create access token for the user */
       const accessToken = global.auth(user.id);
 
       /** Create test note - a parent note */
@@ -684,11 +684,11 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns no note in case where there is no relation exist for the note with status 200', async () => {
+    test('Returns empty array in case where there is no relation exist for the note with status 200', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
-      /** Create acces token for the user */
+      /** Create access token for the user */
       const accessToken = global.auth(user.id);
 
       /** Create test note - a child note */
