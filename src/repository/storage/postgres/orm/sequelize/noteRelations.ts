@@ -228,16 +228,15 @@ export default class NoteRelationsSequelizeStorage {
       FROM ${String(this.database.literal(this.tableName).val)} nr
       INNER JOIN note_parents np ON np.parent_id = nr.note_id
     )
-    SELECT np.note_id, np.parent_id
+    SELECT np.note_id AS "noteId", np.parent_id AS "parentId"
     FROM note_parents np;`;
 
-    const result = await this.database.query(query, {
+    const result = await this.model.sequelize?.query(query, {
       replacements: { startNoteId: noteId },
       type: QueryTypes.SELECT,
     });
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    let noteParents = (result as { note_id: number; parent_id: number }[])?.map(note => note.parent_id) ?? [];
+    let noteParents = (result as { noteId: number; parentId: number }[])?.map(note => note.parentId) ?? [];
 
     noteParents.reverse();
 
