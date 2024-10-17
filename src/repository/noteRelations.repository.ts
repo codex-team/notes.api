@@ -67,4 +67,13 @@ export default class NoteRelationsRepository {
   public async hasRelation(noteId: NoteInternalId): Promise<boolean> {
     return await this.storage.hasRelation(noteId);
   }
+
+  /**
+   * Get all note parents based on note id
+   * @param noteId : note id to get all its parents
+   * @returns an array of note parents ids
+   */
+  public async getNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
+    return await this.storage.getNoteParentsIds(noteId);
+  }
 }
