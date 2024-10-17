@@ -568,7 +568,7 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns two note parents in case when note has two parents', async () => {
+    test('Returns two note parents in case when the note parents IDs relations are provided in a different order than expected', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
@@ -576,36 +576,36 @@ describe('Note API', () => {
       const accessToken = global.auth(user.id);
 
       /** Create test note - a grand parent note */
-      const grandParentNote = await global.db.insertNote({
+      const firstNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
       /** Create test note - a parent note */
-      const parentNote = await global.db.insertNote({
+      const secondNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
       /** Create test note - a child note */
-      const childNote = await global.db.insertNote({
+      const thirdNote = await global.db.insertNote({
         creatorId: user.id,
       });
 
       /** Create test note settings */
       await global.db.insertNoteSetting({
-        noteId: childNote.id,
+        noteId: secondNote.id,
         isPublic: true,
       });
 
       /** Create note relation between parent and grandParentNote */
       await global.db.insertNoteRelation({
-        parentId: grandParentNote.id,
-        noteId: parentNote.id,
+        parentId: firstNote.id,
+        noteId: thirdNote.id,
       });
 
       /** Create test note relation */
       await global.db.insertNoteRelation({
-        parentId: parentNote.id,
-        noteId: childNote.id,
+        parentId: thirdNote.id,
+        noteId: secondNote.id,
       });
 
       const response = await global.api?.fakeRequest({
@@ -613,7 +613,7 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/${childNote.publicId}`,
+        url: `/note/${secondNote.publicId}`,
       });
 
       expect(response?.statusCode).toBe(200);
@@ -621,12 +621,12 @@ describe('Note API', () => {
       expect(response?.json()).toMatchObject({
         parents: [
           {
-            id: grandParentNote.publicId,
-            content: grandParentNote.content,
+            id: firstNote.publicId,
+            content: firstNote.content,
           },
           {
-            id: parentNote.publicId,
-            content: parentNote.content,
+            id: thirdNote.publicId,
+            content: thirdNote.content,
           },
         ],
       });
@@ -684,7 +684,7 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns empty array in case where there is no relation exist for the note with status 200', async () => {
+    test('Returns empty array in case where there is no relation exist for the note', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 

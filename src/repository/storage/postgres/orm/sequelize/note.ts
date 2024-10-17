@@ -329,12 +329,19 @@ export default class NoteSequelizeStorage {
    * @param noteIds - list of note ids
    */
   public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
+    if (noteIds.length === 0) {
+      return [];
+    }
+
     const notes: Note[] = await this.model.findAll({
       where: {
         id: {
           [Op.in]: noteIds,
         },
       },
+      order: [
+        this.database.literal(`ARRAY_POSITION(ARRAY[${noteIds.map(id => `${id}`).join(',')}], id)`),
+      ],
     });
 
     return notes;

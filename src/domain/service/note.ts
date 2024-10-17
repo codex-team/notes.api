@@ -443,8 +443,7 @@ export default class NoteService {
   }
 
   /**
-   * Get note parent structure recursively by note id and user id
-   * and check if user has access to the parent note.
+   * Return a sequence of parent notes for the given note id.
    * @param noteId - id of the note to get parent structure
    * @returns - array of notes that are parent structure of the note
    */
