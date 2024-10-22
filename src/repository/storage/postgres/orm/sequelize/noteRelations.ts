@@ -217,7 +217,10 @@ export default class NoteRelationsSequelizeStorage {
    * @param noteId - the ID of the note.
    */
   public async getNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
-    // get all note ids via a singe sql query instead of many
+    // Query to get all parent notes of a note.
+    // The query uses a recursive common table expression (CTE) to get all parent notes of a note.
+    // It starts from the note with the ID :startNoteId and recursively gets all parent notes.
+    // It returns a list of note ID and parent ID of the note.
     const query = `
     WITH RECURSIVE note_parents AS (
       SELECT np.note_id, np.parent_id
