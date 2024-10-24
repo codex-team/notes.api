@@ -325,7 +325,7 @@ export default class NoteSequelizeStorage {
   };
 
   /**
-   * Get all notes based on their ids
+   * Get all notes based on their ids in the same order of passed ids
    * @param noteIds - list of note ids
    */
   public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {

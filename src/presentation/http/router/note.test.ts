@@ -568,7 +568,7 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns two note parents in case when the note parents IDs relations are provided in a different order than expected', async () => {
+    test('Returns note parents in correct order in case when parents created in a non-linear order', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
 
