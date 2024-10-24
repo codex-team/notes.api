@@ -441,4 +441,16 @@ export default class NoteService {
 
     return noteHistoryPublic;
   }
+
+  /**
+   * Return a sequence of parent notes for the given note id.
+   * @param noteId - id of the note to get parent structure
+   * @returns - array of notes that are parent structure of the note
+   */
+  public async getNoteParents(noteId: NoteInternalId): Promise<Note[]> {
+    const noteIds: NoteInternalId[] = await this.noteRelationsRepository.getNoteParentsIds(noteId);
+    const noteParents = await this.noteRepository.getNotesByIds(noteIds);
+
+    return noteParents;
+  }
 }

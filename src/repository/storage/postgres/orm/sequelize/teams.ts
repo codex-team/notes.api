@@ -7,7 +7,6 @@ import { UserModel } from './user.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type User from '@domain/entities/user.js';
 import type { NoteInternalId } from '@domain/entities/note.js';
-import { DomainError } from '@domain/entities/DomainError.js';
 
 /**
  * Class representing a teams model in database
@@ -188,7 +187,7 @@ export default class TeamsSequelizeStorage {
    */
   public async getTeamMembersWithUserInfoByNoteId(noteId: NoteInternalId): Promise<Team> {
     if (!this.userModel) {
-      throw new DomainError('User model not initialized');
+      throw new Error('TeamStorage: User model not defined');
     }
 
     return await this.model.findAll({
