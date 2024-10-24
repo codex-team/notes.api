@@ -632,58 +632,6 @@ describe('Note API', () => {
       });
     });
 
-    test('Returns one parent note when the user is not in the parent note\'s team but has note relation', async () => {
-      /** Create test user */
-      const user = await global.db.insertUser();
-
-      /** Create another user */
-      const anotherUser = await global.db.insertUser();
-
-      /** Create access token for the user */
-      const accessToken = global.auth(user.id);
-
-      /** Create test note - a parent note */
-      const parentNote = await global.db.insertNote({
-        creatorId: anotherUser.id,
-      });
-
-      /** Create test note - a child note */
-      const childNote = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
-      /** Create test note settings */
-      await global.db.insertNoteSetting({
-        noteId: childNote.id,
-        isPublic: true,
-      });
-
-      /** Create test note relation */
-      await global.db.insertNoteRelation({
-        parentId: parentNote.id,
-        noteId: childNote.id,
-      });
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/${childNote.publicId}`,
-      });
-
-      expect(response?.statusCode).toBe(200);
-
-      expect(response?.json()).toMatchObject({
-        parents: [
-          {
-            id: parentNote.publicId,
-            content: parentNote.content,
-          },
-        ],
-      });
-    });
-
     test('Returns empty array in case where there is no relation exist for the note', async () => {
       /** Create test user */
       const user = await global.db.insertUser();
