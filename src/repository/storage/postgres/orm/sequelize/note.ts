@@ -1,11 +1,10 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes, Model, Op } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
-import { DomainError } from '@domain/entities/DomainError.js';
 import type { NoteHistoryModel } from './noteHistory.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -233,11 +232,11 @@ export default class NoteSequelizeStorage {
    */
   public async getNoteListByUserId(userId: number, offset: number, limit: number): Promise<Note[]> {
     if (this.visitsModel === null) {
-      throw new DomainError('NoteVisit model should be defined');
+      throw new Error('NoteStorage: NoteVisit model should be defined');
     }
 
     if (!this.settingsModel) {
-      throw new Error('Note settings model not initialized');
+      throw new Error('NoteStorage: Note settings model not initialized');
     }
 
     const reply = await this.model.findAll({
@@ -293,7 +292,7 @@ export default class NoteSequelizeStorage {
    */
   public async getNoteByHostname(hostname: string): Promise<Note | null> {
     if (!this.settingsModel) {
-      throw new Error('Note settings model not initialized');
+      throw new Error('NoteStorage: Note settings model not initialized');
     }
 
     /**
@@ -324,4 +323,27 @@ export default class NoteSequelizeStorage {
       },
     });
   };
+
+  /**
+   * Get all notes based on their ids in the same order of passed ids
+   * @param noteIds - list of note ids
+   */
+  public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
+    if (noteIds.length === 0) {
+      return [];
+    }
+
+    const notes: Note[] = await this.model.findAll({
+      where: {
+        id: {
+          [Op.in]: noteIds,
+        },
+      },
+      order: [
+        this.database.literal(`ARRAY_POSITION(ARRAY[${noteIds.map(id => `${id}`).join(',')}], id)`),
+      ],
+    });
+
+    return notes;
+  }
 }

@@ -81,4 +81,13 @@ export default class NoteRepository {
   public async getNoteListByUserId(id: number, offset: number, limit: number): Promise<Note[]> {
     return await this.storage.getNoteListByUserId(id, offset, limit);
   }
+
+  /**
+   * Get all notes based on their ids
+   * @param noteIds : list of note ids
+   * @returns an array of notes
+   */
+  public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
+    return await this.storage.getNotesByIds(noteIds);
+  }
 }

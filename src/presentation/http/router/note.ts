@@ -85,6 +85,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         canEdit: boolean;
       };
       tools: EditorTool[];
+      parents: NotePublic[];
     } | ErrorResponse;
   }>('/:notePublicId', {
     config: {
@@ -121,6 +122,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
               type: 'array',
               items: {
                 $ref: 'EditorToolSchema',
+              },
+            },
+            parents: {
+              type: 'array',
+              items: {
+                $ref: 'NoteSchema',
               },
             },
           },
@@ -172,11 +179,18 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
      */
     const canEdit = memberRole === MemberRole.Write;
 
+    const noteParentStructure = await noteService.getNoteParents(noteId);
+
+    const noteParentsPublic = noteParentStructure.map((notes) => {
+      return definePublicNote(notes);
+    });
+
     return reply.send({
       note: notePublic,
       parentNote: parentNote,
       accessRights: { canEdit: canEdit },
       tools: noteTools,
+      parents: noteParentsPublic,
     });
   });
 

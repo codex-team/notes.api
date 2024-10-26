@@ -1,4 +1,5 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, Sequelize } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { Op } from 'sequelize';
 import { NoteModel } from '@repository/storage/postgres/orm/sequelize/note.js';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
@@ -209,4 +210,39 @@ export default class NoteRelationsSequelizeStorage {
 
     return foundNote !== null;
   };
+
+  /**
+   * Get all parent notes of a note that a user has access to,
+   * where the user has access to.
+   * @param noteId - the ID of the note.
+   */
+  public async getNoteParentsIds(noteId: NoteInternalId): Promise<NoteInternalId[]> {
+    // Query to get all parent notes of a note.
+    // The query uses a recursive common table expression (CTE) to get all parent notes of a note.
+    // It starts from the note with the ID :startNoteId and recursively gets all parent notes.
+    // It returns a list of note ID and parent ID of the note.
+    const query = `
+    WITH RECURSIVE note_parents AS (
+      SELECT np.note_id, np.parent_id
+      FROM ${String(this.database.literal(this.tableName).val)} np
+      WHERE np.note_id = :startNoteId
+      UNION ALL
+      SELECT nr.note_id, nr.parent_id
+      FROM ${String(this.database.literal(this.tableName).val)} nr
+      INNER JOIN note_parents np ON np.parent_id = nr.note_id
+    )
+    SELECT np.note_id AS "noteId", np.parent_id AS "parentId"
+    FROM note_parents np;`;
+
+    const result = await this.model.sequelize?.query(query, {
+      replacements: { startNoteId: noteId },
+      type: QueryTypes.SELECT,
+    });
+
+    let noteParents = (result as { noteId: number; parentId: number }[])?.map(note => note.parentId) ?? [];
+
+    noteParents.reverse();
+
+    return noteParents;
+  }
 }
