@@ -49,7 +49,6 @@ const OauthRouter: FastifyPluginCallback<OauthRouterOptions> = (fastify, opts, d
      * Get referer from request headers
      */
     const { token } = await fastify.googleOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
-
     const user = await opts.userService.getUserByProvider(token.access_token, Provider.GOOGLE);
 
     /**

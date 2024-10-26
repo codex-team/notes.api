@@ -59,6 +59,7 @@ describe('User API', () => {
         exportName: 'Code',
         userId: null,
         isDefault: false,
+        description: 'Code tool for Editor.js',
         source: {
           cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
         },
@@ -85,6 +86,8 @@ describe('User API', () => {
           name: 'code',
           title: 'Code Tool',
           exportName: 'Code',
+          description: 'Code tool for Editor.js',
+          cover: '',
           userId: null,
           isDefault: false,
           source: {
