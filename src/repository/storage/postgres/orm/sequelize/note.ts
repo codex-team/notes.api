@@ -5,6 +5,8 @@ import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from 
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
+import type { NoteRelationsModel } from './noteRelations.js';
+import { DomainError } from '@domain/entities/DomainError.js';
 import type { NoteHistoryModel } from './noteHistory.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -75,6 +77,7 @@ export default class NoteSequelizeStorage {
 
   public historyModel: typeof NoteHistoryModel | null = null;
 
+  public relationsModel: typeof NoteRelationsModel | null = null;
   /**
    * Database instance
    */
@@ -155,6 +158,14 @@ export default class NoteSequelizeStorage {
     });
   };
 
+  public createAssociationWithNoteRelationsModel(model: ModelStatic<NoteRelationsModel>): void {
+    this.relationsModel = model;
+
+    this.model.hasMany(this.relationsModel, {
+      foreignKey: 'parentId',
+      as: 'noteRelations',
+    })
+  }
   /**
    * Insert note to database
    * @param options - note creation options
@@ -345,5 +356,58 @@ export default class NoteSequelizeStorage {
     });
 
     return notes;
+  }
+  
+  /**
+   * Gets note list by parent note id
+   * @param parentId - parent note id
+   * @param offset - number of skipped notes
+   * @param limit - number of notes to get
+   */
+  public async getNoteListByParentNote(parentId: NoteInternalId, offset: number, limit: number): Promise<Note[]> {
+    if (!this.relationsModel) {
+      throw new Error('NoteRelations model not initialized');
+    }
+
+    if (!this.settingsModel) {
+      throw new Error('Note settings model not initialized');
+    }
+
+    const childNotes = await this.relationsModel.findAll({
+      where: { parentId },
+      attributes: ['noteId'],
+    });
+    
+    const noteIds = childNotes.map(relation => relation.noteId);
+    
+    
+    const reply = await this.model.findAll({
+      where: {
+        id: {
+          [Op.in]: noteIds,
+        },
+      },
+      include:[{
+        model: this.settingsModel,
+        as: 'noteSettings',
+        attributes: ['cover'],
+        duplicating: false,
+      }],
+      offset,
+      limit,
+    });
+
+    return reply.map((note) => {
+      return {
+        id: note.id,
+        cover: note.noteSettings!.cover,
+        content: note.content,
+        updatedAt: note.updatedAt,
+        createdAt: note.createdAt,
+        publicId: note.publicId,
+        creatorId: note.creatorId,
+        tools: note.tools,
+      };
+    });
   }
 }
