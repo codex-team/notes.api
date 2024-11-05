@@ -6,7 +6,7 @@ import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleReso
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
 import type { NoteListPublic } from '@domain/entities/noteList.js';
-import { NoteInternalId } from '@domain/entities/note.js';
+import type { NoteInternalId } from '@domain/entities/note.js';
 
 /**
  * Interface for the noteList router.
@@ -18,10 +18,9 @@ interface NoteListRouterOptions {
   noteService: NoteService;
 
   /**
-  * Note Settings service instance
-  */
+   * Note Settings service instance
+   */
   noteSettingsService: NoteSettingsService;
-
 
 }
 
@@ -113,7 +112,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
   fastify.get<{
     Params: {
       parentNoteId: NoteInternalId;
-    }
+    };
     Querystring: {
       page: number;
     };
@@ -129,13 +128,15 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
         notePublicId: {
           $ref: 'NoteSchema#/properties/id',
         },
-      }, querystring: {
+      },
+      querystring: {
         page: {
           type: 'number',
           minimum: 1,
           maximum: 30,
         },
-      }, response: {
+      },
+      response: {
         '2xx': {
           description: 'Query notelist',
           properties: {
@@ -149,14 +150,15 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
           },
         },
       },
-    }, preHandler: [
+    },
+    preHandler: [
       noteResolver,
       noteSettingsResolver,
       memberRoleResolver,
     ],
   }, async (request, reply) => {
-    const { parentNoteId } = await request.params;
-    const { page } = await request.query;
+    const { parentNoteId } = request.params;
+    const { page } = request.query;
 
     const noteList = await noteService.getNoteListByParentNote(parentNoteId, page);
     /**
@@ -169,8 +171,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     };
 
     return reply.send(noteListPublic);
-  })
-
+  });
 
   done();
 };

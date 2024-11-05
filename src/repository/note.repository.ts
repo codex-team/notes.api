@@ -90,10 +90,10 @@ export default class NoteRepository {
   public async getNotesByIds(noteIds: NoteInternalId[]): Promise<Note[]> {
     return await this.storage.getNotesByIds(noteIds);
   }
-  
+
   /**
    * Gets note list by parent note id
-   * @param parentId - parent note id
+   * @param parentNoteId - parent note id
    * @param offset - number of skipped notes
    * @param limit - number of notes to get
    */

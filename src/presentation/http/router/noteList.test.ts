@@ -145,7 +145,6 @@ describe('GET /notes?page', () => {
   });
 });
 
-
 describe('GET /notes/:parentNoteId?page', () => {
   test.each([
     /**
@@ -233,7 +232,7 @@ describe('GET /notes/:parentNoteId?page', () => {
       cover: 'DZnvqi63.png',
       isPublic: true,
     });
-    
+
     for (let i = 0; i < portionSize; i++) {
       const note = await global.db.insertNote({
         creatorId: creator.id,
@@ -244,7 +243,7 @@ describe('GET /notes/:parentNoteId?page', () => {
         cover: 'DZnvqi63.png',
         isPublic: true,
       });
-      
+
       await global.db.insertNoteRelation({
         parentId: parentNote.id,
         noteId: note.id,
@@ -272,4 +271,3 @@ describe('GET /notes/:parentNoteId?page', () => {
     }
   });
 });
-

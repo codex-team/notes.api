@@ -6,7 +6,6 @@ import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteRelationsModel } from './noteRelations.js';
-import { DomainError } from '@domain/entities/DomainError.js';
 import type { NoteHistoryModel } from './noteHistory.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -164,8 +163,9 @@ export default class NoteSequelizeStorage {
     this.model.hasMany(this.relationsModel, {
       foreignKey: 'parentId',
       as: 'noteRelations',
-    })
+    });
   }
+
   /**
    * Insert note to database
    * @param options - note creation options
@@ -357,7 +357,7 @@ export default class NoteSequelizeStorage {
 
     return notes;
   }
-  
+
   /**
    * Gets note list by parent note id
    * @param parentId - parent note id
@@ -377,17 +377,16 @@ export default class NoteSequelizeStorage {
       where: { parentId },
       attributes: ['noteId'],
     });
-    
+
     const noteIds = childNotes.map(relation => relation.noteId);
-    
-    
+
     const reply = await this.model.findAll({
       where: {
         id: {
           [Op.in]: noteIds,
         },
       },
-      include:[{
+      include: [{
         model: this.settingsModel,
         as: 'noteSettings',
         attributes: ['cover'],

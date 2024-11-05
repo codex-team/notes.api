@@ -35,13 +35,13 @@ export default function useNoteResolver(noteService: NoteService): {
       const publicId = requestData.notePublicId as NotePublicId;
 
       return await noteService.getNoteByPublicId(publicId);
-    }
-    else if (hasProperty(requestData, 'parentNoteId') && notEmpty(requestData.parentNoteId)) {
+    } else if (hasProperty(requestData, 'parentNoteId') && notEmpty(requestData.parentNoteId)) {
       const noteId = requestData.parentNoteId as NoteInternalId;
-      return await noteService.getNoteById(noteId)
+
+      return await noteService.getNoteById(noteId);
     }
   }
-  
+
   return {
     noteResolver: async function noteIdResolver(request, reply) {
       let note: Note | undefined;
