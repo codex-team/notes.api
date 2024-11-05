@@ -120,6 +120,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
   }>('/:parentNoteId', {
     config: {
       policy: [
+        'authRequired',
         'notePublicOrUserInTeam',
       ],
     },

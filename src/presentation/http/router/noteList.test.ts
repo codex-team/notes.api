@@ -144,3 +144,132 @@ describe('GET /notes?page', () => {
     }
   });
 });
+
+
+describe('GET /notes/:parentNoteId?page', () => {
+  test.each([
+    /**
+     * Returns noteList with specified length
+     * User is authorized
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 200,
+      expectedMessage: null,
+      expectedLength: 30,
+      pageNumber: 1,
+    },
+    /**
+     * Returns noteList with specified length (for last page)
+     * User is authorized
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 200,
+      expectedMessage: null,
+      expectedLength: 19,
+      pageNumber: 2,
+    },
+    /**
+     * Returns noteList with no items if there are no notes for certain parentNote
+     * User is authorized
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 200,
+      expectedMessage: null,
+      expectedLength: 0,
+      pageNumber: 3,
+    },
+    /**
+     * Returns 'querystring/page must be >= 1' message when page < 0
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 400,
+      expectedMessage: 'querystring/page must be >= 1',
+      expectedLength: 0,
+      pageNumber: -1,
+    },
+    /**
+     * Returns 'querystring/page must be <= 30' message when page is too large (maximum page numbrer is 30 by default)
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 400,
+      expectedMessage: 'querystring/page must be <= 30',
+      expectedLength: 0,
+      pageNumber: 31,
+    },
+    /**
+     * Returns 'unauthorized' message when user is not authorized
+     */
+    {
+      isAuthorized: false,
+      expectedStatusCode: 401,
+      expectedMessage: 'You must be authenticated to access this resource',
+      expectedLength: 0,
+      pageNumber: 1,
+    },
+  ])('Get note list', async ({ isAuthorized, expectedStatusCode, expectedMessage, expectedLength, pageNumber }) => {
+    const portionSize = 49;
+    let accessToken;
+
+    /** Insert creator and randomGuy */
+    const creator = await global.db.insertUser();
+
+    const randomGuy = await global.db.insertUser();
+
+    if (isAuthorized) {
+      accessToken = global.auth(randomGuy.id);
+    }
+
+    const parentNote = await global.db.insertNote({
+      creatorId: creator.id,
+    });
+
+    await global.db.insertNoteSetting({
+      noteId: parentNote.id,
+      cover: 'DZnvqi63.png',
+      isPublic: true,
+    });
+    
+    for (let i = 0; i < portionSize; i++) {
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        cover: 'DZnvqi63.png',
+        isPublic: true,
+      });
+      
+      await global.db.insertNoteRelation({
+        parentId: parentNote.id,
+        noteId: note.id,
+      });
+    }
+
+    const response = await global.api?.fakeRequest({
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+      url: `/notes/${parentNote.id}?page=${pageNumber}`,
+    });
+
+    const body = response?.json();
+
+    if (expectedMessage !== null) {
+      expect(response?.statusCode).toBe(expectedStatusCode);
+
+      expect(body.message).toBe(expectedMessage);
+    } else {
+      expect(response?.statusCode).toBe(expectedStatusCode);
+
+      expect(body.items).toHaveLength(expectedLength);
+    }
+  });
+});
+
