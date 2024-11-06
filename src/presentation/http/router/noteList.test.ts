@@ -157,6 +157,8 @@ describe('GET /notes/:parentNoteId?page', () => {
       expectedMessage: null,
       expectedLength: 30,
       pageNumber: 1,
+      isTeamMember: false,
+      isPublic: true,
     },
     /**
      * Returns noteList with specified length (for last page)
@@ -168,6 +170,8 @@ describe('GET /notes/:parentNoteId?page', () => {
       expectedMessage: null,
       expectedLength: 19,
       pageNumber: 2,
+      isTeamMember: false,
+      isPublic: true,
     },
     /**
      * Returns noteList with no items if there are no notes for certain parentNote
@@ -179,6 +183,8 @@ describe('GET /notes/:parentNoteId?page', () => {
       expectedMessage: null,
       expectedLength: 0,
       pageNumber: 3,
+      isTeamMember: false,
+      isPublic: true,
     },
     /**
      * Returns 'querystring/page must be >= 1' message when page < 0
@@ -189,6 +195,8 @@ describe('GET /notes/:parentNoteId?page', () => {
       expectedMessage: 'querystring/page must be >= 1',
       expectedLength: 0,
       pageNumber: -1,
+      isTeamMember: false,
+      isPublic: true,
     },
     /**
      * Returns 'querystring/page must be <= 30' message when page is too large (maximum page numbrer is 30 by default)
@@ -199,6 +207,8 @@ describe('GET /notes/:parentNoteId?page', () => {
       expectedMessage: 'querystring/page must be <= 30',
       expectedLength: 0,
       pageNumber: 31,
+      isTeamMember: false,
+      isPublic: true,
     },
     /**
      * Returns 'unauthorized' message when user is not authorized
@@ -209,13 +219,52 @@ describe('GET /notes/:parentNoteId?page', () => {
       expectedMessage: 'You must be authenticated to access this resource',
       expectedLength: 0,
       pageNumber: 1,
+      isTeamMember: false,
+      isPublic: true,
     },
-  ])('Get note list', async ({ isAuthorized, expectedStatusCode, expectedMessage, expectedLength, pageNumber }) => {
+    /**
+     * Returns noteList if user is in team
+     * User is authorized
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 200,
+      expectedMessage: null,
+      expectedLength: 30,
+      pageNumber: 1,
+      isTeamMember: true,
+      isPublic: false,
+    },
+    /**
+     * Returns error message with no items if user is not in team
+     * User is authorized
+     */
+    {
+      isAuthorized: true,
+      expectedStatusCode: 403,
+      expectedMessage: 'Permission denied',
+      expectedLength: 0,
+      pageNumber: 1,
+      isTeamMember: false,
+      isPublic: false,
+    },
+  ])('Get note list', async ({ isAuthorized, expectedStatusCode, expectedMessage, expectedLength, pageNumber, isTeamMember, isPublic }) => {
     const portionSize = 49;
     let accessToken;
 
-    /** Insert creator and randomGuy */
+    /** Insert creator */
     const creator = await global.db.insertUser();
+
+    /** Insert Note */
+    const parentNote = await global.db.insertNote({
+      creatorId: creator.id,
+    });
+
+    const noteSetting = await global.db.insertNoteSetting({
+      noteId: parentNote.id,
+      cover: 'DZnvqi63.png',
+      isPublic: isPublic,
+    });
 
     const randomGuy = await global.db.insertUser();
 
@@ -223,15 +272,15 @@ describe('GET /notes/:parentNoteId?page', () => {
       accessToken = global.auth(randomGuy.id);
     }
 
-    const parentNote = await global.db.insertNote({
-      creatorId: creator.id,
-    });
-
-    await global.db.insertNoteSetting({
-      noteId: parentNote.id,
-      cover: 'DZnvqi63.png',
-      isPublic: true,
-    });
+    if (isTeamMember) {
+      await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/join/${noteSetting.invitationHash}`,
+      });
+    }
 
     for (let i = 0; i < portionSize; i++) {
       const note = await global.db.insertNote({

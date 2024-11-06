@@ -141,11 +141,8 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
           description: 'Query notelist',
           properties: {
             items: {
-              id: { type: 'string' },
-              content: { type: 'string' },
-              createdAt: { type: 'string' },
-              creatorId: { type: 'string' },
-              updatedAt: { type: 'string' },
+              type: 'array',
+              items: { $ref: 'NoteSchema#' },
             },
           },
         },

@@ -161,7 +161,7 @@ export default class NoteSequelizeStorage {
     this.relationsModel = model;
 
     this.model.hasMany(this.relationsModel, {
-      foreignKey: 'parentId',
+      foreignKey: 'noteId',
       as: 'noteRelations',
     });
   }
@@ -373,27 +373,34 @@ export default class NoteSequelizeStorage {
       throw new Error('Note settings model not initialized');
     }
 
-    const childNotes = await this.relationsModel.findAll({
-      where: { parentId },
-      attributes: ['noteId'],
-    });
-
-    const noteIds = childNotes.map(relation => relation.noteId);
-
     const reply = await this.model.findAll({
-      where: {
-        id: {
-          [Op.in]: noteIds,
+      include: [
+        {
+          model: this.relationsModel,
+          as: 'noteRelations',
+          where: {
+            parentId,
+          },
+          duplicating: false,
+          attributes: [],
         },
-      },
-      include: [{
-        model: this.settingsModel,
-        as: 'noteSettings',
-        attributes: ['cover'],
-        duplicating: false,
-      }],
-      offset,
-      limit,
+        {
+          model: this.settingsModel,
+          as: 'noteSettings',
+          attributes: ['cover'],
+          duplicating: false,
+        },
+      ],
+      order: [[
+        {
+          model: this.relationsModel,
+          as: 'noteRelations',
+        },
+        'id',
+        'DESC',
+      ]],
+      offset: offset,
+      limit: limit,
     });
 
     return reply.map((note) => {
