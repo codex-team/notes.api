@@ -192,7 +192,7 @@ export default class TeamsSequelizeStorage {
 
     return await this.model.findAll({
       where: { noteId },
-      attributes: ['id', 'role'],
+      attributes: ['id', 'role', 'userId'],
       include: {
         model: this.userModel,
         as: 'user',

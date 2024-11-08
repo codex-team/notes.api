@@ -4,7 +4,7 @@ import { notEmpty } from '@infrastructure/utils/empty.js';
 import { StatusCodes } from 'http-status-codes';
 import hasProperty from '@infrastructure/utils/hasProperty.js';
 import { getLogger } from '@infrastructure/logging/index.js';
-import type { Note, NotePublicId, NoteInternalId } from '@domain/entities/note.js';
+import type { Note, NotePublicId } from '@domain/entities/note.js';
 
 /**
  * Add middleware for resolve Note by public id and add it to request
@@ -35,10 +35,6 @@ export default function useNoteResolver(noteService: NoteService): {
       const publicId = requestData.notePublicId as NotePublicId;
 
       return await noteService.getNoteByPublicId(publicId);
-    } else if (hasProperty(requestData, 'parentNoteId') && notEmpty(requestData.parentNoteId)) {
-      const noteId = requestData.parentNoteId as NoteInternalId;
-
-      return await noteService.getNoteById(noteId);
     }
   }
 

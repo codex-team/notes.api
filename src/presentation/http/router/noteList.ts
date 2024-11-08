@@ -1,8 +1,5 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
-import useNoteResolver from '../middlewares/note/useNoteResolver.js';
-import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
-import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
 import type { NoteListPublic } from '@domain/entities/noteList.js';
@@ -33,24 +30,6 @@ interface NoteListRouterOptions {
 const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, opts, done) => {
   const noteService = opts.noteService;
   const noteSettingsService = opts.noteSettingsService;
-
-  /**
-   * Prepare note id resolver middleware
-   * It should be used in routes that accepts note public id
-   */
-  const { noteResolver } = useNoteResolver(noteService);
-
-  /**
-   * Prepare note settings resolver middleware
-   * It should be used to use note settings in middlewares
-   */
-  const { noteSettingsResolver } = useNoteSettingsResolver(noteSettingsService);
-
-  /**
-   * Prepare user role resolver middleware
-   * It should be used to use user role in middlewares
-   */
-  const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService);
 
   /**
    * Get note list ordered by time of last visit
@@ -120,7 +99,6 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     config: {
       policy: [
         'authRequired',
-        'notePublicOrUserInTeam',
       ],
     },
     schema: {
@@ -148,15 +126,26 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
         },
       },
     },
-    preHandler: [
-      noteResolver,
-      noteSettingsResolver,
-      memberRoleResolver,
-    ],
   }, async (request, reply) => {
     const { parentNoteId } = request.params;
+    const userId = request.userId as number;
     const { page } = request.query;
 
+    /**
+     * Fetching note settings from noteSetting service
+     */
+    const noteSettings = await noteSettingsService.getNoteSettingsByNoteId(parentNoteId);
+
+    if (!noteSettings.isPublic) {
+      const isTeamMember = noteSettings.team?.find(team => team.userId === userId);
+
+      /**
+       * Checks if the user is a member of the team
+       */
+      if (!isTeamMember) {
+        return reply.forbidden();
+      }
+    }
     const noteList = await noteService.getNoteListByParentNote(parentNoteId, page);
     /**
      * Wrapping Notelist for public use
