@@ -103,6 +103,13 @@ export default class TeamsSequelizeStorage {
       tableName: this.tableName,
       sequelize: this.database,
       timestamps: false,
+      indexes: [
+        // Create a unique index on noteId and userId
+        {
+          unique: true,
+          fields: ['noteId', 'userId'],
+        },
+      ],
     });
   }
 
