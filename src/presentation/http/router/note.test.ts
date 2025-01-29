@@ -282,9 +282,10 @@ describe('Note API', () => {
           tools: [headerTool, paragraphTool],
         });
 
-        /** Check if response has createdAt and updatedAt fields */
+        /** Check if response has createdAt, updatedAt and creatorId fields */
         expect(response?.json().note.createdAt).not.toBeNull();
         expect(response?.json().note.updatedAt).not.toBeNull();
+        expect(response?.json().note.creatorId).not.toBeNull();
       } else {
         expect(response?.json()).toStrictEqual({
           message: expectedMessage,
