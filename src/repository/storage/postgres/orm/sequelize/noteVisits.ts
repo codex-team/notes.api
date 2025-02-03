@@ -52,7 +52,7 @@ export default class NoteVisitsSequelizeStorage {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: UserModel.tableName,
+          model: NoteModel.tableName,
           key: 'id',
         },
       },
@@ -60,7 +60,7 @@ export default class NoteVisitsSequelizeStorage {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: NoteModel.tableName,
+          model: UserModel.tableName,
           key: 'id',
         },
       },
