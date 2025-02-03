@@ -285,7 +285,7 @@ describe('Note API', () => {
         /** Check if response has createdAt, updatedAt and creatorId fields */
         expect(response?.json().note.createdAt).not.toBeNull();
         expect(response?.json().note.updatedAt).not.toBeNull();
-        expect(response?.json().note.creatorId).not.toBeNull();
+        expect(response?.json().note.creatorId).to.be.equal(creator.id);
       } else {
         expect(response?.json()).toStrictEqual({
           message: expectedMessage,
