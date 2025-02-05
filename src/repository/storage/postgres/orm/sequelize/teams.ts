@@ -107,7 +107,7 @@ export default class TeamsSequelizeStorage {
         // Create a unique index on noteId and userId
         {
           unique: true,
-          fields: ['noteId', 'userId'],
+          fields: ['note_id', 'user_id'],
         },
       ],
     });
