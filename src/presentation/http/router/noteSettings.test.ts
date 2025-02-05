@@ -762,12 +762,6 @@ describe('NoteSettings API', () => {
         creatorId: user.id,
       });
 
-      await global.db.insertNoteTeam({
-        noteId: note.id,
-        userId: user.id,
-        role: MemberRole.Write,
-      });
-
       const accessToken = global.auth(user.id);
 
       const response = await global.api?.fakeRequest({
