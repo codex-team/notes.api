@@ -26,6 +26,16 @@ export default interface EditorTool {
   exportName: string;
 
   /**
+   * Description of the tool. It's shown in the marketplace
+   */
+  description?: string;
+
+  /**
+   * S3 key to the tool cover image
+   */
+  cover?: string;
+
+  /**
    * User id that added the tool to the marketplace
    */
   userId: User['id'] | null;

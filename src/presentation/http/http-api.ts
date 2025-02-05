@@ -33,6 +33,7 @@ import { DomainError } from '@domain/entities/DomainError.js';
 import UploadRouter from './router/upload.js';
 import { ajvFilePlugin } from '@fastify/multipart';
 import { UploadSchema } from './schema/Upload.js';
+import { AddEditorToolSchema } from './schema/AddEditorTool.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -246,6 +247,8 @@ export default class HttpApi implements Api {
     await this.server?.register(EditorToolsRouter, {
       prefix: '/editor-tools',
       editorToolsService: domainServices.editorToolsService,
+      fileUploaderService: domainServices.fileUploaderService,
+      fileSizeLimit: this.config.fileSizeLimit,
     });
 
     await this.server?.register(UploadRouter, {
@@ -295,6 +298,7 @@ export default class HttpApi implements Api {
     this.server?.addSchema(HistotyRecordShema);
     this.server?.addSchema(HistoryMetaSchema);
     this.server?.addSchema(EditorToolSchema);
+    this.server?.addSchema(AddEditorToolSchema);
     this.server?.addSchema(NoteSettingsSchema);
     this.server?.addSchema(JoinSchemaParams);
     this.server?.addSchema(JoinSchemaResponse);
