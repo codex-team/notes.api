@@ -37,5 +37,8 @@ export const NoteSchema = {
       type: 'string',
       format: 'date-time',
     },
+    creatorId: {
+      type: 'number',
+    },
   },
 };
