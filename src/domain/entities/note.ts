@@ -27,6 +27,18 @@ export type ToolUsedInNoteContent = {
 };
 
 /**
+ * NoteContent
+ */
+export type NoteContent = {
+  blocks: Array<{
+    id: string;
+    type: string;
+    data: unknown;
+    tunes?: { [name: string]: unknown };
+  }>;
+};
+
+/**
  * Note entity
  */
 export interface Note {
@@ -43,14 +55,7 @@ export interface Note {
   /**
    * Note content
    */
-  content: {
-    blocks: Array<{
-      id: string;
-      type: string;
-      data: unknown;
-      tunes?: { [name: string]: unknown };
-    }>;
-  };
+  content: NoteContent;
 
   /**
    * Note creator id
