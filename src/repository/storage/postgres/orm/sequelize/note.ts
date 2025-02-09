@@ -1,11 +1,12 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
-import { DataTypes, Model, Op } from 'sequelize';
+import { DataTypes, Model, Op, QueryTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteContent, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
+import type { NoteTree } from '@domain/entities/noteTree.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -345,5 +346,87 @@ export default class NoteSequelizeStorage {
     });
 
     return notes;
+  }
+
+  /**
+   * Creates a tree of notes
+   * @param noteId - public note id
+   * @returns NoteTree
+   */
+  public async getNoteTreebyNoteId(noteId: NoteInternalId): Promise<NoteTree | null> {
+    // Fetch all notes and relations in a recursive query
+    const query = `
+    WITH RECURSIVE note_tree AS (
+      SELECT 
+        n.id AS noteId,
+        n.content,
+        n.public_id,
+        nr.parent_id
+      FROM ${String(this.database.literal(this.tableName).val)} n
+      LEFT JOIN ${String(this.database.literal('note_relations').val)} nr ON n.id = nr.note_id
+      WHERE n.id = :startNoteId
+      
+      UNION ALL
+
+      SELECT 
+        n.id AS noteId,
+        n.content,
+        n.public_id,
+        nr.parent_id
+      FROM ${String(this.database.literal(this.tableName).val)} n
+      INNER JOIN ${String(this.database.literal('note_relations').val)} nr ON n.id = nr.note_id
+      INNER JOIN note_tree nt ON nr.parent_id = nt.noteId
+    )
+    SELECT * FROM note_tree;
+    `;
+
+    const result = await this.model.sequelize?.query(query, {
+      replacements: { startNoteId: noteId },
+      type: QueryTypes.SELECT,
+    });
+
+    if (!result || result.length === 0) {
+      return null; // No data found
+    }
+
+    type NoteRow = {
+      noteid: NoteInternalId;
+      public_id: NotePublicId;
+      content: NoteContent;
+      parent_id: NoteInternalId | null;
+    };
+
+    const notes = result as NoteRow[];
+
+    const notesMap = new Map<NoteInternalId, NoteTree>();
+    const publicIdMap = new Map<NoteInternalId, NotePublicId>(); // Internal to Public ID lookup
+
+    let root: NoteTree | null = null;
+
+    // Step 1: Parse and initialize all notes
+    notes.forEach((note) => {
+      notesMap.set(note.noteid, {
+        id: note.public_id,
+        content: note.content,
+        childNotes: [],
+      });
+
+      publicIdMap.set(note.noteid, note.public_id);
+    });
+
+    // Step 2: Build hierarchy
+    notes.forEach((note) => {
+      if (note.parent_id === null) {
+        root = notesMap.get(note.noteid) ?? null;
+      } else {
+        const parent = notesMap.get(note.parent_id);
+
+        if (parent) {
+          parent.childNotes?.push(notesMap.get(note.noteid)!);
+        }
+      }
+    });
+
+    return root;
   }
 }

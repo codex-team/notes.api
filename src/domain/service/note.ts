@@ -9,6 +9,7 @@ import type User from '@domain/entities/user.js';
 import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
 import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
+import type { NoteTree } from '@domain/entities/noteTree.js';
 
 /**
  * Note service
@@ -452,5 +453,21 @@ export default class NoteService {
     const noteParents = await this.noteRepository.getNotesByIds(noteIds);
 
     return noteParents;
+  }
+
+  /**
+   * Reutrn a tree structure of notes with childNotes for the given note id
+   * @param noteId - id of the note to get structure
+   * @returns - Object of notes.
+   */
+  public async getNoteHierarchy(noteId: NoteInternalId): Promise<NoteTree | null> {
+    const ultimateParent = await this.noteRelationsRepository.getUltimateParent(noteId);
+
+    // If there is no ultimate parent, the provided noteId is the ultimate parent
+    const rootNoteId = ultimateParent ?? noteId;
+
+    const noteTree = await this.noteRepository.getNoteTreeByNoteId(rootNoteId);
+
+    return noteTree;
   }
 }

@@ -33,6 +33,7 @@ import { DomainError } from '@domain/entities/DomainError.js';
 import UploadRouter from './router/upload.js';
 import { ajvFilePlugin } from '@fastify/multipart';
 import { UploadSchema } from './schema/Upload.js';
+import { NoteTreeSchema } from './schema/NoteTree.js';
 
 const appServerLogger = getLogger('appServer');
 
@@ -300,6 +301,7 @@ export default class HttpApi implements Api {
     this.server?.addSchema(JoinSchemaResponse);
     this.server?.addSchema(OauthSchema);
     this.server?.addSchema(UploadSchema);
+    this.server?.addSchema(NoteTreeSchema);
   }
 
   /**
