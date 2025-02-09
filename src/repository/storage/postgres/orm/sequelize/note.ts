@@ -399,7 +399,6 @@ export default class NoteSequelizeStorage {
     const notes = result as NoteRow[];
 
     const notesMap = new Map<NoteInternalId, NoteTree>();
-    const publicIdMap = new Map<NoteInternalId, NotePublicId>(); // Internal to Public ID lookup
 
     let root: NoteTree | null = null;
 
@@ -410,8 +409,6 @@ export default class NoteSequelizeStorage {
         content: note.content,
         childNotes: [],
       });
-
-      publicIdMap.set(note.noteid, note.public_id);
     });
 
     // Step 2: Build hierarchy
