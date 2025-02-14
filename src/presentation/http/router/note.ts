@@ -13,7 +13,6 @@ import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
 import type { NoteTree } from '@domain/entities/noteTree.js';
-import logger from '@infrastructure/logging/index.js';
 
 /**
  * Interface for the note router.
@@ -142,14 +141,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       memberRoleResolver,
     ],
   }, async (request, reply) => {
-    logger.warn(request);
     const { note } = request;
-
-    logger.warn(note);
 
     const noteId = request.note?.id as number;
 
-    logger.warn(noteId);
     const { memberRole } = request;
     const { userId } = request;
 

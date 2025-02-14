@@ -1,5 +1,8 @@
 import type { NoteContent, NotePublicId } from './note.js';
 
+/**
+ * Note Tree entity
+ */
 export interface NoteTree {
 
   /**
