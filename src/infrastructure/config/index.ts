@@ -112,12 +112,23 @@ const HttpApiConfig = z.object({
 export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
 
 /**
+ * Socket API configuration
+ */
+const SocketApiConfig = z.object({
+  host: z.string(),
+  port: z.number(),
+});
+
+export type SocketApiConfig = z.infer<typeof SocketApiConfig>;
+
+/**
  * Application configuration
  */
 const AppConfig = z.object({
   httpApi: HttpApiConfig,
   metrics: MetricsConfig,
   logging: LoggingConfig,
+  socketApi: SocketApiConfig,
   database: DatabaseConfig,
   auth: AuthConfig,
   openai: OpenAIConfig,
@@ -161,6 +172,10 @@ const defaultConfig: AppConfig = {
     appServer: 'info',
     database: 'info',
     s3Storage: 'info',
+  },
+  socketApi: {
+    host: '0.0.0.0',
+    port: 8080,
   },
   database: {
     dsn: 'postgres://user:pass@postgres/codex-notes',

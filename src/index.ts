@@ -5,6 +5,7 @@ import runMetricsServer from '@infrastructure/metrics/index.js';
 import { init as initDomainServices } from '@domain/index.js';
 import { initORM, init as initRepositories } from '@repository/index.js';
 import process from 'process';
+import SocketApi from '@presentation/sockets/socket-api.js';
 
 /**
  * Application entry point
@@ -14,10 +15,13 @@ const start = async (): Promise<void> => {
     const orm = await initORM(config.database);
     const repositories = await initRepositories(orm, config.s3);
     const domainServices = initDomainServices(repositories, config);
-    const api = new API(config.httpApi);
+    const httpApi = new API(config.httpApi);
+    const socketApi = new SocketApi(config.socketApi);
 
-    await api.init(domainServices);
-    await api.run();
+    await httpApi.init(domainServices);
+    await httpApi.run();
+
+    await socketApi.init(domainServices);
 
     if (config.metrics.enabled) {
       await runMetricsServer();
