@@ -2288,7 +2288,7 @@ describe('Note API', () => {
     test.each([
       // Test case 1: No parent or child
       {
-        description: 'Get note hierarchy with no parent or child',
+        description: 'Should get note hierarchy with no parent or child when noteId passed has no relations',
         setup: async () => {
           const note = await global.db.insertNote({ creatorId: user.id });
 
@@ -2312,7 +2312,7 @@ describe('Note API', () => {
 
       // Test case 2: With child
       {
-        description: 'Get note hierarchy with child',
+        description: 'Should get note hierarchy with child when noteId passed has relations',
         setup: async () => {
           const childNote = await global.db.insertNote({ creatorId: user.id });
           const parentNote = await global.db.insertNote({ creatorId: user.id });

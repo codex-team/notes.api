@@ -247,7 +247,7 @@ export default class NoteRelationsSequelizeStorage {
   }
 
   /**
-   * Get ultimate parent noteId by noteId
+   * Gets the ultimate parent noteId or `null` if none exists
    * @param noteId - the ID of note
    */
   public async getUltimateParentByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null> {
