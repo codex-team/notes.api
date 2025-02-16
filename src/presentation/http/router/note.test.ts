@@ -1,6 +1,7 @@
 import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
+import type { Note } from '@domain/entities/note.js';
 
 describe('Note API', () => {
   /**
@@ -2270,6 +2271,99 @@ describe('Note API', () => {
       });
 
       expect(response?.json().message).toBe('Note not found');
+    });
+  });
+
+  describe('GET /note/note-hierarchy/:noteId', () => {
+    let accessToken = '';
+    let user: User;
+
+    beforeEach(async () => {
+      /** create test user */
+      user = await global.db.insertUser();
+
+      accessToken = global.auth(user.id);
+    });
+
+    test.each([
+      // Test case 1: No parent or child
+      {
+        description: 'Should get note hierarchy with no parent or child when noteId passed has no relations',
+        setup: async () => {
+          const note = await global.db.insertNote({ creatorId: user.id });
+
+          await global.db.insertNoteSetting({
+            noteId: note.id,
+            isPublic: true,
+          });
+
+          return {
+            note: note,
+            childNote: null,
+          };
+        },
+
+        expected: (note: Note, childNote: Note | null) => ({
+          id: note.publicId,
+          content: note.content,
+          childNotes: childNote,
+        }),
+      },
+
+      // Test case 2: With child
+      {
+        description: 'Should get note hierarchy with child when noteId passed has relations',
+        setup: async () => {
+          const childNote = await global.db.insertNote({ creatorId: user.id });
+          const parentNote = await global.db.insertNote({ creatorId: user.id });
+
+          await global.db.insertNoteSetting({
+            noteId: childNote.id,
+            isPublic: true,
+          });
+          await global.db.insertNoteSetting({
+            noteId: parentNote.id,
+            isPublic: true,
+          });
+          await global.db.insertNoteRelation({
+            noteId: childNote.id,
+            parentId: parentNote.id,
+          });
+
+          return {
+            note: parentNote,
+            childNote: childNote,
+          };
+        },
+        expected: (note: Note, childNote: Note | null) => ({
+          id: note.publicId,
+          content: note.content,
+          childNotes: [
+            {
+              id: childNote?.publicId,
+              content: childNote?.content,
+              childNotes: null,
+            },
+          ],
+        }),
+      },
+    ])('$description', async ({ setup, expected }) => {
+      // Setup the test data
+      const { note, childNote } = await setup();
+
+      // Make the API request
+      const response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/note-hierarchy/${note.publicId}`,
+      });
+
+      // Verify the response
+      expect(response?.json().noteHierarchy).toStrictEqual(
+        expected(note, childNote)
+      );
     });
   });
 });

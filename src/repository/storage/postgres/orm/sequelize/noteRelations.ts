@@ -245,4 +245,34 @@ export default class NoteRelationsSequelizeStorage {
 
     return noteParents;
   }
+
+  /**
+   * Gets the ultimate parent noteId or `null` if none exists
+   * @param noteId - the ID of note
+   */
+  public async getUltimateParentByNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null> {
+    const query = `
+    WITH RECURSIVE note_parents AS (
+      SELECT np.note_id, np.parent_id
+      FROM ${String(this.database.literal(this.tableName).val)} np
+      WHERE np.note_id = :startNoteId
+      UNION ALL
+      SELECT nr.note_id, nr.parent_id
+      FROM ${String(this.database.literal(this.tableName).val)} nr
+      INNER JOIN note_parents np ON np.parent_id = nr.note_id
+    )
+    SELECT np.parent_id AS "parentId"
+    FROM note_parents np
+    WHERE np.parent_id IS NOT NULL
+    ORDER BY np.parent_id ASC
+    LIMIT 1;`;
+
+    const result = await this.model.sequelize?.query(query, {
+      replacements: { startNoteId: noteId },
+      type: QueryTypes.SELECT,
+    });
+    let ultimateParent = (result as { parentId: number }[])[0]?.parentId ?? null;
+
+    return ultimateParent;
+  }
 }

@@ -12,6 +12,7 @@ import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
+import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
 
 /**
  * Interface for the note router.
@@ -141,7 +142,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     ],
   }, async (request, reply) => {
     const { note } = request;
+
     const noteId = request.note?.id as number;
+
     const { memberRole } = request;
     const { userId } = request;
 
@@ -771,6 +774,58 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
 
     return reply.send({
       noteHistoryRecord: historyRecord,
+    });
+  });
+
+  fastify.get<{
+    Params: {
+      notePublicId: NotePublicId;
+    };
+    Reply: {
+      noteHierarchy: NoteHierarchy | null;
+    } | ErrorResponse;
+  }>('/note-hierarchy/:notePublicId', {
+    config: {
+      policy: [
+        'notePublicOrUserInTeam',
+      ],
+    },
+    schema: {
+      params: {
+        notePublicId: {
+          $ref: 'NoteSchema#/properties/id',
+        },
+      },
+      response: {
+        '2xx': {
+          type: 'object',
+          properties: {
+            noteHierarchy: {
+              $ref: 'NoteHierarchySchema#',
+            },
+          },
+        },
+      },
+    },
+    preHandler: [
+      noteResolver,
+      noteSettingsResolver,
+      memberRoleResolver,
+    ],
+  }, async (request, reply) => {
+    const noteId = request.note?.id as number;
+
+    /**
+     * Check if note exists
+     */
+    if (noteId === null) {
+      return reply.notAcceptable('Note not found');
+    }
+
+    const noteHierarchy = await noteService.getNoteHierarchy(noteId);
+
+    return reply.send({
+      noteHierarchy: noteHierarchy,
     });
   });
 
