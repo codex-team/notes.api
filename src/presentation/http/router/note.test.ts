@@ -1,6 +1,7 @@
 import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
+import type { Note } from '@domain/entities/note.js';
 
 describe('Note API', () => {
   /**
@@ -2284,14 +2285,73 @@ describe('Note API', () => {
       accessToken = global.auth(user.id);
     });
 
-    test('Get note hierarchy with no parent or child', async () => {
-      /**
-       * Insert test note, note history record will be inserted automatically
-       */
-      const note = await global.db.insertNote({
-        creatorId: user.id,
-      });
+    test.each([
+      // Test case 1: No parent or child
+      {
+        description: 'Get note hierarchy with no parent or child',
+        setup: async () => {
+          const note = await global.db.insertNote({ creatorId: user.id });
 
+          await global.db.insertNoteSetting({
+            noteId: note.id,
+            isPublic: true,
+          });
+
+          return {
+            note: note,
+            childNote: null,
+          };
+        },
+
+        expected: (note: Note, childNote: Note | null) => ({
+          id: note.publicId,
+          content: note.content,
+          childNotes: childNote,
+        }),
+      },
+
+      // Test case 2: With child
+      {
+        description: 'Get note hierarchy with child',
+        setup: async () => {
+          const childNote = await global.db.insertNote({ creatorId: user.id });
+          const parentNote = await global.db.insertNote({ creatorId: user.id });
+
+          await global.db.insertNoteSetting({
+            noteId: childNote.id,
+            isPublic: true,
+          });
+          await global.db.insertNoteSetting({
+            noteId: parentNote.id,
+            isPublic: true,
+          });
+          await global.db.insertNoteRelation({
+            noteId: childNote.id,
+            parentId: parentNote.id,
+          });
+
+          return {
+            note: parentNote,
+            childNote: childNote,
+          };
+        },
+        expected: (note: Note, childNote: Note | null) => ({
+          id: note.publicId,
+          content: note.content,
+          childNotes: [
+            {
+              id: childNote?.publicId,
+              content: childNote?.content,
+              childNotes: null,
+            },
+          ],
+        }),
+      },
+    ])('$description', async ({ setup, expected }) => {
+      // Setup the test data
+      const { note, childNote } = await setup();
+
+      // Make the API request
       const response = await global.api?.fakeRequest({
         method: 'GET',
         headers: {
@@ -2300,48 +2360,10 @@ describe('Note API', () => {
         url: `/note/note-hierarchy/${note.publicId}`,
       });
 
-      expect(response?.json().notehierarchy.id).toBe(note.publicId);
-      expect(response?.json().notehierarchy.childNotes).toHaveLength(0);
-    });
-
-    test('Get note hierarchy with child', async () => {
-      /* create test child note */
-      const childNote = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
-      /* create test parent note */
-      const parentNote = await global.db.insertNote({
-        creatorId: user.id,
-      });
-
-      /* create note settings for child note */
-      await global.db.insertNoteSetting({
-        noteId: childNote.id,
-        isPublic: true,
-      });
-
-      /* create test relation */
-      await global.db.insertNoteRelation({
-        noteId: childNote.id,
-        parentId: parentNote.id,
-      });
-
-      const response = await global.api?.fakeRequest({
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-        url: `/note/note-hierarchy/${parentNote.publicId}`,
-      });
-
-      const childNoteObj = {
-        id: childNote.publicId,
-        content: childNote.content,
-        childNotes: [],
-      };
-
-      expect(response?.json().notehierarchy.childNotes[0]).toStrictEqual(childNoteObj);
+      // Verify the response
+      expect(response?.json().noteHierarchy).toStrictEqual(
+        expected(note, childNote)
+      );
     });
   });
 });

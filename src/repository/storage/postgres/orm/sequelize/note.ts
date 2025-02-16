@@ -407,7 +407,7 @@ export default class NoteSequelizeStorage {
       notesMap.set(note.noteid, {
         id: note.public_id,
         content: note.content,
-        childNotes: [],
+        childNotes: null,
       });
     });
 
@@ -419,6 +419,10 @@ export default class NoteSequelizeStorage {
         const parent = notesMap.get(note.parent_id);
 
         if (parent) {
+          // Initialize childNotes as an array if it's null
+          if (parent.childNotes === null) {
+            parent.childNotes = [];
+          }
           parent.childNotes?.push(notesMap.get(note.noteid)!);
         }
       }

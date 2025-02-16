@@ -782,12 +782,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId: NotePublicId;
     };
     Reply: {
-      notehierarchy: NoteHierarchy | null;
+      noteHierarchy: NoteHierarchy | null;
     } | ErrorResponse;
   }>('/note-hierarchy/:notePublicId', {
     config: {
       policy: [
-        'authRequired',
+        'notePublicOrUserInTeam',
       ],
     },
     schema: {
@@ -800,7 +800,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         '2xx': {
           type: 'object',
           properties: {
-            notehierarchy: {
+            noteHierarchy: {
               $ref: 'NoteHierarchySchema#',
             },
           },
@@ -809,21 +809,23 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     },
     preHandler: [
       noteResolver,
+      noteSettingsResolver,
+      memberRoleResolver,
     ],
   }, async (request, reply) => {
-    const noteId = request?.note?.id as number;
+    const noteId = request.note?.id as number;
 
     /**
      * Check if note exists
      */
     if (noteId === null) {
-      return reply.notFound('Note not found');
+      return reply.notAcceptable('Note not found');
     }
 
     const noteHierarchy = await noteService.getNoteHierarchy(noteId);
 
     return reply.send({
-      notehierarchy: noteHierarchy,
+      noteHierarchy: noteHierarchy,
     });
   });
 
