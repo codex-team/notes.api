@@ -6,7 +6,7 @@ import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
-import type { NoteTree } from '@domain/entities/noteTree.js';
+import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -351,9 +351,9 @@ export default class NoteSequelizeStorage {
   /**
    * Creates a tree of notes
    * @param noteId - public note id
-   * @returns NoteTree
+   * @returns NoteHierarchy
    */
-  public async getNoteTreebyNoteId(noteId: NoteInternalId): Promise<NoteTree | null> {
+  public async getNoteHierarchybyNoteId(noteId: NoteInternalId): Promise<NoteHierarchy | null> {
     // Fetch all notes and relations in a recursive query
     const query = `
     WITH RECURSIVE note_tree AS (
@@ -398,9 +398,9 @@ export default class NoteSequelizeStorage {
 
     const notes = result as NoteRow[];
 
-    const notesMap = new Map<NoteInternalId, NoteTree>();
+    const notesMap = new Map<NoteInternalId, NoteHierarchy>();
 
-    let root: NoteTree | null = null;
+    let root: NoteHierarchy | null = null;
 
     // Step 1: Parse and initialize all notes
     notes.forEach((note) => {

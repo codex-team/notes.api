@@ -12,7 +12,7 @@ import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
-import type { NoteTree } from '@domain/entities/noteTree.js';
+import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
 
 /**
  * Interface for the note router.
@@ -782,9 +782,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       notePublicId: NotePublicId;
     };
     Reply: {
-      notehierarchy: NoteTree | null;
+      notehierarchy: NoteHierarchy | null;
     } | ErrorResponse;
-  }>('/notehierarchy/:notePublicId', {
+  }>('/note-hierarchy/:notePublicId', {
     config: {
       policy: [
         'authRequired',
@@ -801,7 +801,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
           type: 'object',
           properties: {
             notehierarchy: {
-              $ref: 'NoteTreeSchema#',
+              $ref: 'NoteHierarchySchema#',
             },
           },
         },

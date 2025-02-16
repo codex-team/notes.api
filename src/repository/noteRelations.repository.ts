@@ -82,7 +82,7 @@ export default class NoteRelationsRepository {
    * @param noteId - note id to get ultimate parent
    * @returns - note id of the ultimate parent
    */
-  public async getUltimateParent(noteId: NoteInternalId): Promise<NoteInternalId | null> {
+  public async getUltimateParentNoteId(noteId: NoteInternalId): Promise<NoteInternalId | null> {
     return await this.storage.getUltimateParentByNoteId(noteId);
   }
 }

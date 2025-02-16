@@ -1,5 +1,5 @@
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
-import type { NoteTree } from '@domain/entities/noteTree.js';
+import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 
 /**
@@ -95,9 +95,9 @@ export default class NoteRepository {
   /**
    * Gets the Note tree by note id
    * @param noteId - note id
-   * @returns NoteTree structure
+   * @returns NoteHierarchy structure
    */
-  public async getNoteTreeByNoteId(noteId: NoteInternalId): Promise<NoteTree | null> {
-    return await this.storage.getNoteTreebyNoteId(noteId);
+  public async getNoteHierarchyByNoteId(noteId: NoteInternalId): Promise<NoteHierarchy | null> {
+    return await this.storage.getNoteHierarchybyNoteId(noteId);
   }
 }

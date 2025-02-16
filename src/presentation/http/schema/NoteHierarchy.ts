@@ -1,5 +1,5 @@
-export const NoteTreeSchema = {
-  $id: 'NoteTreeSchema',
+export const NoteHierarchySchema = {
+  $id: 'NoteHierarchySchema',
   properties: {
     id: {
       type: 'string',
@@ -23,7 +23,7 @@ export const NoteTreeSchema = {
     },
     childNotes: {
       type: 'array',
-      items: { $ref: 'NoteTreeSchema#' },
+      items: { $ref: 'NoteHierarchySchema#' },
       nullable: true,
     },
   },

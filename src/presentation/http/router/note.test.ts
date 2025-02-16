@@ -2273,7 +2273,7 @@ describe('Note API', () => {
     });
   });
 
-  describe('GET /note/notehierarchy/:noteId', () => {
+  describe('GET /note/note-hierarchy/:noteId', () => {
     let accessToken = '';
     let user: User;
 
@@ -2297,13 +2297,14 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/notehierarchy/${note.publicId}`,
+        url: `/note/note-hierarchy/${note.publicId}`,
       });
 
       expect(response?.json().notehierarchy.id).toBe(note.publicId);
+      expect(response?.json().notehierarchy.childNotes).toHaveLength(0);
     });
 
-    test('Get note hierarchy with parent or child', async () => {
+    test('Get note hierarchy with child', async () => {
       /* create test child note */
       const childNote = await global.db.insertNote({
         creatorId: user.id,
@@ -2331,10 +2332,16 @@ describe('Note API', () => {
         headers: {
           authorization: `Bearer ${accessToken}`,
         },
-        url: `/note/notehierarchy/${parentNote.publicId}`,
+        url: `/note/note-hierarchy/${parentNote.publicId}`,
       });
 
-      expect(response?.json().notehierarchy.childNotes[0].id).toBe(childNote.publicId);
+      const childNoteObj = {
+        id: childNote.publicId,
+        content: childNote.content,
+        childNotes: [],
+      };
+
+      expect(response?.json().notehierarchy.childNotes[0]).toStrictEqual(childNoteObj);
     });
   });
 });

@@ -3,7 +3,7 @@ import type { NoteContent, NotePublicId } from './note.js';
 /**
  * Note Tree entity
  */
-export interface NoteTree {
+export interface NoteHierarchy {
 
   /**
    * public note id
@@ -18,6 +18,6 @@ export interface NoteTree {
   /**
    * child notes
    */
-  childNotes: NoteTree[] | null;
+  childNotes: NoteHierarchy[] | null;
 
 }
