@@ -20,9 +20,6 @@ const start = async (): Promise<void> => {
 
     await httpApi.init(domainServices);
     await httpApi.run();
-
-    await socketApi.init(domainServices);
-
     if (config.metrics.enabled) {
       await runMetricsServer();
     }

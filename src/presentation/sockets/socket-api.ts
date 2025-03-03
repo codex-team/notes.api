@@ -1,33 +1,83 @@
-import http from "http";
-import { WebSocketServer, WebSocket } from "ws";
-import type { DomainServices } from "@domain/index.ts";
+import { CTProtoServer } from "ctproto";
+
+/**
+ * Интерфейсы для CTProto
+ */
+interface AuthRequestPayload {
+  token: string;
+}
+
+interface AuthResponsePayload {
+  userId: string;
+  username?: string;
+}
+
+interface ApiRequest {
+  messageId: string;
+  type: string;
+  payload: any;
+}
+
+interface ApiResponse {
+  messageId: string;
+  type: string;
+  payload: any;
+}
+
+interface ApiUpdate {
+  messageId: string;
+  type: string;
+  payload: any;
+}
 
 export default class SocketApi {
-  private wss: any | undefined;
-  private server: http.Server;
-  private config: any;
+  private ctproto: CTProtoServer<
+    AuthRequestPayload,
+    AuthResponsePayload,
+    ApiRequest,
+    ApiResponse,
+    ApiUpdate
+  >;
 
-  constructor(config: any) {
+  private config: { host: string; port: number };
+
+  constructor(config: { host: string; port: number }) {
     this.config = config;
-    this.server = http.createServer();
-  }
+    this.ctproto = new CTProtoServer({
+      port: this.config.port,
 
-  public async init(domainServices: DomainServices): Promise<void> {
-    this.wss = new WebSocketServer({ server: this.server });
+      async onAuth(authRequestPayload: AuthRequestPayload): Promise<AuthResponsePayload> {
+        console.log("🔑 Проверка токена:", authRequestPayload.token);
 
-    this.wss.on("connection", (ws: WebSocket) => {
-      ws.on("message", (message: string) => {
-        ws.send(`Echo: ${message}`);//TODO: note.ts route
-      });
+        if (!authRequestPayload.token || authRequestPayload.token !== "valid-token") {
+          throw new Error("❌ Неверный токен");
+        }
 
-      ws.on("close", () => {});
+        return {
+          userId: "111",
+          username: "TestUser",
+        };
+      },
 
-      ws.on("error", (error) => {});
+      async onMessage(message: ApiRequest): Promise<ApiResponse> {
+        console.log("📩 Получено сообщение от клиента:", message);
+
+        if (message.type === "note:join") {
+          return {
+            messageId: message.messageId,
+            type: "response",
+            payload: { status: "joined", noteId: message.payload.noteId },
+          };
+        }
+
+        return {
+          messageId: message.messageId,
+          type: "error",
+          payload: "❌ Неизвестная команда",
+        };
+      },
     });
 
-    const { host, port } = this.config;
-    this.server.listen(port, host, () => {
-      console.log(`WebSocket server running at ws://${host}:${port}`);
-    });
+    console.log(`✅ CTProto-сервер запущен на порту ${this.config.port}`);
   }
 }

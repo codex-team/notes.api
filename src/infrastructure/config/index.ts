@@ -174,7 +174,7 @@ const defaultConfig: AppConfig = {
     s3Storage: 'info',
   },
   socketApi: {
-    host: '0.0.0.0',
+    host: 'localhost',
     port: 8080,
   },
   database: {
