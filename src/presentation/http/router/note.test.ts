@@ -2279,7 +2279,7 @@ describe('Note API', () => {
     let user: User;
 
     const getTitleFromContent = (content: NoteContent | undefined): string => {
-      const limitCharsForNoteTitle = 50; // Same as frontend
+      const limitCharsForNoteTitle = 50;
 
       if (!content) {
         return 'Untitled';
@@ -2289,7 +2289,7 @@ describe('Note API', () => {
       const text = (firstNoteBlock?.data as { text?: string })?.text;
 
       if (text === undefined || text.trim() === '') {
-        return 'Untitled'; // Same fallback
+        return 'Untitled';
       }
 
       return text.replace(/&nbsp;/g, ' ').slice(0, limitCharsForNoteTitle);
