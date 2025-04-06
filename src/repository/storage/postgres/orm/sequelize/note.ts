@@ -402,11 +402,23 @@ export default class NoteSequelizeStorage {
 
     let root: NoteHierarchy | null = null;
 
+    const getTitleFromContent = (content: NoteContent): string => {
+      const limitCharsForNoteTitle = 50;
+      const firstNoteBlock = content.blocks[0];
+      const text = (firstNoteBlock?.data as { text?: string })?.text;
+
+      if (text === undefined || text.trim() === '') {
+        return 'Untitled';
+      }
+
+      return text.replace(/&nbsp;/g, ' ').slice(0, limitCharsForNoteTitle);
+    };
+
     // Step 1: Parse and initialize all notes
     notes.forEach((note) => {
       notesMap.set(note.noteid, {
-        id: note.public_id,
-        content: note.content,
+        noteId: note.public_id,
+        noteTitle: getTitleFromContent(note.content),
         childNotes: null,
       });
     });

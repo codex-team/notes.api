@@ -1,7 +1,7 @@
 import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
-import type { Note } from '@domain/entities/note.js';
+import type { Note, NoteContent } from '@domain/entities/note.js';
 
 describe('Note API', () => {
   /**
@@ -2278,6 +2278,23 @@ describe('Note API', () => {
     let accessToken = '';
     let user: User;
 
+    const getTitleFromContent = (content: NoteContent | undefined): string => {
+      const limitCharsForNoteTitle = 50; // Same as frontend
+
+      if (!content) {
+        return 'Untitled';
+      }
+
+      const firstNoteBlock = content.blocks[0];
+      const text = (firstNoteBlock?.data as { text?: string })?.text;
+
+      if (text === undefined || text.trim() === '') {
+        return 'Untitled'; // Same fallback
+      }
+
+      return text.replace(/&nbsp;/g, ' ').slice(0, limitCharsForNoteTitle);
+    };
+
     beforeEach(async () => {
       /** create test user */
       user = await global.db.insertUser();
@@ -2304,8 +2321,8 @@ describe('Note API', () => {
         },
 
         expected: (note: Note, childNote: Note | null) => ({
-          id: note.publicId,
-          content: note.content,
+          noteId: note.publicId,
+          noteTitle: getTitleFromContent(note.content),
           childNotes: childNote,
         }),
       },
@@ -2336,12 +2353,12 @@ describe('Note API', () => {
           };
         },
         expected: (note: Note, childNote: Note | null) => ({
-          id: note.publicId,
-          content: note.content,
+          noteId: note.publicId,
+          noteTitle: getTitleFromContent(note.content),
           childNotes: [
             {
-              id: childNote?.publicId,
-              content: childNote?.content,
+              noteId: childNote?.publicId,
+              noteTitle: getTitleFromContent(childNote?.content),
               childNotes: null,
             },
           ],
