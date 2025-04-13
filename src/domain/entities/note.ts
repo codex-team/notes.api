@@ -87,3 +87,28 @@ export interface Note {
  * Part of note entity used to create new note
  */
 export type NoteCreationAttributes = Pick<Note, 'publicId' | 'content' | 'creatorId' | 'tools'>;
+
+/**
+ * Part of note Hierarchy
+ */
+export type NoteRow = {
+  /**
+   * Note id
+   */
+  noteId: NoteInternalId;
+
+  /**
+   * Note public id
+   */
+  publicId: NotePublicId;
+
+  /**
+   * Note content
+   */
+  content: NoteContent;
+
+  /**
+   * Parent note id
+   */
+  parentId: NoteInternalId | null;
+};

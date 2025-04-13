@@ -1,4 +1,4 @@
-import type { Note, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteContent, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
 import type NoteRepository from '@repository/note.repository.js';
 import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
@@ -466,8 +466,58 @@ export default class NoteService {
     // If there is no ultimate parent, the provided noteId is the ultimate parent
     const rootNoteId = ultimateParent ?? noteId;
 
-    const noteHierarchy = await this.noteRepository.getNoteHierarchyByNoteId(rootNoteId);
+    const notesRows = await this.noteRepository.getNoteRowByNoteId(rootNoteId);
 
-    return noteHierarchy;
+    const notesMap = new Map<NoteInternalId, NoteHierarchy>();
+
+    let root: NoteHierarchy | null = null;
+
+    if (!notesRows || notesRows.length === 0) {
+      return null;
+    }
+    // Step 1: Parse and initialize all notes
+    notesRows.forEach((note) => {
+      notesMap.set(note.noteId, {
+        noteId: note.publicId,
+        noteTitle: this.getTitleFromContent(note.content),
+        childNotes: null,
+      });
+    });
+
+    // Step 2: Build hierarchy
+    notesRows.forEach((note) => {
+      if (note.parentId === null) {
+        root = notesMap.get(note.noteId) ?? null;
+      } else {
+        const parent = notesMap.get(note.parentId);
+
+        if (parent) {
+          // Initialize childNotes as an array if it's null
+          if (parent.childNotes === null) {
+            parent.childNotes = [];
+          }
+          parent.childNotes?.push(notesMap.get(note.noteId)!);
+        }
+      }
+    });
+
+    return root;
   }
+
+  /**
+   * Get the title of the note
+   * @param content - content of the note
+   * @returns the title of the note
+   */
+  public getTitleFromContent(content: NoteContent): string {
+    const limitCharsForNoteTitle = 50;
+    const firstNoteBlock = content.blocks[0];
+    const text = (firstNoteBlock?.data as { text?: string })?.text;
+
+    if (text === undefined || text.trim() === '') {
+      return 'Untitled';
+    }
+
+    return text.replace(/&nbsp;/g, ' ').slice(0, limitCharsForNoteTitle);
+  };
 }

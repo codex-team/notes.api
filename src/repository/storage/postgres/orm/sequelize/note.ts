@@ -1,12 +1,11 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
 import { DataTypes, Model, Op, QueryTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type { Note, NoteContent, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NoteRow } from '@domain/entities/note.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
 import type { NoteHistoryModel } from './noteHistory.js';
-import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
@@ -349,19 +348,19 @@ export default class NoteSequelizeStorage {
   }
 
   /**
-   * Creates a tree of notes
-   * @param noteId - public note id
-   * @returns NoteHierarchy
+   * Fetches the raw recursive note tree data from DB
+   * @param noteId - note id
+   * @returns Array of raw note rows (note with parent_id)
    */
-  public async getNoteHierarchybyNoteId(noteId: NoteInternalId): Promise<NoteHierarchy | null> {
+  public async getNoteRowbyNoteId(noteId: NoteInternalId): Promise<NoteRow[] | null> {
     // Fetch all notes and relations in a recursive query
     const query = `
     WITH RECURSIVE note_tree AS (
       SELECT 
-        n.id AS noteId,
+        n.id AS "noteId",
         n.content,
-        n.public_id,
-        nr.parent_id
+        n.public_id AS "publicId",
+        nr.parent_id AS "parentId"
       FROM ${String(this.database.literal(this.tableName).val)} n
       LEFT JOIN ${String(this.database.literal('note_relations').val)} nr ON n.id = nr.note_id
       WHERE n.id = :startNoteId
@@ -369,13 +368,13 @@ export default class NoteSequelizeStorage {
       UNION ALL
 
       SELECT 
-        n.id AS noteId,
+        n.id AS "noteId",
         n.content,
-        n.public_id,
-        nr.parent_id
+        n.public_id AS "publicId",
+        nr.parent_id AS "parentId"
       FROM ${String(this.database.literal(this.tableName).val)} n
       INNER JOIN ${String(this.database.literal('note_relations').val)} nr ON n.id = nr.note_id
-      INNER JOIN note_tree nt ON nr.parent_id = nt.noteId
+      INNER JOIN note_tree nt ON nr.parent_id = nt."noteId"
     )
     SELECT * FROM note_tree;
     `;
@@ -388,58 +387,8 @@ export default class NoteSequelizeStorage {
     if (!result || result.length === 0) {
       return null; // No data found
     }
-
-    type NoteRow = {
-      noteid: NoteInternalId;
-      public_id: NotePublicId;
-      content: NoteContent;
-      parent_id: NoteInternalId | null;
-    };
-
     const notes = result as NoteRow[];
 
-    const notesMap = new Map<NoteInternalId, NoteHierarchy>();
-
-    let root: NoteHierarchy | null = null;
-
-    const getTitleFromContent = (content: NoteContent): string => {
-      const limitCharsForNoteTitle = 50;
-      const firstNoteBlock = content.blocks[0];
-      const text = (firstNoteBlock?.data as { text?: string })?.text;
-
-      if (text === undefined || text.trim() === '') {
-        return 'Untitled';
-      }
-
-      return text.replace(/&nbsp;/g, ' ').slice(0, limitCharsForNoteTitle);
-    };
-
-    // Step 1: Parse and initialize all notes
-    notes.forEach((note) => {
-      notesMap.set(note.noteid, {
-        noteId: note.public_id,
-        noteTitle: getTitleFromContent(note.content),
-        childNotes: null,
-      });
-    });
-
-    // Step 2: Build hierarchy
-    notes.forEach((note) => {
-      if (note.parent_id === null) {
-        root = notesMap.get(note.noteid) ?? null;
-      } else {
-        const parent = notesMap.get(note.parent_id);
-
-        if (parent) {
-          // Initialize childNotes as an array if it's null
-          if (parent.childNotes === null) {
-            parent.childNotes = [];
-          }
-          parent.childNotes?.push(notesMap.get(note.noteid)!);
-        }
-      }
-    });
-
-    return root;
+    return notes;
   }
 }

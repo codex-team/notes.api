@@ -1,5 +1,4 @@
-import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId } from '@domain/entities/note.js';
-import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NoteRow } from '@domain/entities/note.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 
 /**
@@ -93,11 +92,11 @@ export default class NoteRepository {
   }
 
   /**
-   * Gets the Note tree by note id
+   * Fetches the raw recursive note tree data from DB
    * @param noteId - note id
-   * @returns NoteHierarchy structure
+   * @returns Array of raw note rows (note with parent_id)
    */
-  public async getNoteHierarchyByNoteId(noteId: NoteInternalId): Promise<NoteHierarchy | null> {
-    return await this.storage.getNoteHierarchybyNoteId(noteId);
+  public async getNoteRowByNoteId(noteId: NoteInternalId): Promise<NoteRow[] | null> {
+    return await this.storage.getNoteRowbyNoteId(noteId);
   }
 }
