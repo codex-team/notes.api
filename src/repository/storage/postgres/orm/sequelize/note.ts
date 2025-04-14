@@ -348,9 +348,9 @@ export default class NoteSequelizeStorage {
   }
 
   /**
-   * Fetches the raw recursive note tree data from DB
+   * Get note row by noteId
    * @param noteId - note id
-   * @returns Array of raw note rows (note with parent_id)
+   * @returns an array of note rows
    */
   public async getNoteRowbyNoteId(noteId: NoteInternalId): Promise<NoteRow[] | null> {
     // Fetch all notes and relations in a recursive query
