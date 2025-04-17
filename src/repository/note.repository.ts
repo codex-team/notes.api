@@ -92,11 +92,11 @@ export default class NoteRepository {
   }
 
   /**
-   * Get note row by noteId
+   * Get note and all of its children recursively
    * @param noteId - note id
-   * @returns an array of note rows
+   * @returns an array of note DAO
    */
-  public async getNoteDAOByNoteId(noteId: NoteInternalId): Promise<NoteDAO[] | null> {
-    return await this.storage.getNoteDAObyNoteId(noteId);
+  public async getNoteTreeByNoteId(noteId: NoteInternalId): Promise<NoteDAO[] | null> {
+    return await this.storage.getNoteTreebyNoteId(noteId);
   }
 }

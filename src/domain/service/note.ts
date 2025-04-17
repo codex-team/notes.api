@@ -466,7 +466,7 @@ export default class NoteService {
     // If there is no ultimate parent, the provided noteId is the ultimate parent
     const rootNoteId = ultimateParent ?? noteId;
 
-    const notesRows = await this.noteRepository.getNoteDAOByNoteId(rootNoteId);
+    const notesRows = await this.noteRepository.getNoteTreeByNoteId(rootNoteId);
 
     const notesMap = new Map<NoteInternalId, NoteHierarchy>();
 

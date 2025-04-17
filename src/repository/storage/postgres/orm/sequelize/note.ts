@@ -348,11 +348,11 @@ export default class NoteSequelizeStorage {
   }
 
   /**
-   * Get note row by noteId
+   * Get note and all of its children recursively
    * @param noteId - note id
-   * @returns an array of note rows
+   * @returns an array of note DAO
    */
-  public async getNoteDAObyNoteId(noteId: NoteInternalId): Promise<NoteDAO[] | null> {
+  public async getNoteTreebyNoteId(noteId: NoteInternalId): Promise<NoteDAO[] | null> {
     // Fetch all notes and relations in a recursive query
     const query = `
     WITH RECURSIVE note_tree AS (
