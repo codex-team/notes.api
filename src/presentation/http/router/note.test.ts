@@ -1,7 +1,7 @@
 import { MemberRole } from '@domain/entities/team.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 import type User from '@domain/entities/user.js';
-import type { Note, NoteContent } from '@domain/entities/note.js';
+import type { Note } from '@domain/entities/note.js';
 
 describe('Note API', () => {
   /**
@@ -2278,23 +2278,6 @@ describe('Note API', () => {
     let accessToken = '';
     let user: User;
 
-    const getTitleFromContent = (content: NoteContent | undefined): string => {
-      const limitCharsForNoteTitle = 50;
-
-      if (!content) {
-        return 'Untitled';
-      }
-
-      const firstNoteBlock = content.blocks[0];
-      const text = (firstNoteBlock?.data as { text?: string })?.text;
-
-      if (text === undefined || text.trim() === '') {
-        return 'Untitled';
-      }
-
-      return text.replace(/&nbsp;/g, ' ').slice(0, limitCharsForNoteTitle);
-    };
-
     beforeEach(async () => {
       /** create test user */
       user = await global.db.insertUser();
@@ -2307,7 +2290,10 @@ describe('Note API', () => {
       {
         description: 'Should get note hierarchy with no parent or child when noteId passed has no relations',
         setup: async () => {
-          const note = await global.db.insertNote({ creatorId: user.id });
+          const note = await global.db.insertNote({
+            creatorId: user.id,
+            content: DEFAULT_NOTE_CONTENT,
+          });
 
           await global.db.insertNoteSetting({
             noteId: note.id,
@@ -2322,7 +2308,7 @@ describe('Note API', () => {
 
         expected: (note: Note, childNote: Note | null) => ({
           noteId: note.publicId,
-          noteTitle: getTitleFromContent(note.content),
+          noteTitle: 'text',
           childNotes: childNote,
         }),
       },
@@ -2331,8 +2317,14 @@ describe('Note API', () => {
       {
         description: 'Should get note hierarchy with child when noteId passed has relations',
         setup: async () => {
-          const childNote = await global.db.insertNote({ creatorId: user.id });
-          const parentNote = await global.db.insertNote({ creatorId: user.id });
+          const childNote = await global.db.insertNote({
+            creatorId: user.id,
+            content: DEFAULT_NOTE_CONTENT,
+          });
+          const parentNote = await global.db.insertNote({
+            creatorId: user.id,
+            content: DEFAULT_NOTE_CONTENT,
+          });
 
           await global.db.insertNoteSetting({
             noteId: childNote.id,
@@ -2354,11 +2346,11 @@ describe('Note API', () => {
         },
         expected: (note: Note, childNote: Note | null) => ({
           noteId: note.publicId,
-          noteTitle: getTitleFromContent(note.content),
+          noteTitle: 'text',
           childNotes: [
             {
               noteId: childNote?.publicId,
-              noteTitle: getTitleFromContent(childNote?.content),
+              noteTitle: 'text',
               childNotes: null,
             },
           ],
