@@ -91,7 +91,7 @@ export type NoteCreationAttributes = Pick<Note, 'publicId' | 'content' | 'creato
 /**
  * Part of note Hierarchy
  */
-export type NoteRow = {
+export type NoteDAO = {
   /**
    * Note id
    */

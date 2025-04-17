@@ -1,4 +1,4 @@
-import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NoteRow } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NoteDAO } from '@domain/entities/note.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 
 /**
@@ -96,7 +96,7 @@ export default class NoteRepository {
    * @param noteId - note id
    * @returns an array of note rows
    */
-  public async getNoteRowByNoteId(noteId: NoteInternalId): Promise<NoteRow[] | null> {
-    return await this.storage.getNoteRowbyNoteId(noteId);
+  public async getNoteDAOByNoteId(noteId: NoteInternalId): Promise<NoteDAO[] | null> {
+    return await this.storage.getNoteDAObyNoteId(noteId);
   }
 }
