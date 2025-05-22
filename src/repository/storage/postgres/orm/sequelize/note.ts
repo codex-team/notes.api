@@ -1,7 +1,7 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
 import { DataTypes, Model, Op, QueryTypes } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
-import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NoteDAO } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NotePreview } from '@domain/entities/note.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
 import type { NoteSettingsModel } from './noteSettings.js';
 import type { NoteVisitsModel } from './noteVisits.js';
@@ -350,9 +350,9 @@ export default class NoteSequelizeStorage {
   /**
    * Get note and all of its children recursively
    * @param noteId - note id
-   * @returns an array of note DAO
+   * @returns an array of NotePreview
    */
-  public async getNoteTreebyNoteId(noteId: NoteInternalId): Promise<NoteDAO[] | null> {
+  public async getNoteTreebyNoteId(noteId: NoteInternalId): Promise<NotePreview[] | null> {
     // Fetch all notes and relations in a recursive query
     const query = `
     WITH RECURSIVE note_tree AS (
@@ -387,7 +387,7 @@ export default class NoteSequelizeStorage {
     if (!result || result.length === 0) {
       return null; // No data found
     }
-    const notes = result as NoteDAO[];
+    const notes = result as NotePreview[];
 
     return notes;
   }

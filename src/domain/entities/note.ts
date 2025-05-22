@@ -89,9 +89,9 @@ export interface Note {
 export type NoteCreationAttributes = Pick<Note, 'publicId' | 'content' | 'creatorId' | 'tools'>;
 
 /**
- * Part of note Hierarchy
+ * Note preview entity used to display notes in a sidebar hierarchy
  */
-export type NoteDAO = {
+export type NotePreview = {
   /**
    * Note id
    */

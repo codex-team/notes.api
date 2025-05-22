@@ -1,4 +1,4 @@
-import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NoteDAO } from '@domain/entities/note.js';
+import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NotePreview } from '@domain/entities/note.js';
 import type NoteStorage from '@repository/storage/note.storage.js';
 
 /**
@@ -94,9 +94,9 @@ export default class NoteRepository {
   /**
    * Get note and all of its children recursively
    * @param noteId - note id
-   * @returns an array of note DAO
+   * @returns an array of NotePreview
    */
-  public async getNoteTreeByNoteId(noteId: NoteInternalId): Promise<NoteDAO[] | null> {
+  public async getNoteTreeByNoteId(noteId: NoteInternalId): Promise<NotePreview[] | null> {
     return await this.storage.getNoteTreebyNoteId(noteId);
   }
 }
