@@ -2290,7 +2290,10 @@ describe('Note API', () => {
       {
         description: 'Should get note hierarchy with no parent or child when noteId passed has no relations',
         setup: async () => {
-          const note = await global.db.insertNote({ creatorId: user.id });
+          const note = await global.db.insertNote({
+            creatorId: user.id,
+            content: DEFAULT_NOTE_CONTENT,
+          });
 
           await global.db.insertNoteSetting({
             noteId: note.id,
@@ -2304,8 +2307,8 @@ describe('Note API', () => {
         },
 
         expected: (note: Note, childNote: Note | null) => ({
-          id: note.publicId,
-          content: note.content,
+          noteId: note.publicId,
+          noteTitle: 'text',
           childNotes: childNote,
         }),
       },
@@ -2314,8 +2317,14 @@ describe('Note API', () => {
       {
         description: 'Should get note hierarchy with child when noteId passed has relations',
         setup: async () => {
-          const childNote = await global.db.insertNote({ creatorId: user.id });
-          const parentNote = await global.db.insertNote({ creatorId: user.id });
+          const childNote = await global.db.insertNote({
+            creatorId: user.id,
+            content: DEFAULT_NOTE_CONTENT,
+          });
+          const parentNote = await global.db.insertNote({
+            creatorId: user.id,
+            content: DEFAULT_NOTE_CONTENT,
+          });
 
           await global.db.insertNoteSetting({
             noteId: childNote.id,
@@ -2336,12 +2345,12 @@ describe('Note API', () => {
           };
         },
         expected: (note: Note, childNote: Note | null) => ({
-          id: note.publicId,
-          content: note.content,
+          noteId: note.publicId,
+          noteTitle: 'text',
           childNotes: [
             {
-              id: childNote?.publicId,
-              content: childNote?.content,
+              noteId: childNote?.publicId,
+              noteTitle: 'text',
               childNotes: null,
             },
           ],
