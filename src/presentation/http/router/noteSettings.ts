@@ -216,7 +216,7 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
    * Patch noteSettings by note id
    */
   fastify.patch<{
-    Body: Pick<NoteSettings, 'customHostname' | 'isPublic' | 'cover'>;
+    Body: Pick<NoteSettings, 'customHostname' | 'isPublic' | 'cover' | 'showNoteHierarchy'>;
     Params: {
       notePublicId: NotePublicId;
     };
@@ -263,12 +263,13 @@ const NoteSettingsRouter: FastifyPluginCallback<NoteSettingsRouterOptions> = (fa
     /**
      * @todo validate data
      */
-    const { customHostname, isPublic, cover } = request.body;
+    const { customHostname, isPublic, cover, showNoteHierarchy } = request.body;
 
     const updatedNoteSettings = await noteSettingsService.patchNoteSettingsByNoteId(noteId, {
       customHostname,
       isPublic,
       cover,
+      showNoteHierarchy,
     });
 
     if (updatedNoteSettings === null) {
