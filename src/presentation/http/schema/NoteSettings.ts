@@ -57,7 +57,6 @@ export const NoteSettingsSchema = {
     },
     showNoteHierarchy: {
       type: 'boolean',
-      default: false,
     },
   },
 };
