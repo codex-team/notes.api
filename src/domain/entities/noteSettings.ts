@@ -43,12 +43,17 @@ export default interface NoteSettings {
    * Team members. Team is empty by default because note creator is not stored in team
    */
   team?: Team;
+
+  /**
+   * Note Heirarchy display
+   */
+  showNoteHierarchy: boolean;
 }
 
 /**
  * Attributes of public note settings
  */
-type NoteSettingsPublicProperties = 'customHostname' | 'isPublic' | 'invitationHash' | 'team' | 'cover' ;
+type NoteSettingsPublicProperties = 'customHostname' | 'isPublic' | 'invitationHash' | 'team' | 'cover' | 'showNoteHierarchy' ;
 
 export interface NoteSettingsPublic extends Pick<NoteSettings, NoteSettingsPublicProperties> {}
 
@@ -63,6 +68,7 @@ export function definePublicNoteSettings(noteSettings: NoteSettings): NoteSettin
     invitationHash: noteSettings.invitationHash,
     team: noteSettings.team,
     cover: noteSettings.cover,
+    showNoteHierarchy: noteSettings.showNoteHierarchy,
   };
 }
 
