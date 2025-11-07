@@ -286,6 +286,55 @@ export default class NoteSequelizeStorage {
   }
 
   /**
+   * Gets note list created by user
+   * @param creatorId - id of note creator
+   * @param offset - number of skipped notes
+   * @param limit - number of notes to get
+   * @returns list of the notes ordered by updatedAt DESC
+   */
+  public async getMyNoteList(creatorId: number, offset: number, limit: number): Promise<Note[]> {
+    if (!this.settingsModel) {
+      throw new Error('NoteStorage: Note settings model not initialized');
+    }
+
+    const reply = await this.model.findAll({
+      offset: offset,
+      limit: limit,
+      where: {
+        creatorId: creatorId,
+      },
+      order: [['updatedAt', 'DESC']],
+      include: [
+        {
+          model: this.settingsModel,
+          as: 'noteSettings',
+          attributes: ['cover'],
+          duplicating: false,
+        },
+      ],
+    });
+
+    /**
+     * Convert note model data to Note entity with cover property
+     */
+    return reply.map((note) => {
+      return {
+        id: note.id,
+        /**
+         * noteSettings is required to be, because we make join
+         */
+        cover: note.noteSettings!.cover,
+        content: note.content,
+        updatedAt: note.updatedAt,
+        createdAt: note.createdAt,
+        publicId: note.publicId,
+        creatorId: note.creatorId,
+        tools: note.tools,
+      };
+    });
+  }
+
+  /**
    * Gets note by id
    * @param hostname - custom hostname
    * @returns found note
@@ -356,7 +405,7 @@ export default class NoteSequelizeStorage {
     // Fetch all notes and relations in a recursive query
     const query = `
     WITH RECURSIVE note_tree AS (
-      SELECT 
+      SELECT
         n.id AS "noteId",
         n.content,
         n.public_id AS "publicId",
@@ -364,10 +413,10 @@ export default class NoteSequelizeStorage {
       FROM ${String(this.database.literal(this.tableName).val)} n
       LEFT JOIN ${String(this.database.literal('note_relations').val)} nr ON n.id = nr.note_id
       WHERE n.id = :startNoteId
-      
+
       UNION ALL
 
-      SELECT 
+      SELECT
         n.id AS "noteId",
         n.content,
         n.public_id AS "publicId",

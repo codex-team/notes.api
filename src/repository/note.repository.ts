@@ -83,6 +83,16 @@ export default class NoteRepository {
   }
 
   /**
+   * Gets note list created by user
+   * @param creatorId - id of note creator
+   * @param offset - number of skipped notes
+   * @param limit - number of notes to get
+   */
+  public async getMyNoteList(creatorId: number, offset: number, limit: number): Promise<Note[]> {
+    return await this.storage.getMyNoteList(creatorId, offset, limit);
+  }
+
+  /**
    * Get all notes based on their ids
    * @param noteIds : list of note ids
    * @returns an array of notes
