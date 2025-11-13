@@ -225,16 +225,16 @@ export default class NoteService {
   }
 
   /**
-   * Returns note list by creator id
+   * Returns recent notes visited by user, ordered by time of last visit
    * @param userId - id of the user
    * @param page - number of current page
    * @returns list of the notes ordered by time of last visit
    */
-  public async getNoteListByUserId(userId: User['id'], page: number): Promise<NoteList> {
+  public async getRecentNotesByUserId(userId: User['id'], page: number): Promise<NoteList> {
     const offset = (page - 1) * this.noteListPortionSize;
 
     return {
-      items: await this.noteRepository.getNoteListByUserId(userId, offset, this.noteListPortionSize),
+      items: await this.noteRepository.getRecentNotesByUserId(userId, offset, this.noteListPortionSize),
     };
   }
 

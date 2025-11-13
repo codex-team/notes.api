@@ -224,13 +224,13 @@ export default class NoteSequelizeStorage {
   }
 
   /**
-   * Gets note list by creator id
+   * Gets recent notes visited by user, ordered by time of last visit
    * @param userId - id of certain user
    * @param offset - number of skipped notes
    * @param limit - number of notes to get
-   * @returns list of the notes
+   * @returns list of the notes ordered by last visit time
    */
-  public async getNoteListByUserId(userId: number, offset: number, limit: number): Promise<Note[]> {
+  public async getRecentNotesByUserId(userId: number, offset: number, limit: number): Promise<Note[]> {
     if (this.visitsModel === null) {
       throw new Error('NoteStorage: NoteVisit model should be defined');
     }
@@ -356,7 +356,7 @@ export default class NoteSequelizeStorage {
     // Fetch all notes and relations in a recursive query
     const query = `
     WITH RECURSIVE note_tree AS (
-      SELECT 
+      SELECT
         n.id AS "noteId",
         n.content,
         n.public_id AS "publicId",
@@ -364,10 +364,10 @@ export default class NoteSequelizeStorage {
       FROM ${String(this.database.literal(this.tableName).val)} n
       LEFT JOIN ${String(this.database.literal('note_relations').val)} nr ON n.id = nr.note_id
       WHERE n.id = :startNoteId
-      
+
       UNION ALL
 
-      SELECT 
+      SELECT
         n.id AS "noteId",
         n.content,
         n.public_id AS "publicId",
