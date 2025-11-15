@@ -38,8 +38,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        # volumes:
-          # - ./database:/var/lib/postgresql/data
+        volumes:
+          - ./database:/var/lib/postgresql/data
 
     steps:
       - name: Wait for PostgreSQL
