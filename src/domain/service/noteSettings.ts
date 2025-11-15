@@ -102,6 +102,7 @@ export default class NoteSettingsService {
       noteId: noteId,
       isPublic: isPublic,
       invitationHash: createInvitationHash(),
+      showNoteHierarchy: false,
     });
   }
 
