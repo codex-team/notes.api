@@ -42,19 +42,16 @@ jobs:
           # - ./database:/var/lib/postgresql/data
 
     steps:
-      - name: Wait for PostgreSQL
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '20s'
-
-      - name: Make runner the owner of database folder
-        run: sudo chown -R $USER database
-
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           ref: ${{ matrix.branch }}
-
+      - name: Wait for PostgreSQL
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '20s'
+      - name: Make runner the owner of database folder
+        run: sudo chown -R $USER database
       - name: Setup node
         uses: actions/setup-node@v3
         with:
