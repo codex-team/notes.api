@@ -64,7 +64,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     const userId = request.userId as number;
     const page = request.query.page;
 
-    const noteList = await noteService.getNoteListByUserId(userId, page);
+    const noteList = await noteService.getRecentNotesByUserId(userId, page);
     /**
      * Wrapping Notelist for public use
      */

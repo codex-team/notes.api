@@ -73,13 +73,13 @@ export default class NoteRepository {
   }
 
   /**
-   * Gets note list by creator id
+   * Gets recent notes visited by user, ordered by time of last visit
    * @param id - note creator id
    * @param offset - number of skipped notes
    * @param limit - number of notes to get
    */
-  public async getNoteListByUserId(id: number, offset: number, limit: number): Promise<Note[]> {
-    return await this.storage.getNoteListByUserId(id, offset, limit);
+  public async getRecentNotesByUserId(id: number, offset: number, limit: number): Promise<Note[]> {
+    return await this.storage.getRecentNotesByUserId(id, offset, limit);
   }
 
   /**
