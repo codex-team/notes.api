@@ -286,6 +286,55 @@ export default class NoteSequelizeStorage {
   }
 
   /**
+   * Gets notes created by user, ordered by creation time
+   * @param creatorId - id of note creator
+   * @param offset - number of skipped notes
+   * @param limit - number of notes to get
+   * @returns list of the notes ordered by creation time
+   */
+  public async getNotesByCreatorId(creatorId: number, offset: number, limit: number): Promise<Note[]> {
+    if (!this.settingsModel) {
+      throw new Error('NoteStorage: Note settings model not initialized');
+    }
+
+    const reply = await this.model.findAll({
+      offset: offset,
+      limit: limit,
+      where: {
+        creatorId: creatorId,
+      },
+      order: [
+        ['createdAt', 'DESC'],
+      ],
+      include: [{
+        model: this.settingsModel,
+        as: 'noteSettings',
+        attributes: ['cover'],
+        duplicating: false,
+      }],
+    });
+
+    /**
+     * Convert note model data to Note entity with cover property
+     */
+    return reply.map((note) => {
+      return {
+        id: note.id,
+        /**
+         * noteSettings is required to be, because we make join
+         */
+        cover: note.noteSettings!.cover,
+        content: note.content,
+        updatedAt: note.updatedAt,
+        createdAt: note.createdAt,
+        publicId: note.publicId,
+        creatorId: note.creatorId,
+        tools: note.tools,
+      };
+    });
+  }
+
+  /**
    * Gets note by id
    * @param hostname - custom hostname
    * @returns found note
