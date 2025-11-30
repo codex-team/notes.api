@@ -77,6 +77,60 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     return reply.send(noteListPublic);
   });
 
+  /**
+   * Get note list created by user, ordered by creation time
+   */
+  fastify.get<{
+    Querystring: {
+      page: number;
+    };
+  }>('/created', {
+    config: {
+      policy: [
+        'authRequired',
+      ],
+    },
+    schema: {
+      querystring: {
+        page: {
+          type: 'number',
+          minimum: 1,
+          maximum: 30,
+        },
+      },
+
+      response: {
+        '2xx': {
+          description: 'Query notelist',
+          properties: {
+            items: {
+              id: { type: 'string' },
+              content: { type: 'string' },
+              createdAt: { type: 'string' },
+              creatorId: { type: 'string' },
+              updatedAt: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+  }, async (request, reply) => {
+    const userId = request.userId as number;
+    const page = request.query.page;
+
+    const noteList = await noteService.getNotesByCreatorId(userId, page);
+    /**
+     * Wrapping Notelist for public use
+     */
+    const noteListItemsPublic: NotePublic[] = noteList.items.map(definePublicNote);
+
+    const noteListPublic: NoteListPublic = {
+      items: noteListItemsPublic,
+    };
+
+    return reply.send(noteListPublic);
+  });
+
   done();
 };
 

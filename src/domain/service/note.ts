@@ -239,6 +239,20 @@ export default class NoteService {
   }
 
   /**
+   * Returns notes created by user, ordered by creation time
+   * @param userId - id of the user
+   * @param page - number of current page
+   * @returns list of the notes ordered by creation time
+   */
+  public async getNotesByCreatorId(userId: User['id'], page: number): Promise<NoteList> {
+    const offset = (page - 1) * this.noteListPortionSize;
+
+    return {
+      items: await this.noteRepository.getNotesByCreatorId(userId, offset, this.noteListPortionSize),
+    };
+  }
+
+  /**
    * Create note relation
    * @param noteId - id of the current note
    * @param parentPublicId - id of the parent note
