@@ -55,5 +55,8 @@ export const NoteSettingsSchema = {
     role: {
       type: 'number',
     },
+    showNoteHierarchy: {
+      type: 'boolean',
+    },
   },
 };
