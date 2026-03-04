@@ -3,6 +3,7 @@ import * as process from 'process';
 import type { LoggingConfig } from '../config/index.js';
 import appConfig from '../config/index.js';
 import type { FastifyRequest } from 'fastify';
+import { getCurrentReqId } from './reqId.context.js';
 
 const loggerConfig = process.env['NODE_ENV'] === 'production'
   ? {}
@@ -45,13 +46,14 @@ export function getLogger(moduleName: keyof LoggingConfig): pino.Logger {
  */
 export function getRequestLogger(moduleName: keyof LoggingConfig, request?: FastifyRequest): pino.Logger {
   const baseLogger = getLogger(moduleName);
-  
-  if (request && request.id) {
+  const reqId = getCurrentReqId() ?? request?.id;
+
+  if (reqId) {
     return baseLogger.child({
-      reqId: request.id,
+      reqId,
     });
   }
-  
+
   return baseLogger;
 }
 

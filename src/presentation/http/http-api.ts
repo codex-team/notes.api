@@ -9,6 +9,7 @@ import { fastifyOauth2 } from '@fastify/oauth2';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUI from '@fastify/swagger-ui';
 import addUserIdResolver from '@presentation/http/middlewares/common/userIdResolver.js';
+import addReqIdContext from '@presentation/http/middlewares/common/reqIdContext.js';
 import cookie from '@fastify/cookie';
 import { notFound, forbidden, unauthorized, notAcceptable, domainError } from './decorators/index.js';
 import NoteRouter from '@presentation/http/router/note.js';
@@ -324,6 +325,7 @@ export default class HttpApi implements Api {
       throw new Error('Server is not initialized');
     }
 
+    addReqIdContext(this.server);
     addUserIdResolver(this.server, domainServices.authService);
   }
 

@@ -1,6 +1,6 @@
 import type { DatabaseConfig } from '@infrastructure/config/index.js';
 import { Sequelize } from 'sequelize';
-import { getLogger } from '@infrastructure/logging/index.js';
+import { getLogger, getRequestLogger } from '@infrastructure/logging/index.js';
 
 const databaseLogger = getLogger('database');
 
@@ -28,7 +28,8 @@ export default class SequelizeOrm {
     this.conn = new Sequelize(this.config.dsn, {
       benchmark: true,
       logging: (message, timing) => {
-        databaseLogger.info(
+        const logger = getRequestLogger('database');
+        logger.info(
           { durationMs: timing },
           message
         );
