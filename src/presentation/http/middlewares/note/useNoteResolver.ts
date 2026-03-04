@@ -21,7 +21,7 @@ export default function useNoteResolver(noteService: NoteService): {
   /**
    * Get logger instance
    */
-  const logger = getLogger('appServer');
+  const logger = getLogger('middlewares');
 
   /**
    * Search for Note by public id in passed payload and resolves a note by it

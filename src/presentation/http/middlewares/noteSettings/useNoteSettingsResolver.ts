@@ -18,7 +18,7 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
   /**
    * Get logger instance
    */
-  const logger = getLogger('appServer');
+  const logger = getLogger('middlewares');
 
   return {
     noteSettingsResolver: async function noteSettingsResolver(request, reply) {

@@ -324,7 +324,7 @@ export default class HttpApi implements Api {
       throw new Error('Server is not initialized');
     }
 
-    addUserIdResolver(this.server, domainServices.authService, appServerLogger);
+    addUserIdResolver(this.server, domainServices.authService);
   }
 
   /**

@@ -1,7 +1,9 @@
 import type { FastifyInstance } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
-import type Logger from '@infrastructure/logging/index.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
+import { getLogger } from '@infrastructure/logging/index.js';
+
+const logger = getLogger('middlewares');
 
 /**
  * Add middleware for resolve userId from Access Token and add it to request
@@ -9,7 +11,7 @@ import { notEmpty } from '@infrastructure/utils/empty.js';
  * @param authService - auth domain service
  * @param logger - logger instance
  */
-export default function addUserIdResolver(server: FastifyInstance, authService: AuthService, logger: typeof Logger): void {
+export default function addUserIdResolver(server: FastifyInstance, authService: AuthService): void {
   /**
    * Default userId value — null
    */

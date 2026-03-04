@@ -1,4 +1,6 @@
 import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
+import { getLogger } from '@infrastructure/logging/index.js';
+const logger = getLogger('policies');
 
 /**
  * Policy to enforce user to be logged in
@@ -10,6 +12,9 @@ export default async function authRequired(context: PolicyContext): Promise<void
   const { userId } = request;
 
   if (userId === null) {
+    logger.warn('User is not authenticated');
     return await reply.unauthorized();
   }
+
+  logger.info(`User authenticated with ID: ${userId}`);
 }

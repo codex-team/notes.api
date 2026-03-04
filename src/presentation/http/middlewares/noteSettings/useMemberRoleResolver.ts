@@ -19,7 +19,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
   /**
    * Get logger instance
    */
-  const logger = getLogger('appServer');
+  const logger = getLogger('middlewares');
 
   return {
     memberRoleResolver: async function memberRoleResolver(request, reply) {
