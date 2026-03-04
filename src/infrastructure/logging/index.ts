@@ -2,6 +2,7 @@ import { pino } from 'pino';
 import * as process from 'process';
 import type { LoggingConfig } from '../config/index.js';
 import appConfig from '../config/index.js';
+import type { FastifyRequest } from 'fastify';
 
 const loggerConfig = process.env['NODE_ENV'] === 'production'
   ? {}
@@ -34,6 +35,24 @@ export function getLogger(moduleName: keyof LoggingConfig): pino.Logger {
   childLogger.level = logLevel;
 
   return childLogger;
+}
+
+/**
+ * Creates a request-scoped logger that includes the request ID
+ * @param moduleName - name of the module that is logging
+ * @param request - Fastify request object containing reqId
+ * @returns Logger instance with request ID context
+ */
+export function getRequestLogger(moduleName: keyof LoggingConfig, request?: FastifyRequest): pino.Logger {
+  const baseLogger = getLogger(moduleName);
+  
+  if (request && request.id) {
+    return baseLogger.child({
+      reqId: request.id,
+    });
+  }
+  
+  return baseLogger;
 }
 
 const logger = getLogger('global');

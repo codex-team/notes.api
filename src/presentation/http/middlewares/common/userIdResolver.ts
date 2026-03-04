@@ -1,9 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
-import { getLogger } from '@infrastructure/logging/index.js';
-
-const logger = getLogger('middlewares');
+import { getRequestLogger } from '@infrastructure/logging/index.js';
 
 /**
  * Add middleware for resolve userId from Access Token and add it to request
@@ -21,6 +19,7 @@ export default function addUserIdResolver(server: FastifyInstance, authService: 
    * Resolve userId from Access Token on each request
    */
   server.addHook('preHandler', (request, _reply, done) => {
+    const logger = getRequestLogger('middlewares', request);
     const authorizationHeader = request.headers.authorization;
 
     if (notEmpty(authorizationHeader)) {

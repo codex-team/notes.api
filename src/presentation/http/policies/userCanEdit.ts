@@ -1,8 +1,7 @@
 import { isEmpty } from '@infrastructure/utils/empty.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
-import { getLogger } from '@infrastructure/logging/index.js';
-const logger = getLogger('policies');
+import { getRequestLogger } from '@infrastructure/logging/index.js';
 
 /**
  * Policy to check whether a user has permission to edit the note
@@ -10,6 +9,7 @@ const logger = getLogger('policies');
  */
 export default async function userCanEdit(context: PolicyContext): Promise<void> {
   const { request, reply, domainServices } = context;
+  const logger = getRequestLogger('policies', request);
 
   const { userId } = request;
 

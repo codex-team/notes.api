@@ -1,5 +1,5 @@
 import type { preHandlerHookHandler } from 'fastify';
-import { getLogger } from '@infrastructure/logging/index.js';
+import { getRequestLogger } from '@infrastructure/logging/index.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 
@@ -15,13 +15,10 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
    */
   noteSettingsResolver: preHandlerHookHandler;
 } {
-  /**
-   * Get logger instance
-   */
-  const logger = getLogger('middlewares');
 
   return {
     noteSettingsResolver: async function noteSettingsResolver(request, reply) {
+      const logger = getRequestLogger('middlewares', request);
       let noteSettings: NoteSettings | null;
 
       try {

@@ -1,6 +1,5 @@
 import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
-import { getLogger } from '@infrastructure/logging/index.js';
-const logger = getLogger('policies');
+import { getRequestLogger } from '@infrastructure/logging/index.js';
 
 /**
  * Policy to enforce user to be logged in
@@ -8,6 +7,7 @@ const logger = getLogger('policies');
  */
 export default async function authRequired(context: PolicyContext): Promise<void> {
   const { request, reply } = context;
+  const logger = getRequestLogger('policies', request);
 
   const { userId } = request;
 

@@ -1,8 +1,7 @@
 import { isEmpty } from '@infrastructure/utils/empty.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
 import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
-import { getLogger } from '@infrastructure/logging/index.js';
-const logger = getLogger('policies');
+import { getRequestLogger } from '@infrastructure/logging/index.js';
 
 /**
  * Policy to check does user have permission to access note
@@ -10,6 +9,7 @@ const logger = getLogger('policies');
  */
 export default async function notePublicOrUserInTeam(context: PolicyContext): Promise<void> {
   const { request, reply, domainServices } = context;
+  const logger = getRequestLogger('policies', request);
 
   const { userId } = request;
 

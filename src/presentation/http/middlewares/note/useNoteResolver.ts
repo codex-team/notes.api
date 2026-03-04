@@ -3,7 +3,7 @@ import type NoteService from '@domain/service/note.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
 import { StatusCodes } from 'http-status-codes';
 import hasProperty from '@infrastructure/utils/hasProperty.js';
-import { getLogger } from '@infrastructure/logging/index.js';
+import { getRequestLogger } from '@infrastructure/logging/index.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 
 /**
@@ -18,11 +18,6 @@ export default function useNoteResolver(noteService: NoteService): {
    */
   noteResolver: preHandlerHookHandler;
 } {
-  /**
-   * Get logger instance
-   */
-  const logger = getLogger('middlewares');
-
   /**
    * Search for Note by public id in passed payload and resolves a note by it
    * @param requestData - fastify request data. Can be query, params or body
@@ -40,6 +35,7 @@ export default function useNoteResolver(noteService: NoteService): {
 
   return {
     noteResolver: async function noteIdResolver(request, reply) {
+      const logger = getRequestLogger('middlewares', request);
       let note: Note | undefined;
 
       let statusCode = StatusCodes.NOT_ACCEPTABLE;
