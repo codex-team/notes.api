@@ -9,7 +9,7 @@ import { getRequestLogger } from '@infrastructure/logging/index.js';
  */
 export default async function notePublicOrUserInTeam(context: PolicyContext): Promise<void> {
   const { request, reply, domainServices } = context;
-  const logger = getRequestLogger('policies', request);
+  const logger = getRequestLogger('policies');
 
   const { userId } = request;
 

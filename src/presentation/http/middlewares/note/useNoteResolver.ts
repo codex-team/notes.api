@@ -35,7 +35,7 @@ export default function useNoteResolver(noteService: NoteService): {
 
   return {
     noteResolver: async function noteIdResolver(request, reply) {
-      const logger = getRequestLogger('middlewares', request);
+      const logger = getRequestLogger('middlewares');
       let note: Note | undefined;
 
       let statusCode = StatusCodes.NOT_ACCEPTABLE;
