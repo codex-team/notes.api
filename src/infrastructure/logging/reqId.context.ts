@@ -19,5 +19,6 @@ export const requestContextStorage = new AsyncLocalStorage<RequestContext>();
  */
 export function getCurrentReqId(): string | undefined {
   const context = requestContextStorage.getStore();
+
   return context?.reqId;
 }

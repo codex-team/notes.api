@@ -16,7 +16,6 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
    */
   memberRoleResolver: preHandlerHookHandler;
 } {
-
   return {
     memberRoleResolver: async function memberRoleResolver(request, reply) {
       const logger = getRequestLogger('middlewares');
@@ -39,7 +38,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
           request.memberRole = memberRole;
         }
       } catch (error) {
-        if (request.note && request.userId) {
+        if (request.note != null && request.userId != null) {
           logger.error(`Can not resolve Member role by note [id = ${request.note.id}] and user [id = ${request.userId}]`);
         } else {
           logger.error('Can not resolve Member role - note or user ID not available');

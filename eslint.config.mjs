@@ -77,6 +77,9 @@ export default [
       'n/no-unsupported-features/es-builtins': ['error', {
         version: '>=22.1.0',
       }],
+      'n/no-unsupported-features/node-builtins': ['error', {
+        version: '>=22.1.0',
+      }],
       '@typescript-eslint/naming-convention': ['error', {
         selector: 'property',
         format: ['camelCase', 'PascalCase'],

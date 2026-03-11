@@ -46,7 +46,7 @@ export function getRequestLogger(moduleName: keyof LoggingConfig): pino.Logger {
   const baseLogger = getLogger(moduleName);
   const reqId = getCurrentReqId();
 
-  if (reqId) {
+  if (reqId != null && reqId !== '') {
     return baseLogger.child({
       reqId,
     });

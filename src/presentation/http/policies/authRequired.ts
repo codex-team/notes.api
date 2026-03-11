@@ -13,6 +13,7 @@ export default async function authRequired(context: PolicyContext): Promise<void
 
   if (userId === null) {
     logger.warn('User is not authenticated');
+
     return await reply.unauthorized();
   }
 

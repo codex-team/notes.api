@@ -29,6 +29,7 @@ export default class SequelizeOrm {
       benchmark: true,
       logging: (message, timing) => {
         const logger = getRequestLogger('database');
+
         logger.info(
           { durationMs: timing },
           message

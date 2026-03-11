@@ -18,6 +18,7 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
    */
   if (isEmpty(request.note) || isEmpty(request.noteSettings)) {
     logger.warn('Note or note settings not found');
+
     return await reply.notAcceptable('Note not found');
   };
 
@@ -40,10 +41,12 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
     /** If user is unathorized we return 401 unauthorized */
     if (isEmpty(userId)) {
       logger.warn('Unauthorized user trying to access private note');
+
       return await reply.unauthorized();
     /** If user is authorized, but is not in the team, we return 403 forbidden */
     } else if (isEmpty(memberRole)) {
       logger.warn('User not in team for private note');
+
       return await reply.forbidden();
     }
   }

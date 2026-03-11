@@ -15,7 +15,6 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
    */
   noteSettingsResolver: preHandlerHookHandler;
 } {
-
   return {
     noteSettingsResolver: async function noteSettingsResolver(request, reply) {
       const logger = getRequestLogger('middlewares');
