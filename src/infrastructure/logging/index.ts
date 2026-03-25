@@ -17,11 +17,19 @@ const loggerConfig = process.env['NODE_ENV'] === 'production'
 
 const rootLogger = pino(loggerConfig);
 
+let loggerCache = new Map<keyof LoggingConfig, pino.Logger>();
+
 /**
  * Creates child logger and returns it.
  * @param moduleName - name of the module that is logging
  */
 export function getLogger(moduleName: keyof LoggingConfig): pino.Logger {
+  const cachedLogger = loggerCache.get(moduleName);
+
+  if (cachedLogger) {
+    return cachedLogger;
+  }
+
   const childLogger = rootLogger.child({
     module: moduleName,
   });
@@ -33,6 +41,8 @@ export function getLogger(moduleName: keyof LoggingConfig): pino.Logger {
   }
 
   childLogger.level = logLevel;
+
+  loggerCache.set(moduleName, childLogger);
 
   return childLogger;
 }
