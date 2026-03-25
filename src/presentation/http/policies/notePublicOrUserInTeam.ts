@@ -50,5 +50,5 @@ export default async function notePublicOrUserInTeam(context: PolicyContext): Pr
       return await reply.forbidden();
     }
   }
-  logger.info('Note access check completed successfully');
+  logger.debug('Note access check completed successfully');
 }

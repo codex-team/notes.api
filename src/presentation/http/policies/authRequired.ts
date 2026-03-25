@@ -17,5 +17,5 @@ export default async function authRequired(context: PolicyContext): Promise<void
     return await reply.unauthorized();
   }
 
-  logger.info(`User authenticated with ID: ${userId}`);
+  logger.debug('User authenticated');
 }

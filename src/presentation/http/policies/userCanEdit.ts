@@ -43,5 +43,5 @@ export default async function userCanEdit(context: PolicyContext): Promise<void>
     return await reply.forbidden();
   }
 
-  logger.info('User edit permission check completed successfully');
+  logger.debug('User edit permission check completed successfully');
 }
