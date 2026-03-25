@@ -39,9 +39,9 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
         }
       } catch (error) {
         if (request.note != null && request.userId != null) {
-          logger.error(`Can not resolve Member role by note [id = ${request.note.id}] and user [id = ${request.userId}]`);
+          logger.error(`Cannot resolve Member role by note [id = ${request.note.id}] and user [id = ${request.userId}]`);
         } else {
-          logger.error('Can not resolve Member role - note or user ID not available');
+          logger.error('Cannot resolve Member role - note or user ID not available');
         }
         logger.error(error);
 
