@@ -34,6 +34,7 @@ import UploadRouter from './router/upload.js';
 import { ajvFilePlugin } from '@fastify/multipart';
 import { UploadSchema } from './schema/Upload.js';
 import { NoteHierarchySchema } from './schema/NoteHierarchy.js';
+import { StatusCodes } from 'http-status-codes';
 
 const appServerLogger = getLogger('appServer');
 
@@ -371,6 +372,21 @@ export default class HttpApi implements Api {
         void reply.domainError(error.message);
 
         return;
+      }
+      /**
+       * JSON parse errors (invalid request body)
+       */
+      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+        this.log.warn({ reqId: request.id }, 'Invalid JSON in request body');
+
+        return reply
+          .code(StatusCodes.BAD_REQUEST)
+          .type('application/json')
+          .send({
+            message: 'Invalid JSON in request body',
+            error: 'Bad Request',
+            statusCode: StatusCodes.BAD_REQUEST,
+          });
       }
       /**
        * If error is not a domain error, we route it to the default error handler
