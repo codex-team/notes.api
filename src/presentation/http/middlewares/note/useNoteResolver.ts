@@ -55,6 +55,7 @@ export default function useNoteResolver(noteService: NoteService): {
 
         if (note) {
           request.note = note;
+          logger.debug('Note resolved by public ID');
         } else {
           throw new Error('Note not found');
         }

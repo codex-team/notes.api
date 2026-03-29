@@ -28,6 +28,7 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
         noteSettings = await noteSettingsService.getNoteSettingsByNoteId(request.note.id);
 
         request.noteSettings = noteSettings;
+        logger.debug('Note settings resolved');
       } catch (error) {
         logger.error('Can not resolve Note settings by note');
         logger.error(error);

@@ -26,6 +26,7 @@ export default function addUserIdResolver(server: FastifyInstance, authService: 
 
       try {
         request.userId = authService.verifyAccessToken(token)['id'];
+        logger.debug('User ID resolved from Access Token');
       } catch (error) {
         logger.error('Invalid Access Token');
         logger.error(error);

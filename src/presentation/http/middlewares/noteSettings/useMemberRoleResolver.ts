@@ -36,6 +36,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
 
         if (memberRole !== undefined) {
           request.memberRole = memberRole;
+          logger.debug('Member role resolved');
         }
       } catch (error) {
         if (request.note != null && request.userId != null) {
