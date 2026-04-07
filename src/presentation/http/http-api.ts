@@ -36,6 +36,10 @@ import { UploadSchema } from './schema/Upload.js';
 import { NoteHierarchySchema } from './schema/NoteHierarchy.js';
 import { StatusCodes } from 'http-status-codes';
 
+interface FastifyError extends Error {
+  code: string;
+}
+
 const appServerLogger = getLogger('appServer');
 
 /**
@@ -375,8 +379,10 @@ export default class HttpApi implements Api {
       }
       /**
        * JSON parse errors (invalid request body)
+       * Errors can be either SyntaxError or FastifyError.
        */
-      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+      if ((error instanceof SyntaxError && error.message.includes('JSON'))
+        || ((error as FastifyError).code?.startsWith('FST_ERR_CTP_') ?? false)) {
         this.log.warn({ reqId: request.id }, 'Invalid JSON in request body');
 
         return reply
@@ -384,8 +390,6 @@ export default class HttpApi implements Api {
           .type('application/json')
           .send({
             message: 'Invalid JSON in request body',
-            error: 'Bad Request',
-            statusCode: StatusCodes.BAD_REQUEST,
           });
       }
       /**
