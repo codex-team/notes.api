@@ -8,6 +8,7 @@ import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
 import FileUploaderService from './service/fileUploader.service.js';
 import NoteVisitsService from './service/noteVisits.js';
+import { PinoDomainLoggerAdapter } from '@infrastructure/logging/pinoLoggerAdapter.js';
 
 /**
  * Interface for initiated services
@@ -60,19 +61,23 @@ export interface DomainServices {
  * @param appConfig - app config
  */
 export function init(repositories: Repositories, appConfig: AppConfig): DomainServices {
+  /** Create a shared logger instance for all domain services */
+  const domainLogger = new PinoDomainLoggerAdapter();
+
   /**
    * @todo use shared methods for uncoupling repositories unrelated to note service
    */
-  const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository, repositories.noteVisitsRepository, repositories.editorToolsRepository, repositories.noteHistoryRepository);
-  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository);
+  const noteService = new NoteService(repositories.noteRepository, repositories.noteRelationsRepository, repositories.noteVisitsRepository, repositories.editorToolsRepository, repositories.noteHistoryRepository, domainLogger);
+  const noteVisitsService = new NoteVisitsService(repositories.noteVisitsRepository, domainLogger);
   const authService = new AuthService(
     appConfig.auth.accessSecret,
     appConfig.auth.accessExpiresIn,
     appConfig.auth.refreshExpiresIn,
-    repositories.userSessionRepository
+    repositories.userSessionRepository,
+    domainLogger
   );
-  const editorToolsService = new EditorToolsService(repositories.editorToolsRepository);
-  const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository);
+  const editorToolsService = new EditorToolsService(repositories.editorToolsRepository, domainLogger);
+  const fileUploaderService = new FileUploaderService(repositories.objectStorageRepository, repositories.fileRepository, domainLogger);
 
   const sharedServices = {
     editorTools: editorToolsService,
@@ -83,8 +88,8 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
      */
   };
 
-  const userService = new UserService(repositories.userRepository, sharedServices);
-  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, sharedServices);
+  const userService = new UserService(repositories.userRepository, sharedServices, domainLogger);
+  const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, sharedServices, domainLogger);
   const aiService = new AIService(repositories.aiRepository);
 
   return {
