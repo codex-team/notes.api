@@ -30,6 +30,7 @@ logging:
   s3Storage: info
   middlewares: info
   policies: info
+  domain: info
 
 s3:
   accessKeyId: 'secret'
