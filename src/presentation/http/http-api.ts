@@ -1,4 +1,4 @@
-import { getLogger } from '@infrastructure/logging/index.js';
+import { getLogger, getRequestLogger } from '@infrastructure/logging/index.js';
 import type { HttpApiConfig } from '@infrastructure/config/index.js';
 import type { FastifyInstance, FastifyBaseLogger } from 'fastify';
 import fastify from 'fastify';
@@ -369,7 +369,9 @@ export default class HttpApi implements Api {
        * If we have an error that occurs in the domain-level we reply it with special format
        */
       if (error instanceof DomainError) {
-        this.log.error(error);
+        getRequestLogger('domain').error({
+          err: error,
+        });
         void reply.domainError(error.message);
 
         return;
