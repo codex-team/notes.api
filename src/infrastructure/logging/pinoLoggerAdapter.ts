@@ -1,6 +1,7 @@
 import type pino from 'pino';
 import type { DomainLogger } from '@domain/service/shared/logger.js';
-import { getRequestLogger } from '@infrastructure/logging/index.js';
+import { getLogger } from '@infrastructure/logging/index.js';
+import { getCurrentReqId } from '@infrastructure/logging/reqId.context.js';
 
 /**
  * Adapter that wraps a pino.Logger to implement the DomainLogger interface
@@ -8,28 +9,30 @@ import { getRequestLogger } from '@infrastructure/logging/index.js';
  * without the domain layer depending directly on pino
  */
 export class PinoDomainLoggerAdapter implements DomainLogger {
+  private readonly baseLogger: pino.Logger;
+
+  constructor() {
+    this.baseLogger = getLogger('domain');
+  }
+
   public debug(msg: string, meta?: Record<string, unknown>): void {
-    this.getReqLogger().debug({
-      msg,
-      ...meta,
-    });
+    const reqId = getCurrentReqId();
+
+    this.baseLogger.debug({ ...meta,
+      reqId }, msg);
   }
 
   public info(msg: string, meta?: Record<string, unknown>): void {
-    this.getReqLogger().info({
-      msg,
-      ...meta,
-    });
+    const reqId = getCurrentReqId();
+
+    this.baseLogger.info({ ...meta,
+      reqId }, msg);
   }
 
   public warn(msg: string, meta?: Record<string, unknown>): void {
-    this.getReqLogger().warn({
-      msg,
-      ...meta,
-    });
-  }
+    const reqId = getCurrentReqId();
 
-  private getReqLogger(): pino.Logger {
-    return getRequestLogger('domain');
+    this.baseLogger.warn({ ...meta,
+      reqId }, msg);
   }
 }
