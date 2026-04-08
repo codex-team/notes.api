@@ -3,6 +3,7 @@ import type AuthPayload from '@domain/entities/authPayload.js';
 import { nanoid } from 'nanoid';
 import type UserSessionRepository from '@repository/userSession.repository.js';
 import type UserSession from '@domain/entities/userSession.js';
+import type { DomainLogger } from './shared/logger.js';
 
 /**
  * Auth service
@@ -29,17 +30,24 @@ export default class AuthService {
   private readonly userSessionRepository: UserSessionRepository;
 
   /**
+   * Logger instance
+   */
+  private readonly logger: DomainLogger;
+
+  /**
    * Creates jwt service instance
    * @param accessSecret - access token secret key
    * @param accessTokenExpiresIn - access token expiration time
    * @param refreshTokenExpiresIn - refresh token expiration time
    * @param userSessionRepository - user session repository instance
+   * @param logger - domain logger
    */
-  constructor(accessSecret: string, accessTokenExpiresIn: number, refreshTokenExpiresIn: number, userSessionRepository: UserSessionRepository) {
+  constructor(accessSecret: string, accessTokenExpiresIn: number, refreshTokenExpiresIn: number, userSessionRepository: UserSessionRepository, logger: DomainLogger) {
     this.accessSecret = accessSecret;
     this.accessExpiresIn = accessTokenExpiresIn;
     this.refreshExpiresIn = refreshTokenExpiresIn;
     this.userSessionRepository = userSessionRepository;
+    this.logger = logger;
   }
 
   /**
@@ -77,6 +85,10 @@ export default class AuthService {
 
     const userSession = await this.userSessionRepository.addUserSession(userId, token, new Date(Date.now() + this.refreshExpiresIn));
 
+    this.logger.debug('Refresh token issued', {
+      userId,
+    });
+
     return userSession.refreshToken;
   }
 
@@ -101,6 +113,8 @@ export default class AuthService {
     if (session.refreshTokenExpiresAt.getTime() < Date.now()) {
       await this.userSessionRepository.removeUserSessionByRefreshToken(token);
 
+      this.logger.warn('Refresh token expired');
+
       return null;
     }
 
@@ -113,5 +127,7 @@ export default class AuthService {
    */
   public async removeSessionByRefreshToken(token: string): Promise<void> {
     await this.userSessionRepository.removeUserSessionByRefreshToken(token);
+
+    this.logger.debug('Session revoked');
   }
 }

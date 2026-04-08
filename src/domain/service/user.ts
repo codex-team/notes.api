@@ -4,6 +4,7 @@ import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { SharedDomainMethods } from './shared/index.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import type { DomainLogger } from './shared/logger.js';
 
 export {
   Provider
@@ -19,12 +20,19 @@ export default class UserService {
   private readonly repository: UserRepository;
 
   /**
+   * Logger instance
+   */
+  private readonly logger: DomainLogger;
+
+  /**
    * User service constructor
    * @param repository - user repository instance
    * @param shared - shared domain methods
+   * @param logger - domain logger
    */
-  constructor(repository: UserRepository, private readonly shared: SharedDomainMethods) {
+  constructor(repository: UserRepository, private readonly shared: SharedDomainMethods, logger: DomainLogger) {
     this.repository = repository;
+    this.logger = logger;
   }
 
   /**
@@ -91,6 +99,12 @@ export default class UserService {
       toolId,
     });
 
+    this.logger.info('User editor tool added', {
+      userId,
+      toolId,
+      toolName: toolToAdd.name,
+    });
+
     return toolToAdd;
   }
 
@@ -105,7 +119,12 @@ export default class UserService {
     userId: User['id'];
     toolId: EditorTool['id'];
   }): Promise<void> {
-    return await this.repository.removeUserEditorTool({
+    await this.repository.removeUserEditorTool({
+      userId,
+      toolId,
+    });
+
+    this.logger.info('User editor tool removed', {
       userId,
       toolId,
     });
