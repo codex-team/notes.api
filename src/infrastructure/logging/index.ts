@@ -17,7 +17,7 @@ const loggerConfig = process.env['NODE_ENV'] === 'production'
 
 const rootLogger = pino(loggerConfig);
 
-let loggerCache = new Map<keyof LoggingConfig, pino.Logger>();
+const loggerCache = new Map<keyof LoggingConfig, pino.Logger>();
 
 /**
  * Creates child logger and returns it.
