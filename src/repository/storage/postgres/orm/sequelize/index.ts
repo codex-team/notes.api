@@ -28,8 +28,15 @@ export default class SequelizeOrm {
     this.conn = new Sequelize(this.config.dsn, {
       benchmark: true,
       logging: (message, timing) => {
+        /**
+         * Creates a request-scoped logger instance for database operations.
+         */
         const logger = getRequestLogger('database');
 
+        /**
+         * Logs the query and its execution time.
+         * The execution time is provided by Sequelize.
+         */
         logger.info(
           { durationMs: timing },
           message
