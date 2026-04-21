@@ -35,6 +35,11 @@ export default class AuthService {
   private readonly logger: DomainLogger;
 
   /**
+   * Number of last characters to log from the refresh token
+   */
+  private readonly logTokenLength: number = 4;
+
+  /**
    * Creates jwt service instance
    * @param accessSecret - access token secret key
    * @param accessTokenExpiresIn - access token expiration time
@@ -113,7 +118,9 @@ export default class AuthService {
     if (session.refreshTokenExpiresAt.getTime() < Date.now()) {
       await this.userSessionRepository.removeUserSessionByRefreshToken(token);
 
-      this.logger.warn('Refresh token expired');
+      this.logger.warn('Refresh token expired', {
+        token: session.refreshToken.slice(-this.logTokenLength),
+      });
 
       return null;
     }
