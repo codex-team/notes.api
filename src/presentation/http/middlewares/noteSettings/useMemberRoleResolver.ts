@@ -18,7 +18,7 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
 } {
   return {
     memberRoleResolver: async function memberRoleResolver(request, reply) {
-      const logger = getRequestLogger('middlewares');
+      const logger = getRequestLogger('middlewares').child({ middleware: 'memberRoleResolver' });
       /** If MemberRole equals null, it means that user is not in the team or is not authenticated */
       let memberRole: MemberRole | undefined;
 

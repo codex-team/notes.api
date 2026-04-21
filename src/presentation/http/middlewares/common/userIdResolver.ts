@@ -18,7 +18,7 @@ export default function addUserIdResolver(server: FastifyInstance, authService: 
    * Resolve userId from Access Token on each request
    */
   server.addHook('preHandler', (request, _reply, done) => {
-    const logger = getRequestLogger('middlewares');
+    const logger = getRequestLogger('middlewares').child({ middleware: 'userIdResolver' });
     const authorizationHeader = request.headers.authorization;
 
     if (notEmpty(authorizationHeader)) {
