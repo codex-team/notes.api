@@ -9,7 +9,7 @@ import { getRequestLogger } from '@infrastructure/logging/index.js';
  */
 export default async function userCanEdit(context: PolicyContext): Promise<void> {
   const { request, reply, domainServices } = context;
-  const logger = getRequestLogger('policies');
+  const logger = getRequestLogger('policies').child({ policy: 'userCanEdit' });
 
   const { userId } = request;
 

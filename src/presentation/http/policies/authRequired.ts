@@ -7,7 +7,7 @@ import { getRequestLogger } from '@infrastructure/logging/index.js';
  */
 export default async function authRequired(context: PolicyContext): Promise<void> {
   const { request, reply } = context;
-  const logger = getRequestLogger('policies');
+  const logger = getRequestLogger('policies').child({ policy: 'authRequired' });
 
   const { userId } = request;
 
