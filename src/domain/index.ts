@@ -8,7 +8,7 @@ import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
 import FileUploaderService from './service/fileUploader.service.js';
 import NoteVisitsService from './service/noteVisits.js';
-import { PinoDomainLoggerAdapter } from '@infrastructure/logging/pinoLoggerAdapter.js';
+import { PinoDomainLoggerAdapter } from '@infrastructure/logging/pinoDomainLoggerAdapter.js';
 
 /**
  * Interface for initiated services

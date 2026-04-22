@@ -2,7 +2,7 @@ import type { NoteInternalId } from '@domain/entities/note.js';
 import type User from '@domain/entities/user.js';
 import type NoteVisit from '@domain/entities/noteVisit.js';
 import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
-import type { DomainLogger } from './shared/logger.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Note Visits service, which will store latest note visit

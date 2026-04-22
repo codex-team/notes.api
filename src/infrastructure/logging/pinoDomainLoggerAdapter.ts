@@ -1,5 +1,5 @@
 import type pino from 'pino';
-import type { DomainLogger } from '@domain/service/shared/logger.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 import { getLogger } from '@infrastructure/logging/index.js';
 import { getCurrentReqId } from '@infrastructure/logging/reqId.context.js';
 

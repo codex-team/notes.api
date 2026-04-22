@@ -3,7 +3,7 @@ import type EditorTool from '@domain/entities/editorTools.js';
 import type EditorToolsServiceSharedMethods from './shared/editorTools.js';
 import type User from '@domain/entities/user.js';
 import type { EditorToolCreationAttributes } from '@domain/entities/editorTools.js';
-import type { DomainLogger } from './shared/logger.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Editor tools service

@@ -3,7 +3,7 @@ import type AuthPayload from '@domain/entities/authPayload.js';
 import { nanoid } from 'nanoid';
 import type UserSessionRepository from '@repository/userSession.repository.js';
 import type UserSession from '@domain/entities/userSession.js';
-import type { DomainLogger } from './shared/logger.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Auth service

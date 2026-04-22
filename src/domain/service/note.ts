@@ -10,7 +10,7 @@ import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
 import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
 import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
-import type { DomainLogger } from './shared/logger.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Note service

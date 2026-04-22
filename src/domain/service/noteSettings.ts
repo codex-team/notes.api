@@ -10,7 +10,7 @@ import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type { SharedDomainMethods } from './shared/index.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
-import type { DomainLogger } from './shared/logger.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Service responsible for Note Settings

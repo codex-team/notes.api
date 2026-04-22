@@ -4,7 +4,7 @@ import type User from '@domain/entities/user.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { SharedDomainMethods } from './shared/index.js';
 import { DomainError } from '@domain/entities/DomainError.js';
-import type { DomainLogger } from './shared/logger.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 export {
   Provider
