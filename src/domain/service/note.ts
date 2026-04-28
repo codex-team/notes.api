@@ -10,6 +10,7 @@ import type { NoteList } from '@domain/entities/noteList.js';
 import type NoteHistoryRepository from '@repository/noteHistory.repository.js';
 import type { NoteHistoryMeta, NoteHistoryRecord, NoteHistoryPublic } from '@domain/entities/noteHistory.js';
 import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Note service
@@ -41,6 +42,11 @@ export default class NoteService {
   public noteHistoryRepository: NoteHistoryRepository;
 
   /**
+   * Logger instance
+   */
+  private logger: DomainLogger;
+
+  /**
    * Number of the notes to be displayed on one page
    * it is used to calculate offset and limit for getting notes that the user has recently opened
    */
@@ -58,13 +64,15 @@ export default class NoteService {
    * @param noteVisitsRepository - note visits repository
    * @param editorToolsRepository - editor tools repositoryn
    * @param noteHistoryRepository - note history repository
+   * @param logger - domain logger
    */
-  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository, noteHistoryRepository: NoteHistoryRepository) {
+  constructor(noteRepository: NoteRepository, noteRelationsRepository: NoteRelationsRepository, noteVisitsRepository: NoteVisitsRepository, editorToolsRepository: EditorToolsRepository, noteHistoryRepository: NoteHistoryRepository, logger: DomainLogger) {
     this.noteRepository = noteRepository;
     this.noteRelationsRepository = noteRelationsRepository;
     this.noteVisitsRepository = noteVisitsRepository;
     this.editorToolsRepository = editorToolsRepository;
     this.noteHistoryRepository = noteHistoryRepository;
+    this.logger = logger;
   }
 
   /**
@@ -103,6 +111,12 @@ export default class NoteService {
       await this.noteRelationsRepository.addNoteRelation(note.id, parentNote.id);
     }
 
+    this.logger.info('Note created', {
+      noteId: note.id,
+      creatorId,
+      parentPublicId,
+    });
+
     return note;
   }
 
@@ -139,6 +153,11 @@ export default class NoteService {
       throw new DomainError(`Note with id ${id} was not deleted`);
     }
 
+    this.logger.info('Note deleted', {
+      noteId: id,
+      hadRelation: hasRelation,
+    });
+
     return isNoteDeleted;
   }
 
@@ -168,6 +187,11 @@ export default class NoteService {
       throw new DomainError(`Note with id ${id} was not updated`);
     }
 
+    this.logger.debug('Note updated', {
+      noteId: id,
+      userId,
+    });
+
     return updatedNote;
   }
 
@@ -176,7 +200,13 @@ export default class NoteService {
    * @param noteId - id of note to unlink parent
    */
   public async unlinkParent(noteId: NoteInternalId): Promise<boolean> {
-    return this.noteRelationsRepository.unlinkParent(noteId);
+    const result = await this.noteRelationsRepository.unlinkParent(noteId);
+
+    this.logger.info('Note parent unlinked', {
+      noteId,
+    });
+
+    return result;
   }
 
   /**
@@ -292,6 +322,11 @@ export default class NoteService {
       throw new DomainError(`Relation was not created`);
     }
 
+    this.logger.info('Note relation created', {
+      noteId,
+      parentNoteId: parentNote.id,
+    });
+
     return parentNote;
   }
 
@@ -301,6 +336,8 @@ export default class NoteService {
    * @param parentPublicId - id of the new parent note
    */
   public async updateNoteRelation(noteId: NoteInternalId, parentPublicId: NotePublicId): Promise<boolean> {
+    const currentParentId = await this.noteRelationsRepository.getParentNoteIdByNoteId(noteId);
+
     const parentNote = await this.noteRepository.getNoteByPublicId(parentPublicId);
 
     if (parentNote === null) {
@@ -320,7 +357,15 @@ export default class NoteService {
       parentNoteId = await this.noteRelationsRepository.getParentNoteIdByNoteId(parentNoteId);
     }
 
-    return await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
+    const result = await this.noteRelationsRepository.updateNoteRelationById(noteId, parentNote.id);
+
+    this.logger.info('Note relation changed', {
+      noteId,
+      oldParentId: currentParentId ?? undefined,
+      newParentId: parentNote.id,
+    });
+
+    return result;
   };
 
   /**

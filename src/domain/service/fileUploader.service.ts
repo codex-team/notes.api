@@ -7,6 +7,7 @@ import type ObjectRepository from '@repository/object.repository.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import mime from 'mime';
 import { isEmpty } from '@infrastructure/utils/empty.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * File data for upload
@@ -41,13 +42,20 @@ export default class FileUploaderService {
   private readonly fileRepository: FileRepository;
 
   /**
+   * Logger instance
+   */
+  private readonly logger: DomainLogger;
+
+  /**
    * File uploader service constructor
    * @param objectRepository - repository for objects
    * @param fileRepository - repository for files data
+   * @param logger - domain logger
    */
-  constructor(objectRepository: ObjectRepository, fileRepository: FileRepository) {
+  constructor(objectRepository: ObjectRepository, fileRepository: FileRepository, logger: DomainLogger) {
     this.objectRepository = objectRepository;
     this.fileRepository = fileRepository;
+    this.logger = logger;
   }
 
   /**
@@ -95,6 +103,14 @@ export default class FileUploaderService {
     if (file === null) {
       throw new DomainError('File was not uploaded');
     }
+
+    this.logger.info('File uploaded', {
+      key: file.key,
+      type,
+      size: fileData.data.length,
+      bucket,
+      userId: file.metadata.userId,
+    });
 
     return file.key;
   }
@@ -170,6 +186,12 @@ export default class FileUploaderService {
     if (isRemovedFromObjectStorage === false || isRemovedFromDatabase === false) {
       throw new DomainError('Cannot delete file');
     }
+
+    this.logger.info('File deleted', {
+      key,
+      type: fileType,
+      bucket,
+    });
   }
 
   /**

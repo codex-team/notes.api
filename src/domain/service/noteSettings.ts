@@ -10,6 +10,7 @@ import { createInvitationHash } from '@infrastructure/utils/invitationHash.js';
 import { DomainError } from '@domain/entities/DomainError.js';
 import type { SharedDomainMethods } from './shared/index.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Service responsible for Note Settings
@@ -23,14 +24,21 @@ export default class NoteSettingsService {
   private readonly teamRepository: TeamRepository;
 
   /**
+   * Logger instance
+   */
+  private readonly logger: DomainLogger;
+
+  /**
    * Note Settings service constructor
    * @param noteSettingsRepository - note settings repository
    * @param teamRepository - team repository
    * @param shared - shared domain methods
+   * @param logger - domain logger
    */
-  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository, private readonly shared: SharedDomainMethods) {
+  constructor(noteSettingsRepository: NoteSettingsRepository, teamRepository: TeamRepository, private readonly shared: SharedDomainMethods, logger: DomainLogger) {
     this.noteSettingsRepository = noteSettingsRepository;
     this.teamRepository = teamRepository;
+    this.logger = logger;
   }
 
   /**
@@ -68,6 +76,12 @@ export default class NoteSettingsService {
       role: defaultUserRole,
     });
 
+    this.logger.info('Team member joined', {
+      userId,
+      noteId: teamMember.noteId,
+      role: teamMember.role,
+    });
+
     return {
       noteId: await this.shared.note.getNotePublicIdByInternal(teamMember.noteId),
       userId: teamMember.userId,
@@ -98,11 +112,18 @@ export default class NoteSettingsService {
    * @returns added note settings
    */
   public async addNoteSettings(noteId: NoteInternalId, isPublic: boolean = true): Promise<NoteSettings> {
-    return await this.noteSettingsRepository.addNoteSettings({
+    const noteSettings = await this.noteSettingsRepository.addNoteSettings({
       noteId: noteId,
       isPublic: isPublic,
       invitationHash: createInvitationHash(),
     });
+
+    this.logger.debug('Note settings created', {
+      noteId,
+      isPublic,
+    });
+
+    return noteSettings;
   }
 
   /**
@@ -123,9 +144,24 @@ export default class NoteSettingsService {
      */
     if (notEmpty(data.cover) && notEmpty(noteSettings.cover)) {
       await this.shared.fileUploader.deleteFile(noteSettings.cover);
+
+      this.logger.debug('Note cover replaced', {
+        noteId,
+        oldCoverKey: noteSettings.cover,
+        newCoverKey: data.cover,
+      });
     }
 
-    return await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
+    const updatedSettings = await this.noteSettingsRepository.patchNoteSettingsById(noteSettings.id, data);
+
+    const changedFields = Object.keys(data);
+
+    this.logger.info('Note settings updated', {
+      noteId,
+      changedFields,
+    });
+
+    return updatedSettings;
   }
 
   /**
@@ -168,7 +204,16 @@ export default class NoteSettingsService {
    * @returns returns userId if team member was deleted and undefined otherwise
    */
   public async removeTeamMemberByUserIdAndNoteId(userId: TeamMember['id'], noteId: NoteInternalId): Promise<User['id'] | undefined> {
-    return await this.teamRepository.removeTeamMemberByUserIdAndNoteId(userId, noteId);
+    const removedUserId = await this.teamRepository.removeTeamMemberByUserIdAndNoteId(userId, noteId);
+
+    if (removedUserId !== undefined) {
+      this.logger.info('Team member removed', {
+        userId: removedUserId,
+        noteId,
+      });
+    }
+
+    return removedUserId;
   }
 
   /**
@@ -177,7 +222,15 @@ export default class NoteSettingsService {
    * @returns created team member
    */
   public async createTeamMember(team: TeamMemberCreationAttributes): Promise<TeamMember> {
-    return await this.teamRepository.createTeamMembership(team);
+    const createdMember = await this.teamRepository.createTeamMembership(team);
+
+    this.logger.info('Team member created', {
+      userId: createdMember.userId,
+      noteId: createdMember.noteId,
+      role: createdMember.role,
+    });
+
+    return createdMember;
   }
 
   /**
@@ -197,6 +250,10 @@ export default class NoteSettingsService {
       throw new DomainError(`Note settings was not updated`);
     }
 
+    this.logger.info('Invitation hash regenerated', {
+      noteId,
+    });
+
     return updatedNoteSettings;
   }
 
@@ -208,6 +265,14 @@ export default class NoteSettingsService {
    * @returns returns 1 if the role has been changed and 0 otherwise
    */
   public async patchMemberRoleByUserId(id: TeamMember['id'], noteId: NoteInternalId, role: MemberRole): Promise<MemberRole | undefined> {
-    return await this.teamRepository.patchMemberRoleByUserId(id, noteId, role);
+    const previousRole = await this.teamRepository.patchMemberRoleByUserId(id, noteId, role);
+
+    this.logger.info('Member role changed', {
+      userId: id,
+      noteId,
+      newRole: role,
+    });
+
+    return previousRole;
   }
 }

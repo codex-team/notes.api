@@ -2,6 +2,7 @@ import type { NoteInternalId } from '@domain/entities/note.js';
 import type User from '@domain/entities/user.js';
 import type NoteVisit from '@domain/entities/noteVisit.js';
 import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Note Visits service, which will store latest note visit
@@ -14,11 +15,18 @@ export default class NoteVisitsService {
   public noteVisitsRepository: NoteVisitsRepository;
 
   /**
+   * Logger instance
+   */
+  private readonly logger: DomainLogger;
+
+  /**
    * NoteVisits service constructor
    * @param noteVisitRepository - note Visits repository
+   * @param logger - domain logger
    */
-  constructor(noteVisitRepository: NoteVisitsRepository) {
+  constructor(noteVisitRepository: NoteVisitsRepository, logger: DomainLogger) {
     this.noteVisitsRepository = noteVisitRepository;
+    this.logger = logger;
   }
 
   /**
@@ -27,7 +35,14 @@ export default class NoteVisitsService {
    * @param userId - id of the user
    */
   public async saveVisit(noteId: NoteInternalId, userId: User['id']): Promise<NoteVisit> {
-    return await this.noteVisitsRepository.saveVisit(noteId, userId);
+    const visit = await this.noteVisitsRepository.saveVisit(noteId, userId);
+
+    this.logger.debug('Note visited', {
+      noteId,
+      userId,
+    });
+
+    return visit;
   };
 
   /**
@@ -35,6 +50,12 @@ export default class NoteVisitsService {
    * @param noteId - note internal id
    */
   public async deleteNoteVisits(noteId: NoteInternalId): Promise<boolean> {
-    return await this.noteVisitsRepository.deleteNoteVisits(noteId);
+    const result = await this.noteVisitsRepository.deleteNoteVisits(noteId);
+
+    this.logger.debug('Note visits deleted', {
+      noteId,
+    });
+
+    return result;
   }
 }

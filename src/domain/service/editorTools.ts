@@ -3,6 +3,7 @@ import type EditorTool from '@domain/entities/editorTools.js';
 import type EditorToolsServiceSharedMethods from './shared/editorTools.js';
 import type User from '@domain/entities/user.js';
 import type { EditorToolCreationAttributes } from '@domain/entities/editorTools.js';
+import type { DomainLogger } from '@infrastructure/logging/domainLoggerInterface.js';
 
 /**
  * Editor tools service
@@ -14,11 +15,18 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
   private readonly repository: EditorToolsRepository;
 
   /**
+   * Logger instance
+   */
+  private readonly logger: DomainLogger;
+
+  /**
    * Editor tools service constructor
    * @param repository - user repository instance
+   * @param logger - domain logger
    */
-  constructor(repository: EditorToolsRepository) {
+  constructor(repository: EditorToolsRepository, logger: DomainLogger) {
     this.repository = repository;
+    this.logger = logger;
   }
 
   /**
@@ -58,9 +66,16 @@ export default class EditorToolsService implements EditorToolsServiceSharedMetho
    * @returns editor tool data
    */
   public async addTool(editorTool: Omit<EditorToolCreationAttributes, 'userId'>, userId: User['id']): Promise<EditorTool> {
-    return await this.repository.addTool({
+    const createdTool = await this.repository.addTool({
       userId,
       ...editorTool,
     });
+
+    this.logger.info('Editor tool created', {
+      toolId: createdTool.id,
+      userId,
+    });
+
+    return createdTool;
   }
 }
