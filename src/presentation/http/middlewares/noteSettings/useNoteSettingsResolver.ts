@@ -1,5 +1,5 @@
 import type { preHandlerHookHandler } from 'fastify';
-import { getLogger } from '@infrastructure/logging/index.js';
+import { getRequestLogger } from '@infrastructure/logging/index.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type NoteSettings from '@domain/entities/noteSettings.js';
 
@@ -15,13 +15,9 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
    */
   noteSettingsResolver: preHandlerHookHandler;
 } {
-  /**
-   * Get logger instance
-   */
-  const logger = getLogger('appServer');
-
   return {
     noteSettingsResolver: async function noteSettingsResolver(request, reply) {
+      const logger = getRequestLogger('middlewares').child({ middleware: 'noteSettingsResolver' });
       let noteSettings: NoteSettings | null;
 
       try {
@@ -32,6 +28,7 @@ export default function useNoteSettingsResolver(noteSettingsService: NoteSetting
         noteSettings = await noteSettingsService.getNoteSettingsByNoteId(request.note.id);
 
         request.noteSettings = noteSettings;
+        logger.debug('Note settings resolved');
       } catch (error) {
         logger.error('Can not resolve Note settings by note');
         logger.error(error);

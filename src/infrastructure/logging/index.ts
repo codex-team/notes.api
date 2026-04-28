@@ -2,6 +2,7 @@ import { pino } from 'pino';
 import * as process from 'process';
 import type { LoggingConfig } from '../config/index.js';
 import appConfig from '../config/index.js';
+import { getCurrentReqId } from './reqId.context.js';
 
 const loggerConfig = process.env['NODE_ENV'] === 'production'
   ? {}
@@ -16,11 +17,19 @@ const loggerConfig = process.env['NODE_ENV'] === 'production'
 
 const rootLogger = pino(loggerConfig);
 
+const loggerCache = new Map<keyof LoggingConfig, pino.Logger>();
+
 /**
  * Creates child logger and returns it.
  * @param moduleName - name of the module that is logging
  */
 export function getLogger(moduleName: keyof LoggingConfig): pino.Logger {
+  const cachedLogger = loggerCache.get(moduleName);
+
+  if (cachedLogger) {
+    return cachedLogger;
+  }
+
   const childLogger = rootLogger.child({
     module: moduleName,
   });
@@ -33,7 +42,27 @@ export function getLogger(moduleName: keyof LoggingConfig): pino.Logger {
 
   childLogger.level = logLevel;
 
+  loggerCache.set(moduleName, childLogger);
+
   return childLogger;
+}
+
+/**
+ * Creates a request-scoped logger that includes the request ID
+ * @param moduleName - name of the module that is logging
+ * @returns Logger instance with request ID context
+ */
+export function getRequestLogger(moduleName: keyof LoggingConfig): pino.Logger {
+  const baseLogger = getLogger(moduleName);
+  const reqId = getCurrentReqId();
+
+  if (reqId != null && reqId !== '') {
+    return baseLogger.child({
+      reqId,
+    });
+  }
+
+  return baseLogger;
 }
 
 const logger = getLogger('global');

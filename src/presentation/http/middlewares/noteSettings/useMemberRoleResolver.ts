@@ -1,5 +1,5 @@
 import type { preHandlerHookHandler } from 'fastify';
-import { getLogger } from '@infrastructure/logging/index.js';
+import { getRequestLogger } from '@infrastructure/logging/index.js';
 import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type { MemberRole } from '@domain/entities/team.js';
 import { isEmpty } from '@infrastructure/utils/empty.js';
@@ -16,13 +16,9 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
    */
   memberRoleResolver: preHandlerHookHandler;
 } {
-  /**
-   * Get logger instance
-   */
-  const logger = getLogger('appServer');
-
   return {
     memberRoleResolver: async function memberRoleResolver(request, reply) {
+      const logger = getRequestLogger('middlewares').child({ middleware: 'memberRoleResolver' });
       /** If MemberRole equals null, it means that user is not in the team or is not authenticated */
       let memberRole: MemberRole | undefined;
 
@@ -40,9 +36,14 @@ export default function useMemberRoleResolver(noteSettingsService: NoteSettingsS
 
         if (memberRole !== undefined) {
           request.memberRole = memberRole;
+          logger.debug('Member role resolved');
         }
       } catch (error) {
-        logger.error('Can not resolve Member role by note [id = ${request.note.id}] and user [id = ${request.userId}]');
+        if (request.note != null && request.userId != null) {
+          logger.error(`Cannot resolve Member role by note [id = ${request.note.id}] and user [id = ${request.userId}]`);
+        } else {
+          logger.error('Cannot resolve Member role - note or user ID not available');
+        }
         logger.error(error);
 
         await reply.notAcceptable('Team member not found');

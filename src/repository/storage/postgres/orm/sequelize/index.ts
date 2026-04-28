@@ -1,6 +1,6 @@
 import type { DatabaseConfig } from '@infrastructure/config/index.js';
 import { Sequelize } from 'sequelize';
-import { getLogger } from '@infrastructure/logging/index.js';
+import { getLogger, getRequestLogger } from '@infrastructure/logging/index.js';
 
 const databaseLogger = getLogger('database');
 
@@ -26,7 +26,22 @@ export default class SequelizeOrm {
     this.config = databaseConfig;
 
     this.conn = new Sequelize(this.config.dsn, {
-      logging: databaseLogger.info.bind(databaseLogger),
+      benchmark: true,
+      logging: (message, timing) => {
+        /**
+         * Creates a request-scoped logger instance for database operations.
+         */
+        const logger = getRequestLogger('database');
+
+        /**
+         * Logs the query and its execution time.
+         * The execution time is provided by Sequelize.
+         */
+        logger.info(
+          { durationMs: timing },
+          message
+        );
+      },
       define: {
         /**
          * Use snake_case for fields in db, but camelCase in code

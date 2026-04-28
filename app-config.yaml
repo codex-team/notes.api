@@ -28,6 +28,8 @@ logging:
   appServer: info
   database: info
   s3Storage: info
+  middlewares: info
+  policies: info
 
 s3:
   accessKeyId: 'secret'
