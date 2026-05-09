@@ -83,7 +83,7 @@ export default class HttpApi implements Api {
      * └── your services
      * @see https://fastify.dev/docs/latest/Guides/Getting-Started#loading-order-of-your-plugins
      */
-    this.domainErrorHandler();
+    this.globalErrorHandler();
 
     await this.addCookies();
     await this.addOpenapiDocs();
@@ -364,9 +364,9 @@ export default class HttpApi implements Api {
   }
 
   /**
-   * Domain error handler
+   * Global error handler
    */
-  private domainErrorHandler(): void {
+  private globalErrorHandler(): void {
     this.server?.setErrorHandler(function (error, request, reply) {
       /**
        * If we have an error that occurs in the domain-level we reply it with special format
@@ -393,7 +393,7 @@ export default class HttpApi implements Api {
           });
       }
       /**
-       * If error is not a domain error, we route it to the default error handler
+       * If error is not a known type, we route it to the default error handler
        */
       throw error;
     });
