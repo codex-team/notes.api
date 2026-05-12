@@ -35,6 +35,11 @@ import UploadRouter from './router/upload.js';
 import { ajvFilePlugin } from '@fastify/multipart';
 import { UploadSchema } from './schema/Upload.js';
 import { NoteHierarchySchema } from './schema/NoteHierarchy.js';
+import { StatusCodes } from 'http-status-codes';
+
+interface FastifyError extends Error {
+  code: string;
+}
 
 const appServerLogger = getLogger('appServer');
 
@@ -79,7 +84,7 @@ export default class HttpApi implements Api {
      * └── your services
      * @see https://fastify.dev/docs/latest/Guides/Getting-Started#loading-order-of-your-plugins
      */
-    this.domainErrorHandler();
+    this.globalErrorHandler();
 
     await this.addCookies();
     await this.addOpenapiDocs();
@@ -361,9 +366,9 @@ export default class HttpApi implements Api {
   }
 
   /**
-   * Domain error handler
+   * Global error handler
    */
-  private domainErrorHandler(): void {
+  private globalErrorHandler(): void {
     this.server?.setErrorHandler(function (error, request, reply) {
       /**
        * If we have an error that occurs in the domain-level we reply it with special format
@@ -377,7 +382,22 @@ export default class HttpApi implements Api {
         return;
       }
       /**
-       * If error is not a domain error, we route it to the default error handler
+       * JSON parse errors (invalid request body)
+       * Errors can be either SyntaxError or FastifyError.
+       */
+      if ((error instanceof SyntaxError && error.message.includes('JSON'))
+        || ((error as FastifyError).code?.startsWith('FST_ERR_CTP_') ?? false)) {
+        this.log.warn({ reqId: request.id }, 'Invalid JSON in request body');
+
+        return reply
+          .code(StatusCodes.BAD_REQUEST)
+          .type('application/json')
+          .send({
+            message: 'Invalid JSON in request body',
+          });
+      }
+      /**
+       * If error is not a known type, we route it to the default error handler
        */
       throw error;
     });
