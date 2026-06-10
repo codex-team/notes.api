@@ -143,7 +143,11 @@ export default class NoteSettingsService {
      * In this case we need to remove previous cover
      */
     if (notEmpty(data.cover) && notEmpty(noteSettings.cover)) {
-      await this.shared.fileUploader.deleteFile(noteSettings.cover);
+      try {
+        await this.shared.fileUploader.deleteFile(noteSettings.cover);
+      } catch (error) {
+        this.logger.warn('Previous cover not deleted', { err: error });
+      }
 
       this.logger.debug('Note cover replaced', {
         noteId,
