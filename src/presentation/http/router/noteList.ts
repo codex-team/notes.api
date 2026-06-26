@@ -1,6 +1,6 @@
 import type { FastifyPluginCallback } from 'fastify';
 import type NoteService from '@domain/service/note.js';
-import { definePublicNote, type NotePublic } from '@domain/entities/notePublic.js';
+import { defineNoteListItem, type NotePublic } from '@domain/entities/notePublic.js';
 import type { NoteListPublic } from '@domain/entities/noteList.js';
 
 /**
@@ -51,7 +51,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
           properties: {
             items: {
               id: { type: 'string' },
-              content: { type: 'string' },
+              content: { type: 'object' },
               createdAt: { type: 'string' },
               creatorId: { type: 'string' },
               updatedAt: { type: 'string' },
@@ -68,7 +68,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     /**
      * Wrapping Notelist for public use
      */
-    const noteListItemsPublic: NotePublic[] = noteList.items.map(definePublicNote);
+    const noteListItemsPublic: NotePublic[] = noteList.items.map(defineNoteListItem);
 
     const noteListPublic: NoteListPublic = {
       items: noteListItemsPublic,
@@ -105,7 +105,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
           properties: {
             items: {
               id: { type: 'string' },
-              content: { type: 'string' },
+              content: { type: 'object' },
               createdAt: { type: 'string' },
               creatorId: { type: 'string' },
               updatedAt: { type: 'string' },
@@ -122,7 +122,7 @@ const NoteListRouter: FastifyPluginCallback<NoteListRouterOptions> = (fastify, o
     /**
      * Wrapping Notelist for public use
      */
-    const noteListItemsPublic: NotePublic[] = noteList.items.map(definePublicNote);
+    const noteListItemsPublic: NotePublic[] = noteList.items.map(defineNoteListItem);
 
     const noteListPublic: NoteListPublic = {
       items: noteListItemsPublic,
