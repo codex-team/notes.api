@@ -143,6 +143,64 @@ describe('GET /notes?page', () => {
       expect(body.items).toHaveLength(expectedLength);
     }
   });
+
+  test('Content is trimmed to a single block in the note list response', async () => {
+    const creator = await global.db.insertUser();
+    const accessToken = global.auth(creator.id);
+
+    const multiBlockContent = {
+      blocks: [
+        {
+          id: 'block1',
+          type: 'header',
+          data: {
+            text: 'First block',
+            level: 1,
+          },
+        },
+        {
+          id: 'block2',
+          type: 'paragraph',
+          data: {
+            text: 'Second block',
+          },
+        },
+      ],
+    };
+
+    const note = await global.db.insertNote({
+      creatorId: creator.id,
+      content: multiBlockContent,
+    });
+
+    await global.db.insertNoteSetting({
+      noteId: note.id,
+      cover: 'DZnvqi63.png',
+      isPublic: false,
+    });
+
+    await global.db.insertNoteVisit({
+      userId: creator.id,
+      noteId: note.id,
+    });
+
+    const response = await global.api?.fakeRequest({
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+      url: '/notes?page=1',
+    });
+
+    const body = response?.json();
+
+    expect(response?.statusCode).toBe(200);
+    expect(body.items).toHaveLength(1);
+    expect(body.items[0].content.blocks).toHaveLength(1);
+    expect(body.items[0].content.blocks[0].id).toBe('block1');
+    expect(body.items[0].content.blocks[0].type).toBe('header');
+    expect(body.items[0].content.blocks[0].data.text).toBe('First block');
+  });
 });
 
 describe('GET /notes/created?page', () => {
@@ -272,5 +330,58 @@ describe('GET /notes/created?page', () => {
 
       expect(body.items).toHaveLength(expectedLength);
     }
+  });
+
+  test('Content is trimmed to a single block in the created notes list response', async () => {
+    const creator = await global.db.insertUser();
+    const accessToken = global.auth(creator.id);
+
+    const multiBlockContent = {
+      blocks: [
+        {
+          id: 'block1',
+          type: 'header',
+          data: {
+            text: 'First block',
+            level: 1,
+          },
+        },
+        {
+          id: 'block2',
+          type: 'paragraph',
+          data: {
+            text: 'Second block',
+          },
+        },
+      ],
+    };
+
+    const note = await global.db.insertNote({
+      creatorId: creator.id,
+      content: multiBlockContent,
+    });
+
+    await global.db.insertNoteSetting({
+      noteId: note.id,
+      cover: 'DZnvqi63.png',
+      isPublic: false,
+    });
+
+    const response = await global.api?.fakeRequest({
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+      url: '/notes/created?page=1',
+    });
+
+    const body = response?.json();
+
+    expect(response?.statusCode).toBe(200);
+    expect(body.items).toHaveLength(1);
+    expect(body.items[0].content.blocks).toHaveLength(1);
+    expect(body.items[0].content.blocks[0].id).toBe('block1');
+    expect(body.items[0].content.blocks[0].type).toBe('header');
+    expect(body.items[0].content.blocks[0].data.text).toBe('First block');
   });
 });
