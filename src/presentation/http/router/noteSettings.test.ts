@@ -936,6 +936,42 @@ describe('NoteSettings API', () => {
 
       expect(response?.json().message).toBe('You can\'t remove note\'s creator from the team');
     });
+
+    test('Returns status code 403 and message "You can\'t remove yourself from the team"', async () => {
+      /** Create note creator */
+      const creator = await global.db.insertUser();
+      /** Create test user - member of the team, different from the creator */
+      const user = await global.db.insertUser();
+
+      /** Create test note */
+      const note = await global.db.insertNote({
+        creatorId: creator.id,
+      });
+
+      /** Add test user to the note with a Write role */
+      await global.db.insertNoteTeam({
+        noteId: note.id,
+        userId: user.id,
+        role: MemberRole.Write,
+      });
+
+      const accessToken = global.auth(user.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note-settings/${note.publicId}/team`,
+        body: {
+          userId: user.id,
+        },
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toBe('You can\'t remove yourself from the team');
+    });
   });
 
   describe('DELETE /:notePublicId/team', () => {
