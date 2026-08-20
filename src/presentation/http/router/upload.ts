@@ -143,11 +143,6 @@ const UploadRouter: FastifyPluginCallback<UploadRouterOptions> = async (fastify,
       key: string;
     };
   }>('/:notePublicId/:key', {
-    config: {
-      policy: [
-        'notePublicOrUserInTeam',
-      ],
-    },
     schema: {
       params: {
         key: {
