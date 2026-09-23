@@ -515,7 +515,8 @@ export default class NoteService {
   }
 
   /**
-   * Reutrn a tree structure of notes with childNotes for the given note id
+   * Reutrn a tree structure of notes with childNotes for the given note id.
+   * The sidebar position is returned on the root node only.
    * @param noteId - id of the note to get structure
    * @returns - Object of notes.
    */
@@ -534,6 +535,7 @@ export default class NoteService {
     if (!notesRows || notesRows.length === 0) {
       return null;
     }
+
     // Step 1: Parse and initialize all notes
     notesRows.forEach((note) => {
       notesMap.set(note.noteId, {
@@ -547,6 +549,9 @@ export default class NoteService {
     notesRows.forEach((note) => {
       if (note.parentId === null) {
         root = notesMap.get(note.noteId) ?? null;
+        if (root !== null) {
+          root.sidebarPosition = note.sidebarPosition;
+        }
       } else {
         const parent = notesMap.get(note.parentId);
 

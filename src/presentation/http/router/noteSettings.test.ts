@@ -261,6 +261,7 @@ describe('NoteSettings API', () => {
           {
             isPublic: false,
             invitationHash: noteSettings.invitationHash,
+            sidebarPosition: 'content',
             team:
               [
                 {
