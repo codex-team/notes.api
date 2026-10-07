@@ -111,7 +111,7 @@ export default class NoteSettingsSequelizeStorage {
         allowNull: true,
       },
       sidebarPosition: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('edge', 'content', 'none'),
         allowNull: false,
         defaultValue: 'content',
       },
