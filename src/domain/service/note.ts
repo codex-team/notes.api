@@ -515,7 +515,7 @@ export default class NoteService {
   }
 
   /**
-   * Reutrn a tree structure of notes with childNotes for the given note id.
+   * Return a tree structure of notes with childNotes for the given note id.
    * The sidebar position is returned on the root node only.
    * @param noteId - id of the note to get structure
    * @returns - Object of notes.
