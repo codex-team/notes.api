@@ -21,6 +21,11 @@ export const NoteSettingsSchema = {
     cover: {
       type: 'string',
     },
+    sidebarPosition: {
+      type: 'string',
+      enum: ['edge', 'content', 'none'],
+      default: 'content',
+    },
     team: {
       type: 'array',
       items: {

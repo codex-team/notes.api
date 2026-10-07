@@ -11,6 +11,10 @@ export const NoteHierarchySchema = {
       type: 'string',
       maxLength: 50,
     },
+    sidebarPosition: {
+      type: 'string',
+      enum: ['edge', 'content', 'none'],
+    },
     childNotes: {
       type: 'array',
       items: { $ref: 'NoteHierarchySchema#' },

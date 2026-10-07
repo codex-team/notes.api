@@ -409,9 +409,11 @@ export default class NoteSequelizeStorage {
         n.id AS "noteId",
         n.content,
         n.public_id AS "publicId",
-        nr.parent_id AS "parentId"
+        nr.parent_id AS "parentId",
+        ns.sidebar_position AS "sidebarPosition"
       FROM ${String(this.database.literal(this.tableName).val)} n
       LEFT JOIN ${String(this.database.literal('note_relations').val)} nr ON n.id = nr.note_id
+      LEFT JOIN ${String(this.database.literal('note_settings').val)} ns ON n.id = ns.note_id
       WHERE n.id = :startNoteId
 
       UNION ALL
@@ -420,10 +422,12 @@ export default class NoteSequelizeStorage {
         n.id AS "noteId",
         n.content,
         n.public_id AS "publicId",
-        nr.parent_id AS "parentId"
+        nr.parent_id AS "parentId",
+        ns.sidebar_position AS "sidebarPosition"
       FROM ${String(this.database.literal(this.tableName).val)} n
       INNER JOIN ${String(this.database.literal('note_relations').val)} nr ON n.id = nr.note_id
       INNER JOIN note_tree nt ON nr.parent_id = nt."noteId"
+      LEFT JOIN ${String(this.database.literal('note_settings').val)} ns ON n.id = ns.note_id
     )
     SELECT * FROM note_tree;
     `;
