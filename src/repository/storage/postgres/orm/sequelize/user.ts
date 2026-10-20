@@ -176,13 +176,18 @@ export default class UserSequelizeStorage {
     userId,
     toolId,
   }: AddUserToolOptions): Promise<void> {
+    /**
+     * Escape the tool id to prevent SQL injection
+     */
+    const toolToAdd = this.database.escape(JSON.stringify([toolId]));
+
     await this.model.update({
       editorTools: literal(
         /**
          * If editorTools is null, then set it to empty array
          * Then add the tool to the list
          */
-        `COALESCE(editor_tools, '[]'::jsonb) || '["${toolId}"]'::jsonb`),
+        `COALESCE(editor_tools, '[]'::jsonb) || ${toolToAdd}::jsonb`),
     }, {
       where: {
         id: userId,
@@ -199,8 +204,13 @@ export default class UserSequelizeStorage {
     userId,
     toolId,
   }: RemoveUserEditorTool): Promise<void> {
+    /**
+     * Escape the tool id to prevent SQL injection
+     */
+    const toolToRemove = this.database.escape(toolId);
+
     await this.model.update({
-      editorTools: literal(`editor_tools - '${toolId}'`),
+      editorTools: literal(`editor_tools - ${toolToRemove}`),
     }, {
       where: {
         id: userId,
