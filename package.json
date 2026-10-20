@@ -47,6 +47,7 @@
     "@fastify/oauth2": "^7.2.1",
     "@fastify/swagger": "^8.8.0",
     "@fastify/swagger-ui": "^1.9.3",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@testcontainers/postgresql": "^10.2.1",
     "arg": "^5.0.2",
     "fastify": "^4.17.0",
@@ -60,7 +61,7 @@
     "prom-client": "^14.2.0",
     "sequelize": "^6.31.1",
     "testcontainers": "^10.2.1",
-    "zod": "^3.21.4"
+    "zod": "^3.25.0"
   },
   "packageManager": "yarn@3.6.4"
 }

@@ -8,6 +8,7 @@ import AIService from './service/ai.js';
 import EditorToolsService from '@domain/service/editorTools.js';
 import FileUploaderService from './service/fileUploader.service.js';
 import NoteVisitsService from './service/noteVisits.js';
+import McpTokenService from './service/mcpToken.js';
 import { PinoDomainLoggerAdapter } from '@infrastructure/logging/pinoDomainLoggerAdapter.js';
 
 /**
@@ -53,6 +54,11 @@ export interface DomainServices {
    * Note visits service instance
    */
   noteVisitsService: NoteVisitsService;
+
+  /**
+   * MCP token service instance
+   */
+  mcpTokenService: McpTokenService;
 }
 
 /**
@@ -91,6 +97,7 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
   const userService = new UserService(repositories.userRepository, sharedServices, domainLogger);
   const noteSettingsService = new NoteSettingsService(repositories.noteSettingsRepository, repositories.teamRepository, sharedServices, domainLogger);
   const aiService = new AIService(repositories.aiRepository);
+  const mcpTokenService = new McpTokenService(repositories.mcpTokenRepository, domainLogger);
 
   return {
     fileUploaderService,
@@ -101,5 +108,6 @@ export function init(repositories: Repositories, appConfig: AppConfig): DomainSe
     aiService,
     editorToolsService,
     noteVisitsService,
+    mcpTokenService,
   };
 }
