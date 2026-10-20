@@ -99,6 +99,18 @@ export const LoggingConfig = z.object({
 export type LoggingConfig = z.infer<typeof LoggingConfig>;
 
 /**
+ * Exact origin of the web app, e.g. 'https://notex.so'
+ * Wildcards, paths and trailing slashes are not allowed, because tokens are posted to this origin
+ */
+const WebOrigin = z.string().refine((value) => {
+  try {
+    return new URL(value).origin === value;
+  } catch {
+    return false;
+  }
+}, { message: 'Must be an exact origin like https://notex.so' });
+
+/**
  * Http API configuration
  */
 const HttpApiConfig = z.object({
@@ -109,6 +121,7 @@ const HttpApiConfig = z.object({
   cookieDomain: z.string(),
   accessTokenSecret: z.string(),
   allowedOrigins: z.union([z.array(z.string()), z.literal('*')]),
+  webOrigins: z.array(WebOrigin), // origins of the web app allowed to receive tokens after OAuth login
   oauth2: OAuth2Config,
 });
 
@@ -138,6 +151,7 @@ const defaultConfig: AppConfig = {
     cookieDomain: 'localhost',
     accessTokenSecret: 'accessTokenSecret',
     allowedOrigins: [],
+    webOrigins: [],
     oauth2: {
       google: {
         clientId: '',
