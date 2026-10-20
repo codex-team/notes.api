@@ -297,6 +297,18 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const parentId = request.body.parentId;
     const noteTools = request.body.tools;
 
+    /**
+     * If note is created as a child, user should have a Write role in the parent note
+     */
+    if (parentId !== undefined) {
+      const parentNote = await noteService.getNoteByPublicId(parentId);
+      const memberRole = await noteSettingsService.getUserRoleByUserIdAndNoteId(userId!, parentNote.id);
+
+      if (memberRole !== MemberRole.Write) {
+        return reply.forbidden();
+      }
+    }
+
     await noteService.validateNoteTools(noteTools, content);
 
     const addedNote = await noteService.addNote(content as Note['content'], userId as number, parentId, noteTools); // "authRequired" policy ensures that userId is not null
