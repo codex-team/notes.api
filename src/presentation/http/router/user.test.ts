@@ -93,5 +93,122 @@ describe('User API', () => {
         },
       });
     });
+
+    test('Returns status code 400 if tool id contains forbidden characters', async () => {
+      await global.db.truncateTables();
+
+      /**
+       * Create user and get accessToken
+       */
+      const createdUser = await global.db.insertUser();
+      const accessToken = global.auth(createdUser.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: '/user/editor-tools',
+        body: {
+          toolId: `1"]'::jsonb; --`,
+        },
+      });
+
+      expect(response?.statusCode).toBe(400);
+    });
+  });
+
+  describe('DELETE /user/editor-tools', () => {
+    test('Returns removed tool id with status code 200 and removes tool from user extensions', async () => {
+      await global.db.truncateTables();
+
+      /**
+       * Create user and get accessToken
+       */
+      const createdUser = await global.db.insertUser();
+      const accessToken = global.auth(createdUser.id);
+
+      const toolId = await global.db.insertEditorTool({
+        name: 'code',
+        title: 'Code Tool',
+        exportName: 'Code',
+        userId: null,
+        isDefault: false,
+        source: {
+          cdn: 'https://cdn.jsdelivr.net/npm/@editorjs/code@latest',
+        },
+      });
+
+      /**
+       * Link tool to the user
+       */
+      const addResponse = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: '/user/editor-tools',
+        body: {
+          toolId,
+        },
+      });
+
+      expect(addResponse?.statusCode).toBe(200);
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: '/user/editor-tools',
+        body: {
+          toolId,
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+
+      expect(response?.json()).toStrictEqual({
+        removedId: toolId,
+      });
+
+      /**
+       * Check that tool is no longer in user extensions
+       */
+      const userToolsResponse = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: '/user/editor-tools',
+      });
+
+      const userToolsIds = userToolsResponse?.json().data.map((tool: { id: string }) => tool.id);
+
+      expect(userToolsIds).not.toContain(toolId);
+    });
+
+    test('Returns status code 400 if tool id contains forbidden characters', async () => {
+      await global.db.truncateTables();
+
+      /**
+       * Create user and get accessToken
+       */
+      const createdUser = await global.db.insertUser();
+      const accessToken = global.auth(createdUser.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: '/user/editor-tools',
+        body: {
+          toolId: `1'; UPDATE users SET name = 'hacked'; --`,
+        },
+      });
+
+      expect(response?.statusCode).toBe(400);
+    });
   });
 });
