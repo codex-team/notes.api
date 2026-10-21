@@ -44,7 +44,6 @@ export default function useParentNoteResolver(noteService: NoteService): {
 
       try {
         request.parentNote = await noteService.getNoteByPublicId(parentPublicId);
-        logger.debug('Parent note resolved by public ID');
       } catch (error) {
         logger.error('Invalid parent note public id passed');
         logger.error(error);

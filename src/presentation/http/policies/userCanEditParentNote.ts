@@ -39,8 +39,6 @@ export default async function userCanEditParentNote(context: PolicyContext): Pro
   if (memberRole !== MemberRole.Write) {
     logger.warn('User does not have write permission for parent note');
 
-    return await reply.forbidden();
+    return await reply.forbidden('You don\'t have permission to edit the parent note');
   }
-
-  logger.debug('User parent note edit permission check completed successfully');
 }
