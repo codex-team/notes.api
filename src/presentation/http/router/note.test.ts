@@ -1851,7 +1851,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(403);
 
-      expect(response?.json().message).toStrictEqual('Permission denied');
+      expect(response?.json().message).toStrictEqual('You don\'t have permission to edit the parent note');
 
       response = await global.api?.fakeRequest({
         method: 'GET',
@@ -2055,7 +2055,7 @@ describe('Note API', () => {
 
       expect(response?.statusCode).toBe(403);
 
-      expect(response?.json().message).toStrictEqual('Permission denied');
+      expect(response?.json().message).toStrictEqual('You don\'t have permission to edit the parent note');
 
       response = await global.api?.fakeRequest({
         method: 'GET',
