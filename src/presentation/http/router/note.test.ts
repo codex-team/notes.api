@@ -1130,9 +1130,9 @@ describe('Note API', () => {
         },
       });
 
-      expect(response?.statusCode).toBe(400);
+      expect(response?.statusCode).toBe(406);
 
-      expect(response?.json().message).toStrictEqual(`Note with public id ${nonExistentParentId} was not found`);
+      expect(response?.json().message).toStrictEqual('Parent note not found');
 
       /** Check that neither the note nor its history record was saved */
       const [notes] = await global.db.query(`SELECT id FROM public.notes WHERE creator_id = ${user.id}`) as [unknown[], unknown];
