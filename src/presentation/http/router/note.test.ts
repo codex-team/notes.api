@@ -1897,7 +1897,7 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
     });
 
-    test('Return 400 when parent note does not exist', async () => {
+    test('Return 406 when parent note does not exist', async () => {
       const nonExistentParentId = '47L43yY7dp';
 
       const childNote = await global.db.insertNote({
@@ -1915,9 +1915,9 @@ describe('Note API', () => {
         url: `/note/${childNote.publicId}/relation`,
       });
 
-      expect(response?.statusCode).toBe(400);
+      expect(response?.statusCode).toBe(406);
 
-      expect(response?.json().message).toStrictEqual('Incorrect parent note');
+      expect(response?.json().message).toStrictEqual('Parent note not found');
     });
 
     test('Return 400 when circular reference occurs', async () => {
@@ -2128,7 +2128,7 @@ describe('Note API', () => {
       expect(response?.json().message).toStrictEqual(`Forbidden relation. Note can't be a child of own child`);
     });
 
-    test('Return 400 when parent note does not exist', async () => {
+    test('Return 406 when parent note does not exist', async () => {
       const nonExistentParentId = '47L43yY7dp';
 
       const childNote = await global.db.insertNote({
@@ -2146,9 +2146,9 @@ describe('Note API', () => {
         url: `/note/${childNote.publicId}/relation`,
       });
 
-      expect(response?.statusCode).toBe(400);
+      expect(response?.statusCode).toBe(406);
 
-      expect(response?.json().message).toStrictEqual('Incorrect parent note Id');
+      expect(response?.json().message).toStrictEqual('Parent note not found');
     });
 
     test('Return 400 when circular reference occurs', async () => {

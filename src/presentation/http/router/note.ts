@@ -8,7 +8,6 @@ import useParentNoteResolver from '../middlewares/note/useParentNoteResolver.js'
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 import { MemberRole } from '@domain/entities/team.js';
-import { DomainError } from '@domain/entities/DomainError.js';
 import { type NotePublic, definePublicNote } from '@domain/entities/notePublic.js';
 import type NoteVisitsService from '@domain/service/noteVisits.js';
 import type EditorToolsService from '@domain/service/editorTools.js';
@@ -79,30 +78,6 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * It should be used to use user role in middlewares
    */
   const { memberRoleResolver } = useMemberRoleResolver(noteSettingsService);
-
-  /**
-   * Checks if user has a Write role in the note that is going to become a parent
-   * If parent note does not exist, returns true, so note service could reply with its own error
-   * @param userId - id of the user
-   * @param parentPublicId - public id of the parent note
-   */
-  async function userCanEditParentNote(userId: number, parentPublicId: NotePublicId): Promise<boolean> {
-    let parentNote: Note;
-
-    try {
-      parentNote = await noteService.getNoteByPublicId(parentPublicId);
-    } catch (error) {
-      if (error instanceof DomainError) {
-        return true;
-      }
-
-      throw error;
-    }
-
-    const memberRole = await noteSettingsService.getUserRoleByUserIdAndNoteId(userId, parentNote.id);
-
-    return memberRole === MemberRole.Write;
-  }
 
   /**
    * Get note by id
@@ -467,22 +442,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       policy: [
         'authRequired',
         'userCanEdit',
+        'userCanEditParentNote',
       ],
     },
     preHandler: [
       noteResolver,
+      parentNoteResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const parentNoteId = request.body.parentNoteId;
-    const { userId } = request;
-
-    /**
-     * User should have a Write role in the parent note too
-     */
-    if (!await userCanEditParentNote(userId!, parentNoteId)) {
-      return reply.forbidden();
-    }
 
     const parentNote = await noteService.createNoteRelation(noteId, parentNoteId);
 
@@ -530,22 +499,16 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       policy: [
         'authRequired',
         'userCanEdit',
+        'userCanEditParentNote',
       ],
     },
     preHandler: [
       noteResolver,
+      parentNoteResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
     const parentNoteId = request.body.parentNoteId;
-    const { userId } = request;
-
-    /**
-     * User should have a Write role in the new parent note too
-     */
-    if (!await userCanEditParentNote(userId!, parentNoteId)) {
-      return reply.forbidden();
-    }
 
     const isUpdated = await noteService.updateNoteRelation(noteId, parentNoteId);
 
