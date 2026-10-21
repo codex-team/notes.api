@@ -75,6 +75,15 @@ const McpRouter: FastifyPluginCallback<McpRouterOptions> = (fastify, opts, done)
      */
     void reply.hijack();
 
+    /**
+     * Hijacked reply does not flush headers set by hooks (e.g. CORS), so copy them to the raw response
+     */
+    for (const [name, value] of Object.entries(reply.getHeaders())) {
+      if (value !== undefined) {
+        reply.raw.setHeader(name, value);
+      }
+    }
+
     reply.raw.on('close', () => {
       void transport.close();
       void server.close();

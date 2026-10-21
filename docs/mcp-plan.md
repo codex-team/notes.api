@@ -118,6 +118,8 @@ Separate fix, not part of this work: `POST /note` with `parentId` does not check
 - Step 2: `GET /user/editor-tools` already includes the default tools, so `tools[]` is built from the note tools and the user tools; `GET /editor-tools/all` is not called.
 - Step 2: two helper modules were added: `notexApi.ts` (API client over `fastify.inject()`) and `types.ts` (tool context and result helper).
 - Step 2: besides the tests through `fastify.inject()`, the endpoint was checked over real HTTP with curl against a local server: `initialize`, `tools/list`, `create_note`, `list_notes`, 405 on `GET`, 401 for a revoked token, two tools for a read token. It has not been tried with Claude Code or Cursor yet.
+- Step 2 (review): `PATCH /note/:notePublicId` accepts an optional `expectedUpdatedAt`. The note is updated only if its `updated_at` still matches, checked in the same `UPDATE` query; otherwise the route returns 409. `update_note` always passes the version it read, so concurrent updates and appends can't overwrite each other. Note history is now written after a successful update, not before.
+- Step 2 (review): `/mcp` copies headers set by Fastify hooks (CORS) to the raw response, since the hijacked reply doesn't flush them.
 - Step 3: notes.web has only the English locale, so texts are added to `en.json` only.
 - Step 3: the section is a separate component `src/presentation/components/mcp/McpTokens.vue` with the `useMcpTokens` composable; `Settings.vue` only renders it.
 - Step 3: the "Create token" button sits below the form card, like the "Logout" button in the General section.

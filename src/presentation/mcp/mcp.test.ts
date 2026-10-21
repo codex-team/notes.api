@@ -151,6 +151,29 @@ describe('MCP API', () => {
       expect(response?.statusCode).toBe(401);
     });
 
+    test('Keeps CORS headers on MCP responses', async () => {
+      const user = await global.db.insertUser();
+      const token = await createMcpToken(user, 'read');
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        url: '/mcp',
+        headers: {
+          authorization: `Bearer ${token}`,
+          accept: 'application/json, text/event-stream',
+          origin: 'https://client.example',
+        },
+        body: {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/list',
+        },
+      });
+
+      expect(response?.statusCode).toBe(200);
+      expect(response?.headers['access-control-allow-origin']).toBeDefined();
+    });
+
     test('Returns 405 for GET', async () => {
       const response = await global.api?.fakeRequest({
         method: 'GET',
@@ -373,6 +396,34 @@ describe('MCP API', () => {
       const note = await callTool(token, 'get_note', { note: created.data.id });
 
       expect(note.data.title).toBe('Draft');
+    });
+
+    test('Does not lose blocks appended concurrently', async () => {
+      const user = await global.db.insertUser();
+      const token = await createMcpToken(user, 'write');
+
+      const created = await callTool(token, 'create_note', {
+        blocks: [paragraph('Shopping list')],
+      });
+
+      const results = await Promise.all(['Milk', 'Bread', 'Eggs'].map(async item => await callTool(token, 'update_note', {
+        note: created.data.id,
+        mode: 'append',
+        blocks: [paragraph(item)],
+      })));
+
+      const succeeded = results.filter(result => !result.isError);
+      const note = await callTool(token, 'get_note', { note: created.data.id });
+
+      /**
+       * Every successful append is in the note, failed ones report the conflict
+       */
+      expect(succeeded.length).toBeGreaterThanOrEqual(1);
+      expect(note.data.content.blocks).toHaveLength(1 + succeeded.length);
+
+      for (const result of results.filter(r => r.isError)) {
+        expect(result.text).toContain('Note was changed');
+      }
     });
 
     test('Rejects unknown block types and lists available ones', async () => {

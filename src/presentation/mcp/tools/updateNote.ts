@@ -7,6 +7,8 @@ import { jsonResult } from '../types.js';
 import { getNoteUrl, resolveNotePublicId } from '../noteRef.js';
 import { BLOCKS_FORMAT_DESCRIPTION, blockInputSchema, fillBlockIds, getToolsForBlocks } from '../content.js';
 import type { GetNoteResponse } from './getNote.js';
+import { NotexApiError } from '../notexApi.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Registers "update_note" tool
@@ -49,12 +51,27 @@ export function registerUpdateNoteTool(server: McpServer, context: McpToolContex
     const contentBlocks = mode === 'append' ? [...note.content.blocks, ...newBlocks] : newBlocks;
     const { data: userTools } = await context.api.get<{ data: EditorTool[] }>('/user/editor-tools');
 
-    const { updatedAt } = await context.api.patch<{ updatedAt: Note['updatedAt'] }>(`/note/${publicId}`, {
-      content: {
-        blocks: contentBlocks,
-      },
-      tools: getToolsForBlocks(contentBlocks, [...noteTools, ...userTools]),
-    });
+    let updatedAt: Note['updatedAt'];
+
+    try {
+      ({ updatedAt } = await context.api.patch<{ updatedAt: Note['updatedAt'] }>(`/note/${publicId}`, {
+        content: {
+          blocks: contentBlocks,
+        },
+        tools: getToolsForBlocks(contentBlocks, [...noteTools, ...userTools]),
+
+        /**
+         * Content is built from the version read above, so the update must not overwrite newer changes
+         */
+        expectedUpdatedAt: note.updatedAt,
+      }));
+    } catch (error) {
+      if (error instanceof NotexApiError && error.statusCode === Number(StatusCodes.CONFLICT)) {
+        throw new Error('Note was changed by someone else during the update. Get the note again and repeat the update');
+      }
+
+      throw error;
+    }
 
     return jsonResult({
       id: publicId,
