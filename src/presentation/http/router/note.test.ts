@@ -1664,6 +1664,83 @@ describe('Note API', () => {
       expect(response?.json().parentNote.id).toBe(newParentNote.publicId);
     });
 
+    test.each([
+      /** Returns 403 if user is not in the team of the new parent note */
+      {
+        role: null,
+      },
+
+      /** Returns 403 if user is team member of the new parent note with a Read role */
+      {
+        role: MemberRole.Read,
+      },
+    ])
+    ('Returns 403 when user can not edit the new parent note', async ({ role }) => {
+      /* create test user - creator of the new parent note */
+      const owner = await global.db.insertUser();
+
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test note of another user, that will be new parent for the child note */
+      const newParentNote = await global.db.insertNote({
+        creatorId: owner.id,
+      });
+
+      /* create note settings for child note */
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      /* create test relation */
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: parentNote.id,
+      });
+
+      /* create test team of the new parent note */
+      if (role !== null) {
+        await global.db.insertNoteTeam({
+          noteId: newParentNote.id,
+          userId: user.id,
+          role: role,
+        });
+      }
+
+      let response = await global.api?.fakeRequest({
+        method: 'PATCH',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: newParentNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toStrictEqual('Permission denied');
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.json().parentNote.id).toBe(parentNote.publicId);
+    });
+
     test('Returns 400 when parent is the same as child', async () => {
       /* create test child note */
       const childNote = await global.db.insertNote({
@@ -1800,6 +1877,72 @@ describe('Note API', () => {
       });
 
       expect(response?.json().parentNote.id).toBe(parentNote.publicId);
+    });
+
+    test.each([
+      /** Returns 403 if user is not in the team of the parent note */
+      {
+        role: null,
+      },
+
+      /** Returns 403 if user is team member of the parent note with a Read role */
+      {
+        role: MemberRole.Read,
+      },
+    ])
+    ('Returns 403 when user can not edit the parent note', async ({ role }) => {
+      /* create test user - creator of the parent note */
+      const owner = await global.db.insertUser();
+
+      /* create test child note */
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+      });
+
+      /* create test note of another user, that will be parent for the child note */
+      const parentNote = await global.db.insertNote({
+        creatorId: owner.id,
+      });
+
+      /* create note settings for child note */
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+      });
+
+      /* create test team of the parent note */
+      if (role !== null) {
+        await global.db.insertNoteTeam({
+          noteId: parentNote.id,
+          userId: user.id,
+          role: role,
+        });
+      }
+
+      let response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        body: {
+          parentNoteId: parentNote.publicId,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toStrictEqual('Permission denied');
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}`,
+      });
+
+      expect(response?.json().parentNote).toBeUndefined();
     });
 
     test('Returns 400 when note already has parent note', async () => {
