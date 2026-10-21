@@ -2,7 +2,7 @@
 
 Living document. Update the status checkboxes and the "Deviations" section as the work goes.
 
-**Status:** steps 1 and 2 are done on `feat/mcp-server`; step 3 (notes.web) is not started.
+**Status:** steps 1 and 2 are done on `feat/mcp-server`; step 3 is done on `feat/mcp-tokens` in notes.web.
 
 ## Decisions
 
@@ -88,11 +88,11 @@ Living document. Update the status checkboxes and the "Deviations" section as th
 
 ## Step 3. Settings in notes.web
 
-- [ ] New "MCP" fieldset in `Settings.vue`:
+- [x] New "MCP" fieldset in `Settings.vue`:
   - token list: label, permission, `ntx_…a1b2`, created, last used, request count, "Revoke";
   - new token form: label and an "Allow editing" checkbox (off by default);
   - after creation the token is shown once with a copy button and ready-made setup instructions for Claude Code, Cursor, and claude.ai (custom connector → Request headers).
-- [ ] Layers: entity, notes-api transport methods, service, ru/en texts.
+- [x] Layers: entity, notes-api transport methods, service, ru/en texts.
 
 Setup snippets for the UI:
 
@@ -117,7 +117,11 @@ Separate fix, not part of this work: `POST /note` with `parentId` does not check
 - Step 2: the transport runs with `enableJsonResponse: true`: responses are plain JSON, no SSE streams.
 - Step 2: `GET /user/editor-tools` already includes the default tools, so `tools[]` is built from the note tools and the user tools; `GET /editor-tools/all` is not called.
 - Step 2: two helper modules were added: `notexApi.ts` (API client over `fastify.inject()`) and `types.ts` (tool context and result helper).
-- Step 2: tests cover the MCP protocol through `fastify.inject()`; the endpoint has not been tried with a real MCP client yet.
+- Step 2: besides the tests through `fastify.inject()`, the endpoint was checked over real HTTP with curl against a local server: `initialize`, `tools/list`, `create_note`, `list_notes`, 405 on `GET`, 401 for a revoked token, two tools for a read token. It has not been tried with Claude Code or Cursor yet.
+- Step 3: notes.web has only the English locale, so texts are added to `en.json` only.
+- Step 3: the section is a separate component `src/presentation/components/mcp/McpTokens.vue` with the `useMcpTokens` composable; `Settings.vue` only renders it.
+- Step 3: the "Create token" button sits below the form card, like the "Logout" button in the General section.
+- Step 3: checked in the browser against a local API: creating read and write tokens, the one-time token with setup snippets, the list with usage, revoking with confirmation, no horizontal scroll at 375px width.
 
 ## Verification
 
