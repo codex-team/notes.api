@@ -25,6 +25,8 @@ import NoteVisitsRepository from './noteVisits.repository.js';
 import NoteVisitsStorage from './storage/noteVisits.storage.js';
 import NoteHistoryStorage from './storage/noteHistory.storage.js';
 import NoteHistoryRepository from './noteHistory.repository.js';
+import McpTokenStorage from './storage/mcpToken.storage.js';
+import McpTokenRepository from './mcpToken.repository.js';
 
 /**
  * Interface for initiated repositories
@@ -86,6 +88,11 @@ export interface Repositories {
   noteVisitsRepository: NoteVisitsRepository;
 
   noteHistoryRepository: NoteHistoryRepository;
+
+  /**
+   * MCP tokens repository instance
+   */
+  mcpTokenRepository: McpTokenRepository;
 }
 
 /**
@@ -123,6 +130,7 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   const editorToolsStorage = new EditorToolsStorage(orm);
   const noteVisitsStorage = new NoteVisitsStorage(orm);
   const noteHistoryStorage = new NoteHistoryStorage(orm);
+  const mcpTokenStorage = new McpTokenStorage(orm);
 
   /**
    * Create associations between note and note settings
@@ -166,6 +174,7 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   await noteRelationshipStorage.model.sync();
   await noteVisitsStorage.model.sync();
   await noteHistoryStorage.model.sync();
+  await mcpTokenStorage.model.sync();
 
   /**
    * Create transport instances
@@ -188,6 +197,7 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
   const objectStorageRepository = new ObjectStorageRepository(s3Storage);
   const noteVisitsRepository = new NoteVisitsRepository(noteVisitsStorage);
   const noteHistoryRepository = new NoteHistoryRepository(noteHistoryStorage);
+  const mcpTokenRepository = new McpTokenRepository(mcpTokenStorage);
 
   return {
     noteRepository,
@@ -202,5 +212,6 @@ export async function init(orm: Orm, s3Config: S3StorageConfig): Promise<Reposit
     objectStorageRepository,
     noteVisitsRepository,
     noteHistoryRepository,
+    mcpTokenRepository,
   };
 }

@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import type AuthService from '@domain/service/auth.js';
 import { notEmpty } from '@infrastructure/utils/empty.js';
 import { getRequestLogger } from '@infrastructure/logging/index.js';
+import { MCP_TOKEN_PREFIX } from '@domain/entities/mcpToken.js';
 
 /**
  * Add middleware for resolve userId from Access Token and add it to request
@@ -23,6 +24,15 @@ export default function addUserIdResolver(server: FastifyInstance, authService: 
 
     if (notEmpty(authorizationHeader)) {
       const token = authorizationHeader.replace('Bearer ', '');
+
+      /**
+       * MCP tokens are resolved by the MCP endpoint itself and are not accepted by other routes
+       */
+      if (token.startsWith(MCP_TOKEN_PREFIX)) {
+        done();
+
+        return;
+      }
 
       try {
         request.userId = authService.verifyAccessToken(token)['id'];

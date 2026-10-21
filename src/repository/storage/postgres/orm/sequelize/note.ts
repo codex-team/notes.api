@@ -1,5 +1,5 @@
 import type { CreationOptional, InferAttributes, InferCreationAttributes, ModelStatic, NonAttribute, Sequelize } from 'sequelize';
-import { DataTypes, Model, Op, QueryTypes } from 'sequelize';
+import { DataTypes, Model, Op, QueryTypes, col, fn, where as whereCondition } from 'sequelize';
 import type Orm from '@repository/storage/postgres/orm/sequelize/index.js';
 import type { Note, NoteCreationAttributes, NoteInternalId, NotePublicId, NotePreview } from '@domain/entities/note.js';
 import { UserModel } from '@repository/storage/postgres/orm/sequelize/user.js';
@@ -174,15 +174,23 @@ export default class NoteSequelizeStorage {
    * @param id - note internal id
    * @param content - new content
    * @param tools - tools which are used in note
-   * @returns Note on success, null on failure
+   * @param expectedUpdatedAt - update the note only if it was last updated at this time
+   * @returns Note on success, null if the note does not exist or its version differs from the expected one
    */
-  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], tools: Note['tools']): Promise<Note | null> {
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], tools: Note['tools'], expectedUpdatedAt?: Date): Promise<Note | null> {
     const [affectedRowsCount, affectedRows] = await this.model.update({
       content,
       tools,
     }, {
       where: {
         id,
+        /**
+         * Update only the expected version of the note in the same query, so concurrent updates can not overwrite each other.
+         * Versions are compared with milliseconds precision, as updatedAt is passed through the API
+         */
+        ...(expectedUpdatedAt !== undefined && {
+          [Op.and]: whereCondition(fn('date_trunc', 'milliseconds', col('updated_at')), expectedUpdatedAt),
+        }),
       },
       returning: true,
     });

@@ -2034,6 +2034,81 @@ describe('Note API', () => {
         expect(response?.json().message).toBe(expectedMessage);
       }
     });
+
+    test('Updates note only while expectedUpdatedAt matches the current version', async () => {
+      const user = await global.db.insertUser();
+      const accessToken = global.auth(user.id);
+      const note = await global.db.insertNote({ creatorId: user.id });
+
+      await global.db.insertNoteSetting({
+        noteId: note.id,
+        isPublic: true,
+      });
+
+      const currentNote = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      const expectedUpdatedAt = currentNote?.json().note.updatedAt;
+
+      /**
+       * Updates the note with the expected version
+       * @param text - header text of the new content
+       */
+      const updateNote = async (text: string): ReturnType<NonNullable<typeof global.api>['fakeRequest']> => {
+        return await global.api?.fakeRequest({
+          method: 'PATCH',
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+          },
+          body: {
+            content: {
+              blocks: [
+                {
+                  id: 'mJDq8YbvqO',
+                  type: headerTool.name,
+                  data: { text },
+                },
+              ],
+            },
+            tools: [
+              {
+                name: headerTool.name,
+                id: headerTool.id,
+              },
+            ],
+            expectedUpdatedAt,
+          },
+          url: `/note/${note.publicId}`,
+        });
+      };
+
+      const firstUpdate = await updateNote('First update');
+
+      expect(firstUpdate?.statusCode).toBe(200);
+
+      /**
+       * The same version is stale after the first update
+       */
+      const secondUpdate = await updateNote('Second update');
+
+      expect(secondUpdate?.statusCode).toBe(409);
+      expect(secondUpdate?.json().message).toBe('Note was changed after the expected version');
+
+      const updatedNote = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${note.publicId}`,
+      });
+
+      expect(updatedNote?.json().note.content.blocks[0].data.text).toBe('First update');
+    });
   });
 
   describe('GET /note/:notePublicId/history', () => {

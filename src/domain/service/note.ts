@@ -3,6 +3,7 @@ import type NoteRepository from '@repository/note.repository.js';
 import type NoteVisitsRepository from '@repository/noteVisits.repository.js';
 import { createPublicId } from '@infrastructure/utils/id.js';
 import { DomainError } from '@domain/entities/DomainError.js';
+import { NoteUpdateConflictError } from '@domain/entities/NoteUpdateConflictError.js';
 import type NoteRelationsRepository from '@repository/noteRelations.repository.js';
 import type EditorToolsRepository from '@repository/editorTools.repository.js';
 import type User from '@domain/entities/user.js';
@@ -167,12 +168,26 @@ export default class NoteService {
    * @param content - new content
    * @param noteTools - tools which are used in note
    * @param userId - id of the user that made changes
+   * @param expectedUpdatedAt - update the note only if it was last updated at this time
+   * @throws NoteUpdateConflictError if the note was changed after the expected version
    */
-  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools'], userId: User['id']): Promise<Note> {
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools'], userId: User['id'], expectedUpdatedAt?: Date): Promise<Note> {
+    const areChangesSignificant = await this.areContentChangesSignificant(id, content);
+
+    const updatedNote = await this.noteRepository.updateNoteContentAndToolsById(id, content, noteTools, expectedUpdatedAt);
+
+    if (updatedNote === null) {
+      if (expectedUpdatedAt !== undefined) {
+        throw new NoteUpdateConflictError();
+      }
+
+      throw new DomainError(`Note with id ${id} was not updated`);
+    }
+
     /**
      * If content changes are valuable, they will be saved to note history
      */
-    if (await this.areContentChangesSignificant(id, content)) {
+    if (areChangesSignificant) {
       await this.noteHistoryRepository.createNoteHistoryRecord({
         content,
         userId: userId,
@@ -180,12 +195,6 @@ export default class NoteService {
         tools: noteTools,
       });
     };
-
-    const updatedNote = await this.noteRepository.updateNoteContentAndToolsById(id, content, noteTools);
-
-    if (updatedNote === null) {
-      throw new DomainError(`Note with id ${id} was not updated`);
-    }
 
     this.logger.debug('Note updated', {
       noteId: id,
