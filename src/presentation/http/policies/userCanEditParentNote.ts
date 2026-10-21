@@ -1,4 +1,5 @@
-import { isEmpty } from '@infrastructure/utils/empty.js';
+import { isEmpty, notEmpty } from '@infrastructure/utils/empty.js';
+import hasProperty from '@infrastructure/utils/hasProperty.js';
 import { MemberRole } from '@domain/entities/team.js';
 import type { PolicyContext } from '@presentation/http/types/PolicyContext.js';
 import { getRequestLogger } from '@infrastructure/logging/index.js';
@@ -12,7 +13,13 @@ export default async function userCanEditParentNote(context: PolicyContext): Pro
   const { request, reply, domainServices } = context;
   const logger = getRequestLogger('policies').child({ policy: 'userCanEditParentNote' });
 
-  const { userId } = request;
+  const { userId, body } = request;
+
+  /**
+   * POST /note passes parent note as "parentId", relation routes pass it as "parentNoteId"
+   */
+  const hasParentNoteId = (hasProperty(body, 'parentId') && notEmpty(body.parentId))
+    || (hasProperty(body, 'parentNoteId') && notEmpty(body.parentNoteId));
 
   /**
    * If user is not authorized, we can't check his permissions
@@ -26,8 +33,18 @@ export default async function userCanEditParentNote(context: PolicyContext): Pro
   /**
    * If parent note is not passed, there is nothing to check
    */
-  if (isEmpty(request.parentNote)) {
+  if (!hasParentNoteId) {
     return;
+  };
+
+  /**
+   * If parent note is passed but not resolved, we can't check permissions
+   * It happens if the route uses this policy without parentNoteResolver middleware
+   */
+  if (isEmpty(request.parentNote)) {
+    logger.warn('Parent note not found for parent note edit permission check');
+
+    return await reply.notAcceptable('Parent note not found');
   };
 
   const memberRole = await domainServices.noteSettingsService.getUserRoleByUserIdAndNoteId(request.userId!, request.parentNote.id);
