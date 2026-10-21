@@ -121,7 +121,7 @@ Separate fix, not part of this work: `POST /note` with `parentId` does not check
 - Step 2 (review): `PATCH /note/:notePublicId` accepts an optional `expectedUpdatedAt`. The note is updated only if its `updated_at` still matches, checked in the same `UPDATE` query; otherwise the route returns 409. `update_note` always passes the version it read, so concurrent updates and appends can't overwrite each other. Note history is now written after a successful update, not before.
 - Step 2 (review): `/mcp` copies headers set by Fastify hooks (CORS) to the raw response, since the hijacked reply doesn't flush them.
 - Step 3: notes.web has only the English locale, so texts are added to `en.json` only.
-- Step 3: the section is a separate component `src/presentation/components/mcp/McpTokens.vue` with the `useMcpTokens` composable; `Settings.vue` only renders it.
+- Step 3: the section is a separate component `src/presentation/components/mcp/McpTokens.vue` with the `useUserMcpSettings` composable; `Settings.vue` only renders it. Following review, the domain layer is named after user settings: `UserSettingsService` and `UserSettingsRepository` with `getMcpTokens`, `createMcpToken`, `revokeMcpToken`. Snippets use the `text-monospaced` class from the codex-ui typescale.
 - Step 3: the "Create token" button sits below the form card, like the "Logout" button in the General section.
 - Step 3: checked in the browser against a local API: creating read and write tokens, the one-time token with setup snippets, the list with usage, revoking with confirmation, no horizontal scroll at 375px width.
 
