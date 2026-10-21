@@ -1019,6 +1019,129 @@ describe('Note API', () => {
         id: parentNote.publicId,
       });
     });
+
+    test.each([
+      /** Returns 403 if user is not in the team of the parent note */
+      {
+        role: null,
+      },
+
+      /** Returns 403 if user is team member of the parent note with a Read role */
+      {
+        role: MemberRole.Read,
+      },
+    ])
+    ('Should not create note with parentId if user can not edit the parent note', async ({ role }) => {
+      /** Create test user - creator of a parent note */
+      const owner = await global.db.insertUser();
+
+      /** Create test user */
+      const user = await global.db.insertUser();
+
+      /** Create test parent note */
+      const parentNote = await global.db.insertNote({
+        creatorId: owner.id,
+      });
+
+      /** Create test note settings */
+      await global.db.insertNoteSetting({
+        noteId: parentNote.id,
+        isPublic: true,
+      });
+
+      /** Create test team */
+      if (role !== null) {
+        await global.db.insertNoteTeam({
+          noteId: parentNote.id,
+          userId: user.id,
+          role: role,
+        });
+      }
+
+      const accessToken = global.auth(user.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note`,
+        body: {
+          parentId: parentNote.publicId,
+          content: {
+            blocks: [
+              {
+                id: 'qxnjUh9muR',
+                type: 'header',
+                data: {
+                  text: 'sample text',
+                  level: 1,
+                },
+              },
+            ],
+          },
+          tools: [
+            {
+              name: headerTool.name,
+              id: headerTool.id,
+            },
+          ],
+        },
+      });
+
+      expect(response?.statusCode).toBe(403);
+
+      expect(response?.json().message).toStrictEqual('Permission denied');
+    });
+
+    test('Should not create note if parent note does not exist', async () => {
+      const nonExistentParentId = '47L43yY7dp';
+
+      const user = await global.db.insertUser();
+
+      const accessToken = global.auth(user.id);
+
+      const response = await global.api?.fakeRequest({
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note`,
+        body: {
+          parentId: nonExistentParentId,
+          content: {
+            blocks: [
+              {
+                id: 'qxnjUh9muR',
+                type: 'header',
+                data: {
+                  text: 'sample text',
+                  level: 1,
+                },
+              },
+            ],
+          },
+          tools: [
+            {
+              name: headerTool.name,
+              id: headerTool.id,
+            },
+          ],
+        },
+      });
+
+      expect(response?.statusCode).toBe(406);
+
+      expect(response?.json().message).toStrictEqual('Parent note not found');
+
+      /** Check that neither the note nor its history record was saved */
+      const [notes] = await global.db.query(`SELECT id FROM public.notes WHERE creator_id = ${user.id}`) as [unknown[], unknown];
+      const [historyRecords] = await global.db.query(`SELECT id FROM public.note_history WHERE user_id = ${user.id}`) as [unknown[], unknown];
+
+      expect(notes).toHaveLength(0);
+      expect(historyRecords).toHaveLength(0);
+    });
+
     test.each([
       /**
        * Specified extra tools
