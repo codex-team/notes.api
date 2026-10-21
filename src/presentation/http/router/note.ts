@@ -4,6 +4,7 @@ import type NoteSettingsService from '@domain/service/noteSettings.js';
 import type { ErrorResponse } from '@presentation/http/types/HttpResponse.js';
 import type { Note, NotePublicId } from '@domain/entities/note.js';
 import useNoteResolver from '../middlewares/note/useNoteResolver.js';
+import useParentNoteResolver from '../middlewares/note/useParentNoteResolver.js';
 import useNoteSettingsResolver from '../middlewares/noteSettings/useNoteSettingsResolver.js';
 import useMemberRoleResolver from '../middlewares/noteSettings/useMemberRoleResolver.js';
 import { MemberRole } from '@domain/entities/team.js';
@@ -59,6 +60,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
    * It should be used in routes that accepts note public id
    */
   const { noteResolver } = useNoteResolver(noteService);
+
+  /**
+   * Prepare parent note resolver middleware
+   * It should be used in routes that accepts parent note public id in request body
+   */
+  const { parentNoteResolver } = useParentNoteResolver(noteService);
 
   /**
    * Prepare note settings resolver middleware
@@ -262,6 +269,7 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     config: {
       policy: [
         'authRequired',
+        'userCanEditParentNote',
       ],
     },
     schema: {
@@ -288,6 +296,9 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
         },
       },
     },
+    preHandler: [
+      parentNoteResolver,
+    ],
   }, async (request, reply) => {
     /**
      * @todo Validate request query
