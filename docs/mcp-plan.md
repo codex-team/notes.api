@@ -2,11 +2,11 @@
 
 Living document. Update the status checkboxes and the "Deviations" section as the work goes.
 
-**Status:** steps 1 and 2 are done on `feat/mcp-server`; step 3 is done on `feat/mcp-tokens` in notes.web.
+**Status:** steps 1 and 2 are done on `feat/mcp-server`; step 3 is done on `feat/mcp-tokens` in notes.web. Following review, `/mcp` runs on MCP SDK v2 and serves both protocol revisions.
 
 ## Decisions
 
-- **Where it lives.** A remote MCP endpoint `/mcp` inside notes.api. Transport: Streamable HTTP, stateless (no MCP sessions). No separate deployment, no npm package.
+- **Where it lives.** A remote MCP endpoint `/mcp` inside notes.api. Transport: Streamable HTTP without MCP sessions. Protocol revision 2026-07-28 and 2025-era clients are served on the same endpoint. No separate deployment, no npm package.
 - **Auth.** Personal MCP tokens sent as `Authorization: Bearer ntx_…`. A user can have several tokens, each with `read` or `write` permission. No OAuth for now.
 - **Content format.** Editor.js JSON as stored in the DB. The server generates ids for new blocks and builds `tools[]` itself.
 - **Tools.** `list_notes`, `get_note`, `create_note`, `update_note`. A `read` token sees only the first two. No delete, no search.
@@ -51,7 +51,7 @@ Living document. Update the status checkboxes and the "Deviations" section as th
 
 ## Step 2. `/mcp` endpoint (notes.api)
 
-- [x] Dependency `@modelcontextprotocol/sdk` (zod may need a bump from `^3.21`).
+- [x] Dependencies `@modelcontextprotocol/server` and `@modelcontextprotocol/node` (MCP SDK v2), zod `^4.2`.
 - [x] `src/presentation/mcp/`:
   - `index.ts` — fastify plugin: `POST /mcp`; `GET` and `DELETE` answer 405;
   - `auth.ts` — Bearer token → `resolveToken()`, 401 without a valid token;
@@ -62,8 +62,8 @@ Living document. Update the status checkboxes and the "Deviations" section as th
 - [x] Request flow:
   1. resolve the token;
   2. sign a short access JWT for the owner with `authService.signAccessToken()`;
-  3. create `McpServer` and `StreamableHTTPServerTransport({ sessionIdGenerator: undefined })`;
-  4. `reply.hijack()` and `transport.handleRequest(request.raw, reply.raw, request.body)`;
+  3. `createMcpHandler()`, created once per router, passes the token to its factory through `authInfo`; the factory creates `McpServer` for the request;
+  4. `reply.hijack()` and `toNodeHandler(handler)(request.raw, reply.raw, request.body)`;
   5. tools call the API through `fastify.inject()` with that JWT;
   6. `trackUsage` only on `tools/call`.
 - [x] `userIdResolver` skips `ntx_…` tokens instead of logging a JWT error on every request.
@@ -112,20 +112,28 @@ Separate fix, not part of this work: `POST /note` with `parentId` does not check
 ## Deviations
 
 - Step 1: the migration declares the FK, the permission check and the indexes as named constraints (same structure as other migrations) instead of inline column constraints.
-- Step 2: zod is bumped to `^3.25.0`, the SDK (`@modelcontextprotocol/sdk@^1.32.1`) requires `^3.25 || ^4`.
+- Step 2: zod is bumped to `^4.2.0`, MCP SDK v2 doesn't support zod 3. Outside MCP zod is used only in the config schema, which works on zod 4 unchanged.
 - Step 2: the web url lives in `httpApi.mcp.webUrl` (default `https://notex.so`, `http://localhost:5173` in `app-config.yaml`), so `HttpApi` keeps getting only its own config section.
-- Step 2: the transport runs with `enableJsonResponse: true`: responses are plain JSON, no SSE streams.
+- Step 2: 2025-era requests are answered with a short SSE stream carrying one message, since the SDK's stateless fallback has no JSON-only option. 2026-07-28 requests get plain JSON.
 - Step 2: `GET /user/editor-tools` already includes the default tools, so `tools[]` is built from the note tools and the user tools; `GET /editor-tools/all` is not called.
 - Step 2: two helper modules were added: `notexApi.ts` (API client over `fastify.inject()`) and `types.ts` (tool context and result helper).
 - Step 2: besides the tests through `fastify.inject()`, the endpoint was checked over real HTTP with curl against a local server: `initialize`, `tools/list`, `create_note`, `list_notes`, 405 on `GET`, 401 for a revoked token, two tools for a read token. It has not been tried with Claude Code or Cursor yet.
 - Step 2 (review): `PATCH /note/:notePublicId` accepts an optional `expectedUpdatedAt`. The note is updated only if its `updated_at` still matches, checked in the same `UPDATE` query; otherwise the route returns 409. `update_note` always passes the version it read, so concurrent updates and appends can't overwrite each other. Note history is now written after a successful update, not before.
 - Step 2 (review): `/mcp` copies headers set by Fastify hooks (CORS) to the raw response, since the hijacked reply doesn't flush them.
+- Step 2 (review): `/mcp` moved from `@modelcontextprotocol/sdk` v1 to SDK v2 to serve protocol revision 2026-07-28 next to 2025-era clients:
+  - `createMcpHandler` with the default stateless legacy fallback, wired into Fastify with `toNodeHandler`; the `@modelcontextprotocol/fastify` adapter requires Fastify 5;
+  - tool input schemas are wrapped in `z.object()`;
+  - unknown tools, e.g. write tools for a read token, are rejected with a JSON-RPC error instead of a tool result with `isError`;
+  - SDK v2 needs Node 20+, CI and Docker already use Node 20;
+  - tests connect a real SDK v2 client (`@modelcontextprotocol/client`, dev dependency) through `fastify.inject()` in both eras. The same client was checked over real HTTP against a local server: the legacy client negotiates 2025-11-25, the pinned one 2026-07-28.
 - Step 3: notes.web has only the English locale, so texts are added to `en.json` only.
 - Step 3: the section is a separate component `src/presentation/components/mcp/McpTokens.vue` with the `useUserMcpSettings` composable; `Settings.vue` only renders it. Following review, the domain layer is named after user settings: `UserSettingsService` and `UserSettingsRepository` with `getMcpTokens`, `createMcpToken`, `revokeMcpToken`. Snippets use the `text-monospaced` class from the codex-ui typescale.
 - Step 3: the "Create token" button sits below the form card, like the "Logout" button in the General section.
 - Step 3: checked in the browser against a local API: creating read and write tokens, the one-time token with setup snippets, the list with usage, revoking with confirmation, no horizontal scroll at 375px width.
 
 ## Verification
+
+MCP SDK v2 needs Node 20+, so switch to the `.nvmrc` version first (`nvm use`).
 
 The repo may contain other sessions' worktrees in `.claude/worktrees`, which ESLint and Vitest pick up. Run checks on this checkout only:
 
