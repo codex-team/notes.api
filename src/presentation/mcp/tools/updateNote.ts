@@ -1,4 +1,4 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import type { Note } from '@domain/entities/note.js';
 import type EditorTool from '@domain/entities/editorTools.js';
@@ -21,14 +21,14 @@ export function registerUpdateNoteTool(server: McpServer, context: McpToolContex
     description: 'Updates note content. '
     + '"replace" mode replaces all blocks of the note with the passed ones, so pass the whole content: get it with get_note first. '
     + '"append" mode adds the passed blocks to the end of the note.\n\n' + BLOCKS_FORMAT_DESCRIPTION,
-    inputSchema: {
+    inputSchema: z.object({
       note: z.string().describe('Note URL (e.g. https://notex.so/note/<id>) or note id'),
       blocks: z.array(blockInputSchema).describe('Blocks to replace the content with or to append'),
       mode: z.enum(['replace', 'append']).default('replace')
         .describe('"replace" — replace all blocks, "append" — add blocks to the end'),
       expectedUpdatedAt: z.string().optional()
         .describe('"updatedAt" returned by get_note. If the note was changed after that, the update is rejected'),
-    },
+    }),
     annotations: {
       readOnlyHint: false,
       destructiveHint: true,

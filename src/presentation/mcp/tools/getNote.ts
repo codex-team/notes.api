@@ -1,4 +1,4 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import type { NotePublic } from '@domain/entities/notePublic.js';
 import type EditorTool from '@domain/entities/editorTools.js';
@@ -29,9 +29,9 @@ export function registerGetNoteTool(server: McpServer, context: McpToolContext):
     title: 'Get note',
     description: 'Returns the note with its content in Editor.js format, parent notes and edit rights. '
     + 'Pass "updatedAt" from the result to update_note as "expectedUpdatedAt" to avoid overwriting newer changes.',
-    inputSchema: {
+    inputSchema: z.object({
       note: z.string().describe('Note URL (e.g. https://notex.so/note/<id>) or note id'),
-    },
+    }),
     annotations: {
       readOnlyHint: true,
     },

@@ -1,4 +1,4 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import type { NotePublicId } from '@domain/entities/note.js';
 import type EditorTool from '@domain/entities/editorTools.js';
@@ -16,11 +16,11 @@ export function registerCreateNoteTool(server: McpServer, context: McpToolContex
   server.registerTool('create_note', {
     title: 'Create note',
     description: 'Creates a new note at the root or inside the parent note.\n\n' + BLOCKS_FORMAT_DESCRIPTION,
-    inputSchema: {
+    inputSchema: z.object({
       blocks: z.array(blockInputSchema).describe('Note content blocks'),
       parent: z.string().optional()
         .describe('URL or id of the parent note. Omit to create the note at the root'),
-    },
+    }),
     annotations: {
       readOnlyHint: false,
       destructiveHint: false,

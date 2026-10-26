@@ -1,5 +1,7 @@
 import { describe, test, expect, beforeEach } from 'vitest';
+import { Client, StreamableHTTPClientTransport } from '@modelcontextprotocol/client';
 import type User from '@domain/entities/user.js';
+import type { RequestParams } from '@presentation/api.interface.js';
 import config from '@infrastructure/config/index.js';
 
 /**
@@ -53,10 +55,52 @@ async function sendMcpRequest(token: string | undefined, method: string, params:
 }
 
 /**
- * Parsed JSON of the tool result. Its shape depends on the tool, so tests access it freely
+ * Parsed JSON of MCP messages and tool results. Its shape depends on the method and the tool, so tests access it freely
  */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-type ToolResultData = any;
+type ParsedJson = any;
+
+/**
+ * Reads JSON-RPC message from the MCP endpoint response.
+ * 2025-era requests are answered with an SSE stream carrying the message
+ * @param response - MCP endpoint response
+ */
+function readMcpMessage(response: Awaited<ReturnType<typeof sendMcpRequest>>): ParsedJson {
+  if (!String(response?.headers['content-type']).startsWith('text/event-stream')) {
+    return response?.json();
+  }
+
+  const dataLine = response?.body.split('\n').find(line => line.startsWith('data:'));
+
+  return JSON.parse(dataLine?.slice('data:'.length) ?? 'null');
+}
+
+/**
+ * Fetch for MCP SDK client that sends requests to the API without network
+ * @param url - request url
+ * @param init - request options
+ */
+async function fakeFetch(url: string | URL, init?: RequestInit): Promise<Response> {
+  const response = await global.api?.fakeRequest({
+    method: (init?.method ?? 'GET') as RequestParams['method'],
+    url: new URL(url).pathname,
+    headers: Object.fromEntries(new Headers(init?.headers)),
+    body: typeof init?.body === 'string' ? init.body : undefined,
+  });
+
+  const headers = new Headers();
+
+  for (const [name, value] of Object.entries(response?.headers ?? {})) {
+    if (value !== undefined) {
+      headers.set(name, String(value));
+    }
+  }
+
+  return new Response(response?.body === '' ? null : response?.body, {
+    status: response?.statusCode,
+    headers,
+  });
+}
 
 /**
  * Calls MCP tool and returns its result
@@ -65,15 +109,30 @@ type ToolResultData = any;
  * @param args - tool arguments
  * @returns error flag and text of the tool result, parsed as JSON when possible
  */
-async function callTool(token: string, name: string, args: object): Promise<{ isError: boolean; text: string; data: ToolResultData }> {
+async function callTool(token: string, name: string, args: object): Promise<{ isError: boolean; text: string; data: ParsedJson }> {
   const response = await sendMcpRequest(token, 'tools/call', {
     name,
     arguments: args,
   });
 
-  const { result } = response!.json<{ result: { isError?: boolean; content: { text: string }[] } }>();
+  const { result, error } = readMcpMessage(response) as {
+    result?: { isError?: boolean; content: { text: string }[] };
+    error?: { message: string };
+  };
+
+  /**
+   * Unknown tools are rejected with JSON-RPC error instead of a tool result
+   */
+  if (result === undefined) {
+    return {
+      isError: true,
+      text: error?.message ?? '',
+      data: null,
+    };
+  }
+
   const text = result.content[0].text;
-  let data: ToolResultData = null;
+  let data: ParsedJson = null;
 
   try {
     data = JSON.parse(text);
@@ -199,7 +258,7 @@ describe('MCP API', () => {
       });
 
       expect(response?.statusCode).toBe(200);
-      expect(response?.json().result.serverInfo.name).toBe('notex');
+      expect(readMcpMessage(response).result.serverInfo.name).toBe('notex');
     });
 
     test.each([
@@ -217,7 +276,7 @@ describe('MCP API', () => {
 
       const response = await sendMcpRequest(token, 'tools/list');
 
-      const toolNames = response?.json().result.tools.map((tool: { name: string }) => tool.name).sort();
+      const toolNames = readMcpMessage(response).result.tools.map((tool: { name: string }) => tool.name).sort();
 
       expect(toolNames).toStrictEqual(expectedTools);
     });
@@ -257,6 +316,62 @@ describe('MCP API', () => {
 
       expect(item.requestCount).toBe(2);
       expect(item.lastUsedAt).not.toBeNull();
+    });
+  });
+
+  describe('Protocol revisions', () => {
+    test.each([
+      {
+        era: 'legacy',
+        mode: 'legacy' as const,
+      },
+      {
+        era: 'modern',
+        mode: { pin: '2026-07-28' },
+      },
+    ])('Serves $era clients of MCP SDK', async ({ era, mode }) => {
+      const user = await global.db.insertUser();
+      const token = await createMcpToken(user, 'write');
+      const client = new Client({
+        name: 'test',
+        version: '1.0.0',
+      }, {
+        versionNegotiation: { mode },
+      });
+
+      await client.connect(new StreamableHTTPClientTransport(new URL('http://localhost/mcp'), {
+        fetch: fakeFetch,
+        requestInit: {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
+      }));
+
+      expect(client.getProtocolEra()).toBe(era);
+
+      const { tools } = await client.listTools();
+
+      expect(tools.map(tool => tool.name).sort()).toStrictEqual(['create_note', 'get_note', 'list_notes', 'update_note']);
+
+      const created = await client.callTool({
+        name: 'create_note',
+        arguments: {
+          blocks: [paragraph('Created over MCP')],
+        },
+      });
+      const { id } = JSON.parse((created.content as { text: string }[])[0].text);
+
+      const received = await client.callTool({
+        name: 'get_note',
+        arguments: {
+          note: id,
+        },
+      });
+
+      expect(JSON.parse((received.content as { text: string }[])[0].text).title).toBe('Created over MCP');
+
+      await client.close();
     });
   });
 

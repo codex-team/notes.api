@@ -36,8 +36,11 @@ export default [
        */
       'n/no-missing-import': ['off'],
       'n/no-unpublished-import': ['error', {
-        allowModules: ['vitest', 'postgres-migrations', '@testcontainers/localstack'],
+        allowModules: ['vitest', 'postgres-migrations', '@testcontainers/localstack', '@modelcontextprotocol/client'],
         ignoreTypeImport: true,
+      }],
+      'n/no-unsupported-features/es-builtins': ['error', {
+        version: '>=22.1.0',
       }],
       /**
        * @todo get rid of this rule ignores and solve all eslint errors occured

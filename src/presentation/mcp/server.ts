@@ -1,4 +1,4 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer } from '@modelcontextprotocol/server';
 import type { McpTokenPermission } from '@domain/entities/mcpToken.js';
 import type { McpToolContext } from './types.js';
 import { registerListNotesTool } from './tools/listNotes.js';

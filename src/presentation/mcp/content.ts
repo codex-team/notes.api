@@ -22,8 +22,8 @@ export const blockInputSchema = z.object({
     .describe('Block id. Keep it for existing blocks, omit for new ones'),
   type: z.string().min(1)
     .describe('Editor tool name, e.g. paragraph, header, list'),
-  data: z.record(z.unknown()).describe('Block data, format depends on the block type'),
-  tunes: z.record(z.unknown()).optional()
+  data: z.record(z.string(), z.unknown()).describe('Block data, format depends on the block type'),
+  tunes: z.record(z.string(), z.unknown()).optional()
     .describe('Block tunes, keep them as is for existing blocks'),
 });
 

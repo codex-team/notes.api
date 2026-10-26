@@ -1,16 +1,14 @@
 import type { FastifyPluginCallback, FastifyReply } from 'fastify';
-import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import type { AuthInfo } from '@modelcontextprotocol/server';
+import { createMcpHandler } from '@modelcontextprotocol/server';
+import { toNodeHandler } from '@modelcontextprotocol/node';
 import { StatusCodes } from 'http-status-codes';
+import type McpToken from '@domain/entities/mcpToken.js';
 import type McpTokenService from '@domain/service/mcpToken.js';
 import type AuthService from '@domain/service/auth.js';
 import { getRequestLogger } from '@infrastructure/logging/index.js';
 import NotexApi from './notexApi.js';
 import { createMcpServer } from './server.js';
-
-/**
- * JSON-RPC error code for internal server errors
- */
-const JSON_RPC_INTERNAL_ERROR = -32603;
 
 /**
  * Interface for the MCP router
@@ -33,8 +31,34 @@ interface McpRouterOptions {
 }
 
 /**
- * MCP router plugin. Serves MCP over Streamable HTTP in stateless mode:
- * every request creates its own MCP server for the owner of the passed MCP token
+ * Passes the resolved MCP token to the MCP server factory
+ * @param token - plain MCP token from the request
+ * @param mcpToken - resolved MCP token
+ */
+function toAuthInfo(token: string, mcpToken: McpToken): AuthInfo {
+  return {
+    token,
+    clientId: String(mcpToken.id),
+    scopes: [mcpToken.permission],
+    extra: {
+      mcpToken,
+    },
+  };
+}
+
+/**
+ * Logs MCP errors that do not reach the client
+ * @param error - error thrown while serving MCP request
+ */
+function logMcpError(error: Error): void {
+  getRequestLogger('appServer').child({ router: 'mcp' })
+    .error(error);
+}
+
+/**
+ * MCP router plugin. Serves MCP over Streamable HTTP without sessions:
+ * protocol revision 2026-07-28 and 2025-era clients on the same endpoint.
+ * Every request creates its own MCP server for the owner of the passed MCP token
  * @param fastify - fastify instance
  * @param opts - router options
  * @param done - callback
@@ -42,11 +66,37 @@ interface McpRouterOptions {
 const McpRouter: FastifyPluginCallback<McpRouterOptions> = (fastify, opts, done) => {
   const { mcpTokenService, authService, webUrl } = opts;
 
+  const handler = createMcpHandler(({ authInfo }) => {
+    const mcpToken = authInfo?.extra?.mcpToken as McpToken | undefined;
+
+    if (mcpToken === undefined) {
+      throw new Error('MCP token is not resolved');
+    }
+
+    /**
+     * Tools call API routes on behalf of the token owner
+     */
+    const api = new NotexApi(fastify, authService.signAccessToken({ id: mcpToken.userId }));
+
+    return createMcpServer({
+      api,
+      webUrl,
+      onToolCall: async () => await mcpTokenService.trackUsage(mcpToken.id),
+    }, mcpToken.permission);
+  }, {
+    onerror: logMcpError,
+  });
+
+  const handleMcpRequest = toNodeHandler(handler, { onerror: logMcpError });
+
+  fastify.addHook('onClose', async () => {
+    await handler.close();
+  });
+
   /**
    * Handle MCP JSON-RPC messages
    */
   fastify.post('/', async (request, reply) => {
-    const logger = getRequestLogger('appServer').child({ router: 'mcp' });
     const token = request.headers.authorization?.replace('Bearer ', '') ?? '';
     const mcpToken = await mcpTokenService.resolveToken(token);
 
@@ -55,23 +105,7 @@ const McpRouter: FastifyPluginCallback<McpRouterOptions> = (fastify, opts, done)
     }
 
     /**
-     * Tools call API routes on behalf of the token owner
-     */
-    const api = new NotexApi(fastify, authService.signAccessToken({ id: mcpToken.userId }));
-
-    const server = createMcpServer({
-      api,
-      webUrl,
-      onToolCall: async () => await mcpTokenService.trackUsage(mcpToken.id),
-    }, mcpToken.permission);
-
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
-      enableJsonResponse: true,
-    });
-
-    /**
-     * Transport writes the response itself
+     * MCP handler writes the response itself
      */
     void reply.hijack();
 
@@ -84,30 +118,7 @@ const McpRouter: FastifyPluginCallback<McpRouterOptions> = (fastify, opts, done)
       }
     }
 
-    reply.raw.on('close', () => {
-      void transport.close();
-      void server.close();
-    });
-
-    try {
-      await server.connect(transport);
-      await transport.handleRequest(request.raw, reply.raw, request.body);
-    } catch (error) {
-      logger.error(error);
-
-      if (!reply.raw.headersSent) {
-        reply.raw.setHeader('content-type', 'application/json');
-        reply.raw.writeHead(StatusCodes.INTERNAL_SERVER_ERROR);
-        reply.raw.end(JSON.stringify({
-          jsonrpc: '2.0',
-          error: {
-            code: JSON_RPC_INTERNAL_ERROR,
-            message: 'Internal server error',
-          },
-          id: null,
-        }));
-      }
-    }
+    await handleMcpRequest(Object.assign(request.raw, { auth: toAuthInfo(token, mcpToken) }), reply.raw, request.body);
   });
 
   /**

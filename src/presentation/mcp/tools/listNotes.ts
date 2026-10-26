@@ -1,4 +1,4 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import type { NoteListPublic } from '@domain/entities/noteList.js';
 import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
@@ -69,7 +69,7 @@ export function registerListNotesTool(server: McpServer, context: McpToolContext
     description: 'Lists notes of the user. '
     + 'Without "parent" returns a page of 30 notes: recently opened ones ("recent") or the ones created by the user ("created"). '
     + 'With "parent" returns the tree of notes nested in the given note.',
-    inputSchema: {
+    inputSchema: z.object({
       source: z.enum(['recent', 'created']).default('recent')
         .describe('"recent" — notes ordered by the last visit, "created" — notes created by the user, newest first'),
       page: z.number().int()
@@ -79,7 +79,7 @@ export function registerListNotesTool(server: McpServer, context: McpToolContext
         .describe('Page number, 30 notes per page'),
       parent: z.string().optional()
         .describe('URL or id of the note whose nested notes should be listed'),
-    },
+    }),
     annotations: {
       readOnlyHint: true,
     },
