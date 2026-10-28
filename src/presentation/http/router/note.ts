@@ -465,10 +465,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       policy: [
         'authRequired',
         'userCanEdit',
+        'userCanEditParentNote',
       ],
     },
     preHandler: [
       noteResolver,
+      parentNoteResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
@@ -520,10 +522,12 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       policy: [
         'authRequired',
         'userCanEdit',
+        'userCanEditParentNote',
       ],
     },
     preHandler: [
       noteResolver,
+      parentNoteResolver,
     ],
   }, async (request, reply) => {
     const noteId = request.note?.id as number;
