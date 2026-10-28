@@ -13,6 +13,8 @@ httpApi:
       clientSecret: 'client_secret'
       redirectUrl: '/oauth/google/login'
       callbackUrl: 'http://localhost:1337/oauth/google/callback'
+  mcp:
+    webUrl: 'http://localhost:5173'
 
 auth:
   accessSecret: 'secret'

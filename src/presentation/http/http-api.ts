@@ -18,6 +18,8 @@ import AuthRouter from '@presentation/http/router/auth.js';
 import UserRouter from '@presentation/http/router/user.js';
 import AIRouter from '@presentation/http/router/ai.js';
 import EditorToolsRouter from './router/editorTools.js';
+import McpTokensRouter from './router/mcpTokens.js';
+import McpRouter from '@presentation/mcp/index.js';
 import { UserSchema } from './schema/User.js';
 import { NoteSchema } from './schema/Note.js';
 import { HistotyRecordShema, HistoryMetaSchema } from './schema/History.js';
@@ -35,6 +37,7 @@ import UploadRouter from './router/upload.js';
 import { ajvFilePlugin } from '@fastify/multipart';
 import { UploadSchema } from './schema/Upload.js';
 import { NoteHierarchySchema } from './schema/NoteHierarchy.js';
+import { McpTokenSchema } from './schema/McpToken.js';
 import { StatusCodes } from 'http-status-codes';
 
 interface FastifyError extends Error {
@@ -246,6 +249,18 @@ export default class HttpApi implements Api {
       editorToolsService: domainServices.editorToolsService,
     });
 
+    await this.server?.register(McpTokensRouter, {
+      prefix: '/user/mcp-tokens',
+      mcpTokenService: domainServices.mcpTokenService,
+    });
+
+    await this.server?.register(McpRouter, {
+      prefix: '/mcp',
+      mcpTokenService: domainServices.mcpTokenService,
+      authService: domainServices.authService,
+      webUrl: this.config.mcp.webUrl,
+    });
+
     await this.server?.register(AIRouter, {
       prefix: '/ai',
       aiService: domainServices.aiService,
@@ -309,6 +324,7 @@ export default class HttpApi implements Api {
     this.server?.addSchema(OauthSchema);
     this.server?.addSchema(UploadSchema);
     this.server?.addSchema(NoteHierarchySchema);
+    this.server?.addSchema(McpTokenSchema);
   }
 
   /**

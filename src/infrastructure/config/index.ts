@@ -111,6 +111,15 @@ const WebOrigin = z.string().refine((value) => {
 }, { message: 'Must be an exact origin like https://notex.so' });
 
 /**
+ * MCP endpoint configuration
+ */
+const McpConfig = z.object({
+  webUrl: z.string(), // NoteX web app url, used to build links to notes
+});
+
+export type McpConfig = z.infer<typeof McpConfig>;
+
+/**
  * Http API configuration
  */
 const HttpApiConfig = z.object({
@@ -123,6 +132,7 @@ const HttpApiConfig = z.object({
   allowedOrigins: z.union([z.array(z.string()), z.literal('*')]),
   webOrigins: z.array(WebOrigin), // origins of the web app allowed to receive tokens after OAuth login
   oauth2: OAuth2Config,
+  mcp: McpConfig,
 });
 
 export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
@@ -159,6 +169,9 @@ const defaultConfig: AppConfig = {
         redirectUrl: '/oauth/google/login',
         callbackUrl: '/oauth/google/callback',
       },
+    },
+    mcp: {
+      webUrl: 'https://notex.so',
     },
   },
   auth: {

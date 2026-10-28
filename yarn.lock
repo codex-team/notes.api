@@ -1182,6 +1182,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hono/node-server@npm:^1.19.9 || ^2.1.3":
+  version: 2.1.5
+  resolution: "@hono/node-server@npm:2.1.5"
+  peerDependencies:
+    hono: ^4 || ^5.0.0-0
+  checksum: 38cae5ef670853dff2e783e4fe1b2650ea0a58b8602fa70a931ea4a8a1579d3bd1b12fe2dc78f53ea6b83f3ec0e6138c8613a46905205659b3b6bf371a6321f4
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.13.0":
   version: 0.13.0
   resolution: "@humanwhocodes/config-array@npm:0.13.0"
@@ -1307,6 +1316,52 @@ __metadata:
   version: 2.0.1
   resolution: "@lukeed/ms@npm:2.0.1"
   checksum: c7b46933bf7bad3e024dcbbe2ad6201392b4ed2a05a717c0ef7e96a03fb885d44f08b4b749c392cc51c2736a6a45a08c77f1863ace1c072928fbfd9908a13db3
+  languageName: node
+  linkType: hard
+
+"@modelcontextprotocol/client@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "@modelcontextprotocol/client@npm:2.4.0"
+  dependencies:
+    "@modelcontextprotocol/core": 2.4.0
+    cross-spawn: ^7.0.5
+    eventsource: ^3.0.2
+    eventsource-parser: ^3.0.8
+    jose: ^6.1.3
+    pkce-challenge: ^5.0.0
+    zod: ^4.2.0
+  checksum: 53bd2caa4ce9781df2483efb15219defb87d5988ea00277250ea1468b9df5f57d7fb19ceef8129130720c686947414d813f3bcc2b464dda57ac107bc79122f54
+  languageName: node
+  linkType: hard
+
+"@modelcontextprotocol/core@npm:2.4.0":
+  version: 2.4.0
+  resolution: "@modelcontextprotocol/core@npm:2.4.0"
+  dependencies:
+    zod: ^4.2.0
+  checksum: 9ab9182854906b0752965027ced44df5e814014f9692e3075ecb8c587bbae97fd325d064c4b16a4be4539d76c6678d456566df621be01483aca5e54e580fd5c0
+  languageName: node
+  linkType: hard
+
+"@modelcontextprotocol/node@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "@modelcontextprotocol/node@npm:2.1.2"
+  dependencies:
+    "@hono/node-server": ^1.19.9 || ^2.1.3
+    hono: ^4.11.4
+  peerDependencies:
+    "@modelcontextprotocol/server": ^2.4.0
+  checksum: 3ef7decd0bdbf31689d7a9ac7eb9926ef51316a080742ab07585395c380e886a1b94440ee6e5b3dd1df9d8b221bfc564f34724150972ff65990498c921484efa
+  languageName: node
+  linkType: hard
+
+"@modelcontextprotocol/server@npm:^2.4.0":
+  version: 2.4.0
+  resolution: "@modelcontextprotocol/server@npm:2.4.0"
+  dependencies:
+    "@modelcontextprotocol/core": 2.4.0
+    zod: ^4.2.0
+  checksum: 95c90ec06a1ca8e889cef85d21e39973b96a57dfd3b537b6562f96f297825912e7c0221066a82fcce5530fa013b4f67a7179c760b4f351d95ea3c2b8e894c463
   languageName: node
   linkType: hard
 
@@ -3614,6 +3669,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cross-spawn@npm:^7.0.5":
+  version: 7.0.6
+  resolution: "cross-spawn@npm:7.0.6"
+  dependencies:
+    path-key: ^3.1.0
+    shebang-command: ^2.0.0
+    which: ^2.0.1
+  checksum: 8d306efacaf6f3f60e0224c287664093fa9185680b2d195852ba9a863f85d02dcc737094c6e512175f8ee0161f9b87c73c6826034c2422e39de7d6569cf4503b
+  languageName: node
+  linkType: hard
+
 "cssesc@npm:^3.0.0":
   version: 3.0.0
   resolution: "cssesc@npm:3.0.0"
@@ -4551,6 +4617,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eventsource-parser@npm:^3.0.1, eventsource-parser@npm:^3.0.8":
+  version: 3.1.1
+  resolution: "eventsource-parser@npm:3.1.1"
+  checksum: ab220722d2ae82818b92e0d92a2fd333102f384a0314190ad1d469dc9598ade8047bb83644e3b09f7766becbda9b84a265508b66272aa57d8c76d2afd5c29fa8
+  languageName: node
+  linkType: hard
+
+"eventsource@npm:^3.0.2":
+  version: 3.0.7
+  resolution: "eventsource@npm:3.0.7"
+  dependencies:
+    eventsource-parser: ^3.0.1
+  checksum: cd8cbc3418238b9d751b6652edf442d4b869829fbc3b73444abca1816fe3d23dc707130dd9a990360bc27c281d986f2f62059d870921173425c3ac28d20a8414
+  languageName: node
+  linkType: hard
+
 "execa@npm:^8.0.1":
   version: 8.0.1
   resolution: "execa@npm:8.0.1"
@@ -5243,6 +5325,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hono@npm:^4.11.4":
+  version: 4.13.14
+  resolution: "hono@npm:4.13.14"
+  checksum: 74cfd182fc94504af75fc1629b0f8e46abc26379f5479f0e69923682399ca45785982a27e373461b47d9b44514e5425aec154ddca47ffe978662b78b37498cac
+  languageName: node
+  linkType: hard
+
 "html-escaper@npm:^2.0.0":
   version: 2.0.2
   resolution: "html-escaper@npm:2.0.2"
@@ -5766,6 +5855,13 @@ __metadata:
     "@sideway/formula": ^3.0.1
     "@sideway/pinpoint": ^2.0.0
   checksum: 3a4e9ecba345cdafe585e7ed8270a44b39718e11dff3749aa27e0001a63d578b75100c062be28e6f48f960b594864034e7a13833f33fbd7ad56d5ce6b617f9bf
+  languageName: node
+  linkType: hard
+
+"jose@npm:^6.1.3":
+  version: 6.2.13
+  resolution: "jose@npm:6.2.13"
+  checksum: 14d95b97a5575e662f020a96295527620bec7c221623f6dcd7280653ef94f287beef5f54f4970670bc6f55223800808b1d89b6e61d59cc8e2c3464e86288a902
   languageName: node
   linkType: hard
 
@@ -6550,6 +6646,9 @@ __metadata:
     "@fastify/oauth2": ^7.2.1
     "@fastify/swagger": ^8.8.0
     "@fastify/swagger-ui": ^1.9.3
+    "@modelcontextprotocol/client": ^2.4.0
+    "@modelcontextprotocol/node": ^2.1.2
+    "@modelcontextprotocol/server": ^2.4.0
     "@testcontainers/localstack": ^10.9.0
     "@testcontainers/postgresql": ^10.2.1
     "@types/jsonwebtoken": ^9.0.2
@@ -6580,7 +6679,7 @@ __metadata:
     typescript: ^5.0.4
     typescript-eslint: ^7.6.0
     vitest: ^1.4.0
-    zod: ^3.21.4
+    zod: ^4.2.0
   languageName: unknown
   linkType: soft
 
@@ -7097,6 +7196,13 @@ __metadata:
   bin:
     pino: bin.js
   checksum: c3af0d1d80d0a7ec59530e6c3668895ac813762829ea0b7e316057370f58011d09e128e67289665652904367a1f27f87cca4e564eb3ff2a0d46219f12fcf896e
+  languageName: node
+  linkType: hard
+
+"pkce-challenge@npm:^5.0.0":
+  version: 5.0.1
+  resolution: "pkce-challenge@npm:5.0.1"
+  checksum: 6079ee7520592f827cb78c397a1d2ff0a90a1952756b2efb893bf884524b7d2930dea82d92fec21bb3af99aba558d13553d9da87d5bd9f844b6c4cb3bc8f1ce0
   languageName: node
   linkType: hard
 
@@ -9289,9 +9395,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.21.4":
-  version: 3.22.4
-  resolution: "zod@npm:3.22.4"
-  checksum: 80bfd7f8039b24fddeb0718a2ec7c02aa9856e4838d6aa4864335a047b6b37a3273b191ef335bf0b2002e5c514ef261ffcda5a589fb084a48c336ffc4cdbab7f
+"zod@npm:^4.2.0":
+  version: 4.6.7
+  resolution: "zod@npm:4.6.7"
+  checksum: 6801f5067dd43204d5ed2b4f2f0d09f891365ecfdd385877901e42f6f6ebf67e8943b385c71eaba53081029dd21f4740f16c91497a06f95195e209bffef92056
   languageName: node
   linkType: hard
