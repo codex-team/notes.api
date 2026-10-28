@@ -32,10 +32,11 @@ export default class NoteRepository {
    * @param id - note internal id
    * @param content - new content
    * @param noteTools - tools which are used in note
-   * @returns Note on success, null on failure
+   * @param expectedUpdatedAt - update the note only if it was last updated at this time
+   * @returns Note on success, null if the note does not exist or its version differs from the expected one
    */
-  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools']): Promise<Note | null> {
-    return await this.storage.updateNoteContentAndToolsById(id, content, noteTools);
+  public async updateNoteContentAndToolsById(id: NoteInternalId, content: Note['content'], noteTools: Note['tools'], expectedUpdatedAt?: Date): Promise<Note | null> {
+    return await this.storage.updateNoteContentAndToolsById(id, content, noteTools, expectedUpdatedAt);
   }
 
   /**

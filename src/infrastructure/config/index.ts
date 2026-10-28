@@ -99,6 +99,15 @@ export const LoggingConfig = z.object({
 export type LoggingConfig = z.infer<typeof LoggingConfig>;
 
 /**
+ * MCP endpoint configuration
+ */
+const McpConfig = z.object({
+  webUrl: z.string(), // NoteX web app url, used to build links to notes
+});
+
+export type McpConfig = z.infer<typeof McpConfig>;
+
+/**
  * Http API configuration
  */
 const HttpApiConfig = z.object({
@@ -110,6 +119,7 @@ const HttpApiConfig = z.object({
   accessTokenSecret: z.string(),
   allowedOrigins: z.union([z.array(z.string()), z.literal('*')]),
   oauth2: OAuth2Config,
+  mcp: McpConfig,
 });
 
 export type HttpApiConfig = z.infer<typeof HttpApiConfig>;
@@ -145,6 +155,9 @@ const defaultConfig: AppConfig = {
         redirectUrl: '/oauth/google/login',
         callbackUrl: '/oauth/google/callback',
       },
+    },
+    mcp: {
+      webUrl: 'https://notex.so',
     },
   },
   auth: {

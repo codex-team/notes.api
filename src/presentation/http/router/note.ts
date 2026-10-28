@@ -13,6 +13,8 @@ import type EditorToolsService from '@domain/service/editorTools.js';
 import type EditorTool from '@domain/entities/editorTools.js';
 import type { NoteHistoryMeta, NoteHistoryPublic, NoteHistoryRecord } from '@domain/entities/noteHistory.js';
 import type { NoteHierarchy } from '@domain/entities/NoteHierarchy.js';
+import { NoteUpdateConflictError } from '@domain/entities/NoteUpdateConflictError.js';
+import { StatusCodes } from 'http-status-codes';
 
 /**
  * Interface for the note router.
@@ -337,10 +339,15 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     Body: {
       content: Note['content'];
       tools: Note['tools'];
+
+      /**
+       * If passed, the note is updated only if it was last updated at this time
+       */
+      expectedUpdatedAt?: string;
     };
     Reply: {
       updatedAt: Note['updatedAt'];
-    };
+    } | ErrorResponse;
   }>('/:notePublicId', {
     config: {
       policy: [
@@ -358,6 +365,10 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
       body: {
         content: {
           type: 'object',
+        },
+        expectedUpdatedAt: {
+          type: 'string',
+          format: 'date-time',
         },
       },
 
@@ -382,13 +393,25 @@ const NoteRouter: FastifyPluginCallback<NoteRouterOptions> = (fastify, opts, don
     const noteTools = request.body.tools;
     const { userId } = request;
 
+    const expectedUpdatedAt = request.body.expectedUpdatedAt !== undefined ? new Date(request.body.expectedUpdatedAt) : undefined;
+
     await noteService.validateNoteTools(noteTools, content);
 
-    const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools, userId!);
+    try {
+      const note = await noteService.updateNoteContentAndToolsById(noteId, content, noteTools, userId!, expectedUpdatedAt);
 
-    return reply.send({
-      updatedAt: note.updatedAt,
-    });
+      return await reply.send({
+        updatedAt: note.updatedAt,
+      });
+    } catch (error) {
+      if (error instanceof NoteUpdateConflictError) {
+        return await reply
+          .code(StatusCodes.CONFLICT)
+          .send({ message: error.message });
+      }
+
+      throw error;
+    }
   });
 
   /**
