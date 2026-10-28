@@ -4,7 +4,6 @@
 
 You can install PostgreSQL local https://www.postgresql.org/download/ or use Docker (see `docker-compose.yml`):
 ```
-version: "3.2"
 services:
   api:
     build:
@@ -17,7 +16,7 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres
+    image: postgres:16
     environment:
       POSTGRES_USER: codex
       POSTGRES_DB: notes
