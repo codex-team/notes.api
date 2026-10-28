@@ -38,6 +38,11 @@ export class NoteSettingsModel extends Model<InferAttributes<NoteSettingsModel>,
    * Id of the cover file
    */
   public declare cover: CreationOptional<NoteSettings['cover']>;
+
+  /**
+   * Note heirarchy
+   */
+  public declare showNoteHierarchy: NoteSettings['showNoteHierarchy'];
 }
 
 /**
@@ -104,6 +109,11 @@ export default class NoteSettingsSequelizeStorage {
       cover: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      showNoteHierarchy: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
     }, {
       tableName: this.tableName,
@@ -194,6 +204,7 @@ export default class NoteSettingsSequelizeStorage {
     customHostname,
     isPublic,
     invitationHash,
+    showNoteHierarchy,
   }: NoteSettingsCreationAttributes
   ): Promise<NoteSettings> {
     const settings = await this.model.create({
@@ -201,6 +212,7 @@ export default class NoteSettingsSequelizeStorage {
       customHostname,
       isPublic,
       invitationHash,
+      showNoteHierarchy,
     });
 
     return settings;

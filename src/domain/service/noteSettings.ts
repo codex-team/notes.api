@@ -116,6 +116,7 @@ export default class NoteSettingsService {
       noteId: noteId,
       isPublic: isPublic,
       invitationHash: createInvitationHash(),
+      showNoteHierarchy: false,
     });
 
     this.logger.debug('Note settings created', {
