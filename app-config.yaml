@@ -3,6 +3,8 @@ httpApi:
   fileSizeLimit: 1000000
   port: 1337
   allowedOrigins: '*'
+  webOrigins:
+    - 'http://localhost:5173'
   cookieSecret: 'secret'
   cookieDomain: 'localhost'
   oauth2:

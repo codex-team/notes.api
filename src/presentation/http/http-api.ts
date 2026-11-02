@@ -235,6 +235,7 @@ export default class HttpApi implements Api {
       userService: domainServices.userService,
       authService: domainServices.authService,
       cookieDomain: this.config.cookieDomain,
+      webOrigins: this.config.webOrigins,
     });
 
     await this.server?.register(AuthRouter, {
