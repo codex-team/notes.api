@@ -12,6 +12,8 @@ export const EditorToolSchema = {
       type: 'string',
       readOnly: true,
       description: 'Unique tool id',
+      pattern: '^[a-zA-Z0-9_-]+$',
+      maxLength: 32,
     },
     name: {
       type: 'string',
