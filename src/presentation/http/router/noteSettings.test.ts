@@ -93,6 +93,7 @@ describe('NoteSettings API', () => {
           {
             isPublic: false,
             invitationHash: noteSettings.invitationHash,
+            sidebarPosition: 'content',
             team:
               [
                 {
@@ -260,6 +261,7 @@ describe('NoteSettings API', () => {
           {
             isPublic: false,
             invitationHash: noteSettings.invitationHash,
+            sidebarPosition: 'content',
             team:
               [
                 {
@@ -506,6 +508,7 @@ describe('NoteSettings API', () => {
         body: {
           isPublic: false,
           cover: 'new-image.png',
+          sidebarPosition: 'edge',
         },
         url: `/note-settings/${note.publicId}`,
       });
@@ -515,6 +518,7 @@ describe('NoteSettings API', () => {
       if (expectedStatusCode === 200) {
         expect(response?.json().isPublic).toBe(false);
         expect(response?.json().cover).toBe('new-image.png');
+        expect(response?.json().sidebarPosition).toBe('edge');
       }
     });
 

@@ -38,6 +38,11 @@ export class NoteSettingsModel extends Model<InferAttributes<NoteSettingsModel>,
    * Id of the cover file
    */
   public declare cover: CreationOptional<NoteSettings['cover']>;
+
+  /**
+   * Position of the note in the sidebar
+   */
+  public declare sidebarPosition: CreationOptional<NoteSettings['sidebarPosition']>;
 }
 
 /**
@@ -104,6 +109,11 @@ export default class NoteSettingsSequelizeStorage {
       cover: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      sidebarPosition: {
+        type: DataTypes.ENUM('edge', 'content', 'none'),
+        allowNull: false,
+        defaultValue: 'content',
       },
     }, {
       tableName: this.tableName,

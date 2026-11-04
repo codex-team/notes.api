@@ -1,5 +1,6 @@
 import type User from '@domain/entities/user.js';
 import type EditorTool from './editorTools.js';
+import type { SidebarPosition } from './noteSettings.js';
 
 /**
  * Note internal id. Used to query Note by internal API
@@ -111,4 +112,9 @@ export type NotePreview = {
    * Parent note id
    */
   parentId: NoteInternalId | null;
+
+  /**
+   * Position of the note in the sidebar
+   */
+  sidebarPosition: SidebarPosition;
 };

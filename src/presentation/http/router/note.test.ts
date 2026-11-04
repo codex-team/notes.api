@@ -2373,6 +2373,7 @@ describe('Note API', () => {
           await global.db.insertNoteSetting({
             noteId: note.id,
             isPublic: true,
+            sidebarPosition: 'edge',
           });
 
           return {
@@ -2384,6 +2385,7 @@ describe('Note API', () => {
         expected: (note: Note, childNote: Note | null) => ({
           noteId: note.publicId,
           noteTitle: 'text',
+          sidebarPosition: 'edge',
           childNotes: childNote,
         }),
       },
@@ -2404,10 +2406,12 @@ describe('Note API', () => {
           await global.db.insertNoteSetting({
             noteId: childNote.id,
             isPublic: true,
+            sidebarPosition: 'edge',
           });
           await global.db.insertNoteSetting({
             noteId: parentNote.id,
             isPublic: true,
+            sidebarPosition: 'none',
           });
           await global.db.insertNoteRelation({
             noteId: childNote.id,
@@ -2422,6 +2426,7 @@ describe('Note API', () => {
         expected: (note: Note, childNote: Note | null) => ({
           noteId: note.publicId,
           noteTitle: 'text',
+          sidebarPosition: 'none',
           childNotes: [
             {
               noteId: childNote?.publicId,
@@ -2448,6 +2453,63 @@ describe('Note API', () => {
       expect(response?.json().noteHierarchy).toStrictEqual(
         expected(note, childNote)
       );
+    });
+
+    test('Uses parent sidebar position while linked and own position after unlinking', async () => {
+      const rootNote = await global.db.insertNote({
+        creatorId: user.id,
+        content: DEFAULT_NOTE_CONTENT,
+      });
+      const childNote = await global.db.insertNote({
+        creatorId: user.id,
+        content: DEFAULT_NOTE_CONTENT,
+      });
+
+      await global.db.insertNoteSetting({
+        noteId: rootNote.id,
+        isPublic: true,
+        sidebarPosition: 'none',
+      });
+      await global.db.insertNoteSetting({
+        noteId: childNote.id,
+        isPublic: true,
+        sidebarPosition: 'edge',
+      });
+      await global.db.insertNoteRelation({
+        noteId: childNote.id,
+        parentId: rootNote.id,
+      });
+
+      let response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/note-hierarchy/${childNote.publicId}`,
+      });
+
+      expect(response?.json().noteHierarchy.sidebarPosition).toBe('none');
+
+      const detachResponse = await global.api?.fakeRequest({
+        method: 'DELETE',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/${childNote.publicId}/relation`,
+      });
+
+      expect(detachResponse?.statusCode).toBe(200);
+      expect(detachResponse?.json().isDeleted).toBe(true);
+
+      response = await global.api?.fakeRequest({
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+        },
+        url: `/note/note-hierarchy/${childNote.publicId}`,
+      });
+
+      expect(response?.json().noteHierarchy.sidebarPosition).toBe('edge');
     });
   });
 });
