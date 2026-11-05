@@ -69,7 +69,7 @@ declare module 'fastify' {
     memberRole?: MemberRole;
 
     /**
-     * This property added by noteRelationshipResolver middleware
+     * This property added by parentNoteResolver middleware
      */
     parentNote: Note | null;
   }
